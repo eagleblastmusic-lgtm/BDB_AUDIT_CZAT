@@ -7,6 +7,7 @@ name = "bdb-audit"
 version = "2.0.0.dev0"
 description = "BDB Audit v2 foundation reference implementation"
 requires-python = ">=3.12"
+dependencies = ["jsonschema==4.25.1"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
