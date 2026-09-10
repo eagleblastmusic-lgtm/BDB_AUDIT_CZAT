@@ -7,7 +7,8 @@ prerequisite splitting; see PREFLIGHT_SPEC_RESOLUTION.md. No F3 work.
 |---|---|---|
 | PR-007 | Minimal module CLI, package metadata, Authority protocol | CLI help exit 0; test_cli.py: 1 passed |
 | PR-008 | Exact Registry/golden loader, offline immutable schema bindings, pinned backend/formats; no runtime history | 28 substrate tests passed; affected F1/F2/compatibility suite before final narrow follow-up: 207 passed |
-| PR-009–PR-019 | Sequential original task scope | Pending |
+| PR-009 | Contract reconciliation only; no acceptance implementation | BLOCKED: F2-BOOTSTRAP-ORDER-002 |
+| PR-010–PR-019 | Sequential original task scope | NOT_STARTED due to normative blocker |
 
 No phase acceptance is claimed by this work log.
 
@@ -31,3 +32,23 @@ retrieval or dynamic schema references. These explicit reference-profile
 restrictions are enforced at binding/validation and captured by backend_identity.
 PR-008 test schemas only qualify the substrate; no M5 schema set or runtime
 acceptance is claimed. Full phase golden qualification remains pending.
+
+M5 reconciliation found F2-BOOTSTRAP-ORDER-002; see
+BOOTSTRAP_ORDER_SPEC_CONFLICT.md and tests/f2/diagnose_bootstrap_order.py.
+The diagnostic verifies exact source pins and proves incompatible required
+relative orders. `-m pytest tests/f2/test_bootstrap_order_diagnostic.py -q
+-p no:cacheprovider --tb=short`: 2 passed (diagnostic tests, not M5 gate).
+The diagnostic process returns 2/SPEC_CONFLICT; PowerShell's implicit wrapper
+initially surfaced native nonzero as tool exit 1. The subprocess test directly
+verified exit 2 and NOT_RUN M5 status. No runtime acceptance was attempted.
+
+Local semantic commits:
+
+- PR-007: `19a0cb8` — minimal M4 CLI/Authority boundary and test.
+- PR-008: `b18f9a4` — Registry/goldens + offline schema substrate and tests.
+
+No F2 MilestoneAcceptance, full phase verifier or synthetic accepted HistoryCut
+has been fabricated. Existing preflight diagnostic remains untracked and
+unchanged. Main, frozen legacy/corpus, F0/F1 evidence and normative inputs
+have not been modified. The only production dependency added is jsonschema
+and its transitive reference backend, pinned in requirements-f2.lock.
