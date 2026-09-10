@@ -1,0 +1,4 @@
+# Immutable preservation payloads must retain their exact Git bytes.
+legacy/v1_4_4/** -text
+# Reserved raw payload directory within the planned compatibility corpus.
+LEGACY_COMPATIBILITY_CORPUS/raw/** -text
