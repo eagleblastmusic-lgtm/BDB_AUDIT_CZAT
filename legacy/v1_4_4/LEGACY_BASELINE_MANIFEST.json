@@ -1,0 +1,38 @@
+{
+  "application_version": "1.4.4",
+  "exact_legacy_pin": {
+    "gate_interpretation": "exact immutable commit SHA is the equivalent pin for M0; tag may be added later without changing the frozen baseline",
+    "requested_tag_name": "bdb-audit-v1.4.4",
+    "tag_mutation_available_in_current_connector": false,
+    "type": "git_commit_sha1",
+    "value": "446f11ce1622a49f5100cefead29a04d952d487e"
+  },
+  "governing_protocol": "PA v5.2",
+  "legacy_application": "BDB Audit Assistant v1.4.4",
+  "m0_gate": {
+    "LEGACY_COPY_IMMUTABLE": "YES",
+    "LEGACY_FILE_RAW_DIGEST_KNOWN": "YES",
+    "LEGACY_SELF_TEST_OUTPUT_RETAINED": "YES",
+    "LEGACY_SOURCE_REFERENCE_PINNED": "YES",
+    "LEGACY_TAG_OR_EQUIVALENT_PIN": "YES"
+  },
+  "purpose": "M0 immutable legacy reference truth; preservation baseline only, not correctness authority",
+  "repository": "eagleblastmusic-lgtm/bdb-audit",
+  "schema": "BDB_LEGACY_BASELINE_MANIFEST_V1",
+  "self_test": {
+    "exit_code": 0,
+    "retained_output_path": "legacy/v1_4_4/LEGACY_SELF_TEST_OUTPUT.json",
+    "retained_output_sha256": "301358956c7bb34727c5458acf37e27f0ba044eb6d46992b5b256bfaaf101a44",
+    "status": "PASS"
+  },
+  "source": {
+    "frozen_copy_path": "legacy/v1_4_4/BDB_AUDIT_ASSISTANT_PA_v5.2_WRAPPERS_5.4-RC1_v1.4.4_ARCHIVE.py",
+    "git_blob_sha1": "37adeefe3bf91bb00f9ffa2d5c3d92aebce33bc2",
+    "git_commit_sha1": "446f11ce1622a49f5100cefead29a04d952d487e",
+    "git_tree_sha1": "35e83b7424795381240bd1520f412f6111c28c24",
+    "root_path": "BDB_AUDIT_ASSISTANT_PA_v5.2_WRAPPERS_5.4-RC1_v1.4.4_ARCHIVE.py",
+    "sha256": "d851511fc5cf06e205426e843d1f43ac72edb2adf95b786c39e016a49fbda841",
+    "size_bytes": 1030677
+  },
+  "wrapper_release": "5.4-RC1"
+}

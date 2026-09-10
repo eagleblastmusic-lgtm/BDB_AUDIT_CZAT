@@ -1,0 +1,21 @@
+{
+  "command": "python3 BDB_AUDIT_ASSISTANT_PA_v5.2_WRAPPERS_5.4-RC1_v1.4.4_ARCHIVE.py --self-test",
+  "exit_code": 0,
+  "platform": "Linux-6.18.35-x86_64-with-glibc2.41",
+  "purpose": "M0 legacy baseline preservation evidence; not a v2 correctness claim",
+  "python_implementation": "CPython",
+  "python_version": "3.13.5",
+  "result": {
+    "app_version": "1.4.4",
+    "errors": [],
+    "execution_context_count": 72,
+    "fallback_count": 21,
+    "project_name_count": 84,
+    "status": "PASS",
+    "step_count": 51,
+    "variant_count": 18,
+    "wrapper_release": "5.4-RC1"
+  },
+  "schema": "BDB_LEGACY_SELF_TEST_RETENTION_V1",
+  "source_sha256": "d851511fc5cf06e205426e843d1f43ac72edb2adf95b786c39e016a49fbda841"
+}
