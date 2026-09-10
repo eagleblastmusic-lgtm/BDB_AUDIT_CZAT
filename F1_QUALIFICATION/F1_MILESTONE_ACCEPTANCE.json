@@ -1,0 +1,1126 @@
+{
+  "acceptance_id": "BDB-F1-M2-M3-R5_3-001",
+  "assurance_scope": "Author-qualified synthetic F1; no independent freeze, runtime authority or release qualification.",
+  "baseline_qualification_raw_sha256": "de7c79c3a7ec3f3879d702993e60f882f01f66ecbc00c67e8084de84dc5f99a0",
+  "branch": "bdb-v2",
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f1",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed_counts": [
+        93
+      ]
+    },
+    {
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "tests/compatibility/verify_m1.py"
+      ],
+      "exit_code": 0,
+      "passed_counts": [
+        86
+      ]
+    },
+    {
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/compatibility/test_legacy_baseline.py",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "exit_code": 0,
+      "passed_counts": [
+        4
+      ]
+    },
+    {
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Projekty\\Audyty\\BDB Audit\\legacy\\v1_4_4\\BDB_AUDIT_ASSISTANT_PA_v5.2_WRAPPERS_5.4-RC1_v1.4.4_ARCHIVE.py",
+        "--self-test"
+      ],
+      "exit_code": 0,
+      "passed_counts": []
+    }
+  ],
+  "dual_results": [
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "ACCEPT",
+      "fixture_id": "VALID_BASE_F1",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "PASS"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "PASS"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "ACCEPT",
+      "fixture_id": "VALID_BASE_FINAL",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "error_families": [],
+        "expected_artifact_family": "FINAL_AUDIT_BUNDLE",
+        "expected_prompt_sha256": "d7f3da8b37f7b3de5d77127ea887cd62c125b8a4e4f523bc222eadf53bee9682",
+        "status": "PASS"
+      },
+      "v2": {
+        "error_families": [],
+        "expected_artifact_family": "FINAL_AUDIT_BUNDLE",
+        "expected_prompt_sha256": "d7f3da8b37f7b3de5d77127ea887cd62c125b8a4e4f523bc222eadf53bee9682",
+        "status": "PASS"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "ACCEPT",
+      "fixture_id": "VALID_E2_F1",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "SYNTHETIC_CHECKPOINT_RETAINED",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "PASS"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "SYNTHETIC_CHECKPOINT_RETAINED",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "PASS"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "ACCEPT",
+      "fixture_id": "VALID_E2_F2",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F2",
+        "error_families": [],
+        "ledger_sequence_end": 2,
+        "retained_snapshot_sha256": "eccb9c81ffa3bbf66d1ed92cc6e814382936d011407dddea75d9e93230a5ac0d",
+        "run_state": "SYNTHETIC_CHECKPOINT_RETAINED",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 2,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "PASS"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F2",
+        "error_families": [],
+        "ledger_sequence_end": 2,
+        "retained_snapshot_sha256": "eccb9c81ffa3bbf66d1ed92cc6e814382936d011407dddea75d9e93230a5ac0d",
+        "run_state": "SYNTHETIC_CHECKPOINT_RETAINED",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 2,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "PASS"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "ACCEPT",
+      "fixture_id": "VALID_E2_FINAL",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "error_families": [],
+        "expected_artifact_family": "FINAL_AUDIT_BUNDLE",
+        "expected_prompt_sha256": "29dfe9f180ed59f74ae624c772fb5677a8d61aaeb38bd3fc9ef947459ac6eff2",
+        "status": "PASS"
+      },
+      "v2": {
+        "error_families": [],
+        "expected_artifact_family": "FINAL_AUDIT_BUNDLE",
+        "expected_prompt_sha256": "29dfe9f180ed59f74ae624c772fb5677a8d61aaeb38bd3fc9ef947459ac6eff2",
+        "status": "PASS"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "ACCEPT",
+      "fixture_id": "VALID_ATTESTATION",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "attestation_audit_id": "M1-SYNTHETIC-REQUEST-001",
+        "attestation_run_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "attestation_source_identity": {
+          "route": "D",
+          "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "error_families": [],
+        "expected_run_state": "AWAITING_MANUAL_CANONICAL_REVEAL_AFTER_VERIFIED_F1",
+        "status": "PASS"
+      },
+      "v2": {
+        "attestation_audit_id": "M1-SYNTHETIC-REQUEST-001",
+        "attestation_run_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "attestation_source_identity": {
+          "route": "D",
+          "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "error_families": [],
+        "expected_run_state": "AWAITING_MANUAL_CANONICAL_REVEAL_AFTER_VERIFIED_F1",
+        "status": "PASS"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "ACCEPT",
+      "fixture_id": "VALID_CONTINUATION_TICKET",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "attestation_audit_id": "M1-SYNTHETIC-REQUEST-001",
+        "attestation_run_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "attestation_source_identity": {
+          "route": "D",
+          "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "error_families": [],
+        "expected_run_state": "AWAITING_MANUAL_CANONICAL_REVEAL_AFTER_VERIFIED_F1",
+        "status": "PASS"
+      },
+      "v2": {
+        "attestation_audit_id": "M1-SYNTHETIC-REQUEST-001",
+        "attestation_run_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "attestation_source_identity": {
+          "route": "D",
+          "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "error_families": [],
+        "expected_run_state": "AWAITING_MANUAL_CANONICAL_REVEAL_AFTER_VERIFIED_F1",
+        "status": "PASS"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "ACCEPT",
+      "fixture_id": "VALID_PREVIOUS_PROMPT_BUNDLE",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "error_families": [],
+        "status": "PASS"
+      },
+      "v2": {
+        "error_families": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "WRONG_VARIANT",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "RUN_MANIFEST_VARIANT_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "RUN_MANIFEST_VARIANT_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "WRONG_RUN_ID",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "AUDIT_ATTEMPT_ID_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "AUDIT_ATTEMPT_ID_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "WRONG_AUDIT_ID",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "AUDIT_REQUEST_ID_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "AUDIT_REQUEST_ID_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "WRONG_SOURCE_SHA",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "SOURCE_SHA_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "SOURCE_SHA_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "WRONG_SOURCE_TREE",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "SOURCE_TREE_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "SOURCE_TREE_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "CONFLICTING_DUPLICATE",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "CONFLICTING_DUPLICATE_HANDOFF_MEMBER"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "CONFLICTING_DUPLICATE_HANDOFF_MEMBER"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "INVALID_HASH_MANIFEST",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "HANDOFF_HASH_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "HANDOFF_HASH_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "MISSING_SNAPSHOT",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "F1_SNAPSHOT_MEMBER_COUNT_INVALID"
+        ],
+        "ledger_sequence_end": null,
+        "retained_snapshot_sha256": null,
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": null,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "F1_SNAPSHOT_MEMBER_COUNT_INVALID"
+        ],
+        "ledger_sequence_end": null,
+        "retained_snapshot_sha256": null,
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": null,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "BROKEN_LEDGER_PREFIX",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "F1_LEDGER_RAW_PREFIX_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "F1_LEDGER_RAW_PREFIX_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "BAD_F1_CHECKPOINT",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "F1_DECLARED_SEQUENCE_END_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "F1_DECLARED_SEQUENCE_END_MISMATCH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "BAD_F2_CHECKPOINT",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F2",
+        "error_families": [
+          "F2_DECLARED_SEQUENCE_END_MISMATCH"
+        ],
+        "ledger_sequence_end": 2,
+        "retained_snapshot_sha256": "eccb9c81ffa3bbf66d1ed92cc6e814382936d011407dddea75d9e93230a5ac0d",
+        "run_state": "SYNTHETIC_CHECKPOINT_RETAINED",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 2,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F2",
+        "error_families": [
+          "F2_DECLARED_SEQUENCE_END_MISMATCH"
+        ],
+        "ledger_sequence_end": 2,
+        "retained_snapshot_sha256": "eccb9c81ffa3bbf66d1ed92cc6e814382936d011407dddea75d9e93230a5ac0d",
+        "run_state": "SYNTHETIC_CHECKPOINT_RETAINED",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 2,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "EARLY_REVEAL",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "attestation_audit_id": "M1-SYNTHETIC-REQUEST-001",
+        "attestation_run_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "attestation_source_identity": {
+          "route": "D",
+          "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "error_families": [
+          "ATTESTATION_EARLY_STAGED_SEMANTICS_EXPOSURE"
+        ],
+        "expected_run_state": "AWAITING_MANUAL_CANONICAL_REVEAL_AFTER_VERIFIED_F1",
+        "status": "FAIL"
+      },
+      "v2": {
+        "attestation_audit_id": "M1-SYNTHETIC-REQUEST-001",
+        "attestation_run_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "attestation_source_identity": {
+          "route": "D",
+          "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "error_families": [
+          "ATTESTATION_EARLY_STAGED_SEMANTICS_EXPOSURE"
+        ],
+        "expected_run_state": "AWAITING_MANUAL_CANONICAL_REVEAL_AFTER_VERIFIED_F1",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "SOURCE_GENERATION_MIX",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "attestation_audit_id": "M1-SYNTHETIC-REQUEST-001",
+        "attestation_run_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "attestation_source_identity": {
+          "route": "D",
+          "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "error_families": [
+          "ATTESTATION_SOURCE_GENERATIONS_MIXED"
+        ],
+        "expected_run_state": "AWAITING_MANUAL_CANONICAL_REVEAL_AFTER_VERIFIED_F1",
+        "status": "FAIL"
+      },
+      "v2": {
+        "attestation_audit_id": "M1-SYNTHETIC-REQUEST-001",
+        "attestation_run_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "attestation_source_identity": {
+          "route": "D",
+          "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "error_families": [
+          "ATTESTATION_SOURCE_GENERATIONS_MIXED"
+        ],
+        "expected_run_state": "AWAITING_MANUAL_CANONICAL_REVEAL_AFTER_VERIFIED_F1",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "SUBSTITUTE_F2",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "attestation_audit_id": "M1-SYNTHETIC-REQUEST-001",
+        "attestation_run_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "attestation_source_identity": {
+          "route": "D",
+          "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "error_families": [
+          "ATTESTATION_SUBSTITUTE_F2_CREATED"
+        ],
+        "expected_run_state": "AWAITING_MANUAL_CANONICAL_REVEAL_AFTER_VERIFIED_F1",
+        "status": "FAIL"
+      },
+      "v2": {
+        "attestation_audit_id": "M1-SYNTHETIC-REQUEST-001",
+        "attestation_run_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "attestation_source_identity": {
+          "route": "D",
+          "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "error_families": [
+          "ATTESTATION_SUBSTITUTE_F2_CREATED"
+        ],
+        "expected_run_state": "AWAITING_MANUAL_CANONICAL_REVEAL_AFTER_VERIFIED_F1",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "UNSAFE_ZIP_PATH",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "HANDOFF_HASH_MEMBERSHIP_MISMATCH",
+          "UNSAFE_ZIP_PATH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "HANDOFF_HASH_MEMBERSHIP_MISMATCH",
+          "UNSAFE_ZIP_PATH"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "DUPLICATE_MEMBER",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "DUPLICATE_ZIP_MEMBER_NAMES"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      },
+      "v2": {
+        "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+        "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+        "checkpoint_kind": "F1",
+        "error_families": [
+          "DUPLICATE_ZIP_MEMBER_NAMES"
+        ],
+        "ledger_sequence_end": 1,
+        "retained_snapshot_sha256": "87d047d3c59f83f2b28d4bfa436c8ec9df7f11d40e63bb9817f4f5b10ad76909",
+        "run_state": "AWAITING_CANONICAL_REVEAL_AFTER_VALID_F1",
+        "run_state_source": "STAGE_STATUS",
+        "snapshot_sequence_end": 1,
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "FAIL"
+      }
+    },
+    {
+      "bug_misclassified_safe": 0,
+      "correctness": true,
+      "expected": "REJECT",
+      "fixture_id": "WRONG_ARTIFACT_FAMILY",
+      "preservation": true,
+      "unexplained_diff": 0,
+      "v1": {
+        "error_families": [
+          "MISSING_REQUIRED_FINAL_ARTIFACT"
+        ],
+        "expected_artifact_family": "FINAL_AUDIT_BUNDLE",
+        "expected_prompt_sha256": "d7f3da8b37f7b3de5d77127ea887cd62c125b8a4e4f523bc222eadf53bee9682",
+        "status": "FAIL"
+      },
+      "v2": {
+        "error_families": [
+          "MISSING_REQUIRED_FINAL_ARTIFACT"
+        ],
+        "expected_artifact_family": "FINAL_AUDIT_BUNDLE",
+        "expected_prompt_sha256": "d7f3da8b37f7b3de5d77127ea887cd62c125b8a4e4f523bc222eadf53bee9682",
+        "status": "FAIL"
+      }
+    }
+  ],
+  "f0_acceptance_raw_sha256": "ea8e17ae3a23bb2101afb2db19be2e0e99f238ecea51cc9de794e57a3b14b35c",
+  "f0_regression": "PASS",
+  "f2_started": false,
+  "gates": {
+    "KNOWN_LEGACY_BUGS_MISCLASSIFIED_AS_SAFE": 0,
+    "KNOWN_SAFE_EXPECTATIONS_SATISFIED": "100%",
+    "KNOWN_UNSAFE_EXPECTATIONS_REJECTED": "100%",
+    "LEGACY_BEHAVIOR_PRESERVATION_GATE": "PASS",
+    "UNEXPLAINED_REQUIRED_PRESERVATION_DIFFS": 0,
+    "UNRESOLVED_EXPECTATION_CONFLICTS": 0,
+    "VALIDATOR_CORRECTNESS_GATE": "PASS"
+  },
+  "identity_binding": "Exact parent, staged subject blobs/raw hashes excluding this record; containing commit binds record without circular hash.",
+  "milestone": "F1",
+  "normative_candidate_set_digest": "78de98f8163d2f0bf0ab94781b86bd8e5e0345411a4432669d91fdfc42671d56",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python": "3.14.4",
+  "qualified_parent_commit": "5d2093076f7ef27ea68c69289ae6a5cf2f60b7ef",
+  "repository": "eagleblastmusic-lgtm/bdb-audit",
+  "schema": "BDB_F1_MILESTONE_ACCEPTANCE_PRE_HISTORY_V1",
+  "spec_conflicts": [],
+  "subject_inputs": {
+    "F1_QUALIFICATION/.gitattributes": {
+      "git_blob_sha1": "d4d15d7094d829e7926999fc7186ee0b41d514d9",
+      "mode": "100644",
+      "raw_sha256": "26cd107066f72c98c3741ae1258e0a069e530bda46980294b5589ec29ffc978f"
+    },
+    "F1_QUALIFICATION/README.md": {
+      "git_blob_sha1": "f5a882ae1b13835e366f33a2366721655068a68a",
+      "mode": "100644",
+      "raw_sha256": "c12f03f6c194d81975ec723f6c704974895238014801b3e6486fd2677d1f435c"
+    },
+    "F1_QUALIFICATION/inputs/.gitattributes": {
+      "git_blob_sha1": "0fe61c518c0d6796a252c0a37c96020940f4a0f6",
+      "mode": "100644",
+      "raw_sha256": "3fd6907a39ba488c39e7a1f249abd03f9868af5211714975e304482d552c1492"
+    },
+    "F1_QUALIFICATION/inputs/ADR-006_CANONICAL_SERIALIZATION_AND_IDENTITY_PROFILE.md": {
+      "git_blob_sha1": "6192071c0ad5318e83fa7940fb503076ee848bd0",
+      "mode": "100644",
+      "raw_sha256": "df7e40fc062f5fcc2309276cc6fd4b529c060fb4f5f24fe39484eb66c0153dfa"
+    },
+    "F1_QUALIFICATION/inputs/BDB_AUDIT_V1_TO_V2_MIGRATION_AND_COMPATIBILITY.md": {
+      "git_blob_sha1": "baf6ee434e0cdb98e7f3da1808a526b1c2231444",
+      "mode": "100644",
+      "raw_sha256": "d31fd0d84a4e5c14aced3eae3a67bc704ed5d75d9ca6a8a1ed6943100352358f"
+    },
+    "F1_QUALIFICATION/inputs/BDB_AUDIT_V2_AUTHOR_BASELINE_QUALIFICATION_R5_3.json": {
+      "git_blob_sha1": "f90bf36b5e1875a73885c9cf6914e2e12f6b751f",
+      "mode": "100644",
+      "raw_sha256": "de7c79c3a7ec3f3879d702993e60f882f01f66ecbc00c67e8084de84dc5f99a0"
+    },
+    "F1_QUALIFICATION/inputs/BDB_AUDIT_V2_DATA_AND_ARTIFACT_CONTRACTS.md": {
+      "git_blob_sha1": "e5a7e9f9800fd68188ea10cf6e64ccf041dcc104",
+      "mode": "100644",
+      "raw_sha256": "658f8866ca1a1330db9be582b13b47e87381de2208c53ee64ed9e47a8d3e15ee"
+    },
+    "F1_QUALIFICATION/inputs/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_3.json": {
+      "git_blob_sha1": "897170c2afa255ece795b47fbb0b3b66ec424543",
+      "mode": "100644",
+      "raw_sha256": "7bee0013d179adc8eba14d07c2c3ea159de0b8e37be9a9f6dcd55969550b7772"
+    },
+    "F1_QUALIFICATION/inputs/BDB_AUDIT_V2_IMPLEMENTATION_ROADMAP.md": {
+      "git_blob_sha1": "88408863d50cfdcf7598f985b571dfdc217cedc9",
+      "mode": "100644",
+      "raw_sha256": "b127e249b8db0bd2f17c5e6f77ed3d2d342fc8fb187e3ec720de0b7bd1fac018"
+    },
+    "F1_QUALIFICATION/inputs/BDB_AUDIT_V2_TEST_AND_SELF_AUDIT_PLAN.md": {
+      "git_blob_sha1": "aa58fc510ca2a61b94667f0dd07aa70c5276018a",
+      "mode": "100644",
+      "raw_sha256": "abf92ea199d57c78eb25dc0ca41ed9267a9d20d79401b3c468c01c4e4371b598"
+    },
+    "F1_QUALIFICATION/inputs/CODEX_F1_CONTEXT_R5_3.md": {
+      "git_blob_sha1": "8474ceb464527b479cf4d82db96873d1d7ae4d13",
+      "mode": "100644",
+      "raw_sha256": "48199cef3f90ce8291e9a70423ab4d938a08dbac2467c8cb0d7e4fa514466543"
+    },
+    "src/.gitattributes": {
+      "git_blob_sha1": "ea0b88cc33b960580acc80a00822af56e11421be",
+      "mode": "100644",
+      "raw_sha256": "776293167b3bb9dd9882e4f7b2885e0016608c1dbe83099a294098eba4338067"
+    },
+    "src/bdb_audit/__init__.py": {
+      "git_blob_sha1": "c6ed576c3e5ba32750d7f9ff57d7b5cc5d3e9b6e",
+      "mode": "100644",
+      "raw_sha256": "a91245c311394aa4aa2af48233cb18101bc44e6ebe24ac834d76d87d0f47a843"
+    },
+    "src/bdb_audit/assurance/__init__.py": {
+      "git_blob_sha1": "7eb86157a2dac1a2c632daa71997e20c606c8447",
+      "mode": "100644",
+      "raw_sha256": "ef1b2929313953d567c14af9f28bf7a9411f6edd00ff0a34f6df3e7da61b799a"
+    },
+    "src/bdb_audit/assurance/artifact_hashes.py": {
+      "git_blob_sha1": "5a9032931bbddad7bea26279b6f22e74e89d68dd",
+      "mode": "100644",
+      "raw_sha256": "33b5700b91ef60c42b14eb97a41e3a66334517c926260af3c275d30a234e9f93"
+    },
+    "src/bdb_audit/assurance/legacy.py": {
+      "git_blob_sha1": "446ff765c4244304162b71a9278a3fcb49837181",
+      "mode": "100644",
+      "raw_sha256": "558a3d7f52e756dd4028755da7afc8048e01bfe96c72051bd7eb86bd58725ef9"
+    },
+    "src/bdb_audit/assurance/zip_safety.py": {
+      "git_blob_sha1": "9bd14af7c2c1f50780d804897529aae4fc8e54fc",
+      "mode": "100644",
+      "raw_sha256": "315c686143f5300ec9259ef47e424e3294c7cbdabfdfd76233bb8a1ea93c7146"
+    },
+    "src/bdb_audit/core/__init__.py": {
+      "git_blob_sha1": "53bd75ba694d9590736c73d02960cf31c1c7d328",
+      "mode": "100644",
+      "raw_sha256": "b49dbeed728070c8860456a7fd24941a4e795d5c91c8b691f592459ba25f82ff"
+    },
+    "src/bdb_audit/core/artifact_contract_registry_r5_3.json": {
+      "git_blob_sha1": "dc642522b8bdd914ef8ff85c1352d68720469c22",
+      "mode": "100644",
+      "raw_sha256": "5a89cfe26d927c9bf2638ad1e656b4ed810544f8d35e3e0ddf1365cd54b7343c"
+    },
+    "src/bdb_audit/core/canonical_json.py": {
+      "git_blob_sha1": "1094a481777f6e5a2f0b0d1fd2134d13d4d1259f",
+      "mode": "100644",
+      "raw_sha256": "62dfa640d32fdea9025ae167eb1c8a1c7a3bdde6d3b913677aad517ebdea37ac"
+    },
+    "src/bdb_audit/core/errors.py": {
+      "git_blob_sha1": "0d124719b953618a98e5354eefe51240759732e6",
+      "mode": "100644",
+      "raw_sha256": "fd22fd0097c928833d63439c665e3dca4a9faa9fad7914ad3354c4715f8d4140"
+    },
+    "src/bdb_audit/core/hashing.py": {
+      "git_blob_sha1": "6f92e8a029fc54b720e393e153ce34efe7e17063",
+      "mode": "100644",
+      "raw_sha256": "5745041bccedef190a6eea263e26322e53cc0a5d4640da3785f2b513fa3c4d90"
+    },
+    "src/bdb_audit/core/ids.py": {
+      "git_blob_sha1": "54c22a7d74f7e6e82279814b3403f8abc21e6a5f",
+      "mode": "100644",
+      "raw_sha256": "1c4ffe283e100ae4361bd0e26deed01675889981ab780da461b0e6919612835f"
+    },
+    "tests/f1/.gitattributes": {
+      "git_blob_sha1": "795ae615288b82621822909f0fc7302200bba4e0",
+      "mode": "100644",
+      "raw_sha256": "73b50e51d8542df0e66bbb1bd6587fdf2716471be3cce98085acbf44acda954e"
+    },
+    "tests/f1/conftest.py": {
+      "git_blob_sha1": "755f6967f0f82e851417a09fe9936b8e1561f126",
+      "mode": "100644",
+      "raw_sha256": "2ce16caf030b46b515691e22e22b98333a3b392c6d7cc2c1751b166275215c84"
+    },
+    "tests/f1/dual_support.py": {
+      "git_blob_sha1": "8a235741b8778ab5c7c87b557f06e4facc630f91",
+      "mode": "100644",
+      "raw_sha256": "f6541cf5ef00fb3c090df887931267e501aecc609496edec9e59b31ea54b4827"
+    },
+    "tests/f1/test_core.py": {
+      "git_blob_sha1": "26e4d79b2b355a455939017160eb21038347fe2b",
+      "mode": "100644",
+      "raw_sha256": "7ecd89a6aec568ce11354da4f4fdf3faef97d00907e8008471469a18542e270b"
+    },
+    "tests/f1/test_legacy.py": {
+      "git_blob_sha1": "dbab67b0cf1661e3e2c7fbce00563c107d380d67",
+      "mode": "100644",
+      "raw_sha256": "7ad2a5dda32cb6157f76cd847d4412e67b4e05e8212ed714b348988e5c3506bf"
+    },
+    "tests/f1/test_zip.py": {
+      "git_blob_sha1": "2fa7eec291692956e70ef6d4f7ab5085f8c7f3e5",
+      "mode": "100644",
+      "raw_sha256": "ddf120115f213f50eba4bca173e3a2ef8c25cac0a658638d7c93febf78a318cc"
+    },
+    "tests/f1/verify_f1.py": {
+      "git_blob_sha1": "8ae8b418a31a9167c4da2b46290160491f2dd6e6",
+      "mode": "100644",
+      "raw_sha256": "665e8a1811d33826f3c0f4926f2195888c87d1ede994f9a58c18a755722b1fcd"
+    }
+  },
+  "verdict": "PASS",
+  "work_packages": {
+    "PR003_M2_CORE": "PASS",
+    "PR004_M2_ZIP_ARTIFACT_HASHES": "PASS",
+    "PR005_M3_LEGACY_ASSURANCE": "PASS",
+    "PR006_M3_DUAL_DIFFERENTIAL": "PASS"
+  }
+}
