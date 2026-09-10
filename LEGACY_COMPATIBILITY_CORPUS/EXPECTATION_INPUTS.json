@@ -1,0 +1,28 @@
+{
+  "attestation_run_state": "AWAITING_MANUAL_CANONICAL_REVEAL_AFTER_VERIFIED_F1",
+  "author_qualification_id": "BDB-AUTHOR-BASELINE-QUALIFICATION-R5_3-2026-09-10-001",
+  "canonical_payloads": [
+    {
+      "filename": "BDB_vNext_Project_Plan_v1.json",
+      "sha256": "e78461a6fdfd83237d1fc65c8bddf551d00dc9b438610991d12d4b4d15706da6"
+    },
+    {
+      "filename": "BDB_vNext_Audit_i_Plan_Nastepnej_Iteracji (1).md",
+      "sha256": "f1cbd849140f25a22e80758067d8bf7d348cdd7ec76b877f58aef81397c3eb07"
+    }
+  ],
+  "fallback_prompt_sha256": "202251def9cb9fae7e9088be7117cfe0e6af2404d075bac89239835eb0e73885",
+  "foundation_spec_baseline_frozen": false,
+  "independent_assurance": false,
+  "normative_candidate_set_digest": "78de98f8163d2f0bf0ab94781b86bd8e5e0345411a4432669d91fdfc42671d56",
+  "previous_bundle_sha256": "30bb4006b436520b0d960a3bd725cb779a9410e5bad3dd38c0d171bafce62feb",
+  "previous_prompt_hashes": {
+    "PROMPT_E1_SOL_BASE_FULL_FIRST_PASS.txt": "51ef8a8ba69916bb42a85dfd9dedc3b68b1c08242c4507b093fd834f27161015"
+  },
+  "scope": "Exact frozen artifact-contract inputs, not validation outcomes. Equality/membership requirements are adjudicated in EXPECTATION_BASIS.md.",
+  "source_documents": {
+    "BDB_AUDIT_V2_AUTHOR_BASELINE_QUALIFICATION_R5_3.json": "de7c79c3a7ec3f3879d702993e60f882f01f66ecbc00c67e8084de84dc5f99a0",
+    "CODEX_M1_PR002_CONTEXT_R5_3.md": "a7cb6d6cce75923fa21670d0254c16ce9f1c87b5b10f28e0d4ed0632393e7bf8",
+    "CODEX_M1_PR002_PROMPT.md": "ca621680bfec8714fe099dfb6be4cfd019630eed4c1602c29a47a3ac991728a4"
+  }
+}

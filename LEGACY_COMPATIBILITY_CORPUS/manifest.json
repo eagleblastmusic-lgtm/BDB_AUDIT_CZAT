@@ -1,0 +1,657 @@
+{
+  "fixtures": [
+    {
+      "byte_length": 4089,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#valid-base-f1",
+      "fixture_id": "VALID_BASE_F1",
+      "fixture_intent": "BASE checkpoint: matching source/run/audit identities, exact retained prefix, readback and digest bindings before canonical reveal.",
+      "independent_expected_error_family": "NONE",
+      "independent_safe_expected_result": "ACCEPT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [],
+      "legacy_observed_errors": [],
+      "legacy_observed_result": "PASS",
+      "media_type": "application/zip",
+      "path": "raw/VALID_BASE_F1.zip",
+      "positive_control": null,
+      "raw_digest": "cd3c2b1b00d79464097fdbb7bef3b6fd15fd35bb78bcf512d3214746745f0c6a"
+    },
+    {
+      "byte_length": 5228,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#valid-base-final",
+      "fixture_id": "VALID_BASE_FINAL",
+      "fixture_intent": "BASE final family with F1 retention and no previous-report or F2 artifacts.",
+      "independent_expected_error_family": "NONE",
+      "independent_safe_expected_result": "ACCEPT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "result",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [],
+      "legacy_observed_errors": [],
+      "legacy_observed_result": "PASS",
+      "media_type": "application/zip",
+      "path": "raw/VALID_BASE_FINAL.zip",
+      "positive_control": null,
+      "raw_digest": "da633451764ac9eb023b60e874a8ca88c37f7fcb80256e5af85deff69058c3eb"
+    },
+    {
+      "byte_length": 4063,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#valid-e2-f1",
+      "fixture_id": "VALID_E2_F1",
+      "fixture_intent": "E2 F1 checkpoint with matching identities and retained prefix before previous-prompt reveal.",
+      "independent_expected_error_family": "NONE",
+      "independent_safe_expected_result": "ACCEPT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E2_SOL_ITERACJA_1"
+      },
+      "legacy_observed_error_family": [],
+      "legacy_observed_errors": [],
+      "legacy_observed_result": "PASS",
+      "media_type": "application/zip",
+      "path": "raw/VALID_E2_F1.zip",
+      "positive_control": null,
+      "raw_digest": "d0dd87686b0efeaa805e4403cc9b1857609ef3c5ea382c9d0aba237a1ef6ae82"
+    },
+    {
+      "byte_length": 5773,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#valid-e2-f2",
+      "fixture_id": "VALID_E2_F2",
+      "fixture_intent": "E2 F2 checkpoint retains the exact F1 prefix and F2 snapshot after previous-prompt reveal.",
+      "independent_expected_error_family": "NONE",
+      "independent_safe_expected_result": "ACCEPT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 3,
+        "variant_id": "E2_SOL_ITERACJA_1"
+      },
+      "legacy_observed_error_family": [],
+      "legacy_observed_errors": [],
+      "legacy_observed_result": "PASS",
+      "media_type": "application/zip",
+      "path": "raw/VALID_E2_F2.zip",
+      "positive_control": null,
+      "raw_digest": "34450191ad9370364218a98012b7b9f7ac66cfab85660e888aee70c2c33c307f"
+    },
+    {
+      "byte_length": 7257,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#valid-e2-final",
+      "fixture_id": "VALID_E2_FINAL",
+      "fixture_intent": "E2 final family retains both checkpoints, snapshots, final readback and predecessor lineage.",
+      "independent_expected_error_family": "NONE",
+      "independent_safe_expected_result": "ACCEPT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "result",
+        "step_order": 3,
+        "variant_id": "E2_SOL_ITERACJA_1"
+      },
+      "legacy_observed_error_family": [],
+      "legacy_observed_errors": [],
+      "legacy_observed_result": "PASS",
+      "media_type": "application/zip",
+      "path": "raw/VALID_E2_FINAL.zip",
+      "positive_control": null,
+      "raw_digest": "9875171ea509e9ad50083c038601db7d0c7bdbd72f6cc81399ae9fe06ee1d772"
+    },
+    {
+      "byte_length": 1483,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#valid-attestation",
+      "fixture_id": "VALID_ATTESTATION",
+      "fixture_intent": "Transport-only attestation declares no early exposure, generation mix, or substitute checkpoint; payload identities match pinned canonical inputs.",
+      "independent_expected_error_family": "NONE",
+      "independent_safe_expected_result": "ACCEPT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "attestation",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [],
+      "legacy_observed_errors": [],
+      "legacy_observed_result": "PASS",
+      "media_type": "application/zip",
+      "path": "raw/VALID_ATTESTATION.zip",
+      "positive_control": null,
+      "raw_digest": "2f1dac96a3548d774d0f651f4708905c43ab57058f3c1827f8aa48042675ad0c"
+    },
+    {
+      "byte_length": 832,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#valid-continuation-ticket",
+      "fixture_id": "VALID_CONTINUATION_TICKET",
+      "fixture_intent": "Ticket binds the same variant, step, fallback, attestation state and exact prior-handoff identity.",
+      "independent_expected_error_family": "NONE",
+      "independent_safe_expected_result": "ACCEPT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "attestation_path": "raw/VALID_ATTESTATION.zip",
+        "attestation_raw_digest": "2f1dac96a3548d774d0f651f4708905c43ab57058f3c1827f8aa48042675ad0c",
+        "route": "ticket",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [],
+      "legacy_observed_errors": [],
+      "legacy_observed_result": "PASS",
+      "media_type": "application/json",
+      "path": "raw/VALID_CONTINUATION_TICKET.json",
+      "positive_control": "VALID_ATTESTATION",
+      "raw_digest": "e953d464499c7d5ea136b31e9f244fb37cbd45c5f2d79f64c01b449a92e6d782"
+    },
+    {
+      "byte_length": 10723,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#valid-previous-prompt-bundle",
+      "fixture_id": "VALID_PREVIOUS_PROMPT_BUNDLE",
+      "fixture_intent": "Exact embedded predecessor prompt bytes, membership and consumer/predecessor identities; cross-step outer digest references agree.",
+      "independent_expected_error_family": "NONE",
+      "independent_safe_expected_result": "ACCEPT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "previous_prompt_self_test",
+        "step_order": 2,
+        "variant_id": "E2_SOL_ITERACJA_1"
+      },
+      "legacy_observed_error_family": [],
+      "legacy_observed_errors": [],
+      "legacy_observed_result": "PASS",
+      "media_type": "application/zip",
+      "path": "raw/VALID_PREVIOUS_PROMPT_BUNDLE.zip",
+      "positive_control": null,
+      "raw_digest": "30bb4006b436520b0d960a3bd725cb779a9410e5bad3dd38c0d171bafce62feb"
+    },
+    {
+      "byte_length": 4078,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#wrong-variant",
+      "fixture_id": "WRONG_VARIANT",
+      "fixture_intent": "Change only RUN_MANIFEST.variant_id; checkpoint retains the positive control identity.",
+      "independent_expected_error_family": "VARIANT_IDENTITY",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "RUN_MANIFEST_VARIANT_MISMATCH"
+      ],
+      "legacy_observed_errors": [
+        "RUN_MANIFEST_VARIANT_MISMATCH: expected=E1_SOL_BASE_PLUS_PLIKI actual=E1_SOL_BASE"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/WRONG_VARIANT.zip",
+      "positive_control": "VALID_BASE_F1",
+      "raw_digest": "a483391c90cbe6c68a0cba316bc930fcfe94e5cb4bafff11cc618e3f0b862eba"
+    },
+    {
+      "byte_length": 4078,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#wrong-run-id",
+      "fixture_id": "WRONG_RUN_ID",
+      "fixture_intent": "Change only RUN_MANIFEST.audit_attempt_id; checkpoint retains the positive control identity.",
+      "independent_expected_error_family": "RUN_IDENTITY",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "AUDIT_ATTEMPT_ID_MISMATCH"
+      ],
+      "legacy_observed_errors": [
+        "AUDIT_ATTEMPT_ID_MISMATCH: checkpoint=M1-SYNTHETIC-ATTEMPT-001 manifest=OTHER-ATTEMPT"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/WRONG_RUN_ID.zip",
+      "positive_control": "VALID_BASE_F1",
+      "raw_digest": "217e8d341d7ef00c4594bf26e179106b06378526609d0668f55e3594e64dc252"
+    },
+    {
+      "byte_length": 4078,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#wrong-audit-id",
+      "fixture_id": "WRONG_AUDIT_ID",
+      "fixture_intent": "Change only RUN_MANIFEST.audit_request_id; checkpoint retains the positive control identity.",
+      "independent_expected_error_family": "AUDIT_IDENTITY",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "AUDIT_REQUEST_ID_MISMATCH"
+      ],
+      "legacy_observed_errors": [
+        "AUDIT_REQUEST_ID_MISMATCH: checkpoint=M1-SYNTHETIC-REQUEST-001 manifest=OTHER-REQUEST"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/WRONG_AUDIT_ID.zip",
+      "positive_control": "VALID_BASE_F1",
+      "raw_digest": "2e998c210c619605fc9a64aeff47c362053162341a1eac8cc290882acccf6af1"
+    },
+    {
+      "byte_length": 4089,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#wrong-source-sha",
+      "fixture_id": "WRONG_SOURCE_SHA",
+      "fixture_intent": "Manifest source_sha contradicts checkpoint/readback; artifact hashes are recomputed.",
+      "independent_expected_error_family": "SOURCE_COMMIT_IDENTITY",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "SOURCE_SHA_MISMATCH"
+      ],
+      "legacy_observed_errors": [
+        "SOURCE_SHA_MISMATCH: checkpoint=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa manifest=cccccccccccccccccccccccccccccccccccccccc"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/WRONG_SOURCE_SHA.zip",
+      "positive_control": "VALID_BASE_F1",
+      "raw_digest": "5b0c763049d398d929910f26a22eba12b0b3d0e5f5d801397ba4547ca0a6d4a0"
+    },
+    {
+      "byte_length": 4089,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#wrong-source-tree",
+      "fixture_id": "WRONG_SOURCE_TREE",
+      "fixture_intent": "Manifest source_tree contradicts checkpoint/readback; artifact hashes are recomputed.",
+      "independent_expected_error_family": "SOURCE_TREE_IDENTITY",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "SOURCE_TREE_MISMATCH"
+      ],
+      "legacy_observed_errors": [
+        "SOURCE_TREE_MISMATCH: checkpoint=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb manifest=cccccccccccccccccccccccccccccccccccccccc"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/WRONG_SOURCE_TREE.zip",
+      "positive_control": "VALID_BASE_F1",
+      "raw_digest": "3503837cba36c4b0861f7551a67e105ac85e9d04f2ca34421d05acbce7c08e66"
+    },
+    {
+      "byte_length": 4514,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#conflicting-duplicate",
+      "fixture_id": "CONFLICTING_DUPLICATE",
+      "fixture_intent": "Conflicting evidence copy of the root source readback.",
+      "independent_expected_error_family": "CONFLICTING_MEMBER",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "CONFLICTING_DUPLICATE_HANDOFF_MEMBER"
+      ],
+      "legacy_observed_errors": [
+        "CONFLICTING_DUPLICATE_HANDOFF_MEMBER: PRE_F1_SOURCE_INTEGRITY_READBACK.json: ['evidence/PRE_F1_SOURCE_INTEGRITY_READBACK.json']"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/CONFLICTING_DUPLICATE.zip",
+      "positive_control": "VALID_BASE_F1",
+      "raw_digest": "10789667087906d7f3335298ca0e6285e3de560862d7de4a4e1fc5aea1c783d4"
+    },
+    {
+      "byte_length": 4089,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#invalid-hash-manifest",
+      "fixture_id": "INVALID_HASH_MANIFEST",
+      "fixture_intent": "One manifest digest is all zero; payload bytes unchanged.",
+      "independent_expected_error_family": "ARTIFACT_HASH_IDENTITY",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "HANDOFF_HASH_MISMATCH"
+      ],
+      "legacy_observed_errors": [
+        "HANDOFF_HASH_MISMATCH: AUDIT_LEDGER.jsonl"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/INVALID_HASH_MANIFEST.zip",
+      "positive_control": "VALID_BASE_F1",
+      "raw_digest": "cd90b168e88690a9c73b52c5c5ba89a651641bc0441e2685fbe1a5e97b3a7857"
+    },
+    {
+      "byte_length": 3769,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#missing-snapshot",
+      "fixture_id": "MISSING_SNAPSHOT",
+      "fixture_intent": "Required retained F1 snapshot absent, with transport hashes otherwise consistent.",
+      "independent_expected_error_family": "RETAINED_SNAPSHOT_REQUIRED",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "F1_SNAPSHOT_MEMBER_COUNT_INVALID"
+      ],
+      "legacy_observed_errors": [
+        "F1_SNAPSHOT_MEMBER_COUNT_INVALID: []"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/MISSING_SNAPSHOT.zip",
+      "positive_control": "VALID_BASE_F1",
+      "raw_digest": "bef1aad1332befef8bfd7778be3640efc285c4759381059bf53a81b019b2cd88"
+    },
+    {
+      "byte_length": 4090,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#broken-ledger-prefix",
+      "fixture_id": "BROKEN_LEDGER_PREFIX",
+      "fixture_intent": "Leading whitespace preserves parsed ledger records but breaks exact retained raw prefix; digest record updated.",
+      "independent_expected_error_family": "RAW_LEDGER_PREFIX",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "F1_LEDGER_RAW_PREFIX_MISMATCH"
+      ],
+      "legacy_observed_errors": [
+        "F1_LEDGER_RAW_PREFIX_MISMATCH"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/BROKEN_LEDGER_PREFIX.zip",
+      "positive_control": "VALID_BASE_F1",
+      "raw_digest": "8b8e5ba26029a43b661fb4cff7837d29b23c84893812dc93b0518ef4ce6e3219"
+    },
+    {
+      "byte_length": 4090,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#bad-f1-checkpoint",
+      "fixture_id": "BAD_F1_CHECKPOINT",
+      "fixture_intent": "Checkpoint declares sequence end 99 although retained ledger ends at 1 or 2; hashes consistent.",
+      "independent_expected_error_family": "CHECKPOINT_SEQUENCE_BINDING",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "F1_DECLARED_SEQUENCE_END_MISMATCH"
+      ],
+      "legacy_observed_errors": [
+        "F1_DECLARED_SEQUENCE_END_MISMATCH: expected=99 actual=1"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/BAD_F1_CHECKPOINT.zip",
+      "positive_control": "VALID_BASE_F1",
+      "raw_digest": "8951cf2a385552947bf7da22f29027dbfd4dcaf253850d1a72e9cc7e51ca8e2c"
+    },
+    {
+      "byte_length": 5774,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#bad-f2-checkpoint",
+      "fixture_id": "BAD_F2_CHECKPOINT",
+      "fixture_intent": "Checkpoint declares sequence end 99 although retained ledger ends at 1 or 2; hashes consistent.",
+      "independent_expected_error_family": "CHECKPOINT_SEQUENCE_BINDING",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 3,
+        "variant_id": "E2_SOL_ITERACJA_1"
+      },
+      "legacy_observed_error_family": [
+        "F2_DECLARED_SEQUENCE_END_MISMATCH"
+      ],
+      "legacy_observed_errors": [
+        "F2_DECLARED_SEQUENCE_END_MISMATCH: expected=99 actual=2"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/BAD_F2_CHECKPOINT.zip",
+      "positive_control": "VALID_E2_F2",
+      "raw_digest": "1a5f9c8c1d4435aa666bb7809b03f350496ae1b09431316477e1fb64c293dda5"
+    },
+    {
+      "byte_length": 1482,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#early-reveal",
+      "fixture_id": "EARLY_REVEAL",
+      "fixture_intent": "Attestation explicitly declares staged_payload_semantics_exposed_before_attestation=true; all other positive-control facts unchanged.",
+      "independent_expected_error_family": "REVEAL_ORDER",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "attestation",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "ATTESTATION_EARLY_STAGED_SEMANTICS_EXPOSURE"
+      ],
+      "legacy_observed_errors": [
+        "ATTESTATION_EARLY_STAGED_SEMANTICS_EXPOSURE"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/EARLY_REVEAL.zip",
+      "positive_control": "VALID_ATTESTATION",
+      "raw_digest": "c5d27b1be47cb9dede355f5504f2fc371c4703a7a1ca22bf62f82e0769b4cc6e"
+    },
+    {
+      "byte_length": 1482,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#source-generation-mix",
+      "fixture_id": "SOURCE_GENERATION_MIX",
+      "fixture_intent": "Attestation explicitly declares source_generations_mixed=true; all other positive-control facts unchanged.",
+      "independent_expected_error_family": "SOURCE_GENERATION_ISOLATION",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "attestation",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "ATTESTATION_SOURCE_GENERATIONS_MIXED"
+      ],
+      "legacy_observed_errors": [
+        "ATTESTATION_SOURCE_GENERATIONS_MIXED"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/SOURCE_GENERATION_MIX.zip",
+      "positive_control": "VALID_ATTESTATION",
+      "raw_digest": "39e3d580677dbc1a9bdaf3b57740494c2786ef604827b94b5ed2e8902ee61c00"
+    },
+    {
+      "byte_length": 1482,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#substitute-f2",
+      "fixture_id": "SUBSTITUTE_F2",
+      "fixture_intent": "Attestation explicitly declares substitute_f2_created=true; all other positive-control facts unchanged.",
+      "independent_expected_error_family": "CHECKPOINT_NON_SUBSTITUTION",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "attestation",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "ATTESTATION_SUBSTITUTE_F2_CREATED"
+      ],
+      "legacy_observed_errors": [
+        "ATTESTATION_SUBSTITUTE_F2_CREATED"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/SUBSTITUTE_F2.zip",
+      "positive_control": "VALID_ATTESTATION",
+      "raw_digest": "4cfeefb170dc258ff40c3a239c22773949c73fc5804fd315656e8c9264488da4"
+    },
+    {
+      "byte_length": 4299,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#unsafe-zip-path",
+      "fixture_id": "UNSAFE_ZIP_PATH",
+      "fixture_intent": "Traversal member must be rejected without extraction.",
+      "independent_expected_error_family": "ZIP_PATH_SAFETY",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "HANDOFF_HASH_MEMBERSHIP_MISMATCH",
+        "UNSAFE_ZIP_PATH"
+      ],
+      "legacy_observed_errors": [
+        "UNSAFE_ZIP_PATH: ../escape.txt",
+        "HANDOFF_HASH_MEMBERSHIP_MISMATCH: missing=[], extra=['../escape.txt']"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/UNSAFE_ZIP_PATH.zip",
+      "positive_control": "VALID_BASE_F1",
+      "raw_digest": "0071c1327680b121c0ba97e0c2d75c14a0801794c8bb73573462c2e66885bb2e"
+    },
+    {
+      "byte_length": 4783,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#duplicate-member",
+      "fixture_id": "DUPLICATE_MEMBER",
+      "fixture_intent": "Two physically distinct ZIP entries have the same exact name and bytes.",
+      "independent_expected_error_family": "ZIP_MEMBER_UNIQUENESS",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "prior",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "DUPLICATE_ZIP_MEMBER_NAMES"
+      ],
+      "legacy_observed_errors": [
+        "DUPLICATE_ZIP_MEMBER_NAMES"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/DUPLICATE_MEMBER.zip",
+      "positive_control": "VALID_BASE_F1",
+      "raw_digest": "6d77a342f173d5c66be95af4d3e68cdb413e85b1dac0fe7cdaa86b52876833bd"
+    },
+    {
+      "byte_length": 4089,
+      "compatibility_exception_ref": null,
+      "expectation_basis_ref": "EXPECTATION_BASIS.md#wrong-artifact-family",
+      "fixture_id": "WRONG_ARTIFACT_FAMILY",
+      "fixture_intent": "F1 handoff submitted where a final bundle is required; final report/outcome/readback are absent.",
+      "independent_expected_error_family": "FINAL_ARTIFACT_FAMILY",
+      "independent_safe_expected_result": "REJECT",
+      "intentional_v2_hardening": false,
+      "known_legacy_bug": false,
+      "legacy_call": {
+        "route": "result",
+        "step_order": 2,
+        "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+      },
+      "legacy_observed_error_family": [
+        "MISSING_REQUIRED_FINAL_ARTIFACT"
+      ],
+      "legacy_observed_errors": [
+        "MISSING_REQUIRED_FINAL_ARTIFACT: FINAL_OUTCOME.json",
+        "MISSING_REQUIRED_FINAL_ARTIFACT: FINAL_TECHNICAL_AUDIT_REPORT.md",
+        "MISSING_REQUIRED_FINAL_ARTIFACT: FINAL_SOURCE_INTEGRITY_READBACK.json"
+      ],
+      "legacy_observed_result": "FAIL",
+      "media_type": "application/zip",
+      "path": "raw/WRONG_ARTIFACT_FAMILY.zip",
+      "positive_control": "VALID_BASE_FINAL",
+      "raw_digest": "7387fe51e3cde77510debb4316109f883b7d2ab6ce96bf6376f7a26023fe3550"
+    }
+  ],
+  "legacy_source_sha256": "d851511fc5cf06e205426e843d1f43ac72edb2adf95b786c39e016a49fbda841",
+  "schema": "BDB_M1_COMPATIBILITY_CORPUS_V1",
+  "starting_head": "4f14ab55cdc22f2137d9cea6f7f1d25fc2be9d33",
+  "unresolved_expectation_conflicts": []
+}

@@ -1,0 +1,282 @@
+{
+  "acceptance_id": "BDB-F0-M0-M1-R5_3-001",
+  "assurance_scope": "Author-qualified synthetic F0 corpus; no independent foundation freeze, real audit or release qualification",
+  "branch": "bdb-v2",
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "tests/compatibility/verify_m1.py"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "........................................................................ [ 83%]\n..............                                                           [100%]\n86 passed in 0.97s\n{\n  \"status\": \"PASS\",\n  \"app_version\": \"1.4.4\",\n  \"wrapper_release\": \"5.4-RC1\",\n  \"variant_count\": 18,\n  \"step_count\": 51,\n  \"fallback_count\": 21,\n  \"execution_context_count\": 72,\n  \"project_name_count\": 84,\n  \"errors\": []\n}\n{\n  \"REQUIRED_FIXTURE_BYTES_PINNED\": \"YES\",\n  \"LEGACY_OBSERVED_OUTCOMES_RECORDED\": \"YES\",\n  \"INDEPENDENT_SAFE_EXPECTATIONS_QUALIFIED\": \"YES\",\n  \"KNOWN_LEGACY_BUGS_CLASSIFIED\": \"YES\",\n  \"UNRESOLVED_EXPECTATION_CONFLICTS\": 0\n}\nM1 = PASS\n"
+    },
+    {
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "-m",
+        "pytest",
+        "tests/compatibility/test_legacy_baseline.py",
+        "-q"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "....                                                                     [100%]\n4 passed in 0.02s\n"
+    },
+    {
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Projekty\\Audyty\\BDB Audit\\legacy\\v1_4_4\\BDB_AUDIT_ASSISTANT_PA_v5.2_WRAPPERS_5.4-RC1_v1.4.4_ARCHIVE.py",
+        "--self-test"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\n  \"status\": \"PASS\",\n  \"app_version\": \"1.4.4\",\n  \"wrapper_release\": \"5.4-RC1\",\n  \"variant_count\": 18,\n  \"step_count\": 51,\n  \"fallback_count\": 21,\n  \"execution_context_count\": 72,\n  \"project_name_count\": 84,\n  \"errors\": []\n}\n"
+    }
+  ],
+  "copy_mutation_detected": true,
+  "environment": {
+    "platform": "Windows-10-10.0.19045-SP0",
+    "python": "3.14.4"
+  },
+  "fixture_counts": {
+    "extra": 0,
+    "invalid": 17,
+    "valid": 8
+  },
+  "identity_binding": "Parent commit plus complete subject Git objects excluding this record; containing F0 commit binds the record itself.",
+  "legacy_pin": "446f11ce1622a49f5100cefead29a04d952d487e",
+  "m0_checkpoint": "46ae26e2b91a2fd7a6e2bf2a164b90231f6a95d5",
+  "m0_gate": {
+    "LEGACY_COPY_IMMUTABLE": "YES",
+    "LEGACY_FILE_RAW_DIGEST_KNOWN": "YES",
+    "LEGACY_SELF_TEST_OUTPUT_RETAINED": "YES",
+    "LEGACY_SOURCE_REFERENCE_PINNED": "YES",
+    "LEGACY_TAG_OR_EQUIVALENT_PIN": "YES"
+  },
+  "m0_portability": "PASS",
+  "m1_gate": {
+    "INDEPENDENT_SAFE_EXPECTATIONS_QUALIFIED": "YES",
+    "KNOWN_LEGACY_BUGS_CLASSIFIED": "YES",
+    "LEGACY_OBSERVED_OUTCOMES_RECORDED": "YES",
+    "REQUIRED_FIXTURE_BYTES_PINNED": "YES",
+    "UNRESOLVED_EXPECTATION_CONFLICTS": 0
+  },
+  "m2_started": false,
+  "milestone": "F0",
+  "qualified_parent_commit": "4f14ab55cdc22f2137d9cea6f7f1d25fc2be9d33",
+  "repository": "eagleblastmusic-lgtm/bdb-audit",
+  "schema": "BDB_F0_MILESTONE_ACCEPTANCE_PRE_HISTORY_V1",
+  "subject_git_objects": {
+    ".gitattributes": {
+      "git_blob_sha1": "f0e6ec179c7c7b15ef25ee3625a9bc625c366e11",
+      "mode": "100644"
+    },
+    "BDB_AUDIT_ASSISTANT_PA_v5.2_WRAPPERS_5.4-RC1_v1.4.4_ARCHIVE.py": {
+      "git_blob_sha1": "37adeefe3bf91bb00f9ffa2d5c3d92aebce33bc2",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/EXPECTATION_BASIS.md": {
+      "git_blob_sha1": "862c30f26ac91c419cbdd55d64cae7e0f1184492",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/EXPECTATION_INPUTS.json": {
+      "git_blob_sha1": "ef98be05d9e19f6ee96a7687e43becd499b59fb2",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/M1_QUALIFICATION.json": {
+      "git_blob_sha1": "d5cd56ea846f391643e56975186ff9b3e97e9d7b",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/README.md": {
+      "git_blob_sha1": "736c809517eb37ab7b932986f1d71da15a00cc00",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/manifest.json": {
+      "git_blob_sha1": "e7246b68791f612596371c1460b44fa93ae8366c",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/BAD_F1_CHECKPOINT.zip": {
+      "git_blob_sha1": "fafc2c2181b97eef760266d3153b6bf39cff3468",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/BAD_F2_CHECKPOINT.zip": {
+      "git_blob_sha1": "786950551ccd7381397c5cfd30a4e5febaba2298",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/BROKEN_LEDGER_PREFIX.zip": {
+      "git_blob_sha1": "d70ed8a772ee21b8fb49b162da07d99b101f99d4",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/CONFLICTING_DUPLICATE.zip": {
+      "git_blob_sha1": "7f9a0f6643653d797e72efdaec95309edbd56ba4",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/DUPLICATE_MEMBER.zip": {
+      "git_blob_sha1": "d2becb90d5beb93895003f1e47ceb8095feec767",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/EARLY_REVEAL.zip": {
+      "git_blob_sha1": "8318e83546b3dd190430f56157192f17cd2d6c60",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/INVALID_HASH_MANIFEST.zip": {
+      "git_blob_sha1": "d2f607c76e8bc1d31883fb10dd84d6201c216528",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/MISSING_SNAPSHOT.zip": {
+      "git_blob_sha1": "55d8ffbed400ba56b36d8f02f8911b3ac590f612",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/SOURCE_GENERATION_MIX.zip": {
+      "git_blob_sha1": "d586cc446c70bc606f179a1ccb85f5780d96aec5",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/SUBSTITUTE_F2.zip": {
+      "git_blob_sha1": "d9ccca64cf48876da2b6c571ae8c9002126285fb",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/UNSAFE_ZIP_PATH.zip": {
+      "git_blob_sha1": "ea7f937225de53958cfbe9dc15b9b69012e6048d",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_ATTESTATION.zip": {
+      "git_blob_sha1": "6ec84468e53726124c0e3e882a5a0d72297a97d8",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_BASE_F1.zip": {
+      "git_blob_sha1": "45e469901693260bf2ad4b56dcbf10e696afc99c",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_BASE_FINAL.zip": {
+      "git_blob_sha1": "a4de49cfc918627d356155e238b7a51fd9cc48f4",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_CONTINUATION_TICKET.json": {
+      "git_blob_sha1": "5a66f8992af8b4df70747cdf8f56b80968989e48",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_E2_F1.zip": {
+      "git_blob_sha1": "2ff1b41cad26aa54fad480ca1341f31775550984",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_E2_F2.zip": {
+      "git_blob_sha1": "ceef6bdad7a61747881673b1ba071c411c6cd3f8",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_E2_FINAL.zip": {
+      "git_blob_sha1": "d8e1858bc2c94a33f756e425d0977894cfee5a47",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_PREVIOUS_PROMPT_BUNDLE.zip": {
+      "git_blob_sha1": "b4d5bb41070c2ef5c1c811f3adc1cf01e04b4f76",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/WRONG_ARTIFACT_FAMILY.zip": {
+      "git_blob_sha1": "8b92b47aa52f59e1fdd7eec2d539fbaa81bc5dec",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/WRONG_AUDIT_ID.zip": {
+      "git_blob_sha1": "9cb55c2a0e891dce29be0a756a3570ed214ea3e3",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/WRONG_RUN_ID.zip": {
+      "git_blob_sha1": "5a56648fdc83aa4b3ce5902b01764a7007da6c3f",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/WRONG_SOURCE_SHA.zip": {
+      "git_blob_sha1": "72071f3b03682832095adf9787dc4a02fcaa1ee8",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/WRONG_SOURCE_TREE.zip": {
+      "git_blob_sha1": "79c971591404596bf4a03cd5abf6b84c23478b71",
+      "mode": "100644"
+    },
+    "LEGACY_COMPATIBILITY_CORPUS/raw/WRONG_VARIANT.zip": {
+      "git_blob_sha1": "e0243d470cb268c1886c50baedc08a4bea50389f",
+      "mode": "100644"
+    },
+    "legacy/v1_4_4/BDB_AUDIT_ASSISTANT_PA_v5.2_WRAPPERS_5.4-RC1_v1.4.4_ARCHIVE.py": {
+      "git_blob_sha1": "37adeefe3bf91bb00f9ffa2d5c3d92aebce33bc2",
+      "mode": "100644"
+    },
+    "legacy/v1_4_4/LEGACY_BASELINE_MANIFEST.json": {
+      "git_blob_sha1": "9c13c576fbddf7fba89a0121859574867a7ebd64",
+      "mode": "100644"
+    },
+    "legacy/v1_4_4/LEGACY_SELF_TEST_OUTPUT.json": {
+      "git_blob_sha1": "80c492d90e5b13da04ff7554b58690229f222197",
+      "mode": "100644"
+    },
+    "tests/compatibility/build_corpus.py": {
+      "git_blob_sha1": "48b839a4a2fef9f30d87f1ac316c4f90c91d8f6b",
+      "mode": "100644"
+    },
+    "tests/compatibility/corpus_support.py": {
+      "git_blob_sha1": "904cc45efa598212a7c42e547ec2d02f35f62782",
+      "mode": "100644"
+    },
+    "tests/compatibility/test_compatibility_corpus.py": {
+      "git_blob_sha1": "9dd779000f6049ac64e6442c396d21dbf8291c0c",
+      "mode": "100644"
+    },
+    "tests/compatibility/test_legacy_baseline.py": {
+      "git_blob_sha1": "e996db306e4b37dc631fd10bb640b4bb3d1522cb",
+      "mode": "100644"
+    },
+    "tests/compatibility/verify_f0.py": {
+      "git_blob_sha1": "7aafeef31eec629a68e6b78b6706b4d3cc456da4",
+      "mode": "100644"
+    },
+    "tests/compatibility/verify_m1.py": {
+      "git_blob_sha1": "444cbaaf22718d64a29472ac25fd5b6911864c70",
+      "mode": "100644"
+    }
+  },
+  "subject_raw_sha256": {
+    ".gitattributes": "d0f68b008f53f48aff7a4894ddf5ea48f139be5ab3bdfbe52ebe843e30aeb03d",
+    "LEGACY_COMPATIBILITY_CORPUS/EXPECTATION_BASIS.md": "9167297e23aa62e810fd364b936058ce68631e46ff1ed99b98b811b1751a0cfb",
+    "LEGACY_COMPATIBILITY_CORPUS/EXPECTATION_INPUTS.json": "9195dea2809cbdd9735d89dc66997dcecc34e1f339b2d37c496f8c01853e7535",
+    "LEGACY_COMPATIBILITY_CORPUS/M1_QUALIFICATION.json": "ac3e3919126f61c964909cdbef01a0b9da0dcbcedd9fa5f601aebea4e8ebc437",
+    "LEGACY_COMPATIBILITY_CORPUS/README.md": "3350f31bb72f925ff796ff2291b0607567c1bf3c833f5e4f3dc015fb06d6a641",
+    "LEGACY_COMPATIBILITY_CORPUS/manifest.json": "7de228b169a4c87fa280dd23738f88334e557717b618324840d222b8d6d61fc7",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/BAD_F1_CHECKPOINT.zip": "8951cf2a385552947bf7da22f29027dbfd4dcaf253850d1a72e9cc7e51ca8e2c",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/BAD_F2_CHECKPOINT.zip": "1a5f9c8c1d4435aa666bb7809b03f350496ae1b09431316477e1fb64c293dda5",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/BROKEN_LEDGER_PREFIX.zip": "8b8e5ba26029a43b661fb4cff7837d29b23c84893812dc93b0518ef4ce6e3219",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/CONFLICTING_DUPLICATE.zip": "10789667087906d7f3335298ca0e6285e3de560862d7de4a4e1fc5aea1c783d4",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/DUPLICATE_MEMBER.zip": "6d77a342f173d5c66be95af4d3e68cdb413e85b1dac0fe7cdaa86b52876833bd",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/EARLY_REVEAL.zip": "c5d27b1be47cb9dede355f5504f2fc371c4703a7a1ca22bf62f82e0769b4cc6e",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/INVALID_HASH_MANIFEST.zip": "cd90b168e88690a9c73b52c5c5ba89a651641bc0441e2685fbe1a5e97b3a7857",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/MISSING_SNAPSHOT.zip": "bef1aad1332befef8bfd7778be3640efc285c4759381059bf53a81b019b2cd88",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/SOURCE_GENERATION_MIX.zip": "39e3d580677dbc1a9bdaf3b57740494c2786ef604827b94b5ed2e8902ee61c00",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/SUBSTITUTE_F2.zip": "4cfeefb170dc258ff40c3a239c22773949c73fc5804fd315656e8c9264488da4",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/UNSAFE_ZIP_PATH.zip": "0071c1327680b121c0ba97e0c2d75c14a0801794c8bb73573462c2e66885bb2e",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_ATTESTATION.zip": "2f1dac96a3548d774d0f651f4708905c43ab57058f3c1827f8aa48042675ad0c",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_BASE_F1.zip": "cd3c2b1b00d79464097fdbb7bef3b6fd15fd35bb78bcf512d3214746745f0c6a",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_BASE_FINAL.zip": "da633451764ac9eb023b60e874a8ca88c37f7fcb80256e5af85deff69058c3eb",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_CONTINUATION_TICKET.json": "e953d464499c7d5ea136b31e9f244fb37cbd45c5f2d79f64c01b449a92e6d782",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_E2_F1.zip": "d0dd87686b0efeaa805e4403cc9b1857609ef3c5ea382c9d0aba237a1ef6ae82",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_E2_F2.zip": "34450191ad9370364218a98012b7b9f7ac66cfab85660e888aee70c2c33c307f",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_E2_FINAL.zip": "9875171ea509e9ad50083c038601db7d0c7bdbd72f6cc81399ae9fe06ee1d772",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/VALID_PREVIOUS_PROMPT_BUNDLE.zip": "30bb4006b436520b0d960a3bd725cb779a9410e5bad3dd38c0d171bafce62feb",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/WRONG_ARTIFACT_FAMILY.zip": "7387fe51e3cde77510debb4316109f883b7d2ab6ce96bf6376f7a26023fe3550",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/WRONG_AUDIT_ID.zip": "2e998c210c619605fc9a64aeff47c362053162341a1eac8cc290882acccf6af1",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/WRONG_RUN_ID.zip": "217e8d341d7ef00c4594bf26e179106b06378526609d0668f55e3594e64dc252",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/WRONG_SOURCE_SHA.zip": "5b0c763049d398d929910f26a22eba12b0b3d0e5f5d801397ba4547ca0a6d4a0",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/WRONG_SOURCE_TREE.zip": "3503837cba36c4b0861f7551a67e105ac85e9d04f2ca34421d05acbce7c08e66",
+    "LEGACY_COMPATIBILITY_CORPUS/raw/WRONG_VARIANT.zip": "a483391c90cbe6c68a0cba316bc930fcfe94e5cb4bafff11cc618e3f0b862eba",
+    "legacy/v1_4_4/BDB_AUDIT_ASSISTANT_PA_v5.2_WRAPPERS_5.4-RC1_v1.4.4_ARCHIVE.py": "d851511fc5cf06e205426e843d1f43ac72edb2adf95b786c39e016a49fbda841",
+    "legacy/v1_4_4/LEGACY_BASELINE_MANIFEST.json": "faa7fb0c885234bdd36e738aae2fc3944d911b94f82cc7796c250d707f9e2533",
+    "legacy/v1_4_4/LEGACY_SELF_TEST_OUTPUT.json": "301358956c7bb34727c5458acf37e27f0ba044eb6d46992b5b256bfaaf101a44",
+    "tests/compatibility/build_corpus.py": "7ec7f0c3fb480bf6e3f6acad30a25e268eb23384afb86aec025b0b0440131415",
+    "tests/compatibility/corpus_support.py": "902a03121f324c6b13c6aad8827f7c346e4bed7fbceb84e685746da7b94a0b73",
+    "tests/compatibility/test_compatibility_corpus.py": "7501003337ad2bf6e1dd53d89d4ec30db4e8430c477e8daba9ceccec733a0a9f",
+    "tests/compatibility/verify_f0.py": "537de16ff2a671ffad63fe15fd69eb41ab758ba7fa1ca13b1b0305302f18bc6f",
+    "tests/compatibility/verify_m1.py": "dc901edeec8450a06fd20aacc5759c5415f330c1051b2ec5c91aad0e4f9593ae"
+  },
+  "unresolved_spec_conflicts": [],
+  "verdict": "PASS"
+}

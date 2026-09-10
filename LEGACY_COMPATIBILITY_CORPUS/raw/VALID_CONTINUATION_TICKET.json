@@ -1,0 +1,17 @@
+{
+  "expected_attestation_filename": "PRE_CANONICAL_REVEAL_GATE_PASS_ATTESTATION.zip",
+  "expected_run_state": "AWAITING_MANUAL_CANONICAL_REVEAL_AFTER_VERIFIED_F1",
+  "fallback_prompt_sha256": "202251def9cb9fae7e9088be7117cfe0e6af2404d075bac89239835eb0e73885",
+  "prior_handoff_sha256": "cd3c2b1b00d79464097fdbb7bef3b6fd15fd35bb78bcf512d3214746745f0c6a",
+  "prior_handoff_validation": {
+    "audit_attempt_id": "M1-SYNTHETIC-ATTEMPT-001",
+    "audit_request_id": "M1-SYNTHETIC-REQUEST-001",
+    "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "status": "PASS",
+    "zip_sha256": "cd3c2b1b00d79464097fdbb7bef3b6fd15fd35bb78bcf512d3214746745f0c6a"
+  },
+  "schema": "BDB_CONTINUATION_TICKET_V1",
+  "step_order": 2,
+  "variant_id": "E1_SOL_BASE_PLUS_PLIKI"
+}

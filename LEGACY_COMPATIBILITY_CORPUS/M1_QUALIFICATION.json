@@ -1,0 +1,58 @@
+{
+  "branch": "bdb-v2",
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "-m",
+        "pytest",
+        "tests/compatibility",
+        "-q"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "........................................................................ [ 83%]\n..............                                                           [100%]\n86 passed in 0.89s\n"
+    },
+    {
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Projekty\\Audyty\\BDB Audit\\legacy\\v1_4_4\\BDB_AUDIT_ASSISTANT_PA_v5.2_WRAPPERS_5.4-RC1_v1.4.4_ARCHIVE.py",
+        "--self-test"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\n  \"status\": \"PASS\",\n  \"app_version\": \"1.4.4\",\n  \"wrapper_release\": \"5.4-RC1\",\n  \"variant_count\": 18,\n  \"step_count\": 51,\n  \"fallback_count\": 21,\n  \"execution_context_count\": 72,\n  \"project_name_count\": 84,\n  \"errors\": []\n}\n"
+    }
+  ],
+  "extra_count": 0,
+  "gates": {
+    "INDEPENDENT_SAFE_EXPECTATIONS_QUALIFIED": "YES",
+    "KNOWN_LEGACY_BUGS_CLASSIFIED": "YES",
+    "LEGACY_OBSERVED_OUTCOMES_RECORDED": "YES",
+    "REQUIRED_FIXTURE_BYTES_PINNED": "YES",
+    "UNRESOLVED_EXPECTATION_CONFLICTS": 0
+  },
+  "head_at_verification": "4f14ab55cdc22f2137d9cea6f7f1d25fc2be9d33",
+  "intentional_v2_hardening": [],
+  "invalid_count": 17,
+  "known_legacy_bugs": [],
+  "legacy_source_sha256": "d851511fc5cf06e205426e843d1f43ac72edb2adf95b786c39e016a49fbda841",
+  "m2_started": false,
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python": "3.14.4",
+  "qualification_scope": "Synthetic M1 corpus only; not independent foundation freeze, real audit, release approval or v2 compatibility qualification",
+  "qualified_input_sha256": {
+    "LEGACY_COMPATIBILITY_CORPUS/EXPECTATION_BASIS.md": "9167297e23aa62e810fd364b936058ce68631e46ff1ed99b98b811b1751a0cfb",
+    "LEGACY_COMPATIBILITY_CORPUS/EXPECTATION_INPUTS.json": "9195dea2809cbdd9735d89dc66997dcecc34e1f339b2d37c496f8c01853e7535",
+    "LEGACY_COMPATIBILITY_CORPUS/manifest.json": "7de228b169a4c87fa280dd23738f88334e557717b618324840d222b8d6d61fc7",
+    "tests/compatibility/build_corpus.py": "7ec7f0c3fb480bf6e3f6acad30a25e268eb23384afb86aec025b0b0440131415",
+    "tests/compatibility/corpus_support.py": "902a03121f324c6b13c6aad8827f7c346e4bed7fbceb84e685746da7b94a0b73",
+    "tests/compatibility/test_compatibility_corpus.py": "7501003337ad2bf6e1dd53d89d4ec30db4e8430c477e8daba9ceccec733a0a9f",
+    "tests/compatibility/verify_m1.py": "dc901edeec8450a06fd20aacc5759c5415f330c1051b2ec5c91aad0e4f9593ae"
+  },
+  "repository": "eagleblastmusic-lgtm/bdb-audit",
+  "schema": "BDB_M1_PRE_HISTORY_QUALIFICATION_V1",
+  "valid_count": 8,
+  "verdict": "PASS"
+}

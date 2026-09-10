@@ -2,3 +2,12 @@
 legacy/v1_4_4/** -text
 # Reserved raw payload directory within the planned compatibility corpus.
 LEGACY_COMPATIBILITY_CORPUS/raw/** -text
+# F0 qualification text inputs have stable LF bytes across checkouts.
+/.gitattributes text eol=lf
+/LEGACY_COMPATIBILITY_CORPUS/*.json text eol=lf
+/LEGACY_COMPATIBILITY_CORPUS/*.md text eol=lf
+/tests/compatibility/build_corpus.py text eol=lf
+/tests/compatibility/corpus_support.py text eol=lf
+/tests/compatibility/test_compatibility_corpus.py text eol=lf
+/tests/compatibility/verify_m1.py text eol=lf
+/tests/compatibility/verify_f0.py text eol=lf
