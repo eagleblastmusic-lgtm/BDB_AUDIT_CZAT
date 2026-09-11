@@ -45,7 +45,13 @@ M14_KINDS = (
     "scope_state_record", "inventory_revision", "surface_collector_record",
 )
 
-F3_KINDS = (*F2_KINDS, *M14_KINDS)
+M15_KINDS = (
+    "invariant_revision", "materiality_assessment", "coverage_obligation",
+    "coverage_obligation_key", "coverage_obligation_qualification",
+    "obligation_applicability_decision", "approval_decision",
+)
+
+F3_KINDS = (*F2_KINDS, *M14_KINDS, *M15_KINDS)
 
 
 def executable_schema(kind, *, registry=None):
@@ -74,6 +80,10 @@ def executable_schema(kind, *, registry=None):
         schema.update(structural)
     from .inventory import inventory_schema
     structural = inventory_schema(kind)
+    if structural is not None:
+        schema.update(structural)
+    from .coverage import coverage_schema
+    structural = coverage_schema(kind)
     if structural is not None:
         schema.update(structural)
     return schema
