@@ -476,6 +476,23 @@ class TransactionalHistoryStore:
                 if value_item.get("ref_class") not in semantics:
                     raise ValidationError("UNREGISTERED_REFERENCE_CLASS")
 
+    def _validate_stop_snapshot_binding(self, obj, objects, con):
+        snap_ref = obj.body.get("stop_input_snapshot_ref")
+        if not isinstance(snap_ref, dict) or "revision_digest" not in snap_ref:
+            return
+        target_digest = snap_ref["revision_digest"]
+        snap_obj = next((o for o in objects if o.digest == target_digest), None)
+        if snap_obj is not None:
+            snap_body = snap_obj.body
+        else:
+            row = con.execute("SELECT body FROM immutable_objects WHERE digest=?", (target_digest,)).fetchone()
+            if row is None:
+                return
+            snap_body = json.loads(row[0])
+        from ..stop.evaluator import validate_stop_snapshot_binding
+        validate_stop_snapshot_binding(obj.body, snap_body)
+
+
     def _validate_bootstrap_closure(self, objects, profile):
         required = {
             "command_envelope", "source_generation", "legacy_raw_ref",
@@ -597,6 +614,8 @@ class TransactionalHistoryStore:
             self._validate_content_refs(objects, con)
             for obj in objects:
                 self._validate_material_ref_contracts(obj)
+                if obj.kind == "stop_input":
+                    self._validate_stop_snapshot_binding(obj, objects, con)
             from ..orchestration.fsm import project_states
             prior_events = [event for (raw,) in con.execute("SELECT body FROM commits ORDER BY seq")
                             for event in json.loads(raw)["ordered_event_bodies"]]

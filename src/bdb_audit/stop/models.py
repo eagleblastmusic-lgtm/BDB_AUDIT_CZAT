@@ -54,11 +54,11 @@ class LaneCompletion:
         if self.completion_predicate_result not in {"LANE_COMPLETED", "LANE_COMPLETION_BLOCKED"}:
             raise ValidationError(f"INVALID_LANE_COMPLETION_RESULT: {self.completion_predicate_result}")
 
-        object.__setattr__(self, "attempt_refs", tuple(_ref_dict(r) for r in self.attempt_refs))
-        object.__setattr__(self, "required_output_refs", tuple(_ref_dict(r) for r in self.required_output_refs))
+        object.__setattr__(self, "attempt_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.attempt_refs])))
+        object.__setattr__(self, "required_output_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.required_output_refs])))
         object.__setattr__(
             self, "contamination_assessment_refs",
-            tuple(_ref_dict(r) for r in self.contamination_assessment_refs),
+            tuple(canonical_reference_set([_ref_dict(r) for r in self.contamination_assessment_refs])),
         )
 
     def body(self) -> dict[str, Any]:
@@ -86,7 +86,7 @@ class LaneCompletion:
             "kind": "lane_completion",
             "revision_digest": obj.digest,
             "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": {"schema_id": "BDB_SCHEMA_REGISTRY::lane_completion/1"},
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::lane_completion/1",
             "ref_class": "CONTENT_OR_PRIOR",
         }
 
@@ -123,12 +123,12 @@ class StageCompletion:
 
         object.__setattr__(
             self, "required_lane_slot_results",
-            tuple(_ref_dict(r) for r in self.required_lane_slot_results),
+            tuple(canonical_reference_set([_ref_dict(r) for r in self.required_lane_slot_results])),
         )
-        object.__setattr__(self, "required_output_refs", tuple(_ref_dict(r) for r in self.required_output_refs))
+        object.__setattr__(self, "required_output_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.required_output_refs])))
         object.__setattr__(
             self, "unresolved_material_refs",
-            tuple(_ref_dict(r) for r in self.unresolved_material_refs),
+            tuple(canonical_reference_set([_ref_dict(r) for r in self.unresolved_material_refs])),
         )
 
     def body(self) -> dict[str, Any]:
@@ -156,7 +156,7 @@ class StageCompletion:
             "kind": "stage_completion",
             "revision_digest": obj.digest,
             "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": {"schema_id": "BDB_SCHEMA_REGISTRY::stage_completion/1"},
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::stage_completion/1",
             "ref_class": "CONTENT_OR_PRIOR",
         }
 
@@ -186,8 +186,8 @@ class StopInput:
     release_policy_ref: Mapping[str, Any]
     effort_profile_ref: Mapping[str, Any]
     effort_results_ref: Mapping[str, Any]
-    continuation_budget_authorization_ref: Mapping[str, Any]
     unknown_blocked_summary: Mapping[str, Any]
+    continuation_budget_authorization_ref: Mapping[str, Any] | None = None
     candidate_assurance_case_ref: Mapping[str, Any] | None = None
     challenger_refs: Sequence[Mapping[str, Any]] = ()
     challenger_freshness_profile_ref: Mapping[str, Any] | None = None
@@ -203,20 +203,20 @@ class StopInput:
         if self.evaluation_context not in _EVAL_CONTEXTS:
             raise ValidationError(f"INVALID_EVALUATION_CONTEXT: {self.evaluation_context}")
 
-        object.__setattr__(self, "policy_spec_refs", tuple(_ref_dict(r) for r in self.policy_spec_refs))
-        object.__setattr__(self, "required_stage_spec_refs", tuple(_ref_dict(r) for r in self.required_stage_spec_refs))
-        object.__setattr__(self, "completed_stage_refs", tuple(_ref_dict(r) for r in self.completed_stage_refs))
-        object.__setattr__(self, "pending_required_stage_refs", tuple(_ref_dict(r) for r in self.pending_required_stage_refs))
-        object.__setattr__(self, "mandatory_obligation_refs", tuple(_ref_dict(r) for r in self.mandatory_obligation_refs))
+        object.__setattr__(self, "policy_spec_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.policy_spec_refs])))
+        object.__setattr__(self, "required_stage_spec_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.required_stage_spec_refs])))
+        object.__setattr__(self, "completed_stage_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.completed_stage_refs])))
+        object.__setattr__(self, "pending_required_stage_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.pending_required_stage_refs])))
+        object.__setattr__(self, "mandatory_obligation_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.mandatory_obligation_refs])))
         object.__setattr__(
             self, "current_obligation_qualification_refs",
-            tuple(_ref_dict(r) for r in self.current_obligation_qualification_refs),
+            tuple(canonical_reference_set([_ref_dict(r) for r in self.current_obligation_qualification_refs])),
         )
-        object.__setattr__(self, "evidence_invalidation_refs", tuple(_ref_dict(r) for r in self.evidence_invalidation_refs))
-        object.__setattr__(self, "contradiction_refs", tuple(_ref_dict(r) for r in self.contradiction_refs))
-        object.__setattr__(self, "residual_risk_refs", tuple(_ref_dict(r) for r in self.residual_risk_refs))
-        object.__setattr__(self, "challenger_refs", tuple(_ref_dict(r) for r in self.challenger_refs))
-        object.__setattr__(self, "release_basis_refs", tuple(_ref_dict(r) for r in self.release_basis_refs))
+        object.__setattr__(self, "evidence_invalidation_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.evidence_invalidation_refs])))
+        object.__setattr__(self, "contradiction_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.contradiction_refs])))
+        object.__setattr__(self, "residual_risk_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.residual_risk_refs])))
+        object.__setattr__(self, "challenger_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.challenger_refs])))
+        object.__setattr__(self, "release_basis_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.release_basis_refs])))
 
     def body(self) -> dict[str, Any]:
         res = {
@@ -243,9 +243,10 @@ class StopInput:
             "release_policy_ref": _ref_dict(self.release_policy_ref),
             "effort_profile_ref": _ref_dict(self.effort_profile_ref),
             "effort_results_ref": dict(self.effort_results_ref),
-            "continuation_budget_authorization_ref": _ref_dict(self.continuation_budget_authorization_ref),
             "unknown_blocked_summary": dict(self.unknown_blocked_summary),
         }
+        if self.continuation_budget_authorization_ref is not None:
+            res["continuation_budget_authorization_ref"] = _ref_dict(self.continuation_budget_authorization_ref)
         if self.candidate_assurance_case_ref is not None:
             res["candidate_assurance_case_ref"] = _ref_dict(self.candidate_assurance_case_ref)
         if self.challenger_refs:
@@ -267,7 +268,7 @@ class StopInput:
             "kind": "stop_input",
             "revision_digest": obj.digest,
             "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": {"schema_id": "BDB_SCHEMA_REGISTRY::stop_input/1"},
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::stop_input/1",
             "ref_class": "CONTENT_OR_PRIOR",
         }
 
@@ -307,11 +308,11 @@ class StopEvaluation:
         object.__setattr__(self, "reason_codes", tuple(self.reason_codes))
         object.__setattr__(
             self, "blocking_obligation_refs",
-            tuple(_ref_dict(r) for r in self.blocking_obligation_refs),
+            tuple(canonical_reference_set([_ref_dict(r) for r in self.blocking_obligation_refs])),
         )
         object.__setattr__(
             self, "remaining_obligation_refs",
-            tuple(_ref_dict(r) for r in self.remaining_obligation_refs),
+            tuple(canonical_reference_set([_ref_dict(r) for r in self.remaining_obligation_refs])),
         )
 
     def body(self) -> dict[str, Any]:
@@ -337,6 +338,57 @@ class StopEvaluation:
             "kind": "stop_evaluation",
             "revision_digest": obj.digest,
             "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": {"schema_id": "BDB_SCHEMA_REGISTRY::stop_evaluation/1"},
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::stop_evaluation/1",
             "ref_class": "CONTENT_OR_PRIOR",
         }
+
+
+@dataclass(frozen=True)
+class Snapshot:
+    """Canonical derived projection representing an exact reproducible state snapshot."""
+    snapshot_type: str
+    as_of_head: Mapping[str, Any]
+    projection_code_revision: str
+    projection_input_refs: Sequence[Mapping[str, Any]]
+    snapshot_artifact_ref: Mapping[str, Any]
+    snapshot_id: str | None = None
+
+    def __post_init__(self):
+        if self.snapshot_id is None:
+            object.__setattr__(self, "snapshot_id", new_id("snapshot"))
+        elif self.snapshot_id.startswith("snapshot_"):
+            validate_id(self.snapshot_id, "snapshot")
+
+        object.__setattr__(
+            self, "projection_input_refs",
+            tuple(canonical_reference_set([_ref_dict(r) for r in self.projection_input_refs]))
+        )
+
+    def body(self) -> dict[str, Any]:
+        return {
+            "snapshot_id": self.snapshot_id,
+            "snapshot_type": self.snapshot_type,
+            "as_of_head": dict(self.as_of_head),
+            "projection_code_revision": self.projection_code_revision,
+            "projection_input_refs": list(self.projection_input_refs),
+            "snapshot_artifact_ref": _ref_dict(self.snapshot_artifact_ref),
+        }
+
+    def as_object(self) -> CanonicalObject:
+        lid = self.snapshot_id if (self.snapshot_id and self.snapshot_id.startswith("snapshot_")) else None
+        return CanonicalObject("snapshot", self.body(), logical_id=lid)
+
+    @property
+    def digest(self) -> str:
+        return self.as_object().digest
+
+    @property
+    def ref(self) -> dict[str, Any]:
+        return {
+            "kind": "snapshot",
+            "revision_digest": self.digest,
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::snapshot/1",
+            "ref_class": "CONTENT_OR_PRIOR",
+        }
+

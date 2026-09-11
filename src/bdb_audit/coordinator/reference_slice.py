@@ -48,7 +48,7 @@ from ..adjudication.models import FindingClaimRevision, FindingAdjudicationDecis
 from ..adjudication.contribution import build_contribution_projection, ContributionProjection
 from ..orchestration.stages import StageSpec
 from ..orchestration.runs import LaneSpec
-from ..stop.models import LaneCompletion, StageCompletion, StopInput
+from ..stop.models import LaneCompletion, StageCompletion, StopInput, Snapshot
 from ..stop.evaluator import evaluate_stop, validate_intermediate_stop
 
 
@@ -532,6 +532,7 @@ def run_foundation_reference_slice(store_path: str | Path) -> dict[str, Any]:
     # 9. SEQ=9: LaneCompletion & StageCompletion (M24 / PR-027)
     # -------------------------------------------------------------------------
     lane_comp = LaneCompletion(
+        lane_completion_id=det_id("lane_completion"),
         lane_run_ref=_ref_for("lane_completion", "lane_run_ref", lane_run),
         lane_spec_ref=_ref_for("lane_completion", "lane_spec_ref", lane_spec_obj),
         input_history_cut=head_cut,
@@ -543,6 +544,7 @@ def run_foundation_reference_slice(store_path: str | Path) -> dict[str, Any]:
     )
 
     stage_comp = StageCompletion(
+        stage_completion_id=det_id("stage_completion"),
         stage_run_ref=_ref_for("stage_completion", "stage_run_ref", stage_run),
         stage_spec_ref=_ref_for("stage_completion", "stage_spec_ref", stage_spec_obj),
         input_history_cut=head_cut,
@@ -564,7 +566,28 @@ def run_foundation_reference_slice(store_path: str | Path) -> dict[str, Any]:
     e4_spec = _external_ref("stage_spec", "stage_spec_e4", ref_class="HISTORY_CONTEXT_BINDING")
     e5_spec = _external_ref("stage_spec", "stage_spec_e5", ref_class="HISTORY_CONTEXT_BINDING")
 
+    direct_refs = [
+        _ref_for("stop_input", "source_generation_ref", source_gen),
+        _ref_for("stop_input", "inventory_revision_ref", inv_rev),
+        _ref_for("stop_input", "mandatory_obligation_refs", cov_ob),
+        _ref_for("stop_input", "current_obligation_qualification_refs", cov_qual),
+        _ref_for("stop_input", "completed_stage_refs", stage_comp),
+        _ref_for("stop_input", "required_stage_spec_refs", stage_spec_obj),
+        e4_spec,
+        e5_spec,
+    ]
+
+    snapshot = Snapshot(
+        snapshot_id=det_id("snapshot"),
+        snapshot_type="STOP_INPUT_STATE_CAPTURE",
+        as_of_head=head_cut,
+        projection_code_revision="BDB_V2_SNAPSHOT_PROJECTION_1",
+        projection_input_refs=direct_refs,
+        snapshot_artifact_ref=_external_ref("raw_artifact_ref", "snap_artifact", ref_class="CONTENT_OR_PRIOR"),
+    )
+
     stop_input = StopInput(
+        stop_input_id=det_id("stop_input"),
         campaign_id=campaign_id,
         source_generation_ref=_ref_for("stop_input", "source_generation_ref", source_gen),
         input_history_cut=head_cut,
@@ -576,7 +599,7 @@ def run_foundation_reference_slice(store_path: str | Path) -> dict[str, Any]:
         required_stage_spec_refs=[_ref_for("stop_input", "required_stage_spec_refs", stage_spec_obj), e4_spec, e5_spec],
         completed_stage_refs=[_ref_for("stop_input", "completed_stage_refs", stage_comp)],
         pending_required_stage_refs=[e4_spec, e5_spec],
-        stop_input_snapshot_ref=_external_ref("snapshot", "stop_snap", ref_class="CONTENT_OR_PRIOR"),
+        stop_input_snapshot_ref=_ref_for("stop_input", "stop_input_snapshot_ref", snapshot),
         inventory_revision_ref=_ref_for("stop_input", "inventory_revision_ref", inv_rev),
         mandatory_obligation_refs=[_ref_for("stop_input", "mandatory_obligation_refs", cov_ob)],
         current_obligation_qualification_refs=[_ref_for("stop_input", "current_obligation_qualification_refs", cov_qual)],
@@ -587,14 +610,14 @@ def run_foundation_reference_slice(store_path: str | Path) -> dict[str, Any]:
         release_policy_ref=_external_ref("policy_revision", "rel_policy", ref_class="HISTORY_CONTEXT_BINDING"),
         effort_profile_ref=_external_ref("external_profile_ref", "effort_profile", ref_class="HISTORY_CONTEXT_BINDING"),
         effort_results_ref=_external_ref("registered_immutable_object", "effort_results", ref_class="CONTENT_OR_PRIOR"),
-        continuation_budget_authorization_ref=_external_ref("approval_decision", "budget_app", ref_class="CONTENT_OR_PRIOR"),
+        continuation_budget_authorization_ref=None,
         unknown_blocked_summary={"unknown_surfaces_count": 0, "is_blocked": False},
     )
 
-    stop_eval = evaluate_stop(stop_input)
+    stop_eval = evaluate_stop(stop_input, stop_evaluation_id=det_id("stop_evaluation"))
     validate_intermediate_stop(stop_eval, "INTERMEDIATE")
 
-    seq10_objects = (stop_input.as_object(), stop_eval.as_object())
+    seq10_objects = (snapshot.as_object(), stop_input.as_object(), stop_eval.as_object())
     commit_10 = coordinator.accept(next_cmd(head_ref), immutable_objects=seq10_objects, expected_head=head)
     head = commit_10.head
     head_ref = {"tag": "ACCEPTED_HEAD_REF", **head.as_dict()}

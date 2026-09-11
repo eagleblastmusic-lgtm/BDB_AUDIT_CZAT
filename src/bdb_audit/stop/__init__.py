@@ -4,10 +4,12 @@ from .models import (
     StageCompletion,
     StopInput,
     StopEvaluation,
+    Snapshot,
 )
 from .evaluator import (
     evaluate_stop,
     validate_intermediate_stop,
+    validate_stop_snapshot_binding,
 )
 
 __all__ = [
@@ -15,6 +17,8 @@ __all__ = [
     "StageCompletion",
     "StopInput",
     "StopEvaluation",
+    "Snapshot",
     "evaluate_stop",
     "validate_intermediate_stop",
+    "validate_stop_snapshot_binding",
 ]

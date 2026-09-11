@@ -193,6 +193,10 @@ class AcceptedHead:
             raise ValidationError("INVALID_COMMIT_SEQUENCE")
         _digest(self.commit_hash)
 
+    @property
+    def commit_digest(self) -> str:
+        return self.commit_hash
+
     def as_dict(self):
         return {"campaign_id": self.campaign_id, "commit_seq": self.commit_seq,
                 "commit_hash": self.commit_hash}

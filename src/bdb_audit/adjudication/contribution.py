@@ -108,9 +108,11 @@ def _to_dict(item: Any) -> dict:
     if isinstance(item, dict):
         return item
     if hasattr(item, "body"):
-        return item.body()
+        b = item.body
+        return b() if callable(b) else dict(b)
     if hasattr(item, "as_dict"):
-        return item.as_dict()
+        ad = item.as_dict
+        return ad() if callable(ad) else dict(ad)
     if hasattr(item, "__dict__"):
         return item.__dict__
     return dict(item)
@@ -150,11 +152,11 @@ def build_contribution_projection(
     # Gather producers from discoveries / findings
     for disc in discoveries:
         disc_dict = _to_dict(disc)
-        disc_ref = disc.as_object().ref.as_dict() if hasattr(disc, "as_object") else disc_dict.get("ref", disc_dict)
-        disc_digest = _ref_digest(disc_ref)
+        disc_ref = disc.as_object().ref.as_dict() if hasattr(disc, "as_object") else (disc.ref.as_dict() if hasattr(disc, "ref") and hasattr(disc.ref, "as_dict") else (disc.ref if hasattr(disc, "ref") else disc_dict.get("ref", disc_dict)))
+        disc_digest = disc.digest if hasattr(disc, "digest") else _ref_digest(disc_ref)
         finding_refs_map[disc_digest] = disc_ref
         
-        prod = disc_dict.get("producer_ref") or disc_dict.get("attempt_ref") or attributions.get(disc_digest)
+        prod = attributions.get(disc_digest) or disc_dict.get("producer_ref") or disc_dict.get("attempt_ref")
         if prod:
             prod_dict = _to_dict(prod)
             prod_id = prod_dict.get("producer_id") or prod_dict.get("attempt_id") or _ref_digest(prod)
@@ -164,11 +166,11 @@ def build_contribution_projection(
 
     for claim in finding_claims:
         claim_dict = _to_dict(claim)
-        claim_ref = claim.as_object().ref.as_dict() if hasattr(claim, "as_object") else claim_dict.get("ref", claim_dict)
-        claim_digest = _ref_digest(claim_ref)
+        claim_ref = claim.as_object().ref.as_dict() if hasattr(claim, "as_object") else (claim.ref.as_dict() if hasattr(claim, "ref") and hasattr(claim.ref, "as_dict") else (claim.ref if hasattr(claim, "ref") else claim_dict.get("ref", claim_dict)))
+        claim_digest = claim.digest if hasattr(claim, "digest") else _ref_digest(claim_ref)
         finding_refs_map[claim_digest] = claim_ref
         
-        prod = claim_dict.get("producer_ref") or attributions.get(claim_digest)
+        prod = attributions.get(claim_digest) or claim_dict.get("producer_ref")
         if prod:
             prod_dict = _to_dict(prod)
             prod_id = prod_dict.get("producer_id") or prod_dict.get("attempt_id") or _ref_digest(prod)

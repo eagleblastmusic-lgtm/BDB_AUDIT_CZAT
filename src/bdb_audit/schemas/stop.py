@@ -18,7 +18,7 @@ FIELDS = {
         "stop_input_snapshot_ref inventory_revision_ref mandatory_obligation_refs "
         "current_obligation_qualification_refs evidence_invalidation_refs contradiction_refs "
         "residual_risk_refs evidence_invalidation_state release_policy_ref effort_profile_ref "
-        "effort_results_ref continuation_budget_authorization_ref unknown_blocked_summary"
+        "effort_results_ref unknown_blocked_summary"
     ),
     "stop_evaluation": (
         "stop_evaluation_id stop_input_ref continuation_decision assurance_level "
@@ -32,6 +32,7 @@ OPTIONAL = {
         "challenger_refs",
         "challenger_freshness_profile_ref",
         "release_basis_refs",
+        "continuation_budget_authorization_ref",
     ),
 }
 
@@ -51,6 +52,8 @@ OBJECTS = {
 
 
 def stop_schema(kind):
+    if kind == "snapshot":
+        return snapshot_schema()
     if kind not in FIELDS:
         return None
     fields = FIELDS[kind].split()
@@ -100,3 +103,30 @@ def stop_schema(kind):
         "properties": properties,
         "additionalProperties": False,
     }
+
+
+def snapshot_schema():
+    return {
+        "type": "object",
+        "required": [
+            "snapshot_id",
+            "snapshot_type",
+            "as_of_head",
+            "projection_code_revision",
+            "projection_input_refs",
+            "snapshot_artifact_ref",
+        ],
+        "properties": {
+            "snapshot_id": {"type": "string"},
+            "snapshot_type": {"type": "string"},
+            "as_of_head": {"type": "object"},
+            "projection_code_revision": {"type": "string"},
+            "projection_input_refs": {
+                "type": "array",
+                "items": {"type": "object"},
+            },
+            "snapshot_artifact_ref": {"type": "object"},
+        },
+        "additionalProperties": False,
+    }
+
