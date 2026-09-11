@@ -1,0 +1,156 @@
+{
+  "acceptance_id": "BDB-F3-M14-M23-R5_3_1-001",
+  "adversarial_outcomes": {
+    "F1": "BLIND_SLOT_NOT_SATISFIED",
+    "F2": "STAGE_COMPLETION_BLOCKED",
+    "F3": "REJECTED",
+    "F4": "EXACTLY_ONE_ACCEPTED_EFFECT",
+    "F5": "BLOCKED_CANONICAL_ADMISSION",
+    "F6": "COMPLETION_BLOCKED_UNTIL_REPLACEMENT",
+    "F7": "CONTINUE_REQUIRED_WITH_BOTH_REASONS"
+  },
+  "baseline_qualification_raw_sha256": "4bb0da6a8bcb4ef0bc931bef5178f30120618e85ef727d72633a410fb4fbdb2c",
+  "bootstrap_precedence_profile": "BDB_BOOTSTRAP_PRECEDENCE_V1",
+  "branch": "bdb-v2",
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f1",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 93
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/compatibility",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 86
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f2",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 85
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f3",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 59
+    }
+  ],
+  "f2_predecessor_head": "05e556c235817eda8baf6ec0bb31b5619da04b69",
+  "f3_qualified_implementation_commit": "5fef5cf1b526263892fd50dc60474279ad38b19c",
+  "f3_start_head": "05e556c235817eda8baf6ec0bb31b5619da04b69",
+  "f3_status": "PASS",
+  "f4_started": "NO",
+  "gates": {
+    "AUTHORITY_HISTORY_GATE": "PASS",
+    "CLEAN_STORAGE_REPRODUCIBILITY": "PASS",
+    "DUAL_COMPATIBILITY_GATES": "PASS",
+    "F0_REGRESSION": "PASS",
+    "F1_REGRESSION": "PASS",
+    "F2_REGRESSION": "PASS",
+    "F3_REGRESSION": "PASS",
+    "FOUNDATION_REFERENCE_SLICE_GATE": "PASS",
+    "GOLDEN_VECTOR_QUALIFICATION": "PASS",
+    "IDENTITY_SCHEMA_GATE": "PASS",
+    "M14_GATE": "PASS",
+    "M15_GATE": "PASS",
+    "M16_GATE": "PASS",
+    "M17_GATE": "PASS",
+    "M18_GATE": "PASS",
+    "M19_GATE": "PASS",
+    "M20_GATE": "PASS",
+    "M21_GATE": "PASS",
+    "M22_GATE": "PASS",
+    "M23_GATE": "PASS",
+    "SCHEMA_BINDING_QUALIFICATION": "PASS",
+    "STOP_REFUSAL_PATH": "PASS"
+  },
+  "golden_vector_count": 117,
+  "golden_vector_set_id": "BDB-AUDIT-V2-FOUNDATION-GOLDEN-VECTORS-R5-3-2",
+  "golden_vectors_sha256": "1beeedd979c06816480cc5adc144fd3470a7379630e6ed8d4a4770c5448c48e7",
+  "milestone": "F3",
+  "next_phase_allowed": "YES",
+  "normative_candidate_set_digest": "087539f5a08a2441647aae1889ce51330b47740e559b394574da122bd6cfd15b",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python": "3.14.4",
+  "registry_id": "BDB-AUDIT-V2-ARTIFACT-CONTRACT-REGISTRY-R5-3-2",
+  "registry_sha256": "3cd0945f2987499761281f51cadb48a5947ac8255e4af292f4837cbc843a2a8b",
+  "repository": "eagleblastmusic-lgtm/bdb-audit",
+  "resolved_defects": [
+    {
+      "id": "PR028-COMMAND-CLOSURE-ORDER",
+      "resolution": "Topological Kahn sort prioritizes command_envelope node among zero-indegree roots to prevent receipt generation before envelope emission."
+    },
+    {
+      "id": "PR028-STOP-SNAPSHOT-BINDING",
+      "resolution": "Enforced fail-closed validation of stop_input_snapshot_ref binding in transactional store, rejecting dangling, wrong-kind, and stale/divergent projection input digests with STOP_SNAPSHOT_BINDING_CONFLICT."
+    },
+    {
+      "id": "PR028-BUDGET-AUTHORIZATION-REF",
+      "resolution": "Supported explicit None for continuation_budget_authorization_ref in stop_evaluation schema and store while rejecting dangling/wrong-kind typed references."
+    },
+    {
+      "id": "PR029-CONTAMINATED-LANE-INVARIANT",
+      "resolution": "Fail-closed check in LaneCompletion model prevents LANE_COMPLETED outcome when contamination_assessment_refs are present."
+    },
+    {
+      "id": "PR029-F4-F5-TYPED-ID-SCHEMAS",
+      "resolution": "Adversarial tests conform to strict canonical schema validation and UUIDv4 typed ID format without ad-hoc fallbacks."
+    }
+  ],
+  "schema": "BDB_F3_MILESTONE_ACCEPTANCE_V1",
+  "spec_conflicts": [],
+  "total_passed_tests": 323,
+  "verdict": "PASS",
+  "work_packages": {
+    "PR020_M14": "PASS",
+    "PR021_M15": "PASS",
+    "PR022_M16": "PASS",
+    "PR023_M17": "PASS",
+    "PR024_M18": "PASS",
+    "PR025_M19_M20": "PASS",
+    "PR026_M21": "PASS",
+    "PR027_M22_M23": "PASS",
+    "PR028_REFERENCE_SLICE": "PASS",
+    "PR029_ADVERSARIAL": "PASS",
+    "PR030_QUALIFICATION_GATE": "PASS"
+  }
+}
