@@ -1,4 +1,4 @@
-"""BDB Audit v2 Finding Adjudication and Contradiction module (M21/M22)."""
+"""BDB Audit v2 Finding Adjudication and Contradiction module (M21/M22/WP-F4-08)."""
 from .models import (
     FindingClaimRevision,
     FindingAxisAssessment,
@@ -14,7 +14,13 @@ from .models import (
 )
 from .engine import (
     validate_root_cause_authority,
+    validate_finding_adjudication_rules,
     adjudicate_finding,
+    transition_finding_lifecycle,
+    resolve_contradiction,
+    reopen_contradiction,
+    cluster_findings_into_root_cause,
+    ALLOWED_LIFECYCLE_TRANSITIONS,
 )
 from .contribution import (
     ProducerContribution,
@@ -36,10 +42,15 @@ __all__ = [
     "CONTRADICTION_STATUSES",
     "sort_membership_edges",
     "validate_root_cause_authority",
+    "validate_finding_adjudication_rules",
     "adjudicate_finding",
+    "transition_finding_lifecycle",
+    "resolve_contradiction",
+    "reopen_contradiction",
+    "cluster_findings_into_root_cause",
+    "ALLOWED_LIFECYCLE_TRANSITIONS",
     "ProducerContribution",
     "ContributionProjection",
     "build_contribution_projection",
     "validate_contribution_authority",
 ]
-

@@ -59,7 +59,12 @@ def adjudication_schema(kind):
             ]
         }
     elif kind == "contradiction_revision":
-        properties["status"] = {"enum": ["UNRESOLVED", "RESOLVED"]}
+        properties["status"] = {
+            "enum": [
+                "UNRESOLVED", "RESOLVED",
+                "OPEN", "TESTING", "RESOLVED_SCOPED", "RESOLVED_FULL", "REOPENED", "BLOCKED"
+            ]
+        }
 
     return {
         "type": "object",
