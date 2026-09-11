@@ -21,6 +21,11 @@ from .engine import (
 from .invariants import (
     InvariantRegistryEngine,
 )
+from .policies import (
+    ObligationPolicyLibrary,
+    PolicyObligationRule,
+    compute_breadth_summary,
+)
 
 __all__ = [
     "InvariantRevision",
@@ -39,4 +44,7 @@ __all__ = [
     "evaluate_coverage_qualification",
     "derive_presentation_depth",
     "InvariantRegistryEngine",
+    "ObligationPolicyLibrary",
+    "PolicyObligationRule",
+    "compute_breadth_summary",
 ]
