@@ -55,7 +55,12 @@ M18_KINDS = (
     "hypothesis_revision",
 )
 
-F3_KINDS = (*F2_KINDS, *M14_KINDS, *M15_KINDS, *M18_KINDS)
+M19_KINDS = (
+    "experiment_spec", "execution_descriptor", "fault_run_record",
+    "cleanup_result", "execution_result", "tool_execution_record",
+)
+
+F3_KINDS = (*F2_KINDS, *M14_KINDS, *M15_KINDS, *M18_KINDS, *M19_KINDS)
 
 
 def executable_schema(kind, *, registry=None):
@@ -92,6 +97,10 @@ def executable_schema(kind, *, registry=None):
         schema.update(structural)
     from .hypothesis import hypothesis_schema
     structural = hypothesis_schema(kind)
+    if structural is not None:
+        schema.update(structural)
+    from .experiment import experiment_schema
+    structural = experiment_schema(kind)
     if structural is not None:
         schema.update(structural)
     return schema
