@@ -43,6 +43,13 @@ from .crash import (
     CrashRecoveryEngine,
     CRASH_BOUNDARIES,
 )
+from .endurance import (
+    MetricSnapshot,
+    EnduranceProfile,
+    EnduranceAssessment,
+    EnduranceEngine,
+    ENDURANCE_CLASSIFICATIONS,
+)
 
 __all__ = [
     "State",
@@ -77,4 +84,9 @@ __all__ = [
     "DurableStoreHarness",
     "CrashRecoveryEngine",
     "CRASH_BOUNDARIES",
+    "MetricSnapshot",
+    "EnduranceProfile",
+    "EnduranceAssessment",
+    "EnduranceEngine",
+    "ENDURANCE_CLASSIFICATIONS",
 ]
