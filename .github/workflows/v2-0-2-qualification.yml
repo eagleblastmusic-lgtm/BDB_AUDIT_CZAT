@@ -1,0 +1,100 @@
+name: BDB Audit v2.0.2 Qualification
+
+on:
+  push:
+    branches:
+      - fix/v2.0.2-stop-gate
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v2-0-2-qualification-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualify-windows:
+    name: Windows Python 3.14 qualification
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+
+      - name: Show environment identity
+        shell: pwsh
+        run: |
+          python --version
+          python -c "import platform,sys,sysconfig; print(platform.platform()); print(platform.machine()); print(sys.implementation.name); print(sysconfig.get_config_var('SOABI'))"
+          git rev-parse HEAD
+          git status --short
+
+      - name: Install exact runtime closure and qualification tools
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-f2.lock
+          python -m pip install pytest==9.1.1 ruff==0.16.7 mypy==2.3.1
+
+      - name: Full pytest suite
+        shell: pwsh
+        run: python -m pytest -q
+
+      - name: Ruff release lane
+        shell: pwsh
+        run: python -m ruff check src build
+
+      - name: Mypy release lane
+        shell: pwsh
+        run: python -m mypy --config-file pyproject.toml
+
+      - name: Build v2.0.2 standalone
+        shell: pwsh
+        run: python build/build_single_file_v2_0_2.py
+
+      - name: Standalone isolated smoke
+        shell: pwsh
+        run: |
+          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.2.py --version
+          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.2.py --verify-payload
+          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.2.py self-test
+          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.2.py --help
+
+      - name: Verify tested HEAD is remote branch HEAD
+        if: github.event_name == 'push'
+        shell: pwsh
+        run: |
+          $local = git rev-parse HEAD
+          $remoteLine = git ls-remote origin "refs/heads/fix/v2.0.2-stop-gate"
+          $remote = ($remoteLine -split "`t")[0]
+          Write-Host "LOCAL_HEAD=$local"
+          Write-Host "REMOTE_HEAD=$remote"
+          if ($local -ne $remote) { throw "Tested HEAD is not the remote branch HEAD" }
+
+      - name: Record artifact SHA-256
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash dist/BDB_AUDIT_ASSISTANT_v2.0.2.py -Algorithm SHA256).Hash.ToLower()
+          "SHA256=$hash" | Tee-Object -FilePath dist/SHA256SUMS.txt
+          Get-Item dist/BDB_AUDIT_ASSISTANT_v2.0.2.py | Select-Object FullName,Length
+
+      - name: Upload qualified candidate artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BDB-Audit-v2.0.2-windows-py314-candidate
+          path: |
+            dist/BDB_AUDIT_ASSISTANT_v2.0.2.py
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
