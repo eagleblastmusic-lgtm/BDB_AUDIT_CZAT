@@ -54,6 +54,9 @@ class LaneCompletion:
         if self.completion_predicate_result not in {"LANE_COMPLETED", "LANE_COMPLETION_BLOCKED"}:
             raise ValidationError(f"INVALID_LANE_COMPLETION_RESULT: {self.completion_predicate_result}")
 
+        if self.contamination_assessment_refs and self.completion_predicate_result == "LANE_COMPLETED":
+            raise ValidationError("BLIND_SLOT_NOT_SATISFIED: contaminated lane cannot complete")
+
         object.__setattr__(self, "attempt_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.attempt_refs])))
         object.__setattr__(self, "required_output_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.required_output_refs])))
         object.__setattr__(

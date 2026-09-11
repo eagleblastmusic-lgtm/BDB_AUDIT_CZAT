@@ -110,7 +110,8 @@ def canonical_order(nodes, *, command_kind=None, commit_seq=None,
 
     def key(node_id):
         n = by_id[node_id]
-        return (n.kind, n.logical_id or "", n.revision_digest or "", node_id)
+        is_cmd = 0 if n.kind == "command_envelope" else 1
+        return (is_cmd, n.kind, n.logical_id or "", n.revision_digest or "", node_id)
 
     heap = [(key(n.node_id), n.node_id) for n in prepared if indegree[n.node_id] == 0]
     heapq.heapify(heap)

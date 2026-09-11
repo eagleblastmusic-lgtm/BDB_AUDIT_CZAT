@@ -97,7 +97,7 @@ def _ref_for(parent_kind: str, field_name: str, target: Any) -> dict[str, Any]:
     }
 
 
-def run_foundation_reference_slice(store_path: str | Path) -> dict[str, Any]:
+def run_foundation_reference_slice(store_path: str | Path, *, stop_at_seq: int = 10) -> dict[str, Any]:
     """Execute the full Foundation Reference Slice campaign deterministically.
     
     Returns a dictionary of execution artifacts and verification status.
@@ -559,6 +559,27 @@ def run_foundation_reference_slice(store_path: str | Path) -> dict[str, Any]:
     head = commit_9.head
     head_ref = {"tag": "ACCEPTED_HEAD_REF", **head.as_dict()}
     head_cut = make_cut(head, commit_9.commit)
+
+    if stop_at_seq == 9:
+        return {
+            "store": store,
+            "coordinator": coordinator,
+            "commit_count": 9,
+            "head": head,
+            "head_ref": head_ref,
+            "head_cut": head_cut,
+            "campaign_id": campaign_id,
+            "source_gen": source_gen,
+            "inv_rev": inv_rev,
+            "cov_ob": cov_ob,
+            "cov_qual": cov_qual,
+            "stage_comp": stage_comp,
+            "stage_spec_obj": stage_spec_obj,
+            "next_cmd": next_cmd,
+            "det_id": det_id,
+            "make_cut": make_cut,
+            "commit_9": commit_9,
+        }
 
     # -------------------------------------------------------------------------
     # 10. SEQ=10: Intermediate STOP Gate Evaluation (PR-027)
