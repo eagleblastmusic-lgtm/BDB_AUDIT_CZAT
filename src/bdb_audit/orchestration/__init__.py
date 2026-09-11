@@ -24,6 +24,19 @@ from .native_ensemble import (
     execute_e2_convergence,
     validate_stage_transition,
 )
+from .e3 import (
+    E3_LANE_SLOTS,
+    E3_LANE_STRATEGIES,
+    FORBIDDEN_BLIND_LEAK_FIELDS,
+    build_e3_stage_spec,
+    build_e3_lane_specs,
+    create_result_slot_contract,
+    E3QuarantineBroker,
+    E3BlindAttemptContext,
+    create_e3_blind_attempt,
+    E3BlindNoveltyResult,
+    execute_e3_blind_ensemble,
+)
 
 __all__ = [
     "CampaignState",
@@ -48,4 +61,16 @@ __all__ = [
     "execute_e1_ensemble",
     "execute_e2_convergence",
     "validate_stage_transition",
+    "E3_LANE_SLOTS",
+    "E3_LANE_STRATEGIES",
+    "FORBIDDEN_BLIND_LEAK_FIELDS",
+    "build_e3_stage_spec",
+    "build_e3_lane_specs",
+    "create_result_slot_contract",
+    "E3QuarantineBroker",
+    "E3BlindAttemptContext",
+    "create_e3_blind_attempt",
+    "E3BlindNoveltyResult",
+    "execute_e3_blind_ensemble",
 ]
+
