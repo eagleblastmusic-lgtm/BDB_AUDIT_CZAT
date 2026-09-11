@@ -1,0 +1,170 @@
+{
+  "acceptance_id": "BDB-F4-DOMAIN-EXPANSION-R5_3_1-001",
+  "branch": "bdb-v2",
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f1",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 93
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/compatibility",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 86
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f2",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 85
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f3",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 60
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f4",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 58
+    }
+  ],
+  "f3_final_head": "a10e695f8b62932dae6c35fc3b2860263abfdba3",
+  "f3_predecessor_acceptance_id": "BDB-F3-M14-M23-R5_3_1-001",
+  "f3_predecessor_acceptance_sha256": "8be11af638267e03182bd0d7206bd083042280c6810da314b6d81e30b4786de6",
+  "f4_qualified_implementation_commit": "1ca6be2",
+  "f4_start_head": "a10e695f8b62932dae6c35fc3b2860263abfdba3",
+  "f4_status": "PASS",
+  "f5_started": "NO",
+  "gates": {
+    "AUTHORITY_HISTORY_GATE": "PASS",
+    "CLEAN_STORAGE_REPRODUCIBILITY": "PASS",
+    "DUAL_COMPATIBILITY_GATES": "PASS",
+    "F0_REGRESSION": "PASS",
+    "F1_REGRESSION": "PASS",
+    "F2_REGRESSION": "PASS",
+    "F3_REGRESSION": "PASS",
+    "F4_DOMAIN_EXPANSION_GATE": "PASS",
+    "FOUNDATION_REFERENCE_SLICE_GATE": "PASS",
+    "GOLDEN_VECTOR_QUALIFICATION": "PASS",
+    "IDENTITY_SCHEMA_GATE": "PASS",
+    "SCHEMA_BINDING_QUALIFICATION": "PASS",
+    "STOP_REFUSAL_PATH": "PASS"
+  },
+  "milestone": "F4",
+  "next_phase_allowed": "YES",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "push_performed_during_final_closeout": "NO",
+  "python": "3.14.4",
+  "repository": "eagleblastmusic-lgtm/bdb-audit",
+  "schema": "BDB_F4_MILESTONE_ACCEPTANCE_V1",
+  "spec_conflicts": [],
+  "total_passed_tests": 382,
+  "verdict": "PASS",
+  "work_packages": {
+    "WP_F4_01_COLLECTOR_COVERAGE_PRODUCTION_INVENTORY": {
+      "commit": "ffc0e50",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "WP_F4_02_INVARIANT_CATEGORIES_NEGATIVE_VALIDATION": {
+      "commit": "1618ac2",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "WP_F4_03_OBLIGATION_POLICY_LIBRARY_BREADTH_SUMMARY": {
+      "commit": "93bb747",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "WP_F4_04_PRODUCTION_GAP_ENGINE_REBUILD_EQUIVALENCE": {
+      "commit": "a7328ef",
+      "status": "PASS",
+      "tests_passed": 5
+    },
+    "WP_F4_05_HYPOTHESIS_ORCHESTRATION_IMMUTABLE_FLOW": {
+      "commit": "cb787f5",
+      "status": "PASS",
+      "tests_passed": 4
+    },
+    "WP_F4_06_EXPERIMENT_EXECUTION_ADAPTER_DAG_ACYCLICITY": {
+      "commit": "f2594f2",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "WP_F4_07_EVIDENCE_GRAPH_INVALIDATION_PROPAGATION": {
+      "commit": "e130c24",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "WP_F4_08_FINDING_ROOT_CAUSE_CONTRADICTION_ENGINES": {
+      "commit": "4268ad2",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "WP_F4_09_NATIVE_E1_E2_ORCHESTRATION": {
+      "commit": "3478584",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "WP_F4_10_REPLAY_AND_SUCCESSOR_SEMANTICS": {
+      "commit": "02e7efd",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "WP_F4_11_DOMAIN_INTEGRATION_PROOF": {
+      "commit": "1ca6be2",
+      "status": "PASS",
+      "tests_passed": 1
+    }
+  }
+}
