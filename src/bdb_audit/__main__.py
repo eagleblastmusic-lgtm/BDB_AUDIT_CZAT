@@ -1,14 +1,13 @@
-"""M4 import/CLI boundary. No implicit campaign creation."""
-import argparse
+"""CLI entry point for bdb_audit module."""
+import sys
+from .cli import run_cli
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(
-        prog="bdb_audit", description="BDB Audit v2 foundation reference implementation"
-    )
-    parser.parse_args(argv)
-    parser.print_help()
+    if argv is None:
+        argv = sys.argv[1:]
+    return run_cli(argv)
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
