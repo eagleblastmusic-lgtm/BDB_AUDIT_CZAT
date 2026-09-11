@@ -66,7 +66,13 @@ M20_KINDS = (
     "evidence_invalidation",
 )
 
-F3_KINDS = (*F2_KINDS, *M14_KINDS, *M15_KINDS, *M18_KINDS, *M19_KINDS, *M20_KINDS)
+M21_KINDS = (
+    "finding_claim_revision", "finding_axis_assessment",
+    "finding_adjudication_decision", "root_cause_revision",
+    "contradiction_revision", "contradiction_resolution_decision",
+)
+
+F3_KINDS = (*F2_KINDS, *M14_KINDS, *M15_KINDS, *M18_KINDS, *M19_KINDS, *M20_KINDS, *M21_KINDS)
 
 
 def executable_schema(kind, *, registry=None):
@@ -111,6 +117,10 @@ def executable_schema(kind, *, registry=None):
         schema.update(structural)
     from .evidence import evidence_schema
     structural = evidence_schema(kind)
+    if structural is not None:
+        schema.update(structural)
+    from .adjudication import adjudication_schema
+    structural = adjudication_schema(kind)
     if structural is not None:
         schema.update(structural)
     return schema
