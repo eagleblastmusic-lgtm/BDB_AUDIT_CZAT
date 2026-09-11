@@ -15,6 +15,16 @@ from .adapters import (
     EXPERIMENT_TYPES,
     ExecutionRunOutput,
 )
+from .fuzzing import (
+    FuzzerCapability,
+    FuzzerCase,
+    create_fuzzer_case,
+    FuzzerExecutionRecord,
+    FuzzerAdapter,
+    DeterministicFuzzerAdapter,
+    process_fuzz_result_through_pipeline,
+    validate_no_direct_crash_to_finding,
+)
 
 __all__ = [
     "ExperimentSpec",
@@ -27,4 +37,13 @@ __all__ = [
     "ExecutionAdapter",
     "EXPERIMENT_TYPES",
     "ExecutionRunOutput",
+    "FuzzerCapability",
+    "FuzzerCase",
+    "create_fuzzer_case",
+    "FuzzerExecutionRecord",
+    "FuzzerAdapter",
+    "DeterministicFuzzerAdapter",
+    "process_fuzz_result_through_pipeline",
+    "validate_no_direct_crash_to_finding",
 ]
+
