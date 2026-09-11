@@ -35,6 +35,14 @@ from .concurrency import (
     ScheduleReplayEngine,
     SCHEDULE_LOCATIONS,
 )
+from .crash import (
+    CrashPoint,
+    RecoveryInvariant,
+    RestartResult,
+    DurableStoreHarness,
+    CrashRecoveryEngine,
+    CRASH_BOUNDARIES,
+)
 
 __all__ = [
     "State",
@@ -63,4 +71,10 @@ __all__ = [
     "ReplayResult",
     "ScheduleReplayEngine",
     "SCHEDULE_LOCATIONS",
+    "CrashPoint",
+    "RecoveryInvariant",
+    "RestartResult",
+    "DurableStoreHarness",
+    "CrashRecoveryEngine",
+    "CRASH_BOUNDARIES",
 ]
