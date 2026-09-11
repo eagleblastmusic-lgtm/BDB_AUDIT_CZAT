@@ -11,6 +11,10 @@ from .evaluator import (
     validate_intermediate_stop,
     validate_stop_snapshot_binding,
 )
+from .e6 import (
+    AdaptiveE6Spec,
+    AdaptiveE6Generator,
+)
 
 __all__ = [
     "LaneCompletion",
@@ -21,4 +25,6 @@ __all__ = [
     "evaluate_stop",
     "validate_intermediate_stop",
     "validate_stop_snapshot_binding",
+    "AdaptiveE6Spec",
+    "AdaptiveE6Generator",
 ]
