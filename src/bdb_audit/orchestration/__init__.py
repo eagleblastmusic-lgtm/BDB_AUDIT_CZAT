@@ -49,6 +49,10 @@ from .e3_reveal import (
     FalseNegativeRelationshipAssessment,
     evaluate_false_negative_relationship,
 )
+from .e3_gate import (
+    E3StageCompletionCandidate,
+    E3IntegrationGateEvaluator,
+)
 
 __all__ = [
     "CampaignState",
@@ -94,6 +98,9 @@ __all__ = [
     "execute_holdout_reveal",
     "FalseNegativeRelationshipAssessment",
     "evaluate_false_negative_relationship",
+    "E3StageCompletionCandidate",
+    "E3IntegrationGateEvaluator",
 ]
+
 
 
