@@ -78,6 +78,12 @@ M24_KINDS = (
 
 F3_KINDS = (*F2_KINDS, *M14_KINDS, *M15_KINDS, *M18_KINDS, *M19_KINDS, *M20_KINDS, *M21_KINDS, *M24_KINDS)
 
+M28_KINDS = (
+    "model_fidelity_assessment",
+)
+
+F6_KINDS = (*F3_KINDS, *M28_KINDS)
+
 
 def executable_schema(kind, *, registry=None):
     registry = registry or ContractRegistry()
@@ -129,6 +135,10 @@ def executable_schema(kind, *, registry=None):
         schema.update(structural)
     from .stop import stop_schema
     structural = stop_schema(kind)
+    if structural is not None:
+        schema.update(structural)
+    from .deepen import deepen_schema
+    structural = deepen_schema(kind)
     if structural is not None:
         schema.update(structural)
     return schema
