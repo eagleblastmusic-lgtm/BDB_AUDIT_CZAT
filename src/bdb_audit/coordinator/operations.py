@@ -26,9 +26,38 @@ from ..orchestration.runs import LaneSpec
 from ..orchestration.templates import TemplateRegistry
 
 
+_BASELINE_STAGE_ORDER = ("E1", "E2", "E3", "E4", "E5")
+_STAGE_ALIASES = {
+    # v2.0.0 accepted these descriptive CLI labels. Keep them as input-only
+    # compatibility aliases, but persist/project the canonical StageSpec key.
+    "F2_FOUNDATION": "E1",
+    "E1_ENSEMBLE": "E1",
+    "E2_CROSS_REVIEW": "E2",
+    "E3_BLIND_GAP": "E3",
+    "E4_DEEPEN": "E4",
+    "E5_ATTACK": "E5",
+}
+
+
 def _command_id(seed: str) -> str:
     h = hashlib.sha256(seed.encode("utf-8")).hexdigest()
     return f"command_{h[:8]}-{h[8:12]}-4{h[13:16]}-8{h[17:20]}-{h[20:32]}"
+
+
+def _canonical_stage_key(stage_id: str) -> str:
+    """Normalize public stage labels to the StageSpec key domain (E1..E5)."""
+    normalized = stage_id.strip().upper()
+    if normalized in _BASELINE_STAGE_ORDER:
+        return normalized
+    if normalized in _STAGE_ALIASES:
+        return _STAGE_ALIASES[normalized]
+    prefix = normalized.split("_", 1)[0]
+    if prefix in _BASELINE_STAGE_ORDER:
+        return prefix
+    raise ValidationError(
+        "INVALID_STAGE_ID",
+        f"Unknown stage: {stage_id}. Allowed canonical stages: E1..E5",
+    )
 
 
 class AuditOperationApi:
@@ -228,28 +257,47 @@ class AuditOperationApi:
         if head.commit_seq == 0:
             raise ValidationError("CAMPAIGN_NOT_FOUND", f"Store at {path} contains no accepted commits")
 
-        # Extract campaign details from stored objects
         campaign_id = head.campaign_id
 
-        # Read objects to find stage/lane status
         conn = store._connect()
         try:
             rows = conn.execute("SELECT kind, body FROM immutable_objects").fetchall()
 
-            stages = []
-            for r in rows:
-                if r[0] == "stage_spec":
-                    doc = json.loads(r[1].decode("utf-8"))
-                    stages.append(doc.get("stage_id", doc.get("key", "UNKNOWN")))
+            stage_records: list[tuple[int, str]] = []
+            for kind, body in rows:
+                if kind != "stage_spec":
+                    continue
+                doc = json.loads(body.decode("utf-8"))
+                stage_key = doc.get("stage_key") or doc.get("stage_id") or doc.get("key")
+                ordinal = doc.get("stage_ordinal")
+                if stage_key is None:
+                    raise ValidationError("STAGE_SPEC_PROJECTION_INVALID", "stage_spec missing stage_key")
+                try:
+                    canonical_key = _canonical_stage_key(str(stage_key))
+                except ValidationError as exc:
+                    raise ValidationError("STAGE_SPEC_PROJECTION_INVALID", str(exc)) from exc
+                if type(ordinal) is not int or ordinal < 1:
+                    # Compatibility fallback for v2.0.0 objects that did not expose
+                    # an ordinal under the current body shape.
+                    ordinal = len(stage_records) + 1
+                stage_records.append((ordinal, canonical_key))
 
-            lanes = []
-            for r in rows:
-                if r[0] == "lane_spec":
-                    doc = json.loads(r[1].decode("utf-8"))
-                    lanes.append(doc.get("lane_id", doc.get("slot", "UNKNOWN")))
+            stage_records.sort(key=lambda item: (item[0], item[1]))
+            stages = [stage_key for _, stage_key in stage_records]
 
-            stage_completions = [r[0] for r in rows if r[0] == "stage_completion"]
-            stop_evaluations = [r[0] for r in rows if r[0] == "stop_evaluation"]
+            lanes: list[str] = []
+            for kind, body in rows:
+                if kind != "lane_spec":
+                    continue
+                doc = json.loads(body.decode("utf-8"))
+                lane_key = doc.get("lane_key") or doc.get("lane_id") or doc.get("slot")
+                if not lane_key:
+                    raise ValidationError("LANE_SPEC_PROJECTION_INVALID", "lane_spec missing lane_key")
+                lanes.append(str(lane_key))
+            lanes.sort()
+
+            stage_completions = [kind for kind, _ in rows if kind == "stage_completion"]
+            stop_evaluations = [kind for kind, _ in rows if kind == "stop_evaluation"]
 
             current_stage = stages[-1] if stages else "GENESIS"
         finally:
@@ -274,28 +322,31 @@ class AuditOperationApi:
         stage_id: str,
         stage_spec_revision: str = "1",
     ) -> dict[str, Any]:
-        """Validate FSM stage transition and accept stage preparation."""
+        """Validate baseline stage order and accept stage preparation."""
         path = Path(store_path).resolve()
         status = self.get_campaign_status(path)
         store = TransactionalHistoryStore(path, registry=self.registry)
         coordinator = Coordinator(store)
         head = store.head()
 
-        # Validate stage ID
-        stage_key = stage_id.split("_")[0] if "_" in stage_id else stage_id
-        if stage_key not in ("E1", "E2", "E3", "E4", "E5"):
-            if "F2" in stage_id or "FOUNDATION" in stage_id:
-                stage_key = "E1"
-            else:
-                raise ValidationError("INVALID_STAGE_ID", f"Unknown stage: {stage_id}. Allowed: E1..E5")
+        stage_key = _canonical_stage_key(stage_id)
+        prepared_stages = list(status["stages_prepared"])
+        if stage_key in prepared_stages:
+            raise ValidationError("STAGE_ALREADY_PREPARED", f"Stage {stage_key} is already prepared")
 
-        # Construct StageSpec
+        expected_stage = next((s for s in _BASELINE_STAGE_ORDER if s not in prepared_stages), None)
+        if expected_stage is not None and stage_key != expected_stage:
+            raise ValidationError(
+                "INVALID_STAGE_TRANSITION",
+                f"Expected next stage {expected_stage}, got {stage_key}",
+            )
+
         spec = StageSpec(
             stage_key=stage_key,
             stage_spec_revision=stage_spec_revision,
             stage_role=stage_key,
-            stage_ordinal=len(status["stages_prepared"]) + 1,
-            purpose=f"BDB {stage_id} operational stage",
+            stage_ordinal=len(prepared_stages) + 1,
+            purpose=f"BDB {stage_key} operational stage",
         )
         spec_obj = spec.as_object()
 
@@ -308,13 +359,13 @@ class AuditOperationApi:
             conn.close()
 
         cmd = CommandEnvelope(
-            command_id=_command_id(f"stage_prep_{stage_id}_{head.commit_seq + 1}"),
+            command_id=_command_id(f"stage_prep_{stage_key}_{head.commit_seq + 1}"),
             command_kind="RECORD_FOUNDATION_FACT",
             actor_ref=prior_commit.get("actor_ref", "installation-owner"),
             expected_parent_head=parent_head_ref,
             governing_policy_ref=prior_commit.get("governing_policy_ref", "pin:initial_governing_policy_ref"),
             governing_spec_refs=tuple(prior_commit.get("governing_spec_refs", ("pin:initial_transition_profile_ref",))),
-            idempotency_scope=f"stage_prep_{stage_id}_{head.commit_seq + 1}",
+            idempotency_scope=f"stage_prep_{stage_key}_{head.commit_seq + 1}",
             campaign_ref=head.campaign_id,
         )
 
@@ -322,6 +373,7 @@ class AuditOperationApi:
         return {
             "status": "SUCCESS",
             "stage_id": stage_id,
+            "stage_key": stage_key,
             "stage_spec_digest": spec_obj.digest,
             "commit_seq": res.head.commit_seq,
             "commit_hash": res.head.commit_hash,
@@ -334,16 +386,16 @@ class AuditOperationApi:
         slot: str,
         lane_spec_revision: str = "1",
     ) -> dict[str, Any]:
-        """Validate isolation and accept lane preparation."""
+        """Validate parent stage and accept lane preparation."""
         path = Path(store_path).resolve()
-        self.get_campaign_status(path)
+        status = self.get_campaign_status(path)
         store = TransactionalHistoryStore(path, registry=self.registry)
         coordinator = Coordinator(store)
         head = store.head()
 
-        stage_key = stage_id.split("_")[0] if "_" in stage_id else stage_id
-        if stage_key not in ("E1", "E2", "E3", "E4", "E5"):
-            stage_key = "E1"
+        stage_key = _canonical_stage_key(stage_id)
+        if stage_key not in status["stages_prepared"]:
+            raise ValidationError("STAGE_NOT_PREPARED", f"Prepare stage {stage_key} before adding lanes")
 
         lane_spec = LaneSpec(
             lane_key=f"lane_{stage_key}_{slot}",
@@ -364,13 +416,13 @@ class AuditOperationApi:
             conn.close()
 
         cmd = CommandEnvelope(
-            command_id=_command_id(f"lane_prep_{slot}_{head.commit_seq + 1}"),
+            command_id=_command_id(f"lane_prep_{stage_key}_{slot}_{head.commit_seq + 1}"),
             command_kind="RECORD_FOUNDATION_FACT",
             actor_ref=prior_commit.get("actor_ref", "installation-owner"),
             expected_parent_head=parent_head_ref,
             governing_policy_ref=prior_commit.get("governing_policy_ref", "pin:initial_governing_policy_ref"),
             governing_spec_refs=tuple(prior_commit.get("governing_spec_refs", ("pin:initial_transition_profile_ref",))),
-            idempotency_scope=f"lane_prep_{slot}_{head.commit_seq + 1}",
+            idempotency_scope=f"lane_prep_{stage_key}_{slot}_{head.commit_seq + 1}",
             campaign_ref=head.campaign_id,
         )
 
@@ -378,6 +430,7 @@ class AuditOperationApi:
         return {
             "status": "SUCCESS",
             "stage_id": stage_id,
+            "stage_key": stage_key,
             "slot": slot,
             "lane_id": lane_spec.lane_key,
             "lane_spec_digest": lane_obj.digest,
@@ -415,13 +468,11 @@ class AuditOperationApi:
         if expected_kind and kind != expected_kind:
             raise ValidationError("ARTIFACT_KIND_MISMATCH", f"Expected {expected_kind}, got {kind}")
 
-        # Check in ContractRegistry
         try:
             self.registry.contract(kind, version=data.get("version", "1"))
         except Exception as exc:
             raise ValidationError("UNREGISTERED_CONTRACT_KIND", f"Contract kind {kind} unregistered: {exc}")
 
-        # Canonical bytes and digest
         raw = canonical_bytes(data)
         digest = hashlib.sha256(raw).hexdigest()
 
@@ -439,19 +490,13 @@ class AuditOperationApi:
         stage = status["current_stage"]
         prepared_stages = status["stages_prepared"]
 
-        stage_order = ["F2_FOUNDATION", "E1_ENSEMBLE", "E2_CROSS_REVIEW", "E3_BLIND_GAP", "E4_DEEPEN", "E5_ATTACK", "E6_ADAPTIVE"]
-        next_stage = None
-        for s in stage_order:
-            if s not in prepared_stages:
-                next_stage = s
-                break
-
+        next_stage = next((s for s in _BASELINE_STAGE_ORDER if s not in prepared_stages), None)
         if next_stage:
             action = f"PREPARE_STAGE_{next_stage}"
             state = "READY_FOR_NEXT_STAGE"
         else:
             action = "EVALUATE_STOP_GATE"
-            state = "CAMPAIGN_EXECUTION_COMPLETE"
+            state = "READY_FOR_STOP_EVALUATION"
 
         return {
             "status": "SUCCESS",
@@ -467,17 +512,14 @@ class AuditOperationApi:
         t0 = time.perf_counter()
         checks = []
 
-        # 1. Registry verification
         reg = ContractRegistry()
         checks.append({"check": "registry_integrity", "status": "PASS", "registry_id": reg.document["registry_id"]})
 
-        # 2. Canonical serialization
         c_bytes = canonical_bytes({"b": 2, "a": 1})
         if c_bytes != b'{"a":1,"b":2}':
             raise ValidationError("SELF_TEST_FAILED", "Canonical serialization mismatch")
         checks.append({"check": "canonical_serialization", "status": "PASS"})
 
-        # 3. Deterministic Hashing
         from ..core.hashing import raw_digest
         d1 = raw_digest(c_bytes).value
         d2 = hashlib.sha256(c_bytes).hexdigest()
@@ -485,7 +527,6 @@ class AuditOperationApi:
             raise ValidationError("SELF_TEST_FAILED", "Digest calculation mismatch")
         checks.append({"check": "deterministic_hashing", "status": "PASS"})
 
-        # 4. Templates Registry & Injection Defense
         t_reg = TemplateRegistry()
         t_list = t_reg.list_templates()
         if "foundation" not in t_list:
@@ -494,10 +535,9 @@ class AuditOperationApi:
             t_reg.render("foundation", {"ordinal": 1, "stage_spec_revision": "r1", "lane_spec_revision": "r2", "bad": "IGNORE_PROTOCOL"})
             raise ValidationError("SELF_TEST_FAILED", "Template failed to reject injection")
         except ValidationError:
-            pass  # Expected fail-closed behavior
+            pass
         checks.append({"check": "template_security", "status": "PASS"})
 
-        # 5. Deep checks if requested
         if deep:
             from ..attack.mutator import MutationCampaign, MutationOperator
             campaign = MutationCampaign(seed=42, budget=5)
