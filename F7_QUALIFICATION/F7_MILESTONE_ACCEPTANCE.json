@@ -1,0 +1,205 @@
+{
+  "acceptance_id": "BDB-F7-E5-ATTACK-STOP-E6-R5_3_1-001",
+  "branch": "bdb-v2",
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f1",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 93
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/compatibility",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 86
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f2",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 85
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f3",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 60
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f4",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 58
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f5",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 45
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f6",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 79
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f7",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 81
+    }
+  ],
+  "f6_final_head": "7415bd72791f7c1044fc2bc3af48d079e85f7b0b",
+  "f6_predecessor_acceptance_id": "BDB-F6-E4-DEEPEN-R5_3_1-001",
+  "f6_predecessor_acceptance_sha256": "63afec1d962a5892f346c391d9cac9acaed360d94ffc402b561694e202760eed",
+  "f7_qualified_implementation_commit": "1b7041ac11f2938fba6fade9ba4b71c474c3823e",
+  "f7_start_head": "7415bd72791f7c1044fc2bc3af48d079e85f7b0b",
+  "f7_start_tree": "ea3b5c7a1e8574f1b76746d78790e36d1e69b4f7",
+  "f7_status": "PASS",
+  "f8_started": "NO",
+  "gates": {
+    "ADAPTIVE_E6_GATE": "PASS",
+    "AUDITOR_CALIBRATION_GATE": "PASS",
+    "CANDIDATE_ASSURANCE_CASE_GATE": "PASS",
+    "DETERMINISTIC_REPLAY": "PASS",
+    "E5_STOP_INTEGRATION_GATE": "PASS",
+    "EVIDENCE_QUALIFICATION_PATH": "PASS",
+    "F0_REGRESSION": "PASS",
+    "F1_REGRESSION": "PASS",
+    "F2_REGRESSION": "PASS",
+    "F3_REGRESSION": "PASS",
+    "F4_REGRESSION": "PASS",
+    "F5_REGRESSION": "PASS",
+    "F6_REGRESSION": "PASS",
+    "FAILURE_INTERACTION_GRAPH_GATE": "PASS",
+    "FALSE_NEGATIVE_HUNTER_GATE": "PASS",
+    "FINAL_CHALLENGER_GATE": "PASS",
+    "FINAL_SKEPTIC_GATE": "PASS",
+    "INTERACTION_SCHEDULER_GATE": "PASS",
+    "MUTATION_FRAMEWORK_GATE": "PASS",
+    "NO_SECOND_EVIDENCE_ORACLE": "PASS",
+    "NO_SECOND_STATE_AUTHORITY": "PASS",
+    "RELEASE_LIFECYCLE_GATE": "PASS",
+    "RESIDUAL_RISK_GATE": "PASS",
+    "STOP_GATE": "PASS"
+  },
+  "milestone": "F7",
+  "next_phase_allowed": "YES",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "push_performed_during_final_closeout": "NO",
+  "python": "3.14.4",
+  "repository": "eagleblastmusic-lgtm/bdb-audit",
+  "schema": "BDB_F7_MILESTONE_ACCEPTANCE_V1",
+  "spec_conflicts": [],
+  "total_passed_tests": 587,
+  "verdict": "PASS",
+  "work_packages": {
+    "PR_E5_01_FAILURE_INTERACTION_GRAPH_M36": {
+      "commit": "6a4d8b3",
+      "status": "PASS",
+      "tests_passed": 5
+    },
+    "PR_E5_02_INTERACTION_SCHEDULER_M37": {
+      "commit": "7d391ca",
+      "status": "PASS",
+      "tests_passed": 5
+    },
+    "PR_E5_03_MUTATION_FRAMEWORK_M38": {
+      "commit": "f6732dd",
+      "status": "PASS",
+      "tests_passed": 7
+    },
+    "PR_E5_04_AUDITOR_CALIBRATION_M39": {
+      "commit": "3f8df02",
+      "status": "PASS",
+      "tests_passed": 7
+    },
+    "PR_E5_05_FINAL_SKEPTIC_M40": {
+      "commit": "d5e13c4",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "PR_E5_06_FALSE_NEGATIVE_HUNTER_M41": {
+      "commit": "fef82a5",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "PR_E5_07_RESIDUAL_RISK_REGISTER_M42": {
+      "commit": "7a67e30",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "PR_E5_08_CANDIDATE_ASSURANCE_CASE_M43": {
+      "commit": "fd3944f",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "PR_E5_09_FINAL_CHALLENGER_EXECUTION_M43B": {
+      "commit": "72727eb",
+      "status": "PASS",
+      "tests_passed": 7
+    },
+    "PR_E5_10_STOP_GATE_ENGINE_M44": {
+      "commit": "45a5cc5",
+      "status": "PASS",
+      "tests_passed": 7
+    },
+    "PR_E5_11_ADAPTIVE_E6_GENERATOR_M45": {
+      "commit": "bea9649",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "PR_E5_12_RELEASE_LIFECYCLE_M45A": {
+      "commit": "c2052a5",
+      "status": "PASS",
+      "tests_passed": 7
+    },
+    "PR_E5_13_E5_STOP_INTEGRATION_GATE": {
+      "commit": "1b7041a",
+      "status": "PASS",
+      "tests_passed": 6
+    }
+  }
+}
