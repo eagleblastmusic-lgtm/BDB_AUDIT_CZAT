@@ -1,0 +1,89 @@
+name: BDB Audit v2.0.1 Qualification
+
+on:
+  push:
+    branches:
+      - fix/v2.0.1-campaign-state
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v2-0-1-qualification-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualify-windows:
+    name: Windows Python 3.12 qualification
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Show environment identity
+        shell: pwsh
+        run: |
+          python --version
+          python -c "import platform,sys,sysconfig; print(platform.platform()); print(platform.machine()); print(sys.implementation.name); print(sysconfig.get_config_var('SOABI'))"
+          git rev-parse HEAD
+          git status --short
+
+      - name: Install exact runtime closure and qualification tools
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-f2.lock
+          python -m pip install pytest ruff mypy
+
+      - name: Full pytest suite
+        shell: pwsh
+        run: python -m pytest -q
+
+      - name: Ruff release lane
+        shell: pwsh
+        run: python -m ruff check src build
+
+      - name: Mypy release lane
+        shell: pwsh
+        run: python -m mypy --config-file pyproject.toml
+
+      - name: Build v2.0.1 standalone
+        shell: pwsh
+        run: python build/build_single_file.py
+
+      - name: Standalone isolated smoke
+        shell: pwsh
+        run: |
+          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py --version
+          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py --verify-payload
+          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py self-test
+          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py --help
+
+      - name: Record artifact SHA-256
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash dist/BDB_AUDIT_ASSISTANT_v2.0.1.py -Algorithm SHA256).Hash.ToLower()
+          "SHA256=$hash" | Tee-Object -FilePath dist/SHA256SUMS.txt
+          Get-Item dist/BDB_AUDIT_ASSISTANT_v2.0.1.py | Select-Object FullName,Length
+
+      - name: Upload qualified candidate artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BDB-Audit-v2.0.1-windows-py312-candidate
+          path: |
+            dist/BDB_AUDIT_ASSISTANT_v2.0.1.py
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
