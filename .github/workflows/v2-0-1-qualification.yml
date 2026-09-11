@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   qualify-windows:
-    name: Windows Python 3.12 qualification
+    name: Windows Python 3.14 qualification
     runs-on: windows-latest
     timeout-minutes: 30
 
@@ -26,10 +26,10 @@ jobs:
       - name: Checkout exact commit
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
+      - name: Set up Python 3.14
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.14'
           cache: 'pip'
 
       - name: Show environment identity
@@ -45,7 +45,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-f2.lock
-          python -m pip install pytest ruff mypy
+          python -m pip install pytest==9.1.1 ruff==0.16.7 mypy==2.3.1
 
       - name: Full pytest suite
         shell: pwsh
@@ -81,7 +81,7 @@ jobs:
       - name: Upload qualified candidate artifact
         uses: actions/upload-artifact@v4
         with:
-          name: BDB-Audit-v2.0.1-windows-py312-candidate
+          name: BDB-Audit-v2.0.1-windows-py314-candidate
           path: |
             dist/BDB_AUDIT_ASSISTANT_v2.0.1.py
             dist/SHA256SUMS.txt
