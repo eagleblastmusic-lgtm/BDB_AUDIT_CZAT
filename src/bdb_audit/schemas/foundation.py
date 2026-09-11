@@ -72,7 +72,11 @@ M21_KINDS = (
     "contradiction_revision", "contradiction_resolution_decision",
 )
 
-F3_KINDS = (*F2_KINDS, *M14_KINDS, *M15_KINDS, *M18_KINDS, *M19_KINDS, *M20_KINDS, *M21_KINDS)
+M24_KINDS = (
+    "stage_completion", "lane_completion", "stop_input", "stop_evaluation",
+)
+
+F3_KINDS = (*F2_KINDS, *M14_KINDS, *M15_KINDS, *M18_KINDS, *M19_KINDS, *M20_KINDS, *M21_KINDS, *M24_KINDS)
 
 
 def executable_schema(kind, *, registry=None):
@@ -121,6 +125,10 @@ def executable_schema(kind, *, registry=None):
         schema.update(structural)
     from .adjudication import adjudication_schema
     structural = adjudication_schema(kind)
+    if structural is not None:
+        schema.update(structural)
+    from .stop import stop_schema
+    structural = stop_schema(kind)
     if structural is not None:
         schema.update(structural)
     return schema
