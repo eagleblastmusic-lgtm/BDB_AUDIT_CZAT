@@ -115,5 +115,8 @@ def test_standalone_runs_in_clean_isolated_python_without_jsonschema_installed()
             text=True,
         )
         assert ui_run.returncode == 0, ui_run.stderr
-        assert "BDB Audit v2.0.1" in ui_run.stdout
+        # This test protects the clean-host runtime closure, not a particular UI
+        # release label. The embedded product source can advance independently
+        # of this historical v2.0.1 wrapper regression fixture.
+        assert "Interactive Control Surface" in ui_run.stdout
         assert "Exiting UI." in ui_run.stdout
