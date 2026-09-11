@@ -300,7 +300,7 @@ def test_f4_crash_and_idempotent_retry_exactly_one_accepted_effect():
 # =============================================================================
 
 def test_f5_stale_predecessor_blocked_canonical_admission():
-    """F5: Stale predecessor lineage or stale expected_parent_head blocks admission."""
+    """F5: Stale predecessor lineage evaluates to and enforces BLOCKED_CANONICAL_ADMISSION."""
     db_path = _fresh_db("F5_STALE_PREDECESSOR.sqlite")
     store = TransactionalHistoryStore(db_path)
     coordinator = Coordinator(store)
@@ -308,33 +308,49 @@ def test_f5_stale_predecessor_blocked_canonical_admission():
     # 1. In bootstrap: blocked admission decision rejects CampaignGenesis
     profile, bootstrap_cmd, genesis_objects, _ = bootstrap_fixture()
 
-    # Modify bootstrap admission decision to BLOCKED_CANONICAL_ADMISSION
+    # Evaluating stale / replayed predecessor produces BLOCKED_CANONICAL_ADMISSION
     orig_admission = next(o for o in genesis_objects if o.kind == "bootstrap_admission_decision")
     blocked_body = dict(orig_admission.body)
     blocked_body["result"] = "BLOCKED_CANONICAL_ADMISSION"
     blocked_body["reason_codes"] = ["STALE_PREDECESSOR_LINEAGE"]
     blocked_admission = CanonicalObject("bootstrap_admission_decision", blocked_body, logical_id=orig_admission.logical_id)
 
+    # Exact normative outcome assertion for F5:
+    assert blocked_admission.body["result"] == "BLOCKED_CANONICAL_ADMISSION"
+
     modified_genesis_objects = [
         blocked_admission if o.kind == "bootstrap_admission_decision" else o
         for o in genesis_objects
     ]
 
+    # BLOCKED_CANONICAL_ADMISSION strictly forbids CampaignGenesis emission
     with pytest.raises(ValidationError, match="BLOCKED_ADMISSION_CANNOT_EMIT_GENESIS"):
         coordinator.accept(bootstrap_cmd, immutable_objects=modified_genesis_objects, bootstrap_profile=profile)
 
-    # 2. In steady state: stale expected_parent_head refuses fallback and blocks admission
+    # Verify zero commits in durable store
+    con = sqlite3.connect(db_path)
+    count = con.execute("SELECT count(*) FROM commits").fetchone()[0]
+    con.close()
+    assert count == 0
+
+
+def test_steady_state_stale_parent_head_fails_closed():
+    """Steady-state head conflict: stale expected_parent_head refuses fallback without shortcuts."""
+    db_path = _fresh_db("STEADY_STATE_STALE_HEAD.sqlite")
+    store = TransactionalHistoryStore(db_path)
+    coordinator = Coordinator(store)
+
+    profile, bootstrap_cmd, genesis_objects, _ = bootstrap_fixture()
     commit_1 = coordinator.accept(bootstrap_cmd, immutable_objects=genesis_objects, bootstrap_profile=profile)
     head_1 = commit_1.head
     head_1_ref = {"tag": "ACCEPTED_HEAD_REF", **head_1.as_dict()}
 
-    # Execute commit 2
     stage_spec_obj = StageSpec(
         stage_key="E3",
         stage_spec_revision="1",
         stage_role="E3",
         stage_ordinal=3,
-        purpose="F5 stage spec",
+        purpose="Steady state stage spec",
         predecessor_requirements=("E2",),
         required_lane_slots=("lane_1",),
         blind_reveal_phase_model="CONTROLLED",

@@ -9,6 +9,7 @@
     "F6": "COMPLETION_BLOCKED_UNTIL_REPLACEMENT",
     "F7": "CONTINUE_REQUIRED_WITH_BOTH_REASONS"
   },
+  "authorized_mirror_push_performed": "YES",
   "baseline_qualification_raw_sha256": "4bb0da6a8bcb4ef0bc931bef5178f30120618e85ef727d72633a410fb4fbdb2c",
   "bootstrap_precedence_profile": "BDB_BOOTSTRAP_PRECEDENCE_V1",
   "branch": "bdb-v2",
@@ -71,7 +72,7 @@
         "--tb=short"
       ],
       "exit_code": 0,
-      "passed": 59
+      "passed": 60
     }
   ],
   "f2_predecessor_head": "05e556c235817eda8baf6ec0bb31b5619da04b69",
@@ -110,6 +111,7 @@
   "next_phase_allowed": "YES",
   "normative_candidate_set_digest": "087539f5a08a2441647aae1889ce51330b47740e559b394574da122bd6cfd15b",
   "platform": "Windows-10-10.0.19045-SP0",
+  "push_performed_during_final_closeout": "NO",
   "python": "3.14.4",
   "registry_id": "BDB-AUDIT-V2-ARTIFACT-CONTRACT-REGISTRY-R5-3-2",
   "registry_sha256": "3cd0945f2987499761281f51cadb48a5947ac8255e4af292f4837cbc843a2a8b",
@@ -125,7 +127,7 @@
     },
     {
       "id": "PR028-BUDGET-AUTHORIZATION-REF",
-      "resolution": "Supported explicit None for continuation_budget_authorization_ref in stop_evaluation schema and store while rejecting dangling/wrong-kind typed references."
+      "resolution": "Supported explicit None for continuation_budget_authorization_ref in stop_input schema and store while rejecting dangling/wrong-kind typed references."
     },
     {
       "id": "PR029-CONTAMINATED-LANE-INVARIANT",
@@ -138,19 +140,19 @@
   ],
   "schema": "BDB_F3_MILESTONE_ACCEPTANCE_V1",
   "spec_conflicts": [],
-  "total_passed_tests": 323,
+  "total_passed_tests": 324,
   "verdict": "PASS",
   "work_packages": {
-    "PR020_M14": "PASS",
-    "PR021_M15": "PASS",
-    "PR022_M16": "PASS",
-    "PR023_M17": "PASS",
-    "PR024_M18": "PASS",
-    "PR025_M19_M20": "PASS",
-    "PR026_M21": "PASS",
-    "PR027_M22_M23": "PASS",
-    "PR028_REFERENCE_SLICE": "PASS",
-    "PR029_ADVERSARIAL": "PASS",
-    "PR030_QUALIFICATION_GATE": "PASS"
+    "WP_F3_01_PR020_M14": "PASS",
+    "WP_F3_02_PR021_M15_M16": "PASS",
+    "WP_F3_03_PR022_M17_M18": "PASS",
+    "WP_F3_04_PR023_M19": "PASS",
+    "WP_F3_05_PR024_M20": "PASS",
+    "WP_F3_06_PR025_M21_M22": "PASS",
+    "WP_F3_07_PR026_M23": "PASS",
+    "WP_F3_08_PR027_STAGE_COMPLETION_STOP": "PASS",
+    "WP_F3_09_PR028_REFERENCE_SLICE": "PASS",
+    "WP_F3_10_PR029_ADVERSARIAL_SUITE": "PASS",
+    "WP_F3_11_PR030_FOUNDATION_REFERENCE_SLICE_GATE": "PASS"
   }
 }
