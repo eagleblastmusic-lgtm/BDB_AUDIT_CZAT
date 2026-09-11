@@ -9,6 +9,9 @@ from .engine import (
     build_opportunity_map,
     transition_hypothesis,
 )
+from .orchestrator import (
+    HypothesisOrchestrator,
+)
 
 __all__ = [
     "HypothesisRevision",
@@ -17,4 +20,5 @@ __all__ = [
     "PLANNING_MODES",
     "build_opportunity_map",
     "transition_hypothesis",
+    "HypothesisOrchestrator",
 ]
