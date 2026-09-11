@@ -34,6 +34,16 @@ from .differential import (
     process_differential_result_through_pipeline,
     validate_no_direct_diff_to_finding,
 )
+from .metamorphic import (
+    MetamorphicTransformation,
+    create_metamorphic_transformation,
+    MetamorphicRelationSpec,
+    MetamorphicExecutionRecord,
+    check_metamorphic_relation,
+    MetamorphicTestingFramework,
+    process_metamorphic_result_through_pipeline,
+    validate_no_direct_metamorphic_to_finding,
+)
 
 __all__ = [
     "ExperimentSpec",
@@ -61,6 +71,15 @@ __all__ = [
     "DifferentialTestingFramework",
     "process_differential_result_through_pipeline",
     "validate_no_direct_diff_to_finding",
+    "MetamorphicTransformation",
+    "create_metamorphic_transformation",
+    "MetamorphicRelationSpec",
+    "MetamorphicExecutionRecord",
+    "check_metamorphic_relation",
+    "MetamorphicTestingFramework",
+    "process_metamorphic_result_through_pipeline",
+    "validate_no_direct_metamorphic_to_finding",
 ]
+
 
 
