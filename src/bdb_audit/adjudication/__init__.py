@@ -16,6 +16,12 @@ from .engine import (
     validate_root_cause_authority,
     adjudicate_finding,
 )
+from .contribution import (
+    ProducerContribution,
+    ContributionProjection,
+    build_contribution_projection,
+    validate_contribution_authority,
+)
 
 __all__ = [
     "FindingClaimRevision",
@@ -31,4 +37,9 @@ __all__ = [
     "sort_membership_edges",
     "validate_root_cause_authority",
     "adjudicate_finding",
+    "ProducerContribution",
+    "ContributionProjection",
+    "build_contribution_projection",
+    "validate_contribution_authority",
 ]
+
