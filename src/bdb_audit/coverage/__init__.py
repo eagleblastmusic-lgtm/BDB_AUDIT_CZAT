@@ -26,6 +26,11 @@ from .policies import (
     PolicyObligationRule,
     compute_breadth_summary,
 )
+from .gap_engine import (
+    GapRecord,
+    GapMap,
+    GapEngine,
+)
 
 __all__ = [
     "InvariantRevision",
@@ -47,4 +52,7 @@ __all__ = [
     "ObligationPolicyLibrary",
     "PolicyObligationRule",
     "compute_breadth_summary",
+    "GapRecord",
+    "GapMap",
+    "GapEngine",
 ]
