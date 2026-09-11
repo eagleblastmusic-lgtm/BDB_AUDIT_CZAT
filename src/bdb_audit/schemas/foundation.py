@@ -60,7 +60,13 @@ M19_KINDS = (
     "cleanup_result", "execution_result", "tool_execution_record",
 )
 
-F3_KINDS = (*F2_KINDS, *M14_KINDS, *M15_KINDS, *M18_KINDS, *M19_KINDS)
+M20_KINDS = (
+    "observation", "dependency_independence_assessment",
+    "evidence_applicability_assessment", "evidence_qualification_assessment",
+    "evidence_invalidation",
+)
+
+F3_KINDS = (*F2_KINDS, *M14_KINDS, *M15_KINDS, *M18_KINDS, *M19_KINDS, *M20_KINDS)
 
 
 def executable_schema(kind, *, registry=None):
@@ -101,6 +107,10 @@ def executable_schema(kind, *, registry=None):
         schema.update(structural)
     from .experiment import experiment_schema
     structural = experiment_schema(kind)
+    if structural is not None:
+        schema.update(structural)
+    from .evidence import evidence_schema
+    structural = evidence_schema(kind)
     if structural is not None:
         schema.update(structural)
     return schema
