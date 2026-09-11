@@ -21,6 +21,12 @@ from .adapters import (
     PropertyTestAdapter,
     StatefulTestAdapter,
 )
+from .exploration import (
+    ExplorationBounds,
+    ExplorationResult,
+    BoundedModelExplorer,
+    EXPLORATION_STATUSES,
+)
 
 __all__ = [
     "State",
@@ -39,4 +45,8 @@ __all__ = [
     "StatefulTestResult",
     "PropertyTestAdapter",
     "StatefulTestAdapter",
+    "ExplorationBounds",
+    "ExplorationResult",
+    "BoundedModelExplorer",
+    "EXPLORATION_STATUSES",
 ]
