@@ -118,6 +118,14 @@ class TemplateRegistry:
         for var in template.required_variables:
             if var not in variables:
                 raise ValidationError("MALFORMED_TEMPLATE", f"Missing required variable: {var}")
+
+        # Guard against injection across authority boundary
+        for k, v in variables.items():
+            if isinstance(v, str):
+                for forbidden in ("IGNORE_PROTOCOL", "SKIP_GATE", "BYPASS_VALIDATION", "READ_HIDDEN_REPORT"):
+                    if forbidden in v.upper():
+                        raise ValidationError("INJECTION_ACROSS_AUTHORITY_BOUNDARY", f"Forbidden directive in {k}: {forbidden}")
+
         # Check staleness if history cut or revision is provided
         if "history_cut" in variables and isinstance(variables["history_cut"], dict):
             cut = variables["history_cut"]
