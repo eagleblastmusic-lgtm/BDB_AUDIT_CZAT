@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 import sys
 from typing import Sequence
 
@@ -116,7 +115,7 @@ def create_parser() -> argparse.ArgumentParser:
 
 def run_cli(argv: Sequence[str] | None = None) -> int:
     parser = create_parser()
-    
+
     # Check for empty args
     if argv is not None and len(argv) == 0:
         parser.print_help()

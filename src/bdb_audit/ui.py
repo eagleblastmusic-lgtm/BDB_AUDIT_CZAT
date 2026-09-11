@@ -6,13 +6,10 @@ and never writes unauthoritative state.
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
-import sys
 from typing import Callable, Any
 
 from .coordinator.operations import AuditOperationApi
-from .core.errors import ValidationError
 
 
 class InteractiveAuditUI:
@@ -165,7 +162,7 @@ class InteractiveAuditUI:
                     output_func(f"ERROR: {exc}")
 
             elif choice == "2":
-                store = input_func(f"Enter store path [{self.active_store or ''}]: ").strip() or self.active_store
+                store = input_func(f"Enter store path [{self.active_store or ''}]: ").strip() or self.active_store  # type: ignore[assignment]
                 if not store:
                     output_func("ERROR: Store path required")
                     continue

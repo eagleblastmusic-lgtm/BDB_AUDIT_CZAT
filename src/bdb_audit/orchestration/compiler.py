@@ -1,6 +1,6 @@
 """Pure deterministic prompt/package compiler (M9)."""
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Mapping
 import hashlib
 
 from ..core.canonical_json import canonical_bytes

@@ -10,28 +10,25 @@ import hashlib
 import json
 from pathlib import Path
 import time
-from typing import Any, Mapping
-def _command_id(seed: str) -> str:
-    h = hashlib.sha256(seed.encode("utf-8")).hexdigest()
-    return f"command_{h[:8]}-{h[8:12]}-4{h[13:16]}-8{h[17:20]}-{h[20:32]}"
-
-from ..core.canonical_json import canonical_bytes, parse
+from typing import Any
+from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
-from ..core.hashing import object_digest
-from ..core.ids import ACTIVE_REGISTRY_FILENAME, REGISTRY_SHA256
-from ..core.registry import ContractRegistry, GOLDEN_SHA256
+from ..core.registry import ContractRegistry
 from ..history.objects import (
     CanonicalObject,
     CommandEnvelope,
     InstallationBootstrapProfile,
-    AcceptedHead,
 )
 from ..history.store import TransactionalHistoryStore
 from . import Coordinator
-from ..orchestration.stages import StageSpec, initial_stage_specs
-from ..orchestration.runs import LaneSpec, qualify_isolation
-from ..orchestration.fsm import TransitionFact, legal_transition
+from ..orchestration.stages import StageSpec
+from ..orchestration.runs import LaneSpec
 from ..orchestration.templates import TemplateRegistry
+
+
+def _command_id(seed: str) -> str:
+    h = hashlib.sha256(seed.encode("utf-8")).hexdigest()
+    return f"command_{h[:8]}-{h[8:12]}-4{h[13:16]}-8{h[17:20]}-{h[20:32]}"
 
 
 class AuditOperationApi:
@@ -189,7 +186,7 @@ class AuditOperationApi:
             "reason_codes": [],
         })
 
-        genesis = make("campaign_genesis", {
+        make("campaign_genesis", {
             "campaign_id": cid,
             "input_history_cut": empty,
             "bootstrap_admission_decision_ref": admission.as_ref().as_dict(),
@@ -233,14 +230,12 @@ class AuditOperationApi:
 
         # Extract campaign details from stored objects
         campaign_id = head.campaign_id
-        commits_count = head.commit_seq
 
         # Read objects to find stage/lane status
         conn = store._connect()
         try:
             rows = conn.execute("SELECT kind, body FROM immutable_objects").fetchall()
-            kinds = [r[0] for r in rows]
-            
+
             stages = []
             for r in rows:
                 if r[0] == "stage_spec":
@@ -341,7 +336,7 @@ class AuditOperationApi:
     ) -> dict[str, Any]:
         """Validate isolation and accept lane preparation."""
         path = Path(store_path).resolve()
-        status = self.get_campaign_status(path)
+        self.get_campaign_status(path)
         store = TransactionalHistoryStore(path, registry=self.registry)
         coordinator = Coordinator(store)
         head = store.head()
@@ -422,7 +417,7 @@ class AuditOperationApi:
 
         # Check in ContractRegistry
         try:
-            row = self.registry.contract(kind, version=data.get("version", "1"))
+            self.registry.contract(kind, version=data.get("version", "1"))
         except Exception as exc:
             raise ValidationError("UNREGISTERED_CONTRACT_KIND", f"Contract kind {kind} unregistered: {exc}")
 
@@ -522,7 +517,8 @@ class AuditOperationApi:
     def run_build(self, output_path: str | Path | None = None) -> dict[str, Any]:
         """Execute deterministic standalone build and return identity record."""
         from build.build_single_file import build_standalone
-        out_p, sha, sz = build_standalone(output_path)
+        resolved: Path | None = Path(output_path) if isinstance(output_path, str) else output_path
+        out_p, sha, sz = build_standalone(resolved)
         return {
             "status": "SUCCESS",
             "output_path": str(out_p),

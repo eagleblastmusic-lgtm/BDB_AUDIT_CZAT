@@ -5,7 +5,6 @@ validation, and deterministic rendering.
 """
 from dataclasses import dataclass
 import hashlib
-import re
 from typing import Any, Mapping
 
 from ..core.canonical_json import canonical_bytes
@@ -25,7 +24,7 @@ class PromptTemplate:
         for var in self.required_variables:
             if var not in variables or variables[var] is None:
                 raise ValidationError("MALFORMED_TEMPLATE", f"Missing required variable: {var}")
-        
+
         # Guard against injection across authority boundary:
         # Template inputs cannot contain instruction injection or bypass directives
         for k, v in variables.items():

@@ -57,6 +57,12 @@ class ReleaseValidator:
         if not all([v_match, b_match, m_digest_match, r_digest_match, size_match]):
             raise ValidationError("VALIDATOR_HEADER_MISSING", "Required standalone header constants missing")
 
+        assert v_match is not None
+        assert b_match is not None
+        assert m_digest_match is not None
+        assert r_digest_match is not None
+        assert size_match is not None
+
         # 2. Extract PAYLOAD_MANIFEST
         m_json_match = re.search(r'PAYLOAD_MANIFEST = ({.*?})\n\nEMBEDDED_PAYLOAD_B85', text, re.DOTALL)
         if not m_json_match:

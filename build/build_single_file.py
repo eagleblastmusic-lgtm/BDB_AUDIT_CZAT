@@ -27,7 +27,7 @@ import hashlib
 import io
 import json
 import os
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import sys
 import zipfile
 
@@ -44,7 +44,7 @@ def collect_source_files(src_root: Path) -> list[tuple[str, bytes]]:
     """Collect all source and data files under src_root in deterministic order."""
     collected: list[tuple[str, bytes]] = []
     base_path = src_root.resolve()
-    
+
     # Walk and collect
     all_files: list[Path] = []
     for root, dirs, files in os.walk(base_path):
@@ -74,7 +74,7 @@ def collect_source_files(src_root: Path) -> list[tuple[str, bytes]]:
 
 def build_manifest(files: list[tuple[str, bytes]]) -> dict[str, dict[str, int | str]]:
     """Construct deterministic manifest of embedded files."""
-    manifest = {}
+    manifest: dict[str, dict[str, int | str]] = {}
     for rel_path, data in sorted(files, key=lambda x: x[0]):
         manifest[rel_path] = {
             "size": len(data),
@@ -151,7 +151,7 @@ def verify_embedded_payload(verbose: bool = False) -> dict[str, str]:
         if namelist != manifest_keys:
             diff = namelist.symmetric_difference(manifest_keys)
             raise PayloadIntegrityError(f"Payload manifest key mismatch: {{diff}}")
-        
+
         for name in sorted(manifest_keys):
             entry = PAYLOAD_MANIFEST[name]
             data = zf.read(name)
@@ -180,10 +180,10 @@ def unpack_payload(target_dir: Path | None = None) -> Path:
     """Unpack payload to deterministic content-addressed directory."""
     if target_dir is None:
         target_dir = Path(tempfile.gettempdir()) / f"bdb_audit_v2_{{PAYLOAD_MANIFEST_DIGEST[:16]}}"
-    
+
     target_dir = Path(target_dir).resolve()
     marker_file = target_dir / ".bdb_payload_verified"
-    
+
     if marker_file.exists():
         try:
             if marker_file.read_text().strip() == PAYLOAD_MANIFEST_DIGEST:
@@ -282,7 +282,7 @@ def build_standalone(output_path: Path | None = None) -> tuple[Path, str, int]:
 
     files = collect_source_files(SRC_DIR)
     manifest = build_manifest(files)
-    
+
     # Canonical manifest digest
     manifest_bytes = json.dumps(manifest, sort_keys=True, indent=2).replace("\r\n", "\n").encode("utf-8")
     manifest_digest = hashlib.sha256(manifest_bytes).hexdigest()

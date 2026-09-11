@@ -18,3 +18,32 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 addopts = "-p no:cacheprovider"
+
+[tool.mypy]
+python_version = "3.12"
+mypy_path = "src"
+files = [
+    "src/bdb_audit/release_validator.py",
+    "src/bdb_audit/self_audit.py",
+    "src/bdb_audit/coordinator/operations.py",
+    "src/bdb_audit/cli.py",
+    "src/bdb_audit/ui.py",
+    "src/bdb_audit/orchestration/templates.py",
+    "src/bdb_audit/orchestration/compiler.py",
+    "src/bdb_audit/__main__.py",
+    "build/build_single_file.py",
+]
+ignore_missing_imports = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
+follow_imports = "silent"
+explicit_package_bases = true
+
+[tool.ruff]
+src = ["src", "build"]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501", "F401", "F841", "W291", "W293", "F402", "F541", "E402", "E702"]

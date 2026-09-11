@@ -16,34 +16,23 @@ Any unresolved HIGH or CRITICAL blocks release qualification.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-import hashlib
-import json
+from dataclasses import dataclass
 from pathlib import Path
 import tempfile
-from typing import Any, Mapping
+from typing import Any
 
-from .core.canonical_json import canonical_bytes, parse
+from .core.canonical_json import canonical_bytes
 from .core.errors import ValidationError
-from .core.ids import REGISTRY_SHA256
-from .core.registry import ContractRegistry, GOLDEN_SHA256
+from .core.registry import ContractRegistry
 from .history.objects import (
-    CanonicalObject,
     CommandEnvelope,
-    InstallationBootstrapProfile,
-    AcceptedHead,
 )
 from .history.store import TransactionalHistoryStore
 from .coordinator import Coordinator
 from .coordinator.operations import AuditOperationApi
-from .orchestration.stages import StageSpec
-from .orchestration.runs import LaneSpec
-from .orchestration.fsm import legal_transition, CampaignState, StageRunState, LaneRunState
-from .orchestration.templates import TemplateRegistry
+from .orchestration.fsm import legal_transition
 from .knowledge.quarantine import ClaimQuarantine
-from .orchestration.capability import ProjectionPolicy, ViewRef
-from .stop.evaluator import evaluate_stop
-from .stop.models import StopInput, Snapshot, StageCompletion
+from .orchestration.capability import ProjectionPolicy
 
 
 @dataclass(frozen=True)
@@ -264,7 +253,7 @@ class SelfAuditEngine:
             p2 = Path(td) / "c2.sqlite"
             api = AuditOperationApi(registry=self.registry)
             res1 = api.create_campaign(p1, seed="seed_c1", campaign_id="camp_1")
-            res2 = api.create_campaign(p2, seed="seed_c2", campaign_id="camp_2")
+            _res2 = api.create_campaign(p2, seed="seed_c2", campaign_id="camp_2")
 
             # Try to operate on c2 using c1's head ref in a command envelope
             store2 = TransactionalHistoryStore(p2, registry=self.registry)
@@ -340,7 +329,6 @@ class SelfAuditEngine:
     def audit_prompt_compiler(self) -> bool:
         """Verify determinism, injection rejection, malformed template rejection, and stale inputs."""
         from .orchestration.compiler import PromptPackageCompiler
-        from .orchestration.templates import TemplateRegistry
 
         compiler = PromptPackageCompiler()
         base_inputs = {
