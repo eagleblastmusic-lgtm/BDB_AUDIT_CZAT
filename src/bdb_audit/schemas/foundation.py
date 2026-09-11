@@ -51,7 +51,11 @@ M15_KINDS = (
     "obligation_applicability_decision", "approval_decision",
 )
 
-F3_KINDS = (*F2_KINDS, *M14_KINDS, *M15_KINDS)
+M18_KINDS = (
+    "hypothesis_revision",
+)
+
+F3_KINDS = (*F2_KINDS, *M14_KINDS, *M15_KINDS, *M18_KINDS)
 
 
 def executable_schema(kind, *, registry=None):
@@ -84,6 +88,10 @@ def executable_schema(kind, *, registry=None):
         schema.update(structural)
     from .coverage import coverage_schema
     structural = coverage_schema(kind)
+    if structural is not None:
+        schema.update(structural)
+    from .hypothesis import hypothesis_schema
+    structural = hypothesis_schema(kind)
     if structural is not None:
         schema.update(structural)
     return schema
