@@ -10,3 +10,11 @@ from .scheduler import (
     InteractionCandidate,
     InteractionScheduler,
 )
+from .mutation import (
+    ActivationProof,
+    MutationCase,
+    MutationResult,
+    MutationEngine,
+    MUTATION_CLASSES,
+    MUTATION_OUTCOMES,
+)
