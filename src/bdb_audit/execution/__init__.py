@@ -10,6 +10,11 @@ from .dag import (
     validate_execution_dag,
     parse_edges,
 )
+from .adapters import (
+    ExecutionAdapter,
+    EXPERIMENT_TYPES,
+    ExecutionRunOutput,
+)
 
 __all__ = [
     "ExperimentSpec",
@@ -19,4 +24,7 @@ __all__ = [
     "ExecutionResult",
     "validate_execution_dag",
     "parse_edges",
+    "ExecutionAdapter",
+    "EXPERIMENT_TYPES",
+    "ExecutionRunOutput",
 ]
