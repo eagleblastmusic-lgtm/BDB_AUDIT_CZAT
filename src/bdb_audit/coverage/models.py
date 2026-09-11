@@ -11,6 +11,11 @@ from ..core.registry import canonical_reference_set
 from ..history.objects import CanonicalObject, ObjectRef
 
 INVARIANT_STATUSES = {"ACTIVE", "SUPERSEDED", "RETIRED", "INVALIDATED"}
+INVARIANT_CATEGORIES = {
+    "AUTHORITY", "DURABILITY", "ATOMICITY", "CONSISTENCY", "COMPLETENESS",
+    "PARSING", "RECOVERY", "CONCURRENCY", "RESOURCE_OWNERSHIP", "SECURITY_BOUNDARY",
+    "PRIVACY", "SUPPLY_CHAIN", "RELEASE_ASSURANCE", "STATE_CONSISTENCY",
+}
 MATERIALITY_RESULTS = {"MATERIAL", "NON_MATERIAL", "UNKNOWN", "CONFLICTED"}
 QUALIFICATION_STATUSES = {"UNASSESSED", "IN_PROGRESS", "QUALIFIED", "BLOCKED", "STALE"}
 SUBSTANTIVE_OUTCOMES = {"NO_VIOLATION_OBSERVED", "VIOLATION_CONFIRMED", "INCONCLUSIVE"}
@@ -68,6 +73,9 @@ class InvariantRevision:
 
         if self.status not in INVARIANT_STATUSES:
             raise ValidationError("INVALID_INVARIANT_STATUS", str(self.status))
+
+        if self.category not in INVARIANT_CATEGORIES and not self.category.startswith("CUSTOM_"):
+            raise ValidationError("INVALID_INVARIANT_CATEGORY", str(self.category))
 
         object.__setattr__(
             self,

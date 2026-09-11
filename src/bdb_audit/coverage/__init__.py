@@ -8,6 +8,7 @@ from .models import (
     ObligationApplicabilityDecision,
     ApprovalDecision,
     INVARIANT_STATUSES,
+    INVARIANT_CATEGORIES,
     MATERIALITY_RESULTS,
     QUALIFICATION_STATUSES,
     SUBSTANTIVE_OUTCOMES,
@@ -16,6 +17,9 @@ from .models import (
 from .engine import (
     evaluate_coverage_qualification,
     derive_presentation_depth,
+)
+from .invariants import (
+    InvariantRegistryEngine,
 )
 
 __all__ = [
@@ -27,10 +31,12 @@ __all__ = [
     "ObligationApplicabilityDecision",
     "ApprovalDecision",
     "INVARIANT_STATUSES",
+    "INVARIANT_CATEGORIES",
     "MATERIALITY_RESULTS",
     "QUALIFICATION_STATUSES",
     "SUBSTANTIVE_OUTCOMES",
     "APPLICABILITY_RESULTS",
     "evaluate_coverage_qualification",
     "derive_presentation_depth",
+    "InvariantRegistryEngine",
 ]
