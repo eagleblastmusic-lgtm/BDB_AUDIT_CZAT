@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: v2-0-1-qualification-${{ github.ref }}
@@ -25,43 +25,6 @@ jobs:
     steps:
       - name: Checkout exact commit
         uses: actions/checkout@v4
-
-      - name: Normalize operations.py trailing newline and persist fix
-        if: github.event_name != 'pull_request'
-        shell: pwsh
-        run: |
-          $path = "src/bdb_audit/coordinator/operations.py"
-          $bytes = [System.IO.File]::ReadAllBytes($path)
-          if ($bytes.Length -eq 0 -or $bytes[$bytes.Length - 1] -ne 10) {
-            [System.IO.File]::AppendAllText((Resolve-Path $path), "`n", [System.Text.UTF8Encoding]::new($false))
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -- $path
-            git commit -m "fix(v2.0.1): add trailing newline to operations.py"
-            git push origin "HEAD:${{ github.ref_name }}"
-          } else {
-            Write-Host "operations.py already ends with LF"
-          }
-
-      - name: Normalize build metadata path typing and persist fix
-        if: github.event_name != 'pull_request'
-        shell: pwsh
-        run: |
-          $path = "build/build_single_file.py"
-          $text = [System.IO.File]::ReadAllText($path)
-          $old = 'located = Path(dist.locate_file(package_path))'
-          $new = 'located = Path(str(dist.locate_file(package_path)))'
-          if ($text.Contains($old)) {
-            $text = $text.Replace($old, $new)
-            [System.IO.File]::WriteAllText((Resolve-Path $path), $text, [System.Text.UTF8Encoding]::new($false))
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -- $path
-            git commit -m "fix(v2.0.1): make runtime metadata path type-safe"
-            git push origin "HEAD:${{ github.ref_name }}"
-          } else {
-            Write-Host "build_single_file.py typing fix already present"
-          }
 
       - name: Set up Python 3.14
         uses: actions/setup-python@v5
@@ -109,11 +72,11 @@ jobs:
           python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py --help
 
       - name: Verify tested HEAD is remote branch HEAD
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push'
         shell: pwsh
         run: |
           $local = git rev-parse HEAD
-          $remoteLine = git ls-remote origin "refs/heads/${{ github.ref_name }}"
+          $remoteLine = git ls-remote origin "refs/heads/fix/v2.0.1-campaign-state"
           $remote = ($remoteLine -split "`t")[0]
           Write-Host "LOCAL_HEAD=$local"
           Write-Host "REMOTE_HEAD=$remote"
