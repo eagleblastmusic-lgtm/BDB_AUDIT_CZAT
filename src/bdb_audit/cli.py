@@ -21,8 +21,8 @@ from typing import Sequence
 from .coordinator.operations import AuditOperationApi
 from .core.errors import ValidationError
 
-APP_VERSION = "2.0.0"
-BUILD_ID = "BDB-V2-STANDALONE-2.0.0"
+APP_VERSION = "2.0.1"
+BUILD_ID = "BDB-V2-STANDALONE-2.0.1"
 
 # Explicit Exit Codes
 EXIT_SUCCESS = 0
@@ -53,7 +53,6 @@ def create_parser() -> argparse.ArgumentParser:
 
     subparsers = parser.add_subparsers(dest="command", help="Operational commands")
 
-    # campaign
     campaign_p = subparsers.add_parser("campaign", help="Campaign lifecycle management")
     campaign_subs = campaign_p.add_subparsers(dest="subcommand", help="Campaign operations")
 
@@ -67,47 +66,40 @@ def create_parser() -> argparse.ArgumentParser:
     status_p.add_argument("--store", required=True, help="Path to SQLite history store")
     status_p.add_argument("--json", action="store_true", help="Machine-readable output")
 
-    # stage
     stage_p = subparsers.add_parser("stage", help="Stage lifecycle management")
     stage_subs = stage_p.add_subparsers(dest="subcommand", help="Stage operations")
     st_prep_p = stage_subs.add_parser("prepare", help="Prepare an operational stage")
     st_prep_p.add_argument("--store", required=True, help="Path to SQLite history store")
-    st_prep_p.add_argument("--stage", required=True, help="Stage ID (e.g. F2_FOUNDATION, E1_ENSEMBLE, ...)")
+    st_prep_p.add_argument("--stage", required=True, help="Canonical StageSpec key E1..E5")
     st_prep_p.add_argument("--stage-spec-revision", default="1", help="StageSpec revision")
     st_prep_p.add_argument("--json", action="store_true", help="Machine-readable output")
 
-    # lane
     lane_p = subparsers.add_parser("lane", help="Lane lifecycle management")
     lane_subs = lane_p.add_subparsers(dest="subcommand", help="Lane operations")
     ln_prep_p = lane_subs.add_parser("prepare", help="Prepare an operational lane")
     ln_prep_p.add_argument("--store", required=True, help="Path to SQLite history store")
-    ln_prep_p.add_argument("--stage", required=True, help="Parent stage ID")
+    ln_prep_p.add_argument("--stage", required=True, help="Parent canonical StageSpec key E1..E5")
     ln_prep_p.add_argument("--slot", required=True, help="Lane slot identifier")
     ln_prep_p.add_argument("--lane-spec-revision", default="1", help="LaneSpec revision")
     ln_prep_p.add_argument("--json", action="store_true", help="Machine-readable output")
 
-    # validate
     val_p = subparsers.add_parser("validate", help="Validate an artifact against contract schemas")
     val_p.add_argument("--artifact", required=True, help="Path to JSON artifact file")
     val_p.add_argument("--kind", help="Expected registered contract kind")
     val_p.add_argument("--json", action="store_true", help="Machine-readable output")
 
-    # continue
     cont_p = subparsers.add_parser("continue", help="Evaluate campaign continuation")
     cont_p.add_argument("--store", required=True, help="Path to SQLite history store")
     cont_p.add_argument("--json", action="store_true", help="Machine-readable output")
 
-    # self-test
     st_p = subparsers.add_parser("self-test", help="Execute offline-critical self-test suite")
     st_p.add_argument("--deep", action="store_true", help="Include deep mutation and property checks")
     st_p.add_argument("--json", action="store_true", help="Machine-readable output")
 
-    # build
     bld_p = subparsers.add_parser("build", help="Trigger deterministic standalone build")
     bld_p.add_argument("--output", help="Custom output path for standalone file")
     bld_p.add_argument("--json", action="store_true", help="Machine-readable output")
 
-    # ui
     subparsers.add_parser("ui", help="Launch interactive UI")
 
     return parser
@@ -116,7 +108,6 @@ def create_parser() -> argparse.ArgumentParser:
 def run_cli(argv: Sequence[str] | None = None) -> int:
     parser = create_parser()
 
-    # Check for empty args
     if argv is not None and len(argv) == 0:
         parser.print_help()
         return EXIT_SUCCESS
@@ -124,7 +115,6 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
     try:
         args = parser.parse_args(argv)
     except SystemExit as e:
-        # argparse exit code 2 on malformed args, 0 on --help/--version
         return e.code if isinstance(e.code, int) else EXIT_MALFORMED_ARGS
 
     if not args.command:

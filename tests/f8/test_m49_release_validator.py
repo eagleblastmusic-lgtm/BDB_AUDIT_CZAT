@@ -1,18 +1,16 @@
 """M49 — Release Validator Tests with Comprehensive Negative Fixtures (R5.3 §111)."""
 import base64
 import hashlib
-import io
 import json
 from pathlib import Path
 import re
 import tempfile
-import zipfile
 
 import pytest
 
 from bdb_audit.core.errors import ValidationError
 from bdb_audit.release_validator import ReleaseValidator, validate_release_artifact
-from build.build_single_file import build_standalone, collect_source_files, build_manifest, create_payload_zip, SRC_DIR
+from build.build_single_file import build_standalone, collect_build_files, build_manifest, create_payload_zip
 
 
 @pytest.fixture
@@ -24,9 +22,11 @@ def valid_standalone():
 
 
 def test_m49_valid_standalone_passes_all_checks(valid_standalone):
-    """Untampered standalone must pass all 10 release validator checks."""
+    """Untampered standalone must pass all release validator checks."""
     res = validate_release_artifact(valid_standalone)
     assert res["status"] == "PASS"
+    assert res["app_version"] == "2.0.1"
+    assert res["runtime_lock"]["jsonschema"] == "4.25.1"
     for check_name, status in res["checks"].items():
         assert status == "PASS", f"Check {check_name} failed"
 
@@ -46,7 +46,6 @@ def test_m49_negative_wrong_sha(valid_standalone):
 def test_m49_negative_changed_manifest(valid_standalone):
     """Changed manifest entry must fail closed."""
     text = valid_standalone.read_text(encoding="utf-8")
-    # Change sha of a file in manifest JSON
     tampered_text = text.replace('"sha256": "', '"sha256": "f' * 64)
     with tempfile.TemporaryDirectory() as td:
         tampered_file = Path(td) / "bad_manifest.py"
@@ -81,14 +80,19 @@ def test_m49_negative_incompatible_payload(valid_standalone):
 
 
 def _rebuild_with_modified_file(rel_path: str, new_content: bytes, out_path: Path):
-    files = collect_source_files(SRC_DIR)
+    # Keep the qualified third-party runtime closure in negative fixtures so a
+    # targeted product-payload defect is the first failing condition.
+    files = collect_build_files()
     modified_files = []
+    found = False
     for p, data in files:
         if p == rel_path:
             modified_files.append((p, new_content))
+            found = True
         else:
             modified_files.append((p, data))
-    
+    assert found, rel_path
+
     manifest = build_manifest(modified_files)
     manifest_bytes = json.dumps(manifest, sort_keys=True, indent=2).replace("\r\n", "\n").encode("utf-8")
     manifest_digest = hashlib.sha256(manifest_bytes).hexdigest()
@@ -111,7 +115,7 @@ def _rebuild_with_modified_file(rel_path: str, new_content: bytes, out_path: Pat
 
 
 def test_m49_negative_tampered_module():
-    """Tampering with a core python module must fail closed during reproducibility / validation."""
+    """Tampering with a core python module must fail closed during qualification."""
     with tempfile.TemporaryDirectory() as td:
         out_p = Path(td) / "tampered_module.py"
         _rebuild_with_modified_file("bdb_audit/core/canonical_json.py", b"# TAMPERED CANONICAL MODULE\n", out_p)

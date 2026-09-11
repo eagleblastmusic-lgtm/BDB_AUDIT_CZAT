@@ -130,7 +130,7 @@ class InteractiveAuditUI:
     ) -> int:
         """Run interactive text UI loop."""
         output_func("==================================================")
-        output_func("   BDB Audit v2.0.0 — Interactive Control Surface")
+        output_func("   BDB Audit v2.0.1 — Interactive Control Surface")
         output_func("==================================================")
 
         while True:

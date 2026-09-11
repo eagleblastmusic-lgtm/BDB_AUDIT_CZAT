@@ -10,6 +10,11 @@ from bdb_audit.assurance.artifact_hashes import *
 from bdb_audit.core.hashing import object_digest, raw_digest
 
 
+ZIP_METHODS = [zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED, zipfile.ZIP_BZIP2, zipfile.ZIP_LZMA]
+if hasattr(zipfile, "ZIP_ZSTANDARD"):
+    ZIP_METHODS.append(zipfile.ZIP_ZSTANDARD)
+
+
 def archive(rows, compression=zipfile.ZIP_STORED):
     out = io.BytesIO()
     with zipfile.ZipFile(out, "w", compression=compression) as z:
@@ -58,7 +63,7 @@ def test_crc_and_nested():
     assert read_bytes(archive([("nested.zip", nested)])) == {"nested.zip": nested}
 
 
-@pytest.mark.parametrize("method", [zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED, zipfile.ZIP_BZIP2, zipfile.ZIP_LZMA, zipfile.ZIP_ZSTANDARD])
+@pytest.mark.parametrize("method", ZIP_METHODS)
 def test_actual_decompression_not_header(method):
     import zlib
     raw = archive([("a", b"x"*100000)], method)

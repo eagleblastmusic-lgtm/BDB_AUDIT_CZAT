@@ -1,0 +1,136 @@
+name: Publish BDB Audit v2.0.1
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-bdb-audit-v2-0-1
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout release commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect v2.0.1 release source
+        id: gate
+        shell: pwsh
+        run: |
+          $text = Get-Content -Raw src/bdb_audit/cli.py
+          if ($text -match 'APP_VERSION\s*=\s*"2\.0\.1"' -and $text -match 'BUILD_ID\s*=\s*"BDB-V2-STANDALONE-2\.0\.1"') {
+            "release_ready=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            Write-Host "v2.0.1 release source detected"
+          } else {
+            "release_ready=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            Write-Host "Not a v2.0.1 release source; publication skipped"
+          }
+
+      - name: Set up Python 3.14
+        if: steps.gate.outputs.release_ready == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+
+      - name: Install exact runtime closure and qualification tools
+        if: steps.gate.outputs.release_ready == 'true'
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-f2.lock
+          python -m pip install pytest==9.1.1 ruff==0.16.7 mypy==2.3.1
+
+      - name: Final release qualification
+        if: steps.gate.outputs.release_ready == 'true'
+        shell: pwsh
+        run: |
+          python -m pytest -q
+          python -m ruff check src build
+          python -m mypy --config-file pyproject.toml
+
+      - name: Build and smoke-test standalone
+        if: steps.gate.outputs.release_ready == 'true'
+        shell: pwsh
+        run: |
+          python build/build_single_file.py
+          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py --version
+          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py --verify-payload
+          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py self-test
+          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py --help
+
+      - name: Prepare release evidence
+        if: steps.gate.outputs.release_ready == 'true'
+        shell: pwsh
+        run: |
+          $artifactHash = (Get-FileHash dist/BDB_AUDIT_ASSISTANT_v2.0.1.py -Algorithm SHA256).Hash.ToLower()
+          "SHA256=$artifactHash" | Set-Content -Encoding ascii dist/SHA256SUMS.txt
+          $qualification = [ordered]@{
+            release = "BDB Audit v2.0.1"
+            tag = "bdb-audit-v2.0.1"
+            commit = $env:GITHUB_SHA
+            python = "3.14"
+            platform = "windows-latest"
+            pytest = "PASS"
+            ruff = "PASS"
+            mypy = "PASS"
+            standalone_smoke = "PASS"
+            artifact_sha256 = $artifactHash
+          }
+          $qualification | ConvertTo-Json | Set-Content -Encoding utf8 dist/V2_0_1_RELEASE_QUALIFICATION.json
+          @"
+          # BDB Audit v2.0.1
+
+          Patch release for the standalone runtime and campaign-state defects found during live use.
+
+          ## Fixes
+          - embeds the pinned runtime closure in the single-file standalone build, including the native rpds runtime;
+          - fixes campaign Stage/Lane status projection so canonical `stage_key` / `lane_key` values are reported correctly;
+          - fixes campaign continuation to use the canonical E1-E5 stage sequence consistently;
+          - preserves compatibility aliases such as `F2_FOUNDATION` as input-only aliases;
+          - qualifies the release on Windows / CPython 3.14 with full pytest, Ruff, mypy, isolated standalone smoke, and payload verification.
+
+          ## Standalone
+          `BDB_AUDIT_ASSISTANT_v2.0.1.py`
+
+          SHA-256: `$artifactHash`
+
+          Release commit: `$env:GITHUB_SHA`
+          "@ | Set-Content -Encoding utf8 dist/RELEASE_NOTES_v2.0.1.md
+
+      - name: Create annotated tag and stable GitHub Release
+        if: steps.gate.outputs.release_ready == 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "bdb-audit-v2.0.1"
+          if (git ls-remote --tags origin "refs/tags/$tag" | Select-String .) {
+            throw "Tag $tag already exists; refusing to overwrite"
+          }
+          gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -eq 0) {
+            throw "Release $tag already exists; refusing to overwrite"
+          }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a $tag $env:GITHUB_SHA -m "BDB Audit v2.0.1"
+          git push origin "refs/tags/$tag"
+          gh release create $tag `
+            "dist/BDB_AUDIT_ASSISTANT_v2.0.1.py" `
+            "dist/SHA256SUMS.txt" `
+            "dist/V2_0_1_RELEASE_QUALIFICATION.json" `
+            --repo $env:GITHUB_REPOSITORY `
+            --title "BDB Audit v2.0.1" `
+            --notes-file "dist/RELEASE_NOTES_v2.0.1.md" `
+            --verify-tag
