@@ -1,0 +1,40 @@
+name: Fix BDB Audit v2.0.1 Release Notes
+
+on:
+  push:
+    branches:
+      - fix/v2.0.1-campaign-state
+    paths:
+      - .github/workflows/fix-release-notes-v2-0-1.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix-notes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Correct stable release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > /tmp/release-notes.md <<'EOF'
+          # BDB Audit v2.0.1
+
+          Patch release for the standalone runtime and campaign-state defects found during live use.
+
+          ## Fixes
+          - embeds the pinned runtime closure in the single-file standalone build, including the native rpds runtime;
+          - fixes campaign Stage/Lane status projection so canonical `stage_key` / `lane_key` values are reported correctly;
+          - fixes campaign continuation to use the canonical E1-E5 stage sequence consistently;
+          - preserves compatibility aliases such as `F2_FOUNDATION` as input-only aliases;
+          - qualifies the release on Windows / CPython 3.14 with full pytest, Ruff, mypy, isolated standalone smoke, and payload verification.
+
+          ## Standalone
+          `BDB_AUDIT_ASSISTANT_v2.0.1.py`
+
+          SHA-256: `ac3f25accb1f49aeed97c4283a25caabc3e3d2437c5cae03c780d10ca70d5381`
+
+          Release commit: `a5704266d10a3ac99e70931aac46100834f48e5a`
+          EOF
+          gh release edit bdb-audit-v2.0.1 --repo "$GITHUB_REPOSITORY" --notes-file /tmp/release-notes.md
