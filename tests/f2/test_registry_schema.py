@@ -11,7 +11,7 @@ from bdb_audit.core.registry import ContractRegistry, load_vectors, canonical_re
 from bdb_audit.schemas.binding import SchemaBindings, DIALECT, backend_identity
 
 ROOT = Path(__file__).resolve().parents[2]
-VECTORS = load_vectors(ROOT / "F1_QUALIFICATION/inputs/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_3.json")
+VECTORS = load_vectors(ROOT / "src/bdb_audit/core/foundation_golden_vectors_r5_3_1.json")
 BY_ID = {v["id"]: v for v in VECTORS["vectors"]}
 
 
@@ -31,13 +31,13 @@ def bound(schema, kind="command_envelope"):
 
 def test_exact_loader_and_unknown_kind_version(tmp_path):
     registry = ContractRegistry()
-    assert registry.document["registry_version"] == 3
+    assert registry.document["registry_version"] == 4
     assert len(VECTORS["vectors"]) == len(BY_ID)
     for kind, version in [("command", "1"), ("commit", "1"), ("command_envelope", "2"),
                           ("milestone_acceptance", "1")]:
         with pytest.raises(ValidationError, match="UNREGISTERED_CONTRACT_KIND"):
             registry.contract(kind, version)
-    raw = (ROOT / "src/bdb_audit/core/artifact_contract_registry_r5_3.json").read_bytes()
+    raw = (ROOT / "src/bdb_audit/core/artifact_contract_registry_r5_3_1.json").read_bytes()
     with pytest.raises(ValidationError, match="REGISTRY_PIN_MISMATCH"):
         ContractRegistry(raw + b" ")
     copy = tmp_path / "vectors.json"

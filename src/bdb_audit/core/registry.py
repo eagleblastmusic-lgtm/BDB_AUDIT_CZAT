@@ -10,11 +10,13 @@ from pathlib import Path
 
 from .canonical_json import parse, canonical_bytes
 from .errors import ValidationError
-from .ids import REGISTRY_SHA256
+from .ids import ACTIVE_REGISTRY_FILENAME, REGISTRY_SHA256
 
-GOLDEN_SHA256 = "7bee0013d179adc8eba14d07c2c3ea159de0b8e37be9a9f6dcd55969550b7772"
-REGISTRY_ID = "BDB-AUDIT-V2-ARTIFACT-CONTRACT-REGISTRY-R5-3-1"
-GOLDEN_ID = "BDB-AUDIT-V2-FOUNDATION-GOLDEN-VECTORS-R5-3-1"
+GOLDEN_FILENAME = "foundation_golden_vectors_r5_3_1.json"
+GOLDEN_SHA256 = "1beeedd979c06816480cc5adc144fd3470a7379630e6ed8d4a4770c5448c48e7"
+REGISTRY_ID = "BDB-AUDIT-V2-ARTIFACT-CONTRACT-REGISTRY-R5-3-2"
+REGISTRY_VERSION = 4
+GOLDEN_ID = "BDB-AUDIT-V2-FOUNDATION-GOLDEN-VECTORS-R5-3-2"
 
 
 def _pinned(raw, digest, code):
@@ -26,9 +28,9 @@ def _pinned(raw, digest, code):
 class ContractRegistry:
     def __init__(self, raw=None):
         if raw is None:
-            raw = Path(__file__).with_name("artifact_contract_registry_r5_3.json").read_bytes()
+            raw = Path(__file__).with_name(ACTIVE_REGISTRY_FILENAME).read_bytes()
         doc = _pinned(raw, REGISTRY_SHA256, "REGISTRY_PIN_MISMATCH")
-        if doc["registry_id"] != REGISTRY_ID or doc["registry_version"] != 3:
+        if doc["registry_id"] != REGISTRY_ID or doc["registry_version"] != REGISTRY_VERSION:
             raise ValidationError("REGISTRY_IDENTITY_MISMATCH")
         self._raw = raw
         self._doc = doc
@@ -61,6 +63,55 @@ class ContractRegistry:
             if canonical_bytes(material_refs) != canonical_bytes(row["material_refs"]):
                 raise ValidationError("EXPLICIT_COMPLETE_REFERENCE_CONTRACT_MISMATCH")
 
+    def precedence_profile(self, profile_name):
+        """Return an exact machine profile; prose and kind-name inference are forbidden."""
+        profiles = self._doc.get("order_only_precedence_profiles", {})
+        try:
+            return deepcopy(profiles[profile_name])
+        except KeyError as exc:
+            raise ValidationError("UNKNOWN_PRECEDENCE_PROFILE", str(profile_name)) from exc
+
+    def active_precedence_profile(self, *, command_kind, commit_seq, expected_parent,
+                                  profile_name="BDB_BOOTSTRAP_PRECEDENCE_V1"):
+        profile = self.precedence_profile(profile_name)
+        scope = profile["scope"]
+        if (command_kind, commit_seq, expected_parent) != (
+                scope["command_kind"], scope["commit_seq"], scope["expected_parent"]):
+            return None
+        return profile
+
+    def order_only_edges(self, nodes, *, command_kind, commit_seq, expected_parent,
+                         profile_name="BDB_BOOTSTRAP_PRECEDENCE_V1"):
+        """Build only exact profile edges; no prose/kind-name inference."""
+        profile = self.active_precedence_profile(
+            command_kind=command_kind, commit_seq=commit_seq,
+            expected_parent=expected_parent, profile_name=profile_name)
+        if profile is None:
+            return set()
+        by_kind = {}
+        for node in nodes:
+            kind = node.get("kind") if isinstance(node, dict) else getattr(node, "kind", None)
+            by_kind.setdefault(kind, []).append(node)
+        groups = profile["ordered_kind_groups"]
+        # A group may be absent. Pair every present group with every later
+        # present group, preserving the exact profile relation without
+        # inferring edges from prose or kind-name conventions.
+        edges = set()
+        def node_id(node):
+            return node.get("id") if isinstance(node, dict) else getattr(node, "node_id")
+        for i, group in enumerate(groups):
+            left_nodes = [n for kind in group for n in by_kind.get(kind, ())]
+            if not left_nodes:
+                continue
+            for later_group in groups[i + 1:]:
+                right_nodes = [n for kind in later_group for n in by_kind.get(kind, ())]
+                edges.update(
+                    (node_id(left), node_id(right))
+                    for left in left_nodes for right in right_nodes
+                    if node_id(left) != node_id(right)
+                )
+        return edges
+
     def validate_definition(self, candidate):
         seen = set()
         for row in candidate.get("contracts", []):
@@ -92,7 +143,9 @@ class ContractRegistry:
             raise ValidationError("REGISTRY_SEMANTICS_MISMATCH")
 
 
-def load_vectors(path):
+def load_vectors(path=None):
+    if path is None:
+        path = Path(__file__).with_name(GOLDEN_FILENAME)
     doc = _pinned(Path(path).read_bytes(), GOLDEN_SHA256, "GOLDEN_VECTOR_PIN_MISMATCH")
     if doc.get("vector_set_id") != GOLDEN_ID:
         raise ValidationError("GOLDEN_VECTOR_IDENTITY_MISMATCH")

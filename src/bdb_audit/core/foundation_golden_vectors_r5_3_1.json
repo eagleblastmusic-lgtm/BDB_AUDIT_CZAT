@@ -1,0 +1,2090 @@
+{
+  "date": "2026-09-10",
+  "purpose": "Executable/inspectable design vectors for R5.3.1 bootstrap-order hotfix qualification. Preserves prior R5.3 vectors and adds exact machine coverage for the F2-BOOTSTRAP-ORDER-002 union-DAG/order-only-precedence correction. Expected outcomes are specification checks, not runtime BDB test results.",
+  "status": "AUTHOR_HOTFIX_R5_3_1_NOT_INDEPENDENTLY_FROZEN",
+  "vector_set_id": "BDB-AUDIT-V2-FOUNDATION-GOLDEN-VECTORS-R5-3-2",
+  "vectors": [
+    {
+      "domain": "canonical_identity",
+      "expected": {
+        "object_digest_sha256": "d3fb18e1fe2e935611c36791d4dc3838ba11d3b5de96616957c43f982c73bde9"
+      },
+      "id": "CJSON_OBJECT_DIGEST_ASCII_1",
+      "input": {
+        "canonical_utf8_hex": "7b2261223a312c2262223a2278227d",
+        "kind": "test_object",
+        "object": {
+          "a": 1,
+          "b": "x"
+        },
+        "preimage_hex": "424442322f746573745f6f626a6563742f31007b2261223a312c2262223a2278227d",
+        "version": "1"
+      },
+      "title": "Simple independent ObjectDigest vector",
+      "why": "ASCII-only fixture avoids Unicode serializer ambiguity and pins domain-separation bytes."
+    },
+    {
+      "domain": "stop",
+      "expected": {
+        "continuation_decision": "CONTINUE_REQUIRED",
+        "release_readiness_forbidden": [
+          "READY",
+          "READY_WITH_RESIDUAL_RISK"
+        ],
+        "required_reason_codes": [
+          "REQUIRED_STAGES_PENDING",
+          "INSUFFICIENT_DATA"
+        ]
+      },
+      "id": "F7_DUAL_REASON_NONREGRESSION",
+      "input": {
+        "E3_complete": true,
+        "E4_E5_pending": true,
+        "context": "INTERMEDIATE",
+        "feasible_work_remaining": true,
+        "required_effort_data_insufficient": true
+      },
+      "title": "F7 retains both required reasons",
+      "why": "R5 must not regress the R4 F7 fix."
+    },
+    {
+      "domain": "commit_closure",
+      "expected": {
+        "error": "CONTENT_REFERENCE_CYCLE",
+        "result": "REJECT"
+      },
+      "id": "FR01_CYCLE_REJECT",
+      "input": {
+        "nodes": [
+          {
+            "depends_on": [
+              "B"
+            ],
+            "id": "A"
+          },
+          {
+            "depends_on": [
+              "A"
+            ],
+            "id": "B"
+          }
+        ]
+      },
+      "title": "Same-commit cycle reject",
+      "why": "No topological ordering exists."
+    },
+    {
+      "domain": "commit_closure",
+      "expected": {
+        "canonical_order": [
+          "A",
+          "B"
+        ],
+        "result": "ACCEPT"
+      },
+      "id": "FR01_DEPENDENCY_BEATS_SORT",
+      "input": {
+        "nodes": [
+          {
+            "depends_on": [
+              "A"
+            ],
+            "id": "B",
+            "kind": "assignment_manifest"
+          },
+          {
+            "depends_on": [],
+            "id": "A",
+            "kind": "attempt"
+          }
+        ]
+      },
+      "title": "Dependency order beats lexical/type order",
+      "why": "B depends on A even if typed lexical ordering would choose assignment_manifest first."
+    },
+    {
+      "domain": "commit_closure",
+      "expected": {
+        "error": "DUPLICATE_CONTENT_REFERENCE",
+        "result": "REJECT"
+      },
+      "id": "FR01_DUPLICATE_REF_REJECT",
+      "input": {
+        "immutable_object_refs": [
+          "A",
+          "A"
+        ]
+      },
+      "title": "Duplicate object ref rejected",
+      "why": "Commit closure is a sequence of unique object refs; duplicate membership is not a second valid representation."
+    },
+    {
+      "domain": "commit_closure",
+      "expected": {
+        "canonical_order": [
+          "a",
+          "z"
+        ],
+        "result": "ACCEPT"
+      },
+      "id": "FR01_SIBLING_TIEBREAK",
+      "input": {
+        "nodes": [
+          {
+            "depends_on": [],
+            "digest": "02",
+            "id": "z",
+            "kind": "observation",
+            "logical_id": "z"
+          },
+          {
+            "depends_on": [],
+            "digest": "01",
+            "id": "a",
+            "kind": "observation",
+            "logical_id": "a"
+          }
+        ]
+      },
+      "title": "Independent siblings deterministic tie-break",
+      "why": "Zero-indegree siblings use kind/logical_id/digest tie-break."
+    },
+    {
+      "domain": "legacy_mapping",
+      "expected": {
+        "error": "LEGACY_MAPPING_CANNOT_AUTO_QUALIFY_EVIDENCE",
+        "result": "REJECT"
+      },
+      "id": "FR02_AMBIGUOUS",
+      "input": {
+        "evidence_qualification": "QUALIFIED",
+        "mapping_result": "PARTIAL",
+        "semantic_equivalence": "AMBIGUOUS"
+      },
+      "title": "Ambiguous semantic mapping cannot auto-qualify evidence",
+      "why": "Mapping does not create current evidence truth."
+    },
+    {
+      "domain": "legacy_mapping",
+      "expected": {
+        "result": "ACCEPT"
+      },
+      "id": "FR02_SCOPED_MAPPED",
+      "input": {
+        "mapping_result": "MAPPED",
+        "semantic_equivalence": "SCOPED"
+      },
+      "title": "Semantic scope is not aggregate partial",
+      "why": "SCOPED and MAPPED are independent axes."
+    },
+    {
+      "domain": "legacy_mapping",
+      "expected": {
+        "result": "ACCEPT"
+      },
+      "id": "FR02_SCOPED_PARTIAL",
+      "input": {
+        "mapping_result": "PARTIAL",
+        "semantic_equivalence": "SCOPED"
+      },
+      "title": "Scoped semantic equivalence with partial aggregate mapping",
+      "why": "No implicit conversion between axes."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "error": "BLOCKED_ADMISSION_CANNOT_EMIT_GENESIS",
+        "result": "REJECT"
+      },
+      "id": "FR03_BLOCKED_ADMISSION_NO_GENESIS",
+      "input": {
+        "bootstrap_admission": "BLOCKED_CANONICAL_ADMISSION",
+        "bootstrap_profile": "INSTALLATION_BOOTSTRAP_PROFILE_V1/exact-pin",
+        "command": "INITIALIZE_CAMPAIGN_FROM_LEGACY",
+        "commit_seq": 1,
+        "events": [
+          "BootstrapAdmissionAccepted",
+          "CampaignGenesisAccepted"
+        ],
+        "expected_parent": "EMPTY_HISTORY"
+      },
+      "title": "Fr03 Blocked Admission No Genesis",
+      "why": "Fresh R5.1 regression vector; exact expected result is part of the candidate foundation contract."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "error": "FUTURE_CONTENT_REF_OR_NON_TOPOLOGICAL_CLOSURE",
+        "result": "REJECT"
+      },
+      "id": "FR03_BOOTSTRAP_REF_ORDER_REJECT",
+      "input": {
+        "closure": [
+          "campaign_genesis(ref=bootstrap_admission)",
+          "bootstrap_admission"
+        ],
+        "commit_seq": 1
+      },
+      "title": "Fr03 Bootstrap Ref Order Reject",
+      "why": "Fresh R5.1 regression vector; exact expected result is part of the candidate foundation contract."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "accepted_head_seq": 1,
+        "result": "ACCEPT",
+        "synthetic_h0": false
+      },
+      "id": "FR03_BOOTSTRAP_SINGLE_COMMIT_ACCEPT",
+      "input": {
+        "bootstrap_profile": "INSTALLATION_BOOTSTRAP_PROFILE_V1/exact-pin",
+        "closure": [
+          "initial_profiles",
+          "command_envelope",
+          "source_generation",
+          "legacy_raw_ref",
+          "mechanical_assessment",
+          "source_reconciliation",
+          "lineage_admission",
+          "trusted_predecessor_selection",
+          "bootstrap_admission:ADMITTED",
+          "campaign_genesis"
+        ],
+        "command": "INITIALIZE_CAMPAIGN_FROM_LEGACY",
+        "commit_seq": 1,
+        "expected_parent": "EMPTY_HISTORY",
+        "order_only_precedence_profile": "BDB_BOOTSTRAP_PRECEDENCE_V1"
+      },
+      "title": "Fr03 Bootstrap Single Commit Accept",
+      "why": "R5.3.1 regression vector: first-history bootstrap includes CommandEnvelope and uses exact BDB_BOOTSTRAP_PRECEDENCE_V1 so the accepted canonical order is generated by one union-DAG Kahn procedure rather than prose or a second sort."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "error": "EMPTY_HISTORY_AFTER_INITIALIZATION",
+        "result": "REJECT"
+      },
+      "id": "FR03_EMPTY_AFTER_H1_REJECT",
+      "input": {
+        "command_parent": "EMPTY_HISTORY",
+        "commit_seq": 2,
+        "current_head": "H1"
+      },
+      "title": "Empty history rejected after initialization",
+      "why": "No synthetic restart of accepted history."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "result": "ACCEPT"
+      },
+      "id": "FR03_FIRST_EMPTY_ACCEPT",
+      "input": {
+        "command_parent": "EMPTY_HISTORY",
+        "commit_seq": 1,
+        "current_head": null,
+        "prev_history_ref": "EMPTY_HISTORY"
+      },
+      "title": "First accepted commit uses tagged empty history",
+      "why": "Tagged initialization variant is legal only before H1."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "error": "INITIALIZATION_FUTURE_CAMPAIGN_REF",
+        "result": "REJECT"
+      },
+      "id": "FR03_INIT_FUTURE_CAMPAIGN_REF_REJECT",
+      "input": {
+        "bootstrap_profile": "INSTALLATION_BOOTSTRAP_PROFILE_V1/exact-pin",
+        "campaign_ref": "future:campaign_genesis",
+        "command": "INITIALIZE_CAMPAIGN_FROM_LEGACY",
+        "expected_parent": "EMPTY_HISTORY",
+        "history_namespace_ref": "ns_x",
+        "proposed_campaign_id": "cmp_x"
+      },
+      "title": "Fr03 Init Future Campaign Ref Reject",
+      "why": "Fresh R5.1 regression vector; exact expected result is part of the candidate foundation contract."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "error": "DANGLING_CONTENT_REF",
+        "result": "REJECT"
+      },
+      "id": "FR03_SOURCE_RECONCILIATION_DANGLING_REJECT",
+      "input": {
+        "closure": [
+          "legacy_raw_ref",
+          "source_reconciliation(target_source_generation_ref=missing)",
+          "bootstrap_admission",
+          "campaign_genesis"
+        ],
+        "commit_seq": 1
+      },
+      "title": "Fr03 Source Reconciliation Dangling Reject",
+      "why": "Fresh R5.1 regression vector; exact expected result is part of the candidate foundation contract."
+    },
+    {
+      "domain": "execution_dag",
+      "expected": {
+        "acyclic": true,
+        "result": "ACCEPT"
+      },
+      "id": "FR04_FAULT_DAG_ACCEPT",
+      "input": {
+        "edges": [
+          "ExecutionDescriptor->FaultRunRecord",
+          "ExecutionDescriptor->Observation",
+          "ExecutionDescriptor->CleanupResult",
+          "FaultRunRecord->ExecutionResult",
+          "Observation->ExecutionResult",
+          "CleanupResult->ExecutionResult"
+        ]
+      },
+      "title": "Fault execution DAG",
+      "why": "Result never receives a backlink from a record that itself points to result."
+    },
+    {
+      "domain": "execution_dag",
+      "expected": {
+        "acyclic": true,
+        "result": "ACCEPT"
+      },
+      "id": "FR04_NOFAULT_DAG_ACCEPT",
+      "input": {
+        "edges": [
+          "ExecutionDescriptor->Observation",
+          "ExecutionDescriptor->CleanupResult",
+          "Observation->ExecutionResult",
+          "CleanupResult->ExecutionResult"
+        ]
+      },
+      "title": "No-fault control DAG",
+      "why": "Control run needs no fabricated fault record."
+    },
+    {
+      "domain": "execution_dag",
+      "expected": {
+        "error": "CONTENT_REFERENCE_CYCLE",
+        "result": "REJECT"
+      },
+      "id": "FR04_RESULT_BACKLINK_CYCLE_REJECT",
+      "input": {
+        "edges": [
+          "ExecutionResult->FaultRunRecord",
+          "FaultRunRecord->ExecutionResult"
+        ]
+      },
+      "title": "Execution result/fault backlink cycle rejected",
+      "why": "Literal result backlink cycle is illegal."
+    },
+    {
+      "domain": "release_lifecycle",
+      "expected": {
+        "previous_release_qualification_ref": "FORBIDDEN",
+        "result": "ACCEPT"
+      },
+      "id": "FR05_FRESH_FIRST_AFTER_DRIFT",
+      "input": {
+        "assessment_basis": "FRESH_RELEASE_QUALIFICATION",
+        "audit_assurance_basis_applicable": true,
+        "material_release_drift": true,
+        "prior_release_qualification": null
+      },
+      "title": "First release qualification after release-only drift",
+      "why": "No fabricated predecessor is needed."
+    },
+    {
+      "domain": "release_lifecycle",
+      "expected": {
+        "error": "PREVIOUS_RELEASE_QUALIFICATION_REQUIRED",
+        "result": "REJECT"
+      },
+      "id": "FR05_REASSESS_REQUIRES_PREVIOUS",
+      "input": {
+        "assessment_basis": "RELEASE_REASSESSMENT",
+        "previous_release_qualification_ref": null,
+        "prior_release_qualification": "RQ1"
+      },
+      "title": "Later reassessment needs exact predecessor",
+      "why": "Later release reassessment is explicitly chained."
+    },
+    {
+      "domain": "finalization_dag",
+      "expected": {
+        "error": "CHALLENGER_CANDIDATE_BINDING_MISSING",
+        "result": "REJECT"
+      },
+      "id": "FR06_CHALLENGER_BEFORE_CANDIDATE_REJECT",
+      "input": {
+        "order": [
+          "ChallengerA",
+          "CandidateAssuranceCase"
+        ]
+      },
+      "title": "Challenger cannot precede candidate",
+      "why": "Challenge must bind exact immutable candidate revision."
+    },
+    {
+      "domain": "finalization_dag",
+      "expected": {
+        "result": "ACCEPT"
+      },
+      "id": "FR06_E5_ORDER_ACCEPT",
+      "input": {
+        "order": [
+          "E5A",
+          "CandidateAssuranceCase",
+          "ChallengerA",
+          "ChallengerB",
+          "E5StageCompletion",
+          "FINAL_POST_E5_STOP",
+          "CampaignConclusion",
+          "FinalAssuranceCase"
+        ]
+      },
+      "title": "Canonical E5 finalization order",
+      "why": "Candidate exists before challengers; E5 completes after required challenge results."
+    },
+    {
+      "domain": "authority",
+      "expected": {
+        "error": "SECOND_AUTHORITY_FOR_ROOT_CAUSE_MEMBERSHIP",
+        "result": "REJECT"
+      },
+      "id": "FR07_SEPARATE_MEMBERSHIP_AUTHORITY_REJECT",
+      "input": {
+        "accepted_kind": "RootCauseMembershipRevision",
+        "attempted_effect": "change root-cause membership"
+      },
+      "title": "Separate Root Cause membership authority rejected",
+      "why": "Only RootCauseRevision.membership_edges is authority."
+    },
+    {
+      "domain": "fsm",
+      "expected": {
+        "gate": "LANE_COMPLETION_REQUIRED",
+        "result": "REJECT_GATE"
+      },
+      "id": "FR08_ATTEMPT_RESULT_NOT_LANE_COMPLETION",
+      "input": {
+        "attempt_state": "RESULT_ACCEPTED",
+        "lane_completion_record": null
+      },
+      "title": "Attempt result does not close lane",
+      "why": "Lane and Attempt are distinct aggregates."
+    },
+    {
+      "domain": "fsm",
+      "expected": {
+        "error": "ILLEGAL_TRANSITION",
+        "required_intermediate": "E0_READY",
+        "result": "REJECT"
+      },
+      "id": "FR08_SKIP_E0_REJECT",
+      "input": {
+        "campaign_path": [
+          "CREATED",
+          "GENESIS_ACCEPTED",
+          "AUDIT_RUNNING"
+        ]
+      },
+      "title": "Foundation cannot skip E0 readiness",
+      "why": "Foundation path must be a subset of the same transition profile."
+    },
+    {
+      "domain": "successor_assurance",
+      "expected": {
+        "error": "ASSURANCE_SUCCESSOR_CONFLICT",
+        "result": "BLOCKED"
+      },
+      "id": "FR09_BRANCH_CONFLICT_BLOCK",
+      "input": {
+        "branch_resolution": null,
+        "predecessor": "C1",
+        "successors": [
+          "C2",
+          "C3"
+        ]
+      },
+      "title": "Competing successor branches fail closed",
+      "why": "There cannot be two equal current assurance authorities."
+    },
+    {
+      "domain": "successor_assurance",
+      "expected": {
+        "current_successor": "C3",
+        "result": "ACCEPT"
+      },
+      "id": "FR09_BRANCH_SELECTION_ACCEPT",
+      "input": {
+        "candidate_successor_campaign_refs": [
+          "C2",
+          "C3"
+        ],
+        "predecessor_conclusion_ref": "C1",
+        "resolution_basis_refs": [
+          "R1"
+        ],
+        "selected_successor_campaign_ref": "C3"
+      },
+      "title": "Accepted typed successor branch selection resolves current selector",
+      "why": "Selected successor must belong to exact candidate set; rejected branch remains immutable history."
+    },
+    {
+      "domain": "successor_assurance",
+      "expected": {
+        "old_current_applicability": "STALE",
+        "result": "ACCEPT"
+      },
+      "id": "FR09_SUCCESSOR_ACCEPT",
+      "input": {
+        "material_trigger": "new_material_subsystem",
+        "predecessor_conclusion": "C1",
+        "predecessor_ref": "C1",
+        "successor": "C2"
+      },
+      "title": "Post-conclusion material trigger creates successor campaign",
+      "why": "Historical conclusion stays immutable while current assurance advances through successor chain."
+    },
+    {
+      "domain": "finding_axis",
+      "expected": {
+        "result": "ACCEPT"
+      },
+      "id": "FR10_REFUTED_CONTROLLED_DYNAMIC",
+      "input": {
+        "axis": "REACHABILITY",
+        "epistemic_outcome": "REFUTED",
+        "method": "CONTROLLED_DYNAMIC"
+      },
+      "title": "Epistemic outcome separated from method",
+      "why": "Method does not encode truth outcome."
+    },
+    {
+      "domain": "continuation_authorization",
+      "expected": {
+        "effects": 1,
+        "result": "ACCEPT"
+      },
+      "id": "FR11_ATOMIC_FIRST_USE",
+      "input": {
+        "consume_with_transition": true,
+        "current_head": "H10",
+        "proposal_parent": "H10"
+      },
+      "title": "Authorization proposal accepted with transition",
+      "why": "Proposal does not move head before consumption."
+    },
+    {
+      "domain": "continuation_authorization",
+      "expected": {
+        "error": "STALE_INPUT",
+        "result": "REJECT"
+      },
+      "id": "FR11_INTERVENING_HEAD_REJECT",
+      "input": {
+        "current_head": "H11",
+        "proposal_parent": "H10"
+      },
+      "title": "Intervening head invalidates stale proposal",
+      "why": "Exact expected parent/CAS remains authoritative."
+    },
+    {
+      "domain": "continuation_authorization",
+      "expected": {
+        "error": "AUTHORIZATION_PROPOSAL_ALREADY_CONSUMED",
+        "result": "REJECT"
+      },
+      "id": "FR11_REUSE_REJECT",
+      "input": {
+        "already_consumed": true,
+        "proposal": "P1"
+      },
+      "title": "Consumed proposal cannot authorize second effect",
+      "why": "No second mutable authorization state."
+    },
+    {
+      "domain": "enum_domains",
+      "expected": {
+        "error": "ENUM_DOMAIN_MISMATCH",
+        "result": "REJECT"
+      },
+      "id": "FR12_CROSS_DOMAIN_ENUM_REJECT",
+      "input": {
+        "field": "EvidenceApplicability.status",
+        "value": "STALE_FOR_CURRENT_SOURCE"
+      },
+      "title": "Cross-domain status injection rejected",
+      "why": "STALE_FOR_CURRENT_SOURCE belongs to FindingLifecycle, not evidence applicability."
+    },
+    {
+      "domain": "input_accounting",
+      "expected": {
+        "gate": "ALL_ASSIGNED_INPUTS_TERMINALLY_ACCOUNTED",
+        "result": "REJECT_GATE"
+      },
+      "id": "FR13_PROVISIONAL_TERMINAL_REJECT",
+      "input": {
+        "assigned_inputs": [
+          {
+            "id": "I1",
+            "input_disposition": "PROVISIONAL"
+          }
+        ]
+      },
+      "title": "PROVISIONAL does not satisfy terminal input accounting",
+      "why": "PROVISIONAL is intermediate only."
+    },
+    {
+      "domain": "discovery_order",
+      "expected": {
+        "error": "BLIND_SLOT_NOT_SATISFIED",
+        "result": "REJECT_BLIND_SLOT"
+      },
+      "id": "FR14_DISCOVERY_AFTER_REVEAL_NOT_BLIND",
+      "input": {
+        "events": [
+          "checkpoint",
+          "controlled_reveal",
+          "discovery"
+        ]
+      },
+      "title": "Post-reveal discovery cannot satisfy blind precursor",
+      "why": "Blind precursor must be accepted before checkpoint/reveal."
+    },
+    {
+      "domain": "roadmap_namespace",
+      "expected": {
+        "all_distinct": true,
+        "result": "ACCEPT"
+      },
+      "id": "FR14_NAMESPACE_UNIQUE",
+      "input": {
+        "migration_local": "MG5",
+        "program_phase": "F5",
+        "roadmap_slice": "M5"
+      },
+      "title": "Milestone namespaces are disjoint",
+      "why": "Same numeral in distinct explicit namespaces is unambiguous."
+    },
+    {
+      "domain": "registry",
+      "expected": {
+        "result": "ACCEPT"
+      },
+      "id": "R5N01_CRITICAL_REGISTRY_REF_COMPLETENESS",
+      "input": {
+        "kind": "stop_input",
+        "material_refs_complete": true,
+        "reference_contract_mode": "EXPLICIT_COMPLETE"
+      },
+      "title": "Critical registry wiring must be explicit",
+      "why": "Critical foundation kinds cannot rely on an ambiguous empty ref list."
+    },
+    {
+      "domain": "registry",
+      "expected": {
+        "error": "UNKNOWN_CANONICAL_ROLE",
+        "result": "REJECT"
+      },
+      "id": "R5N02_CANONICAL_ROLE_DOMAIN_REJECT",
+      "input": {
+        "canonical_role": "UNKNOWN_ROLE"
+      },
+      "title": "Unknown registry role rejected",
+      "why": "Machine registry role domain is frozen and typed."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "result": "ACCEPT",
+        "sets_equal": true
+      },
+      "id": "R5N03_BOOTSTRAP_PIN_PARITY",
+      "input": {
+        "contract_material_ref_fields": [
+          "initial_schema_registry_ref",
+          "initial_artifact_contract_registry_ref",
+          "initial_serialization_profile_ref",
+          "initial_governing_policy_ref",
+          "initial_transition_profile_ref",
+          "initial_trust_profile_ref",
+          "allowed_history_namespace_ref",
+          "initial_source_identity_profile_ref"
+        ],
+        "required_pins": [
+          "initial_schema_registry_ref",
+          "initial_artifact_contract_registry_ref",
+          "initial_serialization_profile_ref",
+          "initial_governing_policy_ref",
+          "initial_transition_profile_ref",
+          "initial_trust_profile_ref",
+          "allowed_history_namespace_ref",
+          "initial_source_identity_profile_ref"
+        ]
+      },
+      "title": "Bootstrap profile pin parity",
+      "why": "Profile and installation_bootstrap_profile contract must require exactly the same pins."
+    },
+    {
+      "domain": "registry",
+      "expected": {
+        "error": "UNRESOLVED_REFERENCE_TARGET",
+        "result": "REJECT"
+      },
+      "id": "R5N04_DANGLING_REF_TARGET_REJECT",
+      "input": {
+        "allowed_target": "missing_kind_or_class"
+      },
+      "title": "Dangling registry target rejected",
+      "why": "Every allowed ref target must resolve to a registered kind or typed reference target class."
+    },
+    {
+      "domain": "governance",
+      "expected": {
+        "effective_foundation_frozen": true,
+        "result": "ACCEPT",
+        "reviewed_candidate_bytes_mutated": false
+      },
+      "id": "R5N05_FREEZE_WITHOUT_BYTE_MUTATION",
+      "input": {
+        "candidate_readme_state": "NO_AS_OF_CANDIDATE_BYTES",
+        "freeze_decision": {
+          "baseline_id": "BDB_AUDIT_V2_FOUNDATION_R5_3",
+          "candidate_manifest_raw_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "candidate_manifest_schema": "BDB_AUDIT_V2_R5_3_PACKAGE_MANIFEST/1",
+          "decision": "FREEZE",
+          "foundation_freeze_decision_id": "fd_1",
+          "governance_actor_ref": "governance:authorized",
+          "independent_review_raw_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "independent_review_verdict": "FOUNDATION_SPEC_BASELINE_READY",
+          "reason_codes": [],
+          "reviewed_candidate_set_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        },
+        "independent_verdict": "FOUNDATION_SPEC_BASELINE_READY"
+      },
+      "title": "Freeze via external governance decision",
+      "why": "Independent PASS must not force editing reviewed corpus and invalidating its own verdict."
+    },
+    {
+      "domain": "schema_binding",
+      "expected": {
+        "error": "SCHEMA_BYTES_NOT_BOUND",
+        "result": "REJECT_RUNTIME_ACCEPTANCE"
+      },
+      "id": "R5N06_SCHEMA_BINDING_FAIL_CLOSED",
+      "input": {
+        "exact_schema_digest": null,
+        "kind": "noncritical_future_kind",
+        "registry_mode": "SCHEMA_BOUND_BEFORE_FIRST_ACCEPTANCE"
+      },
+      "title": "Schema-bound kind blocked until exact bytes exist",
+      "why": "Foundation may freeze semantic key while runtime acceptance remains fail-closed until executable schema binding."
+    },
+    {
+      "domain": "vector_manifest",
+      "expected": {
+        "all_vectors_conform": true,
+        "result": "ACCEPT"
+      },
+      "id": "R5N08_VECTOR_SCHEMA_UNIFORM",
+      "input": {
+        "required_fields": [
+          "id",
+          "domain",
+          "input",
+          "expected",
+          "title",
+          "why"
+        ]
+      },
+      "title": "Golden vector schema is uniform",
+      "why": "Runner dispatch and review must not silently skip vectors with a different shape."
+    },
+    {
+      "domain": "stop",
+      "expected": {
+        "result": "ACCEPT",
+        "sets_subset": true
+      },
+      "id": "R5N12_STOP_PROFILE_BINDING_PARITY",
+      "input": {
+        "profile_required_machine_bindings": [
+          "input_history_cut",
+          "governing_policy_ref",
+          "evaluator_revision_ref",
+          "required_stage_set_ref",
+          "completed_stage_refs",
+          "pending_required_stage_refs",
+          "stop_input_snapshot_ref",
+          "release_policy_ref",
+          "effort_profile_ref"
+        ],
+        "stop_input_fields": "same set present"
+      },
+      "title": "STOP profile machine binding parity",
+      "why": "Registry STOP profile and Data Contracts StopInput must name the same required bindings."
+    },
+    {
+      "domain": "reference_dag",
+      "expected": {
+        "error": "BACKWARD_REF_NOT_PRIOR_ACCEPTED",
+        "result": "REJECT"
+      },
+      "id": "R5N15_BACKWARD_REF_SAME_COMMIT_REJECT",
+      "input": {
+        "field": "predecessor_conclusion_ref",
+        "ref_class": "PRIOR_ACCEPTED_ONLY",
+        "target": "same_commit_object"
+      },
+      "title": "Backward-only ref cannot target same commit",
+      "why": "Previous/predecessor/parent/retry/prior-result references must bind an already accepted object and cannot be reinterpreted as same-commit content."
+    },
+    {
+      "domain": "reference_dag",
+      "expected": {
+        "acyclic": true,
+        "result": "ACCEPT"
+      },
+      "id": "R5N16_INLINE_REF_GRAPH_ACYCLIC",
+      "input": {
+        "graph": "foundation_inline_reference_contract_kinds excluding PRIOR_ACCEPTED/HISTORY/PINNED/POST_ACCEPTANCE edges"
+      },
+      "title": "Inline foundation reference type graph is acyclic",
+      "why": "Machine ref classes must not reintroduce a type-level cycle into bootstrap/evidence/finalization semantics."
+    },
+    {
+      "domain": "history_reference_semantics",
+      "expected": {
+        "error": "HISTORY_INPUT_SAME_COMMIT_FORBIDDEN",
+        "result": "REJECT"
+      },
+      "id": "R5N17_HISTORY_CUT_SAME_COMMIT_REJECT",
+      "input": {
+        "field": "candidate_input_history_cut",
+        "ref_class": "HISTORY_INPUT",
+        "target": "same_commit:history_cut"
+      },
+      "title": "History input cannot be ordinary same-commit content",
+      "why": "History/acceptance context must represent prior accepted input or the tagged initialization sentinel, never a current-commit cut."
+    },
+    {
+      "domain": "registry_reference_semantics",
+      "expected": {
+        "result": "REJECT_IF_ANY_USED_CLASS_UNDEFINED"
+      },
+      "id": "R5N18_REFERENCE_CLASS_DOMAIN_COMPLETE",
+      "input": {
+        "rule": "every material_refs[].ref_class must exist in reference_class_semantics"
+      },
+      "title": "Every reference class has pinned semantics",
+      "why": "Undefined ref-class tokens would reintroduce implementation-dependent legality."
+    },
+    {
+      "domain": "canonical_kind_identity",
+      "expected": {
+        "finding_kind": "finding_adjudication_decision",
+        "obligation_applicability_kind": "obligation_applicability_decision",
+        "result": "ACCEPT_ONLY_EXACT_KIND"
+      },
+      "id": "R5N19_CANONICAL_KIND_IDENTITY_PARITY",
+      "input": {
+        "canonical_data_contract_names": [
+          "FINDING_ADJUDICATION_DECISION",
+          "OBLIGATION_APPLICABILITY_DECISION"
+        ]
+      },
+      "title": "Canonical narrative name and registry kind are identity-equivalent",
+      "why": "ObjectDigest domain separation includes kind; a shortened/renamed alias would create a distinct identity."
+    },
+    {
+      "domain": "audit_harness_scope",
+      "expected": {
+        "historical_review_used_as_current_semantics": false,
+        "result": "PASS"
+      },
+      "id": "R5N20_HISTORICAL_REVIEW_EXCLUDED_FROM_CURRENT_NEGATIVE_SCAN",
+      "input": {
+        "current_corpus": [
+          "8 normative docs",
+          "registry",
+          "current vectors"
+        ],
+        "historical_review_contains_old_bad_shortcut": true
+      },
+      "title": "Historical review quotations do not poison current-corpus negative scans",
+      "why": "Review provenance can quote rejected semantics without making them current normative text."
+    },
+    {
+      "domain": "stop",
+      "expected": {
+        "error": "STOP_EVALUATION_MISSING_EXACT_STOP_INPUT_REF",
+        "result": "REJECT"
+      },
+      "id": "R5N21_STOP_EXACT_INPUT_BINDING",
+      "input": {
+        "stop_evaluation_refers_to": "none_or_copied_cut_only",
+        "stop_input_A": "same_history_cut/profile=A",
+        "stop_input_B": "same_history_cut/profile=B"
+      },
+      "title": "StopEvaluation must bind one exact StopInput",
+      "why": "Same HistoryCut can admit distinct fully-bound StopInput revisions; copied input fields are not an unambiguous input identity."
+    },
+    {
+      "domain": "release",
+      "expected": {
+        "error": "HISTORY_INPUT_MUST_PREEXIST",
+        "result": "REJECT"
+      },
+      "id": "R5N22_RELEASE_BASIS_CUT_SAME_COMMIT_REJECT",
+      "input": {
+        "release_assessment_basis_cut": "same_commit_content_history_cut"
+      },
+      "title": "Release assessment basis is history input, never same-commit content",
+      "why": "Release assessment may use an earlier accepted basis cut but cannot create the history it claims to assess."
+    },
+    {
+      "domain": "canonical_identity",
+      "expected": {
+        "error": "OBJECT_DIGEST_KIND_REGISTRY_MISMATCH",
+        "result": "REJECT"
+      },
+      "id": "R5N23_OBJECT_DIGEST_WIRE_KIND_EXACT",
+      "input": {
+        "digest_domain_kind": "command",
+        "registry_kind": "command_envelope"
+      },
+      "title": "ObjectDigest domain kind equals exact Registry wire kind",
+      "why": "Aliases such as command/commit would produce a second identity for the same body."
+    },
+    {
+      "domain": "acceptance_history",
+      "expected": {
+        "error": "WRONG_REF_TYPE",
+        "result": "REJECT"
+      },
+      "id": "R5N24_RECEIPT_COMMIT_TARGET_TYPED",
+      "input": {
+        "field": "accepted_commit_ref",
+        "target_kind": "accepted_head_ref"
+      },
+      "title": "Receipt commit ref points to CommitBody, not AcceptedHead",
+      "why": "Commit identity and head pointer are distinct acceptance artifacts."
+    },
+    {
+      "domain": "registry",
+      "expected": {
+        "error": "EXPLICIT_COMPLETE_REFERENCE_CONTRACT_MISMATCH",
+        "result": "REJECT"
+      },
+      "id": "R5N25_EXPLICIT_COMPLETE_BODY_REGISTRY_PARITY",
+      "input": {
+        "body_ref_field": "governing_policy_ref",
+        "contract_mode": "EXPLICIT_COMPLETE",
+        "registry_field_missing": true
+      },
+      "title": "EXPLICIT_COMPLETE means exact body↔Registry ref parity",
+      "why": "A supposedly complete machine wiring contract cannot silently omit a material ref from the normative body."
+    },
+    {
+      "domain": "authority",
+      "expected": {
+        "error": "SEMANTIC_CONTEXT_NOT_EFFECTIVE_AT_INPUT_HISTORY",
+        "result": "REJECT"
+      },
+      "id": "R5N26_SAME_COMMIT_GOVERNING_SELF_UPGRADE_REJECT",
+      "input": {
+        "command_expected_parent": "H10",
+        "governing_policy_ref": "new policy object earlier in accepting H11 commit"
+      },
+      "title": "Same-commit policy/spec cannot validate the command that installs it",
+      "why": "Governing semantic context comes from prior accepted history or installation pins at EMPTY_HISTORY."
+    },
+    {
+      "domain": "documentation",
+      "expected": {
+        "error": "MALFORMED_FINDING_TABLE",
+        "result": "REJECT"
+      },
+      "id": "R5N27_REMEDIATION_TABLE_STRUCTURAL_INTEGRITY",
+      "input": {
+        "finding_table_has_blank_line_before_rows": true
+      },
+      "title": "Remediation register finding table remains structurally contiguous",
+      "why": "Findings must not disappear from machine/human table parsing due to Markdown structure."
+    },
+    {
+      "domain": "canonical_identity",
+      "expected": {
+        "error": "LEGACY_SHORT_KIND_ALIAS_FORBIDDEN",
+        "result": "REJECT"
+      },
+      "id": "R5N28_EVIDENCE_SEMANTIC_NAME_NOT_IDENTITY_ALIAS",
+      "input": {
+        "attempted_wire_kind": "evidence_qualification",
+        "canonical_wire_kind": "evidence_qualification_assessment",
+        "semantic_class": "EvidenceQualificationAssessment"
+      },
+      "title": "Legacy short evidence kind is not an identity alias",
+      "why": "Exact wire identity is normalized to evidence_qualification_assessment / evidence_applicability_assessment; old short kinds cannot remain alternate ObjectDigest domains."
+    },
+    {
+      "domain": "canonical_identity",
+      "expected": {
+        "error": "UNREGISTERED_IDENTITY_KIND",
+        "result": "REJECT"
+      },
+      "id": "R5N29_COVERAGE_OBLIGATION_KEY_REGISTERED",
+      "input": {
+        "object_digest_kind": "coverage_obligation_key",
+        "registry_contains_kind": false
+      },
+      "title": "CoverageObligationKey digest kind is registered",
+      "why": "An identity-bearing ObjectDigest domain cannot exist outside the pinned identity registry."
+    },
+    {
+      "domain": "stop",
+      "expected": {
+        "error": "SEMANTIC_CONTEXT_NOT_EFFECTIVE_AT_INPUT_HISTORY",
+        "result": "REJECT"
+      },
+      "id": "R5N30_STOP_EVALUATOR_AND_STAGE_PROFILE_HISTORY_BOUND",
+      "input": {
+        "evaluator_revision_ref": "same_commit_new_spec",
+        "pending_required_stage_ref": "same_commit_new_stage_spec"
+      },
+      "title": "STOP evaluator and stage-plan profiles are history-context bindings",
+      "why": "STOP cannot redefine its evaluator or required stage plan inside the same commit as the evaluation input."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "error": "NORMAL_GENESIS_REQUIRES_EMPTY_HISTORY",
+        "result": "REJECT"
+      },
+      "id": "R5N31_CAMPAIGN_GENESIS_ACCEPTED_HISTORY_REJECT",
+      "input": {
+        "input_history_cut": "ACCEPTED_HISTORY_CUT(H10)",
+        "kind": "campaign_genesis"
+      },
+      "title": "Normal CampaignGenesis exists only at empty-history initialization",
+      "why": "Post-conclusion continuation must use SuccessorCampaignGenesis and cannot mint a second normal genesis on existing history."
+    },
+    {
+      "domain": "knowledge_isolation",
+      "expected": {
+        "authority": "canonical POTENTIAL_EXPOSURE_RECORD body only",
+        "result": "ACCEPT"
+      },
+      "id": "R5N32_EXPOSURE_EVENT_VIEW_NOT_SECOND_CANONICAL_BODY",
+      "input": {
+        "canonical_potential_exposure_body_has_delivery_profile_ref": false,
+        "derived_event_enriched_view_has_delivery_profile_ref": true
+      },
+      "title": "Event-enriched exposure projection is not a competing canonical body",
+      "why": "Event position and dereferenced delivery profile enrich a derived view without changing PotentialExposureRecord identity."
+    },
+    {
+      "domain": "authority",
+      "expected": {
+        "error": "ACTOR_AUTHORITY_NOT_EFFECTIVE_AT_INPUT_HISTORY",
+        "result": "REJECT"
+      },
+      "id": "R5N33_COMMAND_ACTOR_CANNOT_SELF_AUTHORIZE",
+      "input": {
+        "actor_ref": "same_commit_new_authority_object",
+        "prior_or_installation_authority_proof": false
+      },
+      "title": "Same-commit actor/authority object cannot authorize its accepting command",
+      "why": "Actor identity is not itself authorization; authority comes from prior accepted or installation-pinned trust context."
+    },
+    {
+      "domain": "stop",
+      "expected": {
+        "authority_source": "DIRECT_OBLIGATION_REVISIONS",
+        "result": "ACCEPT"
+      },
+      "id": "R5N34_STOP_DIRECT_MANDATORY_OBLIGATIONS",
+      "input": {
+        "coverage_summary_only": false,
+        "mandatory_obligation_refs": [
+          "obl:A",
+          "obl:B"
+        ]
+      },
+      "title": "STOP binds direct mandatory obligations",
+      "why": "Derived coverage summary cannot become a second coverage authority."
+    },
+    {
+      "domain": "command_commit",
+      "expected": {
+        "error": "COMMAND_NOT_IN_CURRENT_COMMIT_CLOSURE",
+        "result": "REJECT"
+      },
+      "id": "R5N35_COMMIT_PRIOR_COMMAND_REUSE_REJECT",
+      "input": {
+        "command_ref_location": "PRIOR_ACCEPTED",
+        "new_commit": true
+      },
+      "title": "New commit cannot reuse prior command envelope",
+      "why": "CommitBody.command_ref must identify the command accepted by that exact commit."
+    },
+    {
+      "domain": "command_commit",
+      "expected": {
+        "error": "CAMPAIGN_NOT_PRIOR_ACCEPTED",
+        "result": "REJECT"
+      },
+      "id": "R5N36_NORMAL_COMMAND_SAME_COMMIT_CAMPAIGN_REJECT",
+      "input": {
+        "campaign_ref_location": "SAME_COMMIT",
+        "command_kind": "NORMAL"
+      },
+      "title": "Normal command requires prior campaign",
+      "why": "Same-commit CampaignGenesis is initialization-only and cannot satisfy ordinary command campaign binding."
+    },
+    {
+      "domain": "history",
+      "expected": {
+        "result": "ACCEPT",
+        "schema_set_alias_forbidden": true
+      },
+      "id": "R5N37_HISTORYCUT_SPEC_SCHEMA_DOMAIN_SEPARATION",
+      "input": {
+        "governing_spec_refs": [
+          "spec:transition/v1"
+        ],
+        "schema_set_ref_used_as_spec_binding": false
+      },
+      "title": "HistoryCut separates governing specs from schema set",
+      "why": "Spec revision context and schema-set identity are different domains."
+    },
+    {
+      "domain": "command_commit",
+      "expected": {
+        "error": "RECEIPT_COMMAND_BINDING_CONFLICT",
+        "result": "REJECT"
+      },
+      "id": "R5N38_RECEIPT_COMMAND_COMMIT_EQUALITY",
+      "input": {
+        "accepted_commit_command_ref": "cmd:B",
+        "receipt_command_ref": "cmd:A"
+      },
+      "title": "Receipt command must equal accepted commit command",
+      "why": "Acceptance sidecar cannot point at a different command than the accepted CommitBody."
+    },
+    {
+      "domain": "assurance",
+      "expected": {
+        "result": "ACCEPT",
+        "summary_authority": false
+      },
+      "id": "R5N39_CANDIDATE_DIRECT_COVERAGE_BINDING",
+      "input": {
+        "coverage_obligation_qualification_refs": [
+          "qual:A"
+        ],
+        "coverage_obligation_refs": [
+          "obl:A"
+        ],
+        "coverage_summary_ref": "summary:derived"
+      },
+      "title": "Candidate assurance binds canonical coverage refs",
+      "why": "A derived summary may be presented but cannot establish candidate coverage assurance."
+    },
+    {
+      "domain": "stop",
+      "expected": {
+        "result": "ACCEPT",
+        "state_is_derived": true
+      },
+      "id": "R5N40_STOP_INVALIDATION_EXACT_REFS",
+      "input": {
+        "evidence_invalidation_refs": [
+          "inv:1"
+        ],
+        "evidence_invalidation_state": "HAS_ACTIVE_INVALIDATION"
+      },
+      "title": "STOP invalidation state derives from exact facts",
+      "why": "A scalar invalidation state alone is not reproducible evidence authority."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "command_precedes_authorized_domain_objects": true,
+        "result": "ACCEPT"
+      },
+      "id": "R5N41_BOOTSTRAP_GLOBAL_SEQUENCE_INCLUDES_COMMAND",
+      "input": {
+        "closure": [
+          "payload",
+          "command_envelope",
+          "source_generation",
+          "legacy_raw",
+          "assessments",
+          "admission",
+          "campaign_genesis"
+        ]
+      },
+      "title": "Bootstrap closure includes CommandEnvelope",
+      "why": "CommitBody.command_ref must point to the command accepted by the same deterministic closure; the global bootstrap model cannot omit it."
+    },
+    {
+      "domain": "registry",
+      "expected": {
+        "canonical_order": [
+          "typed:a",
+          "typed:b"
+        ],
+        "duplicates": "REJECT",
+        "result": "ACCEPT_AFTER_CANONICAL_SORT"
+      },
+      "id": "R5N42_REFERENCE_ARRAY_DEFAULT_ORDERING",
+      "input": {
+        "field": "observation_refs",
+        "local_ordering_override": null,
+        "refs": [
+          "typed:b",
+          "typed:a"
+        ]
+      },
+      "title": "Ref arrays have pinned default ordering",
+      "why": "EXPLICIT_COMPLETE contracts remain deterministic even when a set-like ref array does not need a local ordering override."
+    },
+    {
+      "domain": "history",
+      "expected": {
+        "creates_history_fact": false,
+        "result": "ACCEPT_AS_INSTALLATION_DERIVED_VALUE"
+      },
+      "id": "R5N43_EMPTY_HISTORY_CUT_NOT_ACCEPTED_FACT",
+      "input": {
+        "accepted_event_required": false,
+        "moves_head": false,
+        "variant": "EMPTY_HISTORY_CUT"
+      },
+      "title": "EMPTY HistoryCut is not an accepted fact",
+      "why": "Bootstrap input cannot require a pre-existing acceptance event before the first history exists."
+    },
+    {
+      "domain": "stop",
+      "expected": {
+        "error": "STOP_SNAPSHOT_BINDING_CONFLICT",
+        "result": "REJECT"
+      },
+      "id": "R5N44_STOP_SNAPSHOT_BINDING_REJECT",
+      "input": {
+        "snapshot_as_of_head": "head:9",
+        "stop_input_cut": "head:10"
+      },
+      "title": "Stale STOP snapshot rejected",
+      "why": "Derived snapshot is a reproducibility aid and must equality-bind the exact direct StopInput context."
+    },
+    {
+      "domain": "finalization",
+      "expected": {
+        "error": "FINALIZATION_BINDING_CONFLICT",
+        "result": "REJECT"
+      },
+      "id": "R5N45_FINALIZATION_CHAIN_MISMATCH_REJECT",
+      "input": {
+        "campaign_conclusion_stop": "stop:A",
+        "final_case_stop": "stop:B",
+        "release_stop": "stop:A"
+      },
+      "title": "Finalization chain cannot mix STOP evaluations",
+      "why": "Conclusion, Final Assurance Case and Release Qualification must refer to one exact finalization chain."
+    },
+    {
+      "domain": "stop",
+      "expected": {
+        "error": "STOP_OBLIGATION_OUTPUT_NOT_IN_INPUT",
+        "result": "REJECT"
+      },
+      "id": "R5N46_STOP_OBLIGATION_OUTPUT_SUBSET",
+      "input": {
+        "blocking_obligation_refs": [],
+        "mandatory_obligation_refs": [
+          "obl:A"
+        ],
+        "remaining_obligation_refs": [
+          "obl:B"
+        ]
+      },
+      "title": "STOP output obligations come from exact input set",
+      "why": "Evaluator cannot invent, omit-by-rebinding, or switch obligation identity outside referenced StopInput."
+    },
+    {
+      "domain": "governance",
+      "expected": {
+        "result": "ACCEPT",
+        "stale_current_r5_2_reference": false
+      },
+      "id": "R5N47_CURRENT_ARTIFACT_LABELS_R5_3",
+      "input": {
+        "current_baseline": "R5.3",
+        "current_vector_file": "BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_3.json"
+      },
+      "title": "Current artifact references point to R5.3",
+      "why": "Historical R5.2 references may remain as provenance, but current validator/vector/baseline references must identify exact R5.3 artifacts."
+    },
+    {
+      "domain": "governance",
+      "expected": {
+        "candidate_bytes_mutated_after_hash": false,
+        "effective_author_qualified_implementation_baseline": true,
+        "result": "ACCEPT"
+      },
+      "id": "R5N48_AUTHOR_QUALIFICATION_NO_SELF_ATTESTATION",
+      "input": {
+        "candidate_bytes_state": "PENDING_EXTERNAL_QUALIFICATION_RECORD",
+        "drive_readback_match": true,
+        "external_author_qualification_record": true,
+        "manifest_complete": true
+      },
+      "title": "Author qualification uses external post-readback record",
+      "why": "Candidate bytes cannot truthfully attest a future manifest/readback result without recreating the same self-reference problem as freeze status."
+    },
+    {
+      "domain": "enum_domains",
+      "expected": {
+        "error": "ENUM_DOMAIN_MISMATCH",
+        "required_scope_value_for_provisional_scope": "PROVISIONAL_SCOPE",
+        "result": "REJECT"
+      },
+      "id": "R5N49_SCOPE_PROVISIONAL_ENUM_SEPARATION",
+      "input": {
+        "source_field": "InputDisposition",
+        "source_value": "PROVISIONAL",
+        "target_field": "ScopeState"
+      },
+      "title": "Input and scope provisional states are not aliases",
+      "why": "FR-13 requires separate InputDisposition and ScopeState domains; a shared lexical token would invite cross-domain mapping."
+    },
+    {
+      "domain": "temporal_authority",
+      "expected": {
+        "error": "PRIOR_ACCEPTED_REFERENCE_REQUIRED",
+        "result": "REJECT"
+      },
+      "id": "R5N50_CHALLENGER_ASSIGNMENT_SAME_COMMIT_REJECT",
+      "input": {
+        "candidate_assurance_case_ref": "same_commit_candidate",
+        "operation": "ChallengerAssignment"
+      },
+      "title": "Challenger assignment requires prior accepted candidate",
+      "why": "Assignment must exist as an accepted instruction before challenger execution; same-commit candidate cannot establish that temporal boundary."
+    },
+    {
+      "domain": "temporal_authority",
+      "expected": {
+        "error": "PRIOR_ACCEPTED_REFERENCE_REQUIRED",
+        "result": "REJECT"
+      },
+      "id": "R5N50_CHALLENGER_RESULT_SAME_ASSIGNMENT_REJECT",
+      "input": {
+        "challenge_assignment_ref": "same_commit_assignment",
+        "operation": "ChallengerResult"
+      },
+      "title": "Challenger result requires prior accepted assignment",
+      "why": "A result cannot prove execution of an assignment that was not accepted before the result input cut."
+    },
+    {
+      "domain": "finalization",
+      "expected": {
+        "error": "PRIOR_ACCEPTED_REFERENCE_REQUIRED",
+        "result": "REJECT"
+      },
+      "id": "R5N51_CONCLUSION_SAME_STOP_REJECT",
+      "input": {
+        "operation": "ConcludeCampaign",
+        "stop_evaluation_ref": "same_commit_stop"
+      },
+      "title": "Campaign conclusion requires prior accepted STOP",
+      "why": "ConcludeCampaign is a separate state transition based on an already accepted StopEvaluation."
+    },
+    {
+      "domain": "release",
+      "expected": {
+        "error": "PRIOR_ACCEPTED_REFERENCE_REQUIRED",
+        "result": "REJECT"
+      },
+      "id": "R5N51_RELEASE_SAME_FINAL_CASE_REJECT",
+      "input": {
+        "final_assurance_case_ref": "same_commit_final_case",
+        "operation": "ReleaseQualification"
+      },
+      "title": "Release qualification requires prior accepted finalization chain",
+      "why": "qualification_command_input_history_cut must already contain FinalAssuranceCase and all material refs."
+    },
+    {
+      "domain": "artifact_contract_registry",
+      "expected": {
+        "required_kinds": [
+          "grant_body",
+          "coverage_obligation",
+          "coverage_obligation_qualification",
+          "contamination_assessment",
+          "isolation_qualification",
+          "dependency_independence_assessment"
+        ],
+        "required_mode": "EXPLICIT_COMPLETE",
+        "result": "ACCEPT"
+      },
+      "id": "R5N52_CENTRAL_FOUNDATION_CONTRACTS_EXPLICIT_COMPLETE",
+      "input": {
+        "registry_rule": "central knowledge/coverage/evidence authority wiring is frozen at foundation, not deferred to implementation schema binding"
+      },
+      "title": "Central foundation authority contracts are explicit-complete",
+      "why": "Author-final baseline without another independent review must not defer material typed-reference semantics for the core knowledge/coverage/evidence chain."
+    },
+    {
+      "domain": "governance",
+      "expected": {
+        "error": "AUTHOR_BASELINE_SELF_ATTESTATION_FORBIDDEN",
+        "result": "REJECT"
+      },
+      "id": "R5N53_CANDIDATE_SELF_QUALIFIED_REJECT",
+      "input": {
+        "candidate_embedded_author_qualified_implementation_baseline": "YES",
+        "external_author_baseline_qualification_record_present": false
+      },
+      "title": "Candidate cannot self-establish author qualification",
+      "why": "Manifest/readback happen after candidate bytes are fixed; effective YES must be derived from an external post-readback record."
+    },
+    {
+      "domain": "governance",
+      "expected": {
+        "effective_author_qualified_implementation_baseline": "YES",
+        "foundation_spec_baseline_frozen": false,
+        "independent_assurance": false,
+        "result": "ACCEPT"
+      },
+      "id": "R5N53_EXTERNAL_AUTHOR_QUALIFICATION_ACCEPT",
+      "input": {
+        "candidate_status": "PENDING_EXTERNAL_QUALIFICATION_RECORD",
+        "governance_authorized": true,
+        "manifest_digest_matches": true,
+        "normative_candidate_set_digest_matches": true,
+        "readback_all_match": true,
+        "readback_mismatch_count": 0,
+        "self_audit_digest_matches": true
+      },
+      "title": "External author baseline qualification after exact readback",
+      "why": "Allows implementation under explicitly author-only assurance without fabricating independent freeze."
+    },
+    {
+      "domain": "coverage",
+      "expected": {
+        "error": "COVERAGE_OBLIGATION_HISTORY_CONTEXT_UNBOUND",
+        "result": "REJECT"
+      },
+      "id": "R5N54_COVERAGE_OBLIGATION_REQUIRES_INPUT_HISTORY_CUT",
+      "input": {
+        "coverage_obligation_has_history_bound_policy_refs": true,
+        "obligation_input_history_cut": null
+      },
+      "title": "Coverage obligation policy context requires exact input history",
+      "why": "History-context-bound policy/profile predicates need a concrete prior input cut; otherwise the obligation can be semantically self-upgraded."
+    },
+    {
+      "domain": "coverage",
+      "expected": {
+        "allowed_waiver_kind": "approval_decision",
+        "error": "SECOND_COVERAGE_WAIVER_AUTHORITY",
+        "result": "REJECT"
+      },
+      "id": "R5N55_SINGLE_COVERAGE_WAIVER_AUTHORITY",
+      "input": {
+        "canonical_waiver_contract": "APPROVAL_DECISION/COVERAGE_OBLIGATION_WAIVER",
+        "waiver_decision_ref_kind": "coverage_waiver_decision"
+      },
+      "title": "Coverage waiver has one canonical authority",
+      "why": "A second canonical waiver kind would let two object families independently change current waiver state."
+    },
+    {
+      "domain": "authority",
+      "expected": {
+        "error": "SECOND_CAMPAIGN_STATE_AUTHORITY",
+        "result": "REJECT"
+      },
+      "id": "R5N56_NO_STANDALONE_CAMPAIGN_STATE_OBJECT",
+      "input": {
+        "campaign_state_also_derived_from_transitions": true,
+        "standalone_campaign_kind_registered": true
+      },
+      "title": "Campaign lifecycle has one authority path",
+      "why": "Campaign identity is established by genesis; current lifecycle state is derived from accepted transitions, not a second mutable/canonical campaign object."
+    },
+    {
+      "domain": "run_lifecycle",
+      "expected": {
+        "required_kinds": [
+          "stage_run",
+          "lane_run",
+          "attempt"
+        ],
+        "required_mode": "EXPLICIT_COMPLETE",
+        "result": "ACCEPT"
+      },
+      "id": "R5N57_RUN_CREATION_CONTRACTS_EXPLICIT_COMPLETE",
+      "input": {
+        "foundation_run_creation_bodies_defined": true
+      },
+      "title": "Run creation contracts freeze typed references",
+      "why": "StageRun/LaneRun/Attempt are foundation authority and their reference semantics must not be invented later by implementation schemas."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "error": "TRUSTED_PREDECESSOR_SELECTION_KIND_MISSING_OR_ALIASED",
+        "result": "REJECT"
+      },
+      "id": "R5N58_TRUSTED_PREDECESSOR_SELECTION_DISTINCT_KIND",
+      "input": {
+        "bootstrap_selection_kind": "approval_decision"
+      },
+      "title": "Trusted predecessor selection has distinct wire identity",
+      "why": "Generic approval cannot replace the exact predecessor selection decision in the first-history content DAG."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "required_kinds": [
+          "legacy_raw_ref",
+          "legacy_mechanical_validation_assessment",
+          "source_reconciliation_assessment",
+          "lineage_admission_assessment",
+          "legacy_exposure_reconstruction_assessment",
+          "trusted_predecessor_selection_decision",
+          "bootstrap_admission_decision"
+        ],
+        "required_mode": "EXPLICIT_COMPLETE",
+        "result": "ACCEPT"
+      },
+      "id": "R5N59_BOOTSTRAP_CHAIN_EXPLICIT_COMPLETE",
+      "input": {
+        "first_history_chain_is_foundation_authority": true
+      },
+      "title": "First-history admission chain freezes typed refs",
+      "why": "The bootstrap DAG must not defer material ref semantics to implementation after author qualification."
+    },
+    {
+      "domain": "governance",
+      "expected": {
+        "error": "GOVERNANCE_ACTOR_REF_CLASS_MISMATCH",
+        "result": "REJECT"
+      },
+      "id": "R5N60_GOVERNANCE_ACTOR_NOT_PROFILE_REF",
+      "input": {
+        "governance_actor_ref_class": "PINNED_PROFILE_REF"
+      },
+      "title": "Governance actor uses authority reference class",
+      "why": "An actor/authority identity is not a configuration profile and must not inherit profile substitution semantics."
+    },
+    {
+      "domain": "coverage_finding",
+      "expected": {
+        "required_kinds": [
+          "obligation_applicability_decision",
+          "approval_decision",
+          "finding_axis_assessment"
+        ],
+        "required_mode": "EXPLICIT_COMPLETE",
+        "result": "ACCEPT"
+      },
+      "id": "R5N61_CENTRAL_DECISIONS_EXPLICIT_COMPLETE",
+      "input": {
+        "coverage_and_finding_bodies_defined": true
+      },
+      "title": "Coverage and finding decisions freeze typed refs",
+      "why": "Current applicability, waiver and M/R/I authority cannot depend on unspecified later schema wiring."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "error": "BOOTSTRAP_ADMISSION_ENUM_MISMATCH",
+        "result": "REJECT"
+      },
+      "id": "R5N62_CAMPAIGN_GENESIS_EXACT_ADMISSION_ENUM",
+      "input": {
+        "bootstrap_admission_result": "ADMITTED"
+      },
+      "title": "Campaign genesis uses exact bootstrap admission enum",
+      "why": "Stale shorthand result names must not become accepted aliases for identity/validation semantics."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "error": "BOOTSTRAP_SELECTION_BINDING_MISSING",
+        "result": "REJECT"
+      },
+      "id": "R5N63_CANONICAL_PREDECESSOR_SELECTION_BINDING",
+      "input": {
+        "requested_role": "CANONICAL_PREDECESSOR",
+        "trusted_predecessor_selection_ref": null
+      },
+      "title": "Canonical predecessor requires exact trusted selection",
+      "why": "Canonical admission cannot rely on implicit coordinator choice; selection must be an exact earlier decision for the same legacy/source/lineage context."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "error": "UNTRUSTED_PREDECESSOR_PIN",
+        "result": "REJECT"
+      },
+      "id": "R5N64_PREDECESSOR_PIN_MUST_BE_INSTALLATION_AUTHORIZED",
+      "input": {
+        "bound_by_installation_bootstrap_profile": false,
+        "predecessor_pin_ref": "workspace/arbitrary-pin"
+      },
+      "title": "Predecessor pin belongs to bootstrap trust boundary",
+      "why": "Canonical predecessor selection cannot acquire trust from an arbitrary same-workspace pin."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "error": "GENESIS_CONTEXT_SELF_AUTHORIZATION",
+        "result": "REJECT"
+      },
+      "id": "R5N65_GENESIS_OWNER_AND_CONTEXT_PINNED",
+      "input": {
+        "owner_operator_authority_same_commit": true,
+        "policy_schema_bundle_contains_unpinned_semantics": true
+      },
+      "title": "Campaign genesis cannot self-authorize its owner or semantic context",
+      "why": "The first accepted campaign must derive owner/policy/spec/schema authority from the pre-existing installation trust root."
+    },
+    {
+      "domain": "knowledge_discovery",
+      "expected": {
+        "required_kinds": [
+          "checkpoint",
+          "discovery_record",
+          "blind_origin_eligibility_assessment"
+        ],
+        "required_mode": "EXPLICIT_COMPLETE",
+        "result": "ACCEPT"
+      },
+      "id": "R5N66_DISCOVERY_PROVENANCE_EXPLICIT_COMPLETE",
+      "input": {
+        "blind_origin_claim_depends_on_exact_checkpoint_discovery_event_and_later_eligibility": true
+      },
+      "title": "Blind discovery provenance freezes typed refs",
+      "why": "Blind-origin assurance must not depend on later implementation-defined wiring of checkpoint/discovery/event/isolation refs."
+    },
+    {
+      "domain": "invariant_materiality",
+      "expected": {
+        "error": "MATERIALITY_BACKLINK_CYCLE_FORBIDDEN",
+        "result": "REJECT"
+      },
+      "id": "R5N67_INVARIANT_MATERIALITY_NO_BACKLINK_CYCLE",
+      "input": {
+        "invariant_revision_points_to_materiality": true,
+        "materiality_subject_points_to_same_invariant": true
+      },
+      "title": "Invariant/materiality backlink cycle rejected",
+      "why": "Materiality points to an already existing subject; the subject never points forward to the assessment."
+    },
+    {
+      "domain": "surface_identity",
+      "expected": {
+        "result": "ACCEPT"
+      },
+      "id": "R5N68_SURFACE_RECORD_REGISTERED_IDENTITY",
+      "input": {
+        "canonical_kind": "surface_record",
+        "registry_kind_present": true
+      },
+      "title": "SurfaceRecord has registered wire identity",
+      "why": "Canonical surface records cannot exist outside the artifact kind registry."
+    },
+    {
+      "domain": "coverage",
+      "expected": {
+        "result": "ACCEPT"
+      },
+      "id": "R5N69_COVERAGE_MATERIALITY_EXACT_ASSESSMENT",
+      "input": {
+        "assessment_result": "MATERIAL",
+        "materiality_assessment_ref": "prior_exact",
+        "obligation_has_materiality_scalar": false
+      },
+      "title": "Coverage materiality binds exact assessment",
+      "why": "Avoids a duplicated materiality scalar and a separate assessment authority."
+    },
+    {
+      "domain": "registry",
+      "expected": {
+        "result": "ACCEPT"
+      },
+      "id": "R5N70_INVENTORY_INVARIANT_MATERIALITY_EXPLICIT",
+      "input": {
+        "kinds": [
+          "inventory_revision",
+          "invariant_revision",
+          "materiality_assessment",
+          "surface_record"
+        ],
+        "required_mode": "EXPLICIT_COMPLETE"
+      },
+      "title": "Core inventory/invariant/materiality contracts are explicit",
+      "why": "Author-final foundation should not defer central denominator semantics to later schema design."
+    },
+    {
+      "domain": "canonical_identity",
+      "expected": {
+        "legacy_alias_result": "REJECT",
+        "result": "ACCEPT"
+      },
+      "id": "R5N71_EVIDENCE_CANONICAL_KIND_PARITY",
+      "input": {
+        "canonical_names": [
+          "EVIDENCE_QUALIFICATION_ASSESSMENT",
+          "EVIDENCE_APPLICABILITY_ASSESSMENT"
+        ],
+        "legacy_aliases": [
+          "evidence_qualification",
+          "evidence_applicability"
+        ],
+        "registry_kinds": [
+          "evidence_qualification_assessment",
+          "evidence_applicability_assessment"
+        ]
+      },
+      "title": "Evidence assessment canonical wire kind parity",
+      "why": "Digest-domain kind must match canonical contract identity exactly."
+    },
+    {
+      "domain": "canonical_identity",
+      "expected": {
+        "error": "ROOT_CAUSE_MEMBERSHIP_DUPLICATE_OR_AMBIGUOUS",
+        "result": "REJECT"
+      },
+      "id": "R5N74_ROOT_CAUSE_MEMBERSHIP_EXACT_DUPLICATE_REJECT",
+      "input": {
+        "duplicate_exact_membership_tuple": true
+      },
+      "title": "Exact duplicate RootCause membership edge is rejected",
+      "why": "duplicate structured edges cannot create alternate semantic encodings"
+    },
+    {
+      "domain": "canonical_identity",
+      "expected": {
+        "canonical_sort_key": "(finding_claim_revision_ref,relation_role,BDB-CJSON-1(scope))",
+        "result": "ACCEPT_DETERMINISTIC"
+      },
+      "id": "R5N74_ROOT_CAUSE_MEMBERSHIP_TUPLE_ORDER",
+      "input": {
+        "edges": [
+          {
+            "finding_claim_revision_ref": "f2",
+            "relation_role": "CONTRIBUTING",
+            "scope": {
+              "surface": "b"
+            }
+          },
+          {
+            "finding_claim_revision_ref": "f1",
+            "relation_role": "PRIMARY",
+            "scope": {
+              "surface": "a"
+            }
+          }
+        ]
+      },
+      "title": "RootCause structured membership has deterministic tuple ordering",
+      "why": "membership edge is structured, so ref-only default ordering is insufficient for ObjectDigest determinism"
+    },
+    {
+      "domain": "inventory",
+      "expected": {
+        "error": "INCOMPLETE_INPUT_ACCOUNTING",
+        "result": "REJECT"
+      },
+      "id": "R5N75_INVENTORY_ONE_DISPOSITION_PER_ASSIGNED_INPUT",
+      "input": {
+        "assigned_input_refs": [
+          "A",
+          "B"
+        ],
+        "disposition_records_for": [
+          "A"
+        ]
+      },
+      "title": "Terminal inventory requires one current disposition per assigned input",
+      "why": "an assigned input must not disappear from accounting or have ambiguous duplicate current dispositions"
+    },
+    {
+      "domain": "inventory",
+      "expected": {
+        "error": "REFERENCE_TARGET_KIND_MISMATCH",
+        "result": "REJECT"
+      },
+      "id": "R5N75_INVENTORY_TYPED_ACCOUNTING_DOMAINS",
+      "input": {
+        "assigned_input_refs": [
+          "input:A"
+        ],
+        "input_disposition_refs": [
+          "scope_state_record:S"
+        ],
+        "scope_state_record_refs": [
+          "input_disposition_record:D"
+        ]
+      },
+      "title": "Inventory accounting refs cannot cross domains",
+      "why": "assigned inputs, disposition records and scope-state records are different typed domains"
+    },
+    {
+      "domain": "release",
+      "expected": {
+        "error": "RELEASE_READY_REQUIRES_FULL_PASS",
+        "result": "REJECT"
+      },
+      "id": "R5N76_LIMITED_CONCLUSION_RELEASE_READY_FORBIDDEN",
+      "input": {
+        "assurance_level": "BOUNDED",
+        "release_result": "READY_WITH_RESIDUAL_RISK",
+        "stop_continuation_decision": "BLOCKED",
+        "termination_state": "COMPLETED_LIMITED"
+      },
+      "title": "COMPLETED_LIMITED cannot receive READY ReleaseQualification",
+      "why": "READY requires full completed PASS + adequate assurance chain"
+    },
+    {
+      "domain": "stop",
+      "expected": {
+        "error": "STOP_CROSS_AXIS_CONSISTENCY_VIOLATION",
+        "result": "REJECT"
+      },
+      "id": "R5N76_NONPASS_READY_FORBIDDEN",
+      "input": {
+        "assurance_level": "BOUNDED",
+        "continuation_decision": "E6_REQUIRED",
+        "release_readiness": "READY"
+      },
+      "title": "Non-PASS STOP cannot advertise READY release axis",
+      "why": "separate C12 axes still require fail-closed cross-axis consistency against false-ready"
+    },
+    {
+      "domain": "schema",
+      "expected": {
+        "result": "IMPLEMENTATION_ALLOWED_ACCEPTANCE_FORBIDDEN"
+      },
+      "id": "R5N77_SCHEMA_BINDING_BOUNDARY",
+      "input": {
+        "executable_schema_bound": false,
+        "first_runtime_acceptance_attempted": false,
+        "implementation_started": true,
+        "semantic_contract_frozen": true
+      },
+      "title": "Executable schema may bind during implementation but before first acceptance",
+      "why": "foundation freezes semantics without pretending every future executable schema byte already exists"
+    },
+    {
+      "domain": "authority",
+      "expected": {
+        "error": "ACTOR_AUTHORITY_NOT_PREESTABLISHED",
+        "result": "REJECT"
+      },
+      "id": "R5N78_COMMAND_ACTOR_SELF_AUTHORIZATION_REJECT",
+      "input": {
+        "actor_identity_created_in_same_commit": true,
+        "role_grant_created_in_same_commit": true
+      },
+      "title": "Command actor cannot self-authorize in the same commit",
+      "why": "authorization must pre-exist the command it authorizes"
+    },
+    {
+      "domain": "source_identity",
+      "expected": {
+        "error": "SOURCE_AUTHORITY_NOT_PREESTABLISHED",
+        "result": "REJECT"
+      },
+      "id": "R5N79_SOURCE_AUTHORITY_SELF_BOOTSTRAP_REJECT",
+      "input": {
+        "source_authority_created_in_same_commit": true,
+        "source_identity_uses_that_authority": true
+      },
+      "title": "Source authority cannot be invented by its own source object",
+      "why": "repository/snapshot authority must be independently pinned/authorized"
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "canonical_order": [
+          "cmd",
+          "src",
+          "raw",
+          "mechanical",
+          "reconciliation",
+          "lineage",
+          "exposure",
+          "selection",
+          "admission",
+          "genesis"
+        ],
+        "result": "ACCEPT"
+      },
+      "id": "R5N80_BOOTSTRAP_ORDER_ONLY_PRECEDENCE_ACCEPT",
+      "input": {
+        "nodes": [
+          {
+            "depends_on": [],
+            "id": "cmd",
+            "kind": "command_envelope"
+          },
+          {
+            "depends_on": [],
+            "id": "src",
+            "kind": "source_generation"
+          },
+          {
+            "depends_on": [],
+            "id": "raw",
+            "kind": "legacy_raw_ref"
+          },
+          {
+            "depends_on": [
+              "raw"
+            ],
+            "id": "mechanical",
+            "kind": "legacy_mechanical_validation_assessment"
+          },
+          {
+            "depends_on": [
+              "raw",
+              "src"
+            ],
+            "id": "reconciliation",
+            "kind": "source_reconciliation_assessment"
+          },
+          {
+            "depends_on": [
+              "raw",
+              "mechanical",
+              "reconciliation"
+            ],
+            "id": "lineage",
+            "kind": "lineage_admission_assessment"
+          },
+          {
+            "depends_on": [
+              "raw"
+            ],
+            "id": "exposure",
+            "kind": "legacy_exposure_reconstruction_assessment"
+          },
+          {
+            "depends_on": [
+              "raw",
+              "reconciliation",
+              "lineage"
+            ],
+            "id": "selection",
+            "kind": "trusted_predecessor_selection_decision"
+          },
+          {
+            "depends_on": [
+              "raw",
+              "mechanical",
+              "reconciliation",
+              "lineage",
+              "exposure",
+              "selection"
+            ],
+            "id": "admission",
+            "kind": "bootstrap_admission_decision"
+          },
+          {
+            "depends_on": [
+              "src",
+              "raw",
+              "admission"
+            ],
+            "id": "genesis",
+            "kind": "campaign_genesis"
+          }
+        ],
+        "order_only_precedence_profile": "BDB_BOOTSTRAP_PRECEDENCE_V1",
+        "scope": {
+          "command_kind": "INITIALIZE_CAMPAIGN_FROM_LEGACY",
+          "commit_seq": 1,
+          "expected_parent": "EMPTY_HISTORY"
+        }
+      },
+      "title": "Bootstrap order-only precedence augments typed-ref DAG before one Kahn sort",
+      "why": "Without the pinned order-only profile, legacy_raw_ref and exposure can become zero-indegree too early. The exact bootstrap profile supplies ordering-only edges while typed refs remain the sole referential/authority graph."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "canonical_order": [
+          "raw",
+          "src"
+        ],
+        "profile_applied": false,
+        "result": "ACCEPT"
+      },
+      "id": "R5N80_BOOTSTRAP_PRECEDENCE_NOT_GLOBAL",
+      "input": {
+        "nodes": [
+          {
+            "depends_on": [],
+            "id": "src",
+            "kind": "source_generation"
+          },
+          {
+            "depends_on": [],
+            "id": "raw",
+            "kind": "legacy_raw_ref"
+          }
+        ],
+        "order_only_precedence_profile_available": "BDB_BOOTSTRAP_PRECEDENCE_V1",
+        "scope": {
+          "command_kind": "NORMAL_POST_GENESIS_COMMAND",
+          "commit_seq": 2,
+          "expected_parent": "accepted_head_ref"
+        }
+      },
+      "title": "Bootstrap precedence profile is not global ordering authority",
+      "why": "Outside the exact initialization scope, no order-only bootstrap edge is active; ordinary Kahn typed tie-break therefore selects legacy_raw_ref before source_generation."
+    },
+    {
+      "domain": "history_bootstrap",
+      "expected": {
+        "error": "CONTENT_REFERENCE_CYCLE",
+        "result": "REJECT"
+      },
+      "id": "R5N80_BOOTSTRAP_PRECEDENCE_CYCLE_REJECT",
+      "input": {
+        "nodes": [
+          {
+            "depends_on": [
+              "raw"
+            ],
+            "id": "src",
+            "kind": "source_generation"
+          },
+          {
+            "depends_on": [],
+            "id": "raw",
+            "kind": "legacy_raw_ref"
+          }
+        ],
+        "order_only_precedence_profile": "BDB_BOOTSTRAP_PRECEDENCE_V1",
+        "scope": {
+          "command_kind": "INITIALIZE_CAMPAIGN_FROM_LEGACY",
+          "commit_seq": 1,
+          "expected_parent": "EMPTY_HISTORY"
+        }
+      },
+      "title": "Cycle introduced by union of typed and order-only bootstrap edges is rejected",
+      "why": "The profile adds src→raw while the typed ref fixture adds raw→src. Cycle detection runs on the union graph before Kahn; order-only edges never bypass cycle safety."
+    }
+  ]
+}

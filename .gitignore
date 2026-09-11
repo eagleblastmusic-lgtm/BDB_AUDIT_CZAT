@@ -1,1 +1,5 @@
 /.venv-f2/
+__pycache__/
+.pytest-*/
+*.sqlite
+tmp*/

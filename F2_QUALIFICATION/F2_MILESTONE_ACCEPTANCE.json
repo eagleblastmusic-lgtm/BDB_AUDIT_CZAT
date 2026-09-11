@@ -1,0 +1,127 @@
+{
+  "acceptance_id": "BDB-F2-M4-M13-R5_3_1-001",
+  "baseline_qualification_raw_sha256": "4bb0da6a8bcb4ef0bc931bef5178f30120618e85ef727d72633a410fb4fbdb2c",
+  "bootstrap_precedence_profile": "BDB_BOOTSTRAP_PRECEDENCE_V1",
+  "branch": "bdb-v2",
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f1",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 93
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/compatibility",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 86
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f2",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 85
+    }
+  ],
+  "f2_start_head": "756e8684cbf23a511812065eeda74afb74f7636e",
+  "f2_status": "PASS",
+  "f3_started": "NO",
+  "gates": {
+    "CRASH_ATOMICITY_QUALIFICATION": "PASS",
+    "F0_REGRESSION": "PASS",
+    "F1_REGRESSION": "PASS",
+    "GOLDEN_VECTOR_QUALIFICATION": "PASS",
+    "ISOLATION_KNOWLEDGE_ADVERSARIAL": "PASS",
+    "M10_GATE": "PASS",
+    "M11_GATE": "PASS",
+    "M12_GATE": "PASS",
+    "M13_GATE": "PASS",
+    "M4_GATE": "PASS",
+    "M5_GATE": "PASS",
+    "M6_GATE": "PASS",
+    "M7_GATE": "PASS",
+    "M8_GATE": "PASS",
+    "M9_GATE": "PASS",
+    "PROJECTION_REBUILD": "PASS",
+    "SCHEMA_BINDING_QUALIFICATION": "PASS"
+  },
+  "golden_vector_count": 117,
+  "golden_vector_set_id": "BDB-AUDIT-V2-FOUNDATION-GOLDEN-VECTORS-R5-3-2",
+  "golden_vectors_sha256": "1beeedd979c06816480cc5adc144fd3470a7379630e6ed8d4a4770c5448c48e7",
+  "milestone": "F2",
+  "next_phase_allowed": "YES",
+  "normative_candidate_set_digest": "087539f5a08a2441647aae1889ce51330b47740e559b394574da122bd6cfd15b",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python": "3.14.4",
+  "registry_id": "BDB-AUDIT-V2-ARTIFACT-CONTRACT-REGISTRY-R5-3-2",
+  "registry_sha256": "3cd0945f2987499761281f51cadb48a5947ac8255e4af292f4837cbc843a2a8b",
+  "repository": "eagleblastmusic-lgtm/bdb-audit",
+  "resolved_defects": [
+    {
+      "id": "F2-IMPLEMENTATION-AUTHORITY-003",
+      "resolution": "CapabilityBroker and ExposureLedger resolve delivery/exposures strictly via accepted canonical history cut."
+    },
+    {
+      "id": "F2-IMPLEMENTATION-BLINDNESS-004",
+      "resolution": "blind_origin_eligible requires accepted earlier discovery fact and verified isolation boundary evidence."
+    },
+    {
+      "id": "F2-IMPLEMENTATION-SCHEMA-005",
+      "resolution": "Executable schemas generated strictly from R5.3.1 Data Contracts with required properties, uniqueItems, and additionalProperties=False."
+    },
+    {
+      "id": "F2-BOOTSTRAP-ORDER-002",
+      "resolution": "Resolved by R5.3.1 union DAG Kahn sort using pinned BDB_BOOTSTRAP_PRECEDENCE_V1 profile."
+    },
+    {
+      "id": "F2-CLOSEOUT-006",
+      "resolution": "Complete qualification artifacts and terminal verification generated."
+    }
+  ],
+  "schema": "BDB_F2_MILESTONE_ACCEPTANCE_V1",
+  "spec_conflicts": [],
+  "total_passed_tests": 264,
+  "verdict": "PASS",
+  "work_packages": {
+    "PR007_M4": "PASS",
+    "PR008_REGISTRY_GOLDEN": "PASS",
+    "PR009_M5_OBJECTS": "PASS",
+    "PR010_M5_TRANSACTION": "PASS",
+    "PR011_M5_FSM_GATE": "PASS",
+    "PR012_M6_STAGESPEC": "PASS",
+    "PR013_M7_ISOLATION_GATE": "PASS",
+    "PR014_M8_CAPABILITY_VIEWS": "PASS",
+    "PR015_M9_COMPILER_GATE": "PASS",
+    "PR016_M10_SCHEMA_IDENTITY": "PASS",
+    "PR017_M11_CORPUS_GATE": "PASS",
+    "PR018_M12_KNOWLEDGE_GATE": "PASS",
+    "PR019_M13_QUARANTINE": "PASS"
+  }
+}

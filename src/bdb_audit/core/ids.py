@@ -5,18 +5,30 @@ import json
 from pathlib import Path
 import re
 from uuid import uuid4
+from functools import lru_cache
 
 from .errors import ValidationError
 from .hashing import RawDigest, ObjectDigest, DIGEST_PROFILE
 
-REGISTRY_SHA256 = "5a89cfe26d927c9bf2638ad1e656b4ed810544f8d35e3e0ddf1365cd54b7343c"
+ACTIVE_REGISTRY_FILENAME = "artifact_contract_registry_r5_3_1.json"
+REGISTRY_SHA256 = "3cd0945f2987499761281f51cadb48a5947ac8255e4af292f4837cbc843a2a8b"
+
+
+@lru_cache(maxsize=1)
+def _active_document():
+    raw = Path(__file__).with_name(ACTIVE_REGISTRY_FILENAME).read_bytes()
+    if hashlib.sha256(raw).hexdigest() != REGISTRY_SHA256:
+        raise ValidationError("REGISTRY_PIN_MISMATCH")
+    return json.loads(raw)
+
+
+def active_registry_document():
+    """Read the byte-pinned active registry once per process."""
+    return _active_document()
 
 
 def contract(kind, version="1"):
-    raw = Path(__file__).with_name("artifact_contract_registry_r5_3.json").read_bytes()
-    if hashlib.sha256(raw).hexdigest() != REGISTRY_SHA256:
-        raise ValidationError("REGISTRY_PIN_MISMATCH")
-    for row in json.loads(raw)["contracts"]:
+    for row in _active_document()["contracts"]:
         if row["kind"] == kind and row["version"] == version:
             return row
     raise ValidationError("UNREGISTERED_CONTRACT_KIND", str(kind))
