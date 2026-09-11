@@ -25,6 +25,15 @@ from .fuzzing import (
     process_fuzz_result_through_pipeline,
     validate_no_direct_crash_to_finding,
 )
+from .differential import (
+    SEMANTIC_RELATIONS,
+    DifferentialPathConfig,
+    DifferentialExecutionResult,
+    compare_semantic_relation,
+    DifferentialTestingFramework,
+    process_differential_result_through_pipeline,
+    validate_no_direct_diff_to_finding,
+)
 
 __all__ = [
     "ExperimentSpec",
@@ -45,5 +54,13 @@ __all__ = [
     "DeterministicFuzzerAdapter",
     "process_fuzz_result_through_pipeline",
     "validate_no_direct_crash_to_finding",
+    "SEMANTIC_RELATIONS",
+    "DifferentialPathConfig",
+    "DifferentialExecutionResult",
+    "compare_semantic_relation",
+    "DifferentialTestingFramework",
+    "process_differential_result_through_pipeline",
+    "validate_no_direct_diff_to_finding",
 ]
+
 
