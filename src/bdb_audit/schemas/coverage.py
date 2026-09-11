@@ -38,7 +38,7 @@ def coverage_schema(kind):
             properties[name] = {"type": "array"}
         elif name in OBJECTS:
             properties[name] = {"type": "object"}
-        elif name.endswith("_ref") or name.endswith("_key"):
+        elif name.endswith("_ref"):
             properties[name] = {
                 "type": "object",
                 "required": ["kind", "revision_digest", "digest_profile", "schema_revision_ref", "ref_class"],

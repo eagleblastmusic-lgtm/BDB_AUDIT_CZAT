@@ -63,7 +63,7 @@ M19_KINDS = (
 M20_KINDS = (
     "observation", "dependency_independence_assessment",
     "evidence_applicability_assessment", "evidence_qualification_assessment",
-    "evidence_invalidation",
+    "evidence_invalidation", "environment_record",
 )
 
 M21_KINDS = (

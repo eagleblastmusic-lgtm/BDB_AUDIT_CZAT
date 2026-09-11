@@ -35,4 +35,7 @@ class Coordinator:
         return self._history.rebuild_projection()
 
 
-__all__ = ["Authority", "Coordinator"]
+from .reference_slice import run_foundation_reference_slice
+
+__all__ = ["Authority", "Coordinator", "run_foundation_reference_slice"]
+

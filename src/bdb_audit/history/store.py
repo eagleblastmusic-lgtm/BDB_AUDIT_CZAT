@@ -15,7 +15,7 @@ from ..core.canonical_json import canonical_bytes, parse
 from ..core.errors import ValidationError
 from ..core.hashing import object_digest
 from ..core.registry import ContractRegistry, canonical_reference_set
-from ..schemas.foundation import F2_KINDS, M5_KINDS, foundation_schema_bindings
+from ..schemas.foundation import F2_KINDS, F3_KINDS, M5_KINDS, foundation_schema_bindings
 from .closure import canonical_order, ClosureNode
 from .objects import (
     EMPTY_HISTORY, ACCEPTED_HEAD_REF, AcceptedHead, CanonicalObject, CommandEnvelope,
@@ -25,6 +25,17 @@ from .objects import (
 
 class InjectedCrash(RuntimeError):
     """Named deterministic test-only persistence-boundary fault."""
+
+
+TARGET_CLASS_MEMBERS = {
+    "materiality_subject_ref": {"surface_record", "surface_key", "invariant_revision", "materiality_subject_ref"},
+    "typed_scope_ref": {"surface_record", "surface_key", "invariant_revision", "finding_claim_revision", "scope_state_record", "typed_scope_ref"},
+    "finding_or_risk_ref": {"finding_claim_revision", "finding_adjudication_decision", "residual_risk", "finding_or_risk_ref"},
+    "limited_conclusion_basis_ref": {"stage_completion", "stop_evaluation", "residual_risk", "limited_conclusion_basis_ref"},
+    "control_ref": {"raw_artifact_ref", "external_profile_ref", "control_ref"},
+    "residual_risk_ref": {"residual_risk", "residual_risk_ref"},
+    "coverage_obligation_summary_ref": {"coverage_obligation_summary_ref", "coverage_obligation_qualification"},
+}
 
 
 @dataclass(frozen=True)
@@ -50,7 +61,7 @@ class TransactionalHistoryStore:
         # Bind every foundation kind up front.  This is still a prerequisite
         # substrate (M10 qualification is separate), but no accepted closure
         # can reach an unbound registered dependency.
-        self.schemas = schema_bindings or foundation_schema_bindings(kinds=tuple(F2_KINDS))
+        self.schemas = schema_bindings or foundation_schema_bindings(kinds=tuple(F3_KINDS))
         self.crash_hook = crash_hook
         if crash_hook is not None and not callable(crash_hook):
             raise TypeError("crash_hook must be callable")
@@ -456,7 +467,11 @@ class TransactionalHistoryStore:
                     raise ValidationError("TYPED_REF_INCOMPLETE", field)
                 if value_item.get("ref_class") != spec["ref_class"]:
                     raise ValidationError("REFERENCE_CLASS_MISMATCH", field)
-                if value_item.get("kind") not in spec.get("allowed", ()) and "registered_immutable_object" not in spec.get("allowed", ()):
+                allowed_kinds = set(spec.get("allowed", ()))
+                for a in list(allowed_kinds):
+                    if a in TARGET_CLASS_MEMBERS:
+                        allowed_kinds.update(TARGET_CLASS_MEMBERS[a])
+                if value_item.get("kind") not in allowed_kinds and "registered_immutable_object" not in allowed_kinds:
                     raise ValidationError("TYPED_REF_TARGET_MISMATCH", field)
                 if value_item.get("ref_class") not in semantics:
                     raise ValidationError("UNREGISTERED_REFERENCE_CLASS")

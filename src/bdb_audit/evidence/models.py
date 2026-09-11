@@ -208,17 +208,24 @@ class EvidenceApplicabilityAssessment:
 @dataclass(frozen=True)
 class EvidenceQualificationAssessment:
     claim_revision_ref: Any
-    assessment_input_history_cut: dict
     dependency_graph_ref: Any
     independence_assessment_ref: Any
     applicability_assessment_ref: Any
     observation_refs: Sequence[Any]
+    input_history_cut: dict | None = None
+    assessment_input_history_cut: dict | None = None
     result: str = "SUPPORTS"
     controls_refs: Sequence[Any] = ()
     reason_codes: Sequence[str] = ()
     assessment_id: str | None = None
 
     def __post_init__(self):
+        cut = self.input_history_cut or self.assessment_input_history_cut
+        if cut is None:
+            raise ValidationError("HISTORY_CUT_REQUIRED")
+        object.__setattr__(self, "input_history_cut", cut)
+        object.__setattr__(self, "assessment_input_history_cut", cut)
+
         if self.assessment_id is None:
             object.__setattr__(self, "assessment_id", new_id("evidence_qualification_assessment"))
         elif self.assessment_id.startswith("evidence_qualification_assessment_"):
@@ -244,7 +251,7 @@ class EvidenceQualificationAssessment:
         data = {
             "assessment_id": self.assessment_id or "qualification_default",
             "claim_revision_ref": _ref_dict(self.claim_revision_ref),
-            "assessment_input_history_cut": dict(self.assessment_input_history_cut),
+            "input_history_cut": dict(self.input_history_cut),
             "dependency_graph_ref": _ref_dict(self.dependency_graph_ref),
             "independence_assessment_ref": _ref_dict(self.independence_assessment_ref),
             "applicability_assessment_ref": _ref_dict(self.applicability_assessment_ref),
