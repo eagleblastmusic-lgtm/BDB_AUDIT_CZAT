@@ -1,4 +1,4 @@
-"""Small, pure orchestration primitives used by the F2 reference profile."""
+"""Orchestration primitives, FSM, and native E1/E2 ensemble execution (WP-F4-09)."""
 
 from .fsm import (
     CampaignState,
@@ -9,8 +9,43 @@ from .fsm import (
     legal_transition,
     project_states,
 )
+from .stages import StageSpec, StageSpecRegistry
+from .runs import LaneSpec, Attempt
+from .native_ensemble import (
+    E1_LANE_SLOTS,
+    E1_LANE_STRATEGIES,
+    build_e1_stage_spec,
+    build_e1_lane_specs,
+    build_e2_stage_spec,
+    EnsembleQuarantineBroker,
+    E1CompletionResult,
+    E2CompletionResult,
+    execute_e1_ensemble,
+    execute_e2_convergence,
+    validate_stage_transition,
+)
 
 __all__ = [
-    "CampaignState", "StageRunState", "LaneRunState", "AttemptState",
-    "TransitionFact", "legal_transition", "project_states",
+    "CampaignState",
+    "StageRunState",
+    "LaneRunState",
+    "AttemptState",
+    "TransitionFact",
+    "legal_transition",
+    "project_states",
+    "StageSpec",
+    "StageSpecRegistry",
+    "LaneSpec",
+    "Attempt",
+    "E1_LANE_SLOTS",
+    "E1_LANE_STRATEGIES",
+    "build_e1_stage_spec",
+    "build_e1_lane_specs",
+    "build_e2_stage_spec",
+    "EnsembleQuarantineBroker",
+    "E1CompletionResult",
+    "E2CompletionResult",
+    "execute_e1_ensemble",
+    "execute_e2_convergence",
+    "validate_stage_transition",
 ]
