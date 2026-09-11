@@ -1,4 +1,4 @@
-"""Deterministic executable schemas for the F2 reference profile.
+"""Deterministic executable schemas for the reference profile.
 
 R5.3.1 freezes semantic contracts in the Registry; these small executable
 schemas make the reference implementation's accepted paths offline and
@@ -40,6 +40,13 @@ F2_KINDS = (
     "artifact_contract_registry",
 )
 
+M14_KINDS = (
+    "surface_key", "surface_record", "input_disposition_record",
+    "scope_state_record", "inventory_revision", "surface_collector_record",
+)
+
+F3_KINDS = (*F2_KINDS, *M14_KINDS)
+
 
 def executable_schema(kind, *, registry=None):
     registry = registry or ContractRegistry()
@@ -65,10 +72,14 @@ def executable_schema(kind, *, registry=None):
     structural = bootstrap_schema(kind)
     if structural is not None:
         schema.update(structural)
+    from .inventory import inventory_schema
+    structural = inventory_schema(kind)
+    if structural is not None:
+        schema.update(structural)
     return schema
 
 
-@lru_cache(maxsize=2)
+@lru_cache(maxsize=4)
 def foundation_schema_bindings(profile=FOUNDATION_SCHEMA_PROFILE, kinds=F2_KINDS):
     if profile != FOUNDATION_SCHEMA_PROFILE:
         raise ValueError("unknown foundation schema profile")
