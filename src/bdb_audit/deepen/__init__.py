@@ -50,6 +50,11 @@ from .endurance import (
     EnduranceEngine,
     ENDURANCE_CLASSIFICATIONS,
 )
+from .causal import (
+    CausalEdge,
+    CausalChainRecord,
+    CausalChainEngine,
+)
 
 __all__ = [
     "State",
@@ -89,4 +94,7 @@ __all__ = [
     "EnduranceAssessment",
     "EnduranceEngine",
     "ENDURANCE_CLASSIFICATIONS",
+    "CausalEdge",
+    "CausalChainRecord",
+    "CausalChainEngine",
 ]
