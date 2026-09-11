@@ -25,3 +25,9 @@ from .calibration import (
     CORPUS_PARTITIONS,
     CASE_TYPES,
 )
+from .skeptic import (
+    SkepticCounterclaim,
+    FalsePositiveSkepticCapability,
+    CHALLENGE_TYPES as SKEPTIC_CHALLENGE_TYPES,
+    CHALLENGER_TYPE as SKEPTIC_CHALLENGER_TYPE,
+)
