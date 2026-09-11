@@ -31,3 +31,9 @@ from .skeptic import (
     CHALLENGE_TYPES as SKEPTIC_CHALLENGE_TYPES,
     CHALLENGER_TYPE as SKEPTIC_CHALLENGER_TYPE,
 )
+from .hunter import (
+    HunterCounterclaim,
+    FalseNegativeHunterCapability,
+    HUNTER_OPPORTUNITY_TYPES,
+    CHALLENGER_TYPE as HUNTER_CHALLENGER_TYPE,
+)
