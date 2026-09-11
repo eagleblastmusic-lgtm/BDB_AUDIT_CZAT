@@ -2,7 +2,7 @@
 """Build wrapper for the BDB Audit v2.0.2 standalone patch release."""
 from __future__ import annotations
 
-from build import build_single_file as base
+import build_single_file as base
 
 
 base.DEFAULT_OUTPUT_NAME = "BDB_AUDIT_ASSISTANT_v2.0.2.py"
