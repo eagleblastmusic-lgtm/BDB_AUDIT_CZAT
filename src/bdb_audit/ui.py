@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Callable, Any
 
 from .coordinator.operations import AuditOperationApi
+from .stop.operation import evaluate_stop_gate
 
 
 class InteractiveAuditUI:
@@ -101,6 +102,29 @@ class InteractiveAuditUI:
             self.last_result = {"status": "FAIL", "error": str(exc)}
             raise
 
+    def handle_evaluate_stop(
+        self,
+        store_path: str | None = None,
+        stop_input_path: str | None = None,
+        e6_plan_approved: bool = False,
+    ) -> dict[str, Any]:
+        target = store_path or self.active_store
+        if not target:
+            raise ValueError("No store selected or specified")
+        try:
+            res = evaluate_stop_gate(
+                target,
+                stop_input_path=stop_input_path,
+                e6_plan_approved=e6_plan_approved,
+            )
+            self.last_result = res
+            self.last_error = None
+            return res
+        except Exception as exc:
+            self.last_error = str(exc)
+            self.last_result = {"status": "FAIL", "error": str(exc)}
+            raise
+
     def handle_self_test(self, deep: bool = False) -> dict[str, Any]:
         try:
             res = self.api.run_self_test(deep=deep)
@@ -130,7 +154,7 @@ class InteractiveAuditUI:
     ) -> int:
         """Run interactive text UI loop."""
         output_func("==================================================")
-        output_func("   BDB Audit v2.0.1 — Interactive Control Surface")
+        output_func("   BDB Audit v2.0.2 — Interactive Control Surface")
         output_func("==================================================")
 
         while True:
@@ -145,9 +169,10 @@ class InteractiveAuditUI:
             output_func("7. Run Self-Test")
             output_func("8. Build Standalone Assistant")
             output_func("9. Exit")
+            output_func("10. Evaluate STOP Gate")
 
             try:
-                choice = input_func("Select action [1-9]: ").strip()
+                choice = input_func("Select action [1-10]: ").strip()
             except (EOFError, KeyboardInterrupt):
                 output_func("\nExiting UI.")
                 return 0
@@ -203,6 +228,8 @@ class InteractiveAuditUI:
                 try:
                     res = self.handle_continue()
                     output_func(f"CONTINUATION: State={res['continuation_state']}, Next Action={res['next_action']}")
+                    if res.get("next_action") == "EVALUATE_STOP_GATE":
+                        output_func("STOP Gate is available as action 10.")
                 except Exception as exc:
                     output_func(f"ERROR: {exc}")
 
@@ -226,8 +253,30 @@ class InteractiveAuditUI:
                 output_func("Exiting UI.")
                 return 0
 
+            elif choice == "10":
+                stop_input = input_func(
+                    "Enter STOP input artifact path (blank = latest accepted STOP input): "
+                ).strip() or None
+                e6_choice = input_func("Approved E6 plan? (y/N): ").strip().lower()
+                try:
+                    res = self.handle_evaluate_stop(
+                        stop_input_path=stop_input,
+                        e6_plan_approved=(e6_choice == "y"),
+                    )
+                    output_func(
+                        "STOP: "
+                        f"Decision={res['continuation_decision']}, "
+                        f"Assurance={res['assurance_level']}, "
+                        f"Readiness={res['release_readiness']}"
+                    )
+                    output_func(f"Evaluated: {res['evaluated']}, Authoritative: {res['authoritative']}")
+                    output_func(f"Reason Codes: {res['reason_codes']}")
+                    output_func(f"Next Action: {res['next_action']}")
+                except Exception as exc:
+                    output_func(f"STOP EVALUATION FAILED: {exc}")
+
             else:
-                output_func(f"Invalid option '{choice}'. Please select 1-9.")
+                output_func(f"Invalid option '{choice}'. Please select 1-10.")
 
 
 def run_ui() -> int:

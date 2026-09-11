@@ -7,6 +7,7 @@ Commands:
   lane prepare      Prepare and qualify an operational lane
   validate          Validate an artifact against contract schemas
   continue          Evaluate campaign continuation and next required action
+  stop evaluate     Evaluate the STOP gate from accepted history or preview input
   self-test         Execute offline-critical self-test suite
   build             Trigger deterministic standalone single-file build
   ui                Launch interactive terminal interface
@@ -20,9 +21,10 @@ from typing import Sequence
 
 from .coordinator.operations import AuditOperationApi
 from .core.errors import ValidationError
+from .stop.operation import evaluate_stop_gate
 
-APP_VERSION = "2.0.1"
-BUILD_ID = "BDB-V2-STANDALONE-2.0.1"
+APP_VERSION = "2.0.2"
+BUILD_ID = "BDB-V2-STANDALONE-2.0.2"
 
 # Explicit Exit Codes
 EXIT_SUCCESS = 0
@@ -91,6 +93,21 @@ def create_parser() -> argparse.ArgumentParser:
     cont_p = subparsers.add_parser("continue", help="Evaluate campaign continuation")
     cont_p.add_argument("--store", required=True, help="Path to SQLite history store")
     cont_p.add_argument("--json", action="store_true", help="Machine-readable output")
+
+    stop_p = subparsers.add_parser("stop", help="STOP gate operations")
+    stop_subs = stop_p.add_subparsers(dest="subcommand", help="STOP gate operations")
+    stop_eval_p = stop_subs.add_parser("evaluate", help="Evaluate the STOP gate")
+    stop_eval_p.add_argument("--store", required=True, help="Path to SQLite history store")
+    stop_eval_p.add_argument(
+        "--input",
+        help="Optional STOP input JSON file. File inputs are preview-only and never become accepted authority.",
+    )
+    stop_eval_p.add_argument(
+        "--e6-plan-approved",
+        action="store_true",
+        help="Evaluate with an already-approved bounded E6 plan",
+    )
+    stop_eval_p.add_argument("--json", action="store_true", help="Machine-readable output")
 
     st_p = subparsers.add_parser("self-test", help="Execute offline-critical self-test suite")
     st_p.add_argument("--deep", action="store_true", help="Include deep mutation and property checks")
@@ -166,6 +183,18 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
             _emit_output(res, is_json)
             return EXIT_SUCCESS
 
+        elif args.command == "stop":
+            if args.subcommand == "evaluate":
+                res = evaluate_stop_gate(
+                    args.store,
+                    stop_input_path=args.input,
+                    e6_plan_approved=args.e6_plan_approved,
+                )
+                _emit_output(res, is_json)
+                return EXIT_SUCCESS
+            parser.parse_args(["stop", "--help"])
+            return EXIT_MALFORMED_ARGS
+
         elif args.command == "self-test":
             res = api.run_self_test(deep=args.deep)
             _emit_output(res, is_json)
@@ -193,7 +222,7 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
         else:
             print(f"[FAIL] {err_code}: {err_detail}", file=sys.stderr)
 
-        if err_code in ("CAMPAIGN_NOT_FOUND", "ARTIFACT_FILE_NOT_FOUND"):
+        if err_code in ("CAMPAIGN_NOT_FOUND", "ARTIFACT_FILE_NOT_FOUND", "STOP_INPUT_FILE_NOT_FOUND"):
             return EXIT_CAMPAIGN_NOT_FOUND
         elif err_code in ("CAMPAIGN_ALREADY_EXISTS", "STALE_REF"):
             return EXIT_CONFLICT_ERROR
