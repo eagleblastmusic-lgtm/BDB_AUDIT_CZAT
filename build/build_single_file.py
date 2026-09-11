@@ -149,7 +149,7 @@ def collect_runtime_files(requirements: dict[str, str] | None = None) -> list[tu
                 continue
             if rel.endswith((".pyc", ".pyo")) or "/__pycache__/" in f"/{rel}/":
                 continue
-            located = Path(dist.locate_file(package_path))
+            located = Path(str(dist.locate_file(package_path)))
             if not located.is_file():
                 continue
             data = located.read_bytes()
