@@ -84,6 +84,18 @@ M28_KINDS = (
 
 F6_KINDS = (*F3_KINDS, *M28_KINDS)
 
+F7_KINDS = (
+    *F6_KINDS,
+    "candidate_assurance_case",
+    "challenger_assignment",
+    "challenger_result",
+    "campaign_conclusion",
+    "final_assurance_case",
+    "release_qualification",
+    "successor_campaign_genesis",
+    "successor_campaign_selection_decision",
+)
+
 
 def executable_schema(kind, *, registry=None):
     registry = registry or ContractRegistry()
@@ -139,6 +151,10 @@ def executable_schema(kind, *, registry=None):
         schema.update(structural)
     from .deepen import deepen_schema
     structural = deepen_schema(kind)
+    if structural is not None:
+        schema.update(structural)
+    from .assurance import assurance_schema
+    structural = assurance_schema(kind)
     if structural is not None:
         schema.update(structural)
     return schema

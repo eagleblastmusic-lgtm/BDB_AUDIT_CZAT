@@ -5,3 +5,7 @@ from .residual_risk import (
     RISK_DISPOSITIONS,
     RISK_MATERIALITIES,
 )
+from .candidate_case import (
+    CandidateAssuranceCase,
+    CandidateAssuranceCaseBuilder,
+)
