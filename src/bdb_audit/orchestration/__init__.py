@@ -37,6 +37,18 @@ from .e3 import (
     E3BlindNoveltyResult,
     execute_e3_blind_ensemble,
 )
+from .e3_reveal import (
+    E3BlindCheckpoint,
+    create_e3_blind_checkpoint,
+    PositiveGapProjection,
+    E3RevealEvent,
+    execute_positive_gap_reveal,
+    E3GapDirectedScheduler,
+    execute_cumulative_corpus_reveal,
+    execute_holdout_reveal,
+    FalseNegativeRelationshipAssessment,
+    evaluate_false_negative_relationship,
+)
 
 __all__ = [
     "CampaignState",
@@ -72,5 +84,16 @@ __all__ = [
     "create_e3_blind_attempt",
     "E3BlindNoveltyResult",
     "execute_e3_blind_ensemble",
+    "E3BlindCheckpoint",
+    "create_e3_blind_checkpoint",
+    "PositiveGapProjection",
+    "E3RevealEvent",
+    "execute_positive_gap_reveal",
+    "E3GapDirectedScheduler",
+    "execute_cumulative_corpus_reveal",
+    "execute_holdout_reveal",
+    "FalseNegativeRelationshipAssessment",
+    "evaluate_false_negative_relationship",
 ]
+
 
