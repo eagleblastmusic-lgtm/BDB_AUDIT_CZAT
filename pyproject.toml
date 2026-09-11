@@ -16,7 +16,7 @@ where = ["src"]
 "bdb_audit.core" = ["*.json"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 addopts = "-p no:cacheprovider"
 
 [tool.mypy]
@@ -31,6 +31,7 @@ files = [
     "src/bdb_audit/orchestration/templates.py",
     "src/bdb_audit/orchestration/compiler.py",
     "src/bdb_audit/__main__.py",
+    "src/bdb_audit/workflow",
     "build/build_single_file.py",
 ]
 ignore_missing_imports = true

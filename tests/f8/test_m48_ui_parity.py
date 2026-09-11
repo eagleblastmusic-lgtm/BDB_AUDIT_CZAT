@@ -103,7 +103,7 @@ def test_m48_ui_scripted_menu_loop():
 
         outputs = []
         ui = InteractiveAuditUI()
-        ret = ui.run_menu_loop(input_func=lambda prompt="": next(inputs), output_func=lambda msg: outputs.append(msg))
+        ret = ui.run_advanced_menu_loop(input_func=lambda prompt="": next(inputs), output_func=lambda msg: outputs.append(msg))
 
         assert ret == 0
         all_output = "\n".join(outputs)
@@ -112,7 +112,7 @@ def test_m48_ui_scripted_menu_loop():
         assert "Stage E1 prepared" in all_output
         assert "SELF-TEST: PASS" in all_output
         assert "Invalid option '99'" in all_output
-        assert "Exiting UI." in all_output
+        assert "Returning to main menu." in all_output
 
 
 def test_m48_ui_error_handling():

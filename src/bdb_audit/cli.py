@@ -23,8 +23,8 @@ from .coordinator.operations import AuditOperationApi
 from .core.errors import ValidationError
 from .stop.operation import evaluate_stop_gate
 
-APP_VERSION = "2.0.2"
-BUILD_ID = "BDB-V2-STANDALONE-2.0.2"
+APP_VERSION = "2.0.3"
+BUILD_ID = "BDB-V2-STANDALONE-2.0.3"
 
 # Explicit Exit Codes
 EXIT_SUCCESS = 0

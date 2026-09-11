@@ -124,9 +124,11 @@ def test_v202_preview_stop_input_evaluates_but_is_non_authoritative(tmp_path: Pa
 def test_v202_ui_exposes_stop_gate_action(tmp_path: Path):
     store = str(tmp_path / "campaign.sqlite")
     inputs = iter([
+        "6",  # Enter Advanced menu
         "1", store, "v202_ui",
         "10", "", "n",
-        "9",
+        "9",  # Back to Main menu
+        "7",  # Exit Main menu
     ])
     outputs: list[str] = []
     ui = InteractiveAuditUI()
@@ -137,7 +139,7 @@ def test_v202_ui_exposes_stop_gate_action(tmp_path: Path):
 
     assert rc == 0
     text = "\n".join(outputs)
-    assert "BDB Audit v2.0.2" in text
+    assert "BDB Audit v2.0.3" in text
     assert "10. Evaluate STOP Gate" in text
     assert "Decision=BLOCKED" in text
     assert "MISSING_ACCEPTED_STOP_INPUT" in text

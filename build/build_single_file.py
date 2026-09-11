@@ -25,9 +25,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = REPO_ROOT / "src"
 DIST_DIR = REPO_ROOT / "dist"
 RUNTIME_LOCK_PATH = REPO_ROOT / "requirements-f2.lock"
-DEFAULT_OUTPUT_NAME = "BDB_AUDIT_ASSISTANT_v2.0.1.py"
-APP_VERSION = "2.0.1"
-BUILD_ID = "BDB-V2-STANDALONE-2.0.1"
+DEFAULT_OUTPUT_NAME = "BDB_AUDIT_ASSISTANT_v2.0.3.py"
+APP_VERSION = "2.0.3"
+BUILD_ID = "BDB-V2-STANDALONE-2.0.3"
 FIXED_ZIP_DATETIME = (2026, 9, 11, 0, 0, 0)
 _RUNTIME_META_PREFIX = "__bdb_runtime__"
 
@@ -219,7 +219,7 @@ def create_payload_zip(files: list[tuple[str, bytes]]) -> bytes:
 
 
 STANDALONE_STUB_TEMPLATE = '''#!/usr/bin/env python3
-"""BDB Audit Assistant v2.0.1 — self-contained standalone distribution."""
+"""BDB Audit Assistant v2.0.3 — self-contained standalone distribution."""
 from __future__ import annotations
 
 import base64

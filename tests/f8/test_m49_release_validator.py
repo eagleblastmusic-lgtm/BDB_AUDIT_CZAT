@@ -25,7 +25,7 @@ def test_m49_valid_standalone_passes_all_checks(valid_standalone):
     """Untampered standalone must pass all release validator checks."""
     res = validate_release_artifact(valid_standalone)
     assert res["status"] == "PASS"
-    assert res["app_version"] == "2.0.1"
+    assert res["app_version"] == "2.0.3"
     assert res["runtime_lock"]["jsonschema"] == "4.25.1"
     for check_name, status in res["checks"].items():
         assert status == "PASS", f"Check {check_name} failed"

@@ -41,7 +41,7 @@ def test_standalone_runs_in_clean_isolated_python_without_jsonschema_installed()
     """The exact release defect: clean host import fails, embedded runtime succeeds."""
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
-        artifact = root / "BDB_AUDIT_ASSISTANT_v2.0.1.py"
+        artifact = root / "BDB_AUDIT_ASSISTANT_v2.0.3.py"
         venv_dir = root / "clean_venv"
         build_standalone(artifact)
 
@@ -72,7 +72,7 @@ def test_standalone_runs_in_clean_isolated_python_without_jsonschema_installed()
             text=True,
         )
         assert version.returncode == 0, version.stderr
-        assert "v2.0.1" in version.stdout
+        assert "v2.0.3" in version.stdout
 
         verify = subprocess.run(
             [str(python_exe), "-I", str(artifact), "--verify-payload"],
@@ -110,7 +110,7 @@ def test_standalone_runs_in_clean_isolated_python_without_jsonschema_installed()
             [str(python_exe), "-I", str(artifact), "ui"],
             cwd=root,
             env=env,
-            input="9\n",
+            input="7\n",
             capture_output=True,
             text=True,
         )
@@ -118,5 +118,5 @@ def test_standalone_runs_in_clean_isolated_python_without_jsonschema_installed()
         # This test protects the clean-host runtime closure, not a particular UI
         # release label. The embedded product source can advance independently
         # of this historical v2.0.1 wrapper regression fixture.
-        assert "Interactive Control Surface" in ui_run.stdout
+        assert "BDB AUDIT v2.0.3" in ui_run.stdout or "Interactive Control Surface" in ui_run.stdout
         assert "Exiting UI." in ui_run.stdout
