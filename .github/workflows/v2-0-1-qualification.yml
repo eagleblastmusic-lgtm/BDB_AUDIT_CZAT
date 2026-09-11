@@ -43,6 +43,26 @@ jobs:
             Write-Host "operations.py already ends with LF"
           }
 
+      - name: Normalize build metadata path typing and persist fix
+        if: github.event_name != 'pull_request'
+        shell: pwsh
+        run: |
+          $path = "build/build_single_file.py"
+          $text = [System.IO.File]::ReadAllText($path)
+          $old = 'located = Path(dist.locate_file(package_path))'
+          $new = 'located = Path(str(dist.locate_file(package_path)))'
+          if ($text.Contains($old)) {
+            $text = $text.Replace($old, $new)
+            [System.IO.File]::WriteAllText((Resolve-Path $path), $text, [System.Text.UTF8Encoding]::new($false))
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -- $path
+            git commit -m "fix(v2.0.1): make runtime metadata path type-safe"
+            git push origin "HEAD:${{ github.ref_name }}"
+          } else {
+            Write-Host "build_single_file.py typing fix already present"
+          }
+
       - name: Set up Python 3.14
         uses: actions/setup-python@v5
         with:
