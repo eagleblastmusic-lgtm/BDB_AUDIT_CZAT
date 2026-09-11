@@ -48,6 +48,16 @@ def new_id(kind):
     return kind + "_" + str(uuid4())
 
 
+def deterministic_id(kind, seed):
+    contract(kind)
+    seed_bytes = seed.encode("utf-8") if isinstance(seed, str) else bytes(seed)
+    h = bytearray(hashlib.sha256(seed_bytes).digest()[:16])
+    h[6] = (h[6] & 0x0F) | 0x40  # RFC 4122 version 4
+    h[8] = (h[8] & 0x3F) | 0x80  # RFC 4122 variant
+    import uuid
+    return kind + "_" + str(uuid.UUID(bytes=bytes(h)))
+
+
 @dataclass(frozen=True)
 class TypedRef:
     kind: str

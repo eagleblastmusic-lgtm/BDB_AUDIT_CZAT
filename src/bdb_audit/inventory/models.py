@@ -144,7 +144,7 @@ class InputDispositionRecord:
             validate_id(self.input_disposition_record_id, "input_disposition_record")
 
         # Strict separation: ScopeState values in InputDisposition are rejected
-        if self.disposition in SCOPE_STATES:
+        if self.disposition in (SCOPE_STATES - INPUT_DISPOSITIONS):
             raise ValidationError("ENUM_DOMAIN_MISMATCH", f"ScopeState {self.disposition} in InputDisposition")
         if self.disposition not in INPUT_DISPOSITIONS:
             raise ValidationError("INVALID_INPUT_DISPOSITION", str(self.disposition))
@@ -192,7 +192,7 @@ class ScopeStateRecord:
             validate_id(self.scope_state_record_id, "scope_state_record")
 
         # Strict separation: InputDisposition values in ScopeState are rejected
-        if self.state in INPUT_DISPOSITIONS:
+        if self.state in (INPUT_DISPOSITIONS - SCOPE_STATES):
             raise ValidationError("ENUM_DOMAIN_MISMATCH", f"InputDisposition {self.state} in ScopeState")
         if self.state not in SCOPE_STATES:
             raise ValidationError("INVALID_SCOPE_STATE", str(self.state))

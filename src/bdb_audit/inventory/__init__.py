@@ -1,4 +1,4 @@
-"""BDB Audit v2 Surface and Inventory module (M14)."""
+"""BDB Audit v2 Surface and Inventory module (M14 / F4)."""
 from .models import (
     SurfaceKey,
     SurfaceRecord,
@@ -17,6 +17,11 @@ from .accounting import (
     compute_inventory_denominator,
     evaluate_m14_gate,
 )
+from .engine import (
+    CollectorProfile,
+    CollectorOutput,
+    CollectorCoverageEngine,
+)
 
 __all__ = [
     "SurfaceKey",
@@ -33,4 +38,7 @@ __all__ = [
     "validate_terminal_accounting",
     "compute_inventory_denominator",
     "evaluate_m14_gate",
+    "CollectorProfile",
+    "CollectorOutput",
+    "CollectorCoverageEngine",
 ]
