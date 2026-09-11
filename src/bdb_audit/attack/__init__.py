@@ -37,3 +37,7 @@ from .hunter import (
     HUNTER_OPPORTUNITY_TYPES,
     CHALLENGER_TYPE as HUNTER_CHALLENGER_TYPE,
 )
+from .gate import (
+    E5StopGateVerdict,
+    E5StopSyntheticBenchmark,
+)
