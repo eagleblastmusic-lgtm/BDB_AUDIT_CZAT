@@ -1,0 +1,217 @@
+{
+  "acceptance_id": "BDB-F8-RELEASE-V2_0_0-R5_3_1-001",
+  "branch": "bdb-v2",
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src/",
+        "build/"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "mypy",
+        "--config-file",
+        "pyproject.toml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f1",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 93
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/compatibility",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 86
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f2",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 85
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f3",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 60
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f4",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 58
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f5",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 45
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f6",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 79
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f7",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 81
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/f8",
+        "-q"
+      ],
+      "exit_code": 0,
+      "passed": 32
+    }
+  ],
+  "f7_final_head": "12fbc34e40180c3a36efb8dc57577430cf8dec43",
+  "f7_predecessor_acceptance_id": "BDB-F7-E5-ATTACK-STOP-E6-R5_3_1-001",
+  "f7_predecessor_acceptance_sha256": "ba46fcfd7e021b1a8c1cd27833e698e9f02c45c5401f0023d3e2ce4eba061e77",
+  "f8_qualified_implementation_commit": "b404d5dd35b489c5e14e1540753dccac6bba67b3",
+  "f8_start_head": "12fbc34e40180c3a36efb8dc57577430cf8dec43",
+  "f8_start_tree": "5c9d69061c1f82f47abfaccc8f0528ee508dd285",
+  "f8_status": "PASS",
+  "release_candidate_commit": "b404d5dd35b489c5e14e1540753dccac6bba67b3",
+  "release_candidate_tree": "26490dbbfacc8ab27ac89ee68bb2fe10a2feea77",
+  "standalone_sha256": "6daa1f4b4bb5dac7bbf72bc3d171e711931a84815b1d7d60573f0bf98898f935",
+  "v2_0_0_release_qualified": "YES",
+  "gates": {
+    "LINT_GATE": "PASS",
+    "TYPECHECK_GATE": "PASS",
+    "UNIT_GATE": "PASS",
+    "COMPATIBILITY_GATE": "PASS",
+    "INTEGRATION_GATE": "PASS",
+    "PROPERTY_GATE": "PASS",
+    "ADVERSARIAL_GATE": "PASS",
+    "GOLDEN_GATE": "PASS",
+    "BUILD_REPRODUCIBILITY_GATE": "PASS",
+    "M46_STANDALONE_BUILD_GATE": "PASS",
+    "M47_CORE_OPERATION_CLI_GATE": "PASS",
+    "M48_INTERACTIVE_UI_GATE": "PASS",
+    "M49_RELEASE_VALIDATOR_GATE": "PASS",
+    "M50_SELF_AUDIT_GATE": "PASS",
+    "CRITICAL_MUTATION_SURVIVORS": 0,
+    "SELF_AUDIT_UNRESOLVED_HIGH": 0,
+    "F0_REGRESSION": "PASS",
+    "F1_REGRESSION": "PASS",
+    "F2_REGRESSION": "PASS",
+    "F3_REGRESSION": "PASS",
+    "F4_REGRESSION": "PASS",
+    "F5_REGRESSION": "PASS",
+    "F6_REGRESSION": "PASS",
+    "F7_REGRESSION": "PASS",
+    "F8_REGRESSION": "PASS"
+  },
+  "milestone": "F8",
+  "next_phase_allowed": "NO_MORE_PHASES",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "push_performed_during_final_closeout": "NO",
+  "publication_performed": "NO",
+  "python": "3.14.4",
+  "repository": "eagleblastmusic-lgtm/bdb-audit",
+  "schema": "BDB_F8_MILESTONE_ACCEPTANCE_V1",
+  "spec_conflicts": [],
+  "total_passed_tests": 619,
+  "verdict": "PASS",
+  "work_packages": {
+    "PR_F8_01_STANDALONE_BUILD_SYSTEM_M46": {
+      "commit": "d0cd3d4",
+      "status": "PASS",
+      "tests_passed": 4
+    },
+    "PR_F8_02_CORE_OPERATION_API_CLI_M47": {
+      "commit": "7ed3f23",
+      "status": "PASS",
+      "tests_passed": 5
+    },
+    "PR_F8_03_INTERACTIVE_UI_M48": {
+      "commit": "29187ee",
+      "status": "PASS",
+      "tests_passed": 3
+    },
+    "PR_F8_04_RELEASE_VALIDATOR_M49": {
+      "commit": "21cfb0f",
+      "status": "PASS",
+      "tests_passed": 10
+    },
+    "PR_F8_05_SELF_AUDIT_V2_M50": {
+      "commit": "3271e48",
+      "status": "PASS",
+      "tests_passed": 10
+    },
+    "PR_F8_06_RELEASE_CLOSEOUT": {
+      "commit": "b404d5d",
+      "status": "PASS",
+      "lanes_qualified": [
+        "lint",
+        "typecheck",
+        "unit",
+        "compatibility",
+        "integration",
+        "property",
+        "adversarial",
+        "golden",
+        "build-reproducibility"
+      ]
+    }
+  }
+}
