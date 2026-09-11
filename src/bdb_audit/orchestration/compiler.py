@@ -45,6 +45,10 @@ class PromptPackageCompiler:
             "history_cut": _freeze(history_cut),
         }
         if prompt is not None:
+            if isinstance(prompt, dict) and "template" in prompt:
+                from .templates import TemplateRegistry
+                reg = TemplateRegistry()
+                reg.validate_inputs(prompt["template"], {**inputs, **prompt})
             inputs["prompt"] = _freeze(prompt)
         body = {"format": "BDB-F2-PROMPT-PACKAGE-1", "inputs": inputs}
         raw = canonical_bytes(body)
