@@ -14,6 +14,13 @@ from .temporal import (
     VALID_RELATIONS,
     VALID_STATUSES,
 )
+from .adapters import (
+    AdapterCapability,
+    PropertyTestResult,
+    StatefulTestResult,
+    PropertyTestAdapter,
+    StatefulTestAdapter,
+)
 
 __all__ = [
     "State",
@@ -27,4 +34,9 @@ __all__ = [
     "TemporalInvariant",
     "VALID_RELATIONS",
     "VALID_STATUSES",
+    "AdapterCapability",
+    "PropertyTestResult",
+    "StatefulTestResult",
+    "PropertyTestAdapter",
+    "StatefulTestAdapter",
 ]
