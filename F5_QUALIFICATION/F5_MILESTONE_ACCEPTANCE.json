@@ -1,0 +1,165 @@
+{
+  "acceptance_id": "BDB-F5-E3-EXPAND-R5_3_1-001",
+  "branch": "bdb-v2",
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f1",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 93
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/compatibility",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 86
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f2",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 85
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f3",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 60
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f4",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 58
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/f5",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "passed": 45
+    }
+  ],
+  "f4_final_head": "66fcb6d852bf823d572d1ce807ef31796a197ff6",
+  "f4_predecessor_acceptance_id": "BDB-F4-DOMAIN-EXPANSION-R5_3_1-001",
+  "f4_predecessor_acceptance_sha256": "d36bb249a2f084f84f38669863c9cfba382e535951efa639cfe6701901c6c900",
+  "f5_qualified_implementation_commit": "064ef4a85357002c07d31c6923d3877449423ebd",
+  "f5_start_head": "66fcb6d852bf823d572d1ce807ef31796a197ff6",
+  "f5_start_tree": "b99f3143d60bd62f5b44ca4058829d0b785a3539",
+  "f5_status": "PASS",
+  "f6_started": "NO",
+  "gates": {
+    "AUTHORITY_HISTORY_GATE": "PASS",
+    "BLIND_DISCOVERY_PROVENANCE": "PASS",
+    "DIFFERENTIAL_TESTING_GATE": "PASS",
+    "DOMAIN_EXPANSION_REGRESSION": "PASS",
+    "E3_INTEGRATION_GATE": "PASS",
+    "F0_REGRESSION": "PASS",
+    "F1_REGRESSION": "PASS",
+    "F2_REGRESSION": "PASS",
+    "F3_REGRESSION": "PASS",
+    "F4_REGRESSION": "PASS",
+    "FOUNDATION_REFERENCE_SLICE_GATE": "PASS",
+    "FUZZING_ADAPTER_GATE": "PASS",
+    "GAP_DIRECTED_MODE": "PASS",
+    "IDENTITY_SCHEMA_GATE": "PASS",
+    "KNOWLEDGE_REVEAL_PROVENANCE": "PASS",
+    "METAMORPHIC_TESTING_GATE": "PASS",
+    "STOP_REFUSAL_PATH": "PASS"
+  },
+  "milestone": "F5",
+  "next_phase_allowed": "YES",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "push_performed_during_final_closeout": "NO",
+  "python": "3.14.4",
+  "repository": "eagleblastmusic-lgtm/bdb-audit",
+  "schema": "BDB_F5_MILESTONE_ACCEPTANCE_V1",
+  "spec_conflicts": [],
+  "total_passed_tests": 427,
+  "verdict": "PASS",
+  "work_packages": {
+    "PR_E3_01_BLIND_NOVELTY_LANES": {
+      "commit": "d9bf8b3",
+      "status": "PASS",
+      "tests_passed": 7
+    },
+    "PR_E3_02_CHECKPOINT_POSITIVE_REVEAL": {
+      "commit": "81bf57f",
+      "status": "PASS",
+      "tests_passed": 8
+    },
+    "PR_E3_03_FUZZING_ADAPTER_M25": {
+      "commit": "d97fb59",
+      "status": "PASS",
+      "tests_passed": 8
+    },
+    "PR_E3_04_DIFFERENTIAL_TESTING_M26": {
+      "commit": "056a315",
+      "status": "PASS",
+      "tests_passed": 5
+    },
+    "PR_E3_05_METAMORPHIC_TESTING_M27": {
+      "commit": "516b995",
+      "status": "PASS",
+      "tests_passed": 6
+    },
+    "PR_E3_06_E3_INTEGRATION_GATE": {
+      "commit": "064ef4a",
+      "status": "PASS",
+      "tests_passed": 11
+    }
+  }
+}
