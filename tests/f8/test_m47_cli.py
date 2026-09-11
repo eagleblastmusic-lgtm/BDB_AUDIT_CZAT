@@ -23,7 +23,7 @@ def temp_store():
 
 
 def test_m47_happy_path_workflow(temp_store, capsys):
-    """Test full normative command sequence: create -> status -> stage -> lane -> continue -> validate -> self-test -> build."""
+    """Test create -> projection -> stage -> lane -> continuation -> validation -> self-test -> build."""
     store_str = str(temp_store)
 
     # 1. campaign create
@@ -34,36 +34,64 @@ def test_m47_happy_path_workflow(temp_store, capsys):
     assert out["commit_seq"] == 1
     assert "campaign_" in out["campaign_id"]
 
-    # 2. campaign status
+    # 2. genesis projection and continuation
     rc = run_cli(["campaign", "status", "--store", store_str, "--json"])
     assert rc == EXIT_SUCCESS
     out = json.loads(capsys.readouterr().out)
     assert out["status"] == "SUCCESS"
     assert out["accepted_head_seq"] == 1
+    assert out["current_stage"] == "GENESIS"
+    assert out["stages_prepared"] == []
+    assert out["lanes_prepared"] == []
 
-    # 3. stage prepare
-    rc = run_cli(["stage", "prepare", "--store", store_str, "--stage", "F2_FOUNDATION", "--json"])
+    rc = run_cli(["continue", "--store", store_str, "--json"])
+    assert rc == EXIT_SUCCESS
+    out = json.loads(capsys.readouterr().out)
+    assert out["continuation_state"] == "READY_FOR_NEXT_STAGE"
+    assert out["next_action"] == "PREPARE_STAGE_E1"
+
+    # 3. stage prepare must persist/project the canonical StageSpec key
+    rc = run_cli(["stage", "prepare", "--store", store_str, "--stage", "E1", "--json"])
     assert rc == EXIT_SUCCESS
     out = json.loads(capsys.readouterr().out)
     assert out["status"] == "SUCCESS"
-    assert out["stage_id"] == "F2_FOUNDATION"
+    assert out["stage_id"] == "E1"
+    assert out["stage_key"] == "E1"
     assert out["commit_seq"] == 2
 
-    # 4. lane prepare
-    rc = run_cli(["lane", "prepare", "--store", store_str, "--stage", "F2_FOUNDATION", "--slot", "L1", "--json"])
+    rc = run_cli(["campaign", "status", "--store", store_str, "--json"])
+    assert rc == EXIT_SUCCESS
+    out = json.loads(capsys.readouterr().out)
+    assert out["current_stage"] == "E1"
+    assert out["stages_prepared"] == ["E1"]
+    assert out["lanes_prepared"] == []
+
+    # 4. lane prepare must persist/project lane_key, not UNKNOWN
+    rc = run_cli(["lane", "prepare", "--store", store_str, "--stage", "E1", "--slot", "L1", "--json"])
     assert rc == EXIT_SUCCESS
     out = json.loads(capsys.readouterr().out)
     assert out["status"] == "SUCCESS"
+    assert out["stage_key"] == "E1"
     assert out["slot"] == "L1"
+    assert out["lane_id"] == "lane_E1_L1"
     assert out["isolation_status"] == "QUALIFIED"
     assert out["commit_seq"] == 3
 
-    # 5. continue
+    rc = run_cli(["campaign", "status", "--store", store_str, "--json"])
+    assert rc == EXIT_SUCCESS
+    out = json.loads(capsys.readouterr().out)
+    assert out["current_stage"] == "E1"
+    assert out["stages_prepared"] == ["E1"]
+    assert out["lanes_prepared"] == ["lane_E1_L1"]
+
+    # 5. continuation follows the same canonical stage key domain
     rc = run_cli(["continue", "--store", store_str, "--json"])
     assert rc == EXIT_SUCCESS
     out = json.loads(capsys.readouterr().out)
     assert out["status"] == "SUCCESS"
-    assert "continuation_state" in out
+    assert out["current_stage"] == "E1"
+    assert out["continuation_state"] == "READY_FOR_NEXT_STAGE"
+    assert out["next_action"] == "PREPARE_STAGE_E2"
 
     # 6. validate valid artifact
     with tempfile.TemporaryDirectory() as td:
@@ -71,7 +99,7 @@ def test_m47_happy_path_workflow(temp_store, capsys):
         art_path.write_text(json.dumps({
             "kind": "stage_spec",
             "version": "1",
-            "key": "F2_FOUNDATION",
+            "key": "E1",
             "revision": "1",
             "policy_ref": "policy:test",
             "ordinal": 1,
@@ -100,17 +128,52 @@ def test_m47_happy_path_workflow(temp_store, capsys):
         assert build_out.exists()
 
 
+def test_m47_legacy_descriptive_stage_alias_projects_canonical_key(temp_store, capsys):
+    """v2.0.0 descriptive F2 label remains accepted, but projection is canonical E1."""
+    store_str = str(temp_store)
+    assert run_cli(["campaign", "create", "--store", store_str, "--json"]) == EXIT_SUCCESS
+    capsys.readouterr()
+
+    assert run_cli(["stage", "prepare", "--store", store_str, "--stage", "F2_FOUNDATION", "--json"]) == EXIT_SUCCESS
+    out = json.loads(capsys.readouterr().out)
+    assert out["stage_id"] == "F2_FOUNDATION"
+    assert out["stage_key"] == "E1"
+
+    assert run_cli(["campaign", "status", "--store", store_str, "--json"]) == EXIT_SUCCESS
+    out = json.loads(capsys.readouterr().out)
+    assert out["current_stage"] == "E1"
+    assert out["stages_prepared"] == ["E1"]
+
+    assert run_cli(["continue", "--store", store_str, "--json"]) == EXIT_SUCCESS
+    out = json.loads(capsys.readouterr().out)
+    assert out["next_action"] == "PREPARE_STAGE_E2"
+
+
+def test_m47_stage_order_and_lane_parent_fail_closed(temp_store, capsys):
+    """Out-of-order stages and lanes for an unprepared stage must be rejected."""
+    store_str = str(temp_store)
+    assert run_cli(["campaign", "create", "--store", store_str, "--json"]) == EXIT_SUCCESS
+    capsys.readouterr()
+
+    rc = run_cli(["stage", "prepare", "--store", store_str, "--stage", "E2", "--json"])
+    assert rc == EXIT_DOMAIN_ERROR
+    err = json.loads(capsys.readouterr().err)
+    assert err["error"] == "INVALID_STAGE_TRANSITION"
+
+    rc = run_cli(["lane", "prepare", "--store", store_str, "--stage", "E1", "--slot", "L1", "--json"])
+    assert rc == EXIT_DOMAIN_ERROR
+    err = json.loads(capsys.readouterr().err)
+    assert err["error"] == "STAGE_NOT_PREPARED"
+
+
 def test_m47_malformed_arguments(capsys):
     """Missing required arguments must exit with code 2."""
-    # missing --store
     rc = run_cli(["campaign", "create"])
     assert rc == EXIT_MALFORMED_ARGS
 
-    # missing --stage
     rc = run_cli(["stage", "prepare", "--store", "dummy.sqlite"])
     assert rc == EXIT_MALFORMED_ARGS
 
-    # missing --artifact
     rc = run_cli(["validate"])
     assert rc == EXIT_MALFORMED_ARGS
 
@@ -122,7 +185,7 @@ def test_m47_missing_campaign(capsys):
         rc = run_cli(["campaign", "status", "--store", non_existent, "--json"])
         assert rc == EXIT_CAMPAIGN_NOT_FOUND
 
-        rc = run_cli(["stage", "prepare", "--store", non_existent, "--stage", "F2_FOUNDATION", "--json"])
+        rc = run_cli(["stage", "prepare", "--store", non_existent, "--stage", "E1", "--json"])
         assert rc == EXIT_CAMPAIGN_NOT_FOUND
 
 
@@ -139,25 +202,21 @@ def test_m47_conflict_duplicate_campaign(temp_store, capsys):
 def test_m47_invalid_artifact_validation(capsys):
     """Invalid artifacts must fail closed with EXIT_DOMAIN_ERROR (1)."""
     with tempfile.TemporaryDirectory() as td:
-        # 1. Malformed JSON
         bad_json = Path(td) / "bad.json"
         bad_json.write_text("{ unquoted_key: 123 ")
         rc = run_cli(["validate", "--artifact", str(bad_json), "--json"])
         assert rc == EXIT_DOMAIN_ERROR
 
-        # 2. Missing kind
         no_kind = Path(td) / "no_kind.json"
         no_kind.write_text(json.dumps({"some_data": 42}))
         rc = run_cli(["validate", "--artifact", str(no_kind), "--json"])
         assert rc == EXIT_DOMAIN_ERROR
 
-        # 3. Unregistered contract kind
         unreg = Path(td) / "unreg.json"
         unreg.write_text(json.dumps({"kind": "totally_unregistered_kind", "version": "1"}))
         rc = run_cli(["validate", "--artifact", str(unreg), "--json"])
         assert rc == EXIT_DOMAIN_ERROR
 
-        # 4. Kind mismatch
         mismatch = Path(td) / "mismatch.json"
         mismatch.write_text(json.dumps({"kind": "stage_spec", "version": "1"}))
         rc = run_cli(["validate", "--artifact", str(mismatch), "--kind", "lane_spec", "--json"])
