@@ -71,6 +71,8 @@ class AuditOperationApi:
         store_path: str | Path,
         seed: str = "default_campaign",
         campaign_id: str | None = None,
+        target_repo: str | None = None,
+        commit_sha: str | None = None,
     ) -> dict[str, Any]:
         """Initialize a new campaign with genesis objects in a transactional store."""
         path = Path(store_path).resolve()
@@ -111,29 +113,38 @@ class AuditOperationApi:
                 "ref_class": ref_class,
             }
 
+        repo_authority_id = f"repo:{target_repo}" if target_repo else f"repo-{seed}"
+        commit_id = commit_sha if commit_sha else hashlib.sha256(seed.encode()).hexdigest()[:40]
+        has_real_git = bool(target_repo and commit_sha)
+
         source_manifest = make("source_manifest", {
             "entries": [{
                 "repo_relative_posix_path": "README.md",
                 "entry_type": "REGULAR_FILE",
                 "relevant_mode": "0644",
                 "byte_length": len(seed),
-                "content_raw_digest": hashlib.sha256(seed.encode()).hexdigest(),
+                "content_raw_digest": hashlib.sha256(commit_id.encode()).hexdigest(),
             }]
         })
 
-        source_identity = make("source_identity", {
+        source_identity_body: dict[str, Any] = {
             "profile_ref": ext("source_identity_profile_pin", f"profile-{seed}", "PINNED_PROFILE_REF"),
-            "authority_mode": "AUTHORIZED_SNAPSHOT",
-            "authorized_repository_or_snapshot_ref": ext("repository_or_snapshot_authority_ref", f"repo-{seed}", "SOURCE_AUTHORITY_REF"),
+            "authority_mode": "AUTHORIZED_GIT" if has_real_git else "AUTHORIZED_SNAPSHOT",
+            "authorized_repository_or_snapshot_ref": ext("repository_or_snapshot_authority_ref", repo_authority_id, "SOURCE_AUTHORITY_REF"),
             "materialized_source_manifest_ref": source_manifest.as_ref().as_dict(),
             "completeness_state": "COMPLETE_SOURCE",
-        })
+        }
+        if has_real_git:
+            source_identity_body["git_commit_object_id"] = commit_id
+            source_identity_body["git_tree_object_id"] = commit_id
+
+        source_identity = make("source_identity", source_identity_body)
 
         source_generation = make("source_generation", {
             "source_generation_id": f"source_gen_{cid}",
             "source_identity_ref": source_identity.as_ref().as_dict(),
             "source_identity_profile_ref": ext("source_identity_profile_pin", f"profile-{seed}", "PINNED_PROFILE_REF"),
-            "repository_authority_ref": ext("repository_or_snapshot_authority_ref", f"repo-{seed}", "SOURCE_AUTHORITY_REF"),
+            "repository_authority_ref": ext("repository_or_snapshot_authority_ref", repo_authority_id, "SOURCE_AUTHORITY_REF"),
             "materialized_source_manifest_ref": source_manifest.as_ref().as_dict(),
             "representation_refs": [],
         })
@@ -315,6 +326,28 @@ class AuditOperationApi:
             "stop_evaluations_count": len(stop_evaluations),
             "total_objects_count": len(rows),
         }
+
+    def get_campaign_source_identity(self, store_path: str | Path) -> dict[str, Any]:
+        """Inspect store and return authoritative source identity from campaign genesis."""
+        path = Path(store_path).resolve()
+        if not path.exists() or path.stat().st_size == 0:
+            raise ValidationError("CAMPAIGN_NOT_FOUND", f"No database found at {path}")
+        store = TransactionalHistoryStore(path, registry=self.registry)
+        conn = store._connect()
+        try:
+            row = conn.execute("SELECT body FROM immutable_objects WHERE kind='source_identity' LIMIT 1").fetchone()
+            if not row:
+                return {}
+            doc = json.loads(row[0].decode("utf-8"))
+            repo_ref = doc.get("authorized_repository_or_snapshot_ref", {})
+            return {
+                "authority_mode": doc.get("authority_mode"),
+                "git_commit_object_id": doc.get("git_commit_object_id"),
+                "git_tree_object_id": doc.get("git_tree_object_id"),
+                "repository_authority_ref": repo_ref,
+            }
+        finally:
+            conn.close()
 
     def prepare_stage(
         self,

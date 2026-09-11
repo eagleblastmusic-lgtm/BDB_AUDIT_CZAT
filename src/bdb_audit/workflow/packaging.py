@@ -15,6 +15,7 @@ from typing import Any, Mapping
 import zipfile
 
 from ..core.canonical_json import canonical_bytes
+from ..core.errors import ValidationError
 from ..history.store import TransactionalHistoryStore
 from ..orchestration.compiler import PromptPackageCompiler, CompiledPackage
 from ..orchestration.native_ensemble import (
@@ -39,6 +40,9 @@ class E1LaneJob:
     package_zip_path: Path
     package_zip_sha256: str
     prompt_text: str
+    source_commit_sha: str = ""
+    executor_profile: str = "ChatGPT / GitHub"
+    model: str = "Sol 5.6"
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -70,6 +74,27 @@ class E1Batch:
     def get_job(self, slot: str) -> E1LaneJob:
         return self.jobs[slot]
 
+    @property
+    def source_commit_sha(self) -> str:
+        for j in self.jobs.values():
+            if j.source_commit_sha:
+                return j.source_commit_sha
+        return ""
+
+    @property
+    def executor_profile(self) -> str:
+        for j in self.jobs.values():
+            if j.executor_profile:
+                return j.executor_profile
+        return ""
+
+    @property
+    def model(self) -> str:
+        for j in self.jobs.values():
+            if j.model:
+                return j.model
+        return ""
+
 
 def _build_lane_prompt(
     campaign_id: str,
@@ -79,6 +104,8 @@ def _build_lane_prompt(
     source: ResolvedSource,
     package_digest: str,
     cut: dict[str, Any],
+    execution_mode: str = "ChatGPT / GitHub",
+    model: str = "Sol 5.6",
 ) -> str:
     """Generate high-clarity prompt for external auditor session (ChatGPT / GitHub)."""
     return f"""# BDB AUDIT v2.0.3 — AUDIT JOB: {lane_slot} ({lane_title.upper()})
@@ -117,7 +144,8 @@ When your audit is complete, you must package your findings into a single ZIP ar
   "campaign_id": "{campaign_id}",
   "stage_id": "E1",
   "lane_slot": "{lane_slot}",
-  "executor_model": "Sol 5.6",
+  "executor_profile": "{execution_mode}",
+  "executor_model": "{model}",
   "input_package_digest": "{package_digest}",
   "source_commit_sha": "{source.exact_commit_sha}",
   "history_cut": {{
@@ -132,7 +160,6 @@ When your audit is complete, you must package your findings into a single ZIP ar
       "statement": "<Concise finding description>",
       "severity": "<CRITICAL | HIGH | MEDIUM | LOW | INFORMATIONAL>",
       "affected_component": "<Component/file path>",
-      "claim_outcome": "SUPPORTED",
       "description": "<Detailed explanation of the issue>"
     }}
   ]
@@ -142,6 +169,34 @@ When your audit is complete, you must package your findings into a single ZIP ar
 
 Return the resulting ZIP file to BDB Audit via the result inbox.
 """
+
+
+def compute_package_identity_digest(
+    compiled_digest: str,
+    executor_model: str,
+    executor_profile: str,
+    history_cut: dict[str, Any],
+    lane_slot: str,
+    source_commit_sha: str,
+    source_location: str,
+    stage_id: str = "E1",
+) -> str:
+    """Canonical package identity digest binding inputs deterministically."""
+    body = {
+        "compiled_digest": compiled_digest,
+        "executor_model": executor_model,
+        "executor_profile": executor_profile,
+        "history_cut": {
+            "accepted_head_hash": history_cut.get("accepted_head_hash", ""),
+            "accepted_head_seq": history_cut.get("accepted_head_seq", 0),
+            "campaign_id": history_cut.get("campaign_id", ""),
+        },
+        "lane_slot": lane_slot,
+        "source_commit_sha": source_commit_sha,
+        "source_location": source_location,
+        "stage_id": stage_id,
+    }
+    return hashlib.sha256(canonical_bytes(body)).hexdigest()
 
 
 def prepare_e1_batch(
@@ -157,6 +212,13 @@ def prepare_e1_batch(
     1. E1-A, E1-B, E1-C, E1-D, and E1-E all share the exact same HistoryCut.
     2. No result from any lane can influence another lane package.
     """
+    if execution_mode != "ChatGPT / GitHub":
+        raise ValidationError(
+            "NEEDS_IMPLEMENTATION",
+            f"Execution mode '{execution_mode}' automated packaging is not supported in v2.0.3. "
+            "Only 'ChatGPT / GitHub' is fully implemented in this version.",
+        )
+
     head = store.head()
     if head is None:
         raise ValueError("Campaign store has no accepted head")
@@ -208,14 +270,27 @@ def prepare_e1_batch(
             prompt=prompt_dict,
         )
 
+        pkg_identity_digest = compute_package_identity_digest(
+            compiled_digest=compiled.digest,
+            executor_model=model,
+            executor_profile=execution_mode,
+            history_cut=frozen_cut,
+            lane_slot=slot,
+            source_commit_sha=source_info.exact_commit_sha,
+            source_location=source_info.location,
+            stage_id="E1",
+        )
+
         prompt_text = _build_lane_prompt(
             campaign_id=head.campaign_id,
             lane_slot=slot,
             lane_title=lane_title,
             strategy=strategy,
             source=source_info,
-            package_digest=compiled.digest,
+            package_digest=pkg_identity_digest,
             cut=frozen_cut,
+            execution_mode=execution_mode,
+            model=model,
         )
 
         manifest_data = {
@@ -225,7 +300,8 @@ def prepare_e1_batch(
             "lane_slot": slot,
             "lane_title": lane_title,
             "strategy": strategy,
-            "package_digest": compiled.digest,
+            "package_digest": pkg_identity_digest,
+            "compiled_digest": compiled.digest,
             "input_history_cut": frozen_cut,
             "source_target": source_info.as_dict(),
             "execution_mode": execution_mode,
@@ -256,10 +332,13 @@ def prepare_e1_batch(
             lane_title=lane_title,
             strategy=strategy,
             input_history_cut=frozen_cut,
-            package_digest=compiled.digest,
+            package_digest=pkg_identity_digest,
             package_zip_path=zip_path,
             package_zip_sha256=zip_sha256,
             prompt_text=prompt_text,
+            source_commit_sha=source_info.exact_commit_sha,
+            executor_profile=execution_mode,
+            model=model,
         )
 
     return E1Batch(
@@ -274,4 +353,5 @@ __all__ = [
     "E1LaneJob",
     "E1Batch",
     "prepare_e1_batch",
+    "compute_package_identity_digest",
 ]

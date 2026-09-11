@@ -7,12 +7,14 @@ FIELDS = {
     "lane_run": "lane_run_id stage_run_ref lane_spec_ref source_generation_ref creation_input_history_cut required_result_slots",
     "attempt": "attempt_id lane_run_ref attempt_nonce executor_profile_ref delivery_profile_ref assigned_history_cut result_slot_contracts",
     "isolation_qualification": "isolation_qualification_id attempt_ref assessment_input_history_cut executor_profile_ref delivery_profile_ref channel_inventory_ref enforcement_receipt_refs filesystem_boundary_evidence_refs network_boundary_evidence_refs tool_boundary_evidence_refs session_boundary_evidence_refs contamination_assessment_refs required_isolation_assurance result scope limitations reason_codes",
+    "bdb_audit_lane_result": "kind version campaign_id stage_id lane_slot source_commit_sha history_cut input_package_digest executor_profile executor_model findings",
 }
 OPTIONAL = {
     "stage_run": ("successor_of_stage_run_ref",), "lane_run": ("successor_of_lane_run_ref",),
     "attempt": ("retry_of_attempt_ref", "retry_reason_ref"),
+    "bdb_audit_lane_result": ("findings_count", "notes", "evidence_files"),
 }
-ARRAYS = set("predecessor_requirements required_lane_slots optional_lane_slots allowed_corpus_roles forbidden_corpus_roles required_stage_completion_outputs scope_selectors allowed_view_classes forbidden_knowledge_classes required_outputs executor_capability_requirements predecessor_stage_completion_refs required_lane_slot_contract_refs required_result_slots result_slot_contracts".split())
+ARRAYS = set("predecessor_requirements required_lane_slots optional_lane_slots allowed_corpus_roles forbidden_corpus_roles required_stage_completion_outputs scope_selectors allowed_view_classes forbidden_knowledge_classes required_outputs executor_capability_requirements predecessor_stage_completion_refs required_lane_slot_contract_refs required_result_slots result_slot_contracts findings evidence_files".split())
 ARRAYS.update("enforcement_receipt_refs filesystem_boundary_evidence_refs network_boundary_evidence_refs tool_boundary_evidence_refs session_boundary_evidence_refs contamination_assessment_refs limitations reason_codes".split())
 
 
@@ -39,4 +41,11 @@ def orchestration_schema(kind):
     if kind == "isolation_qualification":
         properties["result"] = {"enum": ["ENFORCED", "DECLARED", "UNKNOWN"]}
         properties["required_isolation_assurance"] = {"enum": ["ENFORCED", "DECLARED", "UNKNOWN"]}
+    if kind == "bdb_audit_lane_result":
+        properties["findings"] = {"type": "array"}
+        properties["history_cut"] = {"type": "object"}
+        properties["lane_slot"] = {"enum": ["E1-A", "E1-B", "E1-C", "E1-D", "E1-E"]}
+        properties["stage_id"] = {"const": "E1"}
+        properties["kind"] = {"const": "bdb_audit_lane_result"}
+        properties["version"] = {"const": "1"}
     return {"type": "object", "required": fields, "properties": properties, "additionalProperties": False}

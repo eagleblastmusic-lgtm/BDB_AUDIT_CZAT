@@ -75,13 +75,15 @@ class UserSettings:
         if not isinstance(raw, dict):
             return cls()
 
+        allowed_fields = set(getattr(cls, "__dataclass_fields__", {}).keys())
+
         # Reject/ignore forbidden credential fields
         safe_kwargs = {}
         for k, v in raw.items():
             upper = str(k).upper()
             if any(forbidden in upper for forbidden in FORBIDDEN_CREDENTIAL_KEYWORDS):
                 continue
-            if hasattr(cls, k):
+            if k in allowed_fields:
                 safe_kwargs[k] = v
 
         try:

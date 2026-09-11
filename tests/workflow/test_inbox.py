@@ -59,7 +59,9 @@ def _valid_manifest_for_lane(batch, slot: str) -> dict:
         "campaign_id": batch.campaign_id,
         "stage_id": "E1",
         "lane_slot": slot,
-        "executor_model": "Sol 5.6",
+        "source_commit_sha": batch.source_commit_sha,
+        "executor_profile": job.executor_profile,
+        "executor_model": job.model,
         "input_package_digest": job.package_digest,
         "history_cut": batch.frozen_history_cut,
         "findings": [

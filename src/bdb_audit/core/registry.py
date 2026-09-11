@@ -36,12 +36,39 @@ class ContractRegistry:
         self._doc = doc
         self._contracts = {(r["kind"], r["version"]): r for r in doc["contracts"]}
         self.validate_definition(doc)
+        # R5.3 extension contracts for orchestrator / auditor submission artifacts (v2.0.3)
+        self._extension_contracts: dict[tuple[str, str], dict] = {
+            ("bdb_audit_lane_result", "1"): {
+                "authoritative_for": "auditor lane result submission package",
+                "canonical_role": "PROPOSAL",
+                "consumer_roles": ["COORDINATOR", "VALIDATOR"],
+                "identity_semantics": "BDB-CJSON-1 + BDB-OBJECT-DIGEST-1 unless RAW/EXPORT",
+                "kind": "bdb_audit_lane_result",
+                "lifecycle": "IMMUTABLE",
+                "material_refs": [],
+                "ordering_rules": {},
+                "producer_authority": "AUDITOR_EXTERNAL",
+                "reference_contract_mode": "SCHEMA_BOUND_BEFORE_FIRST_ACCEPTANCE",
+                "required_validation_layers": ["L1", "L2", "L4", "L5"],
+                "schema_ref": "BDB_SCHEMA_REGISTRY::bdb_audit_lane_result/1",
+                "validation_profile": "DERIVED",
+                "version": "1",
+            }
+        }
 
     @property
     def document(self):
         return deepcopy(self._doc)
 
+    def register_extension_contract(self, contract_entry: dict) -> None:
+        """Register a versioned artifact contract dynamically."""
+        kind = contract_entry["kind"]
+        version = contract_entry.get("version", "1")
+        self._extension_contracts[(kind, version)] = deepcopy(contract_entry)
+
     def contract(self, kind, version="1"):
+        if hasattr(self, "_extension_contracts") and (kind, version) in self._extension_contracts:
+            return deepcopy(self._extension_contracts[(kind, version)])
         try:
             return deepcopy(self._contracts[(kind, version)])
         except (KeyError, TypeError) as exc:

@@ -12,6 +12,8 @@ import re
 import subprocess
 from typing import Any
 
+from ..core.errors import ValidationError
+
 SHA1_HEX_PATTERN = re.compile(r"^[0-9a-fA-F]{40}$")
 
 
@@ -65,51 +67,34 @@ def resolve_github_source(repo_url: str, ref: str, explicit_sha: str | None = No
         )
 
     # 2. Query remote repository via git ls-remote
-    try:
-        proc = subprocess.run(
-            ["git", "ls-remote", repo_url, ref],
-            capture_output=True,
-            text=True,
-            timeout=15,
-        )
-        if proc.returncode == 0 and proc.stdout:
-            for line in proc.stdout.splitlines():
-                parts = line.strip().split()
-                if parts and SHA1_HEX_PATTERN.match(parts[0]):
-                    return ResolvedSource(
-                        target_type="github",
-                        location=repo_url,
-                        display_name=display,
-                        ref=ref,
-                        exact_commit_sha=parts[0],
-                    )
-    except Exception:
-        pass
+    queries = [ref, f"refs/heads/{ref}", f"refs/tags/{ref}"]
+    for q in queries:
+        try:
+            proc = subprocess.run(
+                ["git", "ls-remote", repo_url, q],
+                capture_output=True,
+                text=True,
+                timeout=15,
+            )
+            if proc.returncode == 0 and proc.stdout:
+                for line in proc.stdout.splitlines():
+                    parts = line.strip().split()
+                    if parts and SHA1_HEX_PATTERN.match(parts[0]):
+                        return ResolvedSource(
+                            target_type="github",
+                            location=repo_url,
+                            display_name=display,
+                            ref=ref,
+                            exact_commit_sha=parts[0],
+                        )
+        except Exception:
+            pass
 
-    # 3. Check if local git clone of this repository exists and knows the remote
-    try:
-        proc = subprocess.run(
-            ["git", "rev-parse", ref],
-            capture_output=True,
-            text=True,
-            timeout=5,
-        )
-        if proc.returncode == 0:
-            sha = proc.stdout.strip()
-            if SHA1_HEX_PATTERN.match(sha):
-                return ResolvedSource(
-                    target_type="github",
-                    location=repo_url,
-                    display_name=display,
-                    ref=ref,
-                    exact_commit_sha=sha,
-                )
-    except Exception:
-        pass
-
-    raise ValueError(
-        f"COULD_NOT_RESOLVE_EXACT_SHA: Cannot resolve '{ref}' for '{repo_url}' to an exact 40-character commit SHA. "
-        "Please provide the exact commit SHA or check network connectivity."
+    # Never fall back to local working directory git rev-parse for a remote GitHub repository.
+    raise ValidationError(
+        "COULD_NOT_RESOLVE_EXACT_SHA",
+        f"Cannot resolve ref '{ref}' for remote repository '{repo_url}' to an exact 40-character commit SHA. "
+        "Local repository fallback is forbidden. Please configure an explicit commit SHA or verify network access.",
     )
 
 

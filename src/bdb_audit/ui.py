@@ -242,15 +242,34 @@ class InteractiveAuditUI:
         output_func("[N] Back to menu")
 
         choice = input_func("Choice [R/i/n]: ").strip().lower()
-        if choice == "r":
+        if choice in ("r", "i"):
             self.active_store = str(unfinished.store_path)
-            self.orchestrator.active_store_path = unfinished.store_path
-            # Run full audit resume path
-            self.handle_run_full_audit(input_func, output_func)
-        elif choice == "i":
-            self.active_store = str(unfinished.store_path)
-            self.orchestrator.active_store_path = unfinished.store_path
-            self._execute_result_import(input_func, output_func)
+            res_info = self.orchestrator.resume_campaign(unfinished.store_path)
+            output_func("\n--------------------------------------------------")
+            output_func("RESUMED AUDIT CAMPAIGN")
+            output_func("--------------------------------------------------")
+            output_func(f"Campaign ID: {res_info['campaign_id']}")
+            output_func(f"Store Path:  {res_info['store_path']}")
+            output_func(f"Accepted:    {res_info['accepted_lanes_count']}/{res_info['total_required_lanes']} lanes accepted")
+            if res_info["missing_lanes"]:
+                output_func(f"Waiting for: {', '.join(res_info['missing_lanes'])}")
+            else:
+                output_func("All E1 lanes completed.")
+
+            if res_info["stage_complete"]:
+                output_func("\nE1 stage is already completed.")
+                return
+
+            output_func("\n[I] Import results now")
+            output_func("[D] Deliver/show missing lane")
+            output_func("[N] Back to menu")
+            action = input_func("Choice [I/d/n]: ").strip().lower()
+            if action == "d":
+                for slot in res_info["missing_lanes"]:
+                    self.orchestrator.deliver_lane_to_user(slot)
+                    output_func(f"Lane {slot} prompt delivered.")
+            elif action != "n":
+                self._execute_result_import(input_func, output_func)
 
     def handle_audit_status(self, output_func: Callable[[str], None]) -> None:
         """Render clear, non-technical text dashboard of audit status and progress."""
