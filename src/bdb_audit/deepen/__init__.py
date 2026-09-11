@@ -55,6 +55,11 @@ from .causal import (
     CausalChainRecord,
     CausalChainEngine,
 )
+from .gate import (
+    E4GateVerdict,
+    E4SyntheticBenchmark,
+    E4IntegrationGate,
+)
 
 __all__ = [
     "State",
@@ -97,4 +102,7 @@ __all__ = [
     "CausalEdge",
     "CausalChainRecord",
     "CausalChainEngine",
+    "E4GateVerdict",
+    "E4SyntheticBenchmark",
+    "E4IntegrationGate",
 ]
