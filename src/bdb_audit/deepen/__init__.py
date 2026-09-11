@@ -27,6 +27,14 @@ from .exploration import (
     BoundedModelExplorer,
     EXPLORATION_STATUSES,
 )
+from .concurrency import (
+    SchedulePoint,
+    InterleavingSeed,
+    ConcurrencySchedule,
+    ReplayResult,
+    ScheduleReplayEngine,
+    SCHEDULE_LOCATIONS,
+)
 
 __all__ = [
     "State",
@@ -49,4 +57,10 @@ __all__ = [
     "ExplorationResult",
     "BoundedModelExplorer",
     "EXPLORATION_STATUSES",
+    "SchedulePoint",
+    "InterleavingSeed",
+    "ConcurrencySchedule",
+    "ReplayResult",
+    "ScheduleReplayEngine",
+    "SCHEDULE_LOCATIONS",
 ]
