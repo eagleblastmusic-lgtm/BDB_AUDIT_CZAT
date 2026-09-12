@@ -36,8 +36,8 @@ def orchestration_schema(kind):
             or kind == "bdb_audit_lane_result"
         ) and name != "campaign_ref":
             properties[name] = {"type": "object", "required": ["kind", "revision_digest", "digest_profile", "schema_revision_ref", "ref_class"]}
-        elif name in {"stage_ordinal", "raw_result_byte_length"}:
-            properties[name] = {"type": "integer", "minimum": 0 if name == "raw_result_byte_length" else 1}
+        elif name in {"stage_ordinal", "raw_result_byte_length", "findings_count"}:
+            properties[name] = {"type": "integer", "minimum": 0 if name != "stage_ordinal" else 1}
         else:
             properties[name] = {"type": "string"}
     if kind == "attempt":
