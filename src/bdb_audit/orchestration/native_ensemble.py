@@ -258,7 +258,6 @@ def _axis_evidence(item: Mapping[str, Any], axis: str) -> list[dict]:
     refs = []
     if isinstance(raw, Mapping):
         refs.extend(_typed_evidence_refs(raw.get(axis)))
-    refs.extend(_generic_evidence(item))
     by_digest = {ref["revision_digest"]: ref for ref in refs}
     return [by_digest[key] for key in sorted(by_digest)]
 
