@@ -105,9 +105,10 @@ class AuditOperationApi:
             return obj
 
         def ext(kind: str, val: str, ref_class: str = "CONTENT_OR_PRIOR") -> dict[str, Any]:
+            preimage = f"BDB2/{kind}/1\0".encode("ascii") + canonical_bytes({"reference_id": val})
             return {
                 "kind": kind,
-                "revision_digest": hashlib.sha256(val.encode()).hexdigest(),
+                "revision_digest": hashlib.sha256(preimage).hexdigest(),
                 "digest_profile": "BDB-OBJECT-DIGEST-1",
                 "schema_revision_ref": f"BDB_TARGET/{kind}",
                 "ref_class": ref_class,
@@ -519,7 +520,10 @@ class AuditOperationApi:
 
         # 4. Layered validation (Schema, Canonical ObjectDigest, TypedRefs, Context)
         validator = LayeredValidator(registry=self.registry)
-        schema_ref = contract_row["schema_ref"]
+        schema_ref = contract_row.get("schema_ref")
+        if not schema_ref or not isinstance(schema_ref, str):
+            raise ValidationError("MISSING_SCHEMA_REF", f"Contract for {kind}/{version} missing schema_ref")
+
         validator.bindings.require_bound(schema_ref)
         schema_dict = validator.bindings._validators[schema_ref].schema
         props = schema_dict.get("properties", {})
@@ -536,16 +540,34 @@ class AuditOperationApi:
         raw_body_bytes = canonical_bytes(body_dict)
         validated = validator.validate(kind, raw_body_bytes, version=version, context=context)
 
+        # 5. Layer execution evaluation & admission determination
+        executed_layers = ["L1", "L3", "L4"]
+        if context is not None:
+            executed_layers.append("L5")
+            if isinstance(context, dict) and "qualified_layers" in context:
+                for ql in context["qualified_layers"]:
+                    if ql not in executed_layers:
+                        executed_layers.append(ql)
+
+        required_layers = list(contract_row.get("required_validation_layers", ["L3", "L4", "L5"]))
+        missing_layers = [layer for layer in required_layers if layer not in executed_layers]
+        is_admissible = (len(missing_layers) == 0)
+
         return {
             "status": "PASS",
-            "admissible": True,
+            "structural_validation": "PASS",
+            "admissible": is_admissible,
+            "admission_status": "ADMITTED" if is_admissible else "NOT_ADMITTED",
             "kind": kind,
             "version": version,
             "digest": validated.revision_digest,
             "digest_profile": "BDB-OBJECT-DIGEST-1",
             "schema_revision_ref": contract_row["schema_ref"],
             "contract_registered": True,
-            "validation_layers": ["TRANSPORT", "SCHEMA", "SEMANTIC", "REFERENTIAL"] + (["CONTEXT"] if context else []),
+            "required_validation_layers": required_layers,
+            "executed_validation_layers": executed_layers,
+            "missing_validation_layers": missing_layers,
+            "validation_layers": executed_layers,
             "byte_length": len(raw_bytes),
         }
 

@@ -16,6 +16,7 @@ from uuid import uuid4
 
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
+from ..history.objects import CanonicalObject
 from .e3 import E3BlindNoveltyResult
 from .e3_reveal import (
     E3BlindCheckpoint,
@@ -71,7 +72,7 @@ class E3StageCompletionCandidate:
 
     @property
     def digest(self) -> str:
-        return hashlib.sha256(self.canonical_bytes()).hexdigest()
+        return CanonicalObject("stage_completion", self.body()).digest
 
     @property
     def ref(self) -> dict:

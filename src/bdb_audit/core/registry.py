@@ -99,8 +99,40 @@ class ContractRegistry:
                 f"Extension contract ({kind}, {version}) is already registered",
             )
 
+        # Check for canonical schema collision: extension cannot shadow or reuse a canonical contract's schema_ref
+        schema_ref = contract_entry.get("schema_ref")
+        if schema_ref:
+            if not isinstance(schema_ref, str) or not schema_ref.strip():
+                raise ValidationError("INVALID_SCHEMA_REFERENCE", "Extension schema_ref must be a non-empty string")
+            canonical_schemas = {c["schema_ref"] for c in self._contracts.values()}
+            if schema_ref in canonical_schemas:
+                raise ValidationError(
+                    "CANONICAL_SCHEMA_COLLISION",
+                    f"Extension contract ({kind}, {version}) cannot reuse canonical schema '{schema_ref}'",
+                )
+
+        # Check validation profile (mandatory, non-empty, and must be valid)
+        val_profile = contract_entry.get("validation_profile")
+        if not val_profile or not isinstance(val_profile, str) or not val_profile.strip():
+            raise ValidationError(
+                "INVALID_VALIDATION_PROFILE",
+                "Extension contract must declare a non-empty validation_profile",
+            )
+        profiles = self._doc.get("validation_layer_profiles", {})
+        if val_profile not in profiles and val_profile not in ("FOUNDATION", "IDENTITY", "DERIVED", "STRUCTURAL", "EPISTEMIC", "FINALIZATION", "GOVERNANCE", "RAW"):
+            raise ValidationError(
+                "INVALID_VALIDATION_PROFILE",
+                f"Validation profile '{val_profile}' is not registered",
+            )
+
         if "canonical_role" in contract_entry:
-            self.role(contract_entry["canonical_role"])
+            role = contract_entry["canonical_role"]
+            if role in ("TRUST_ROOT", "CANONICAL_FOUNDATION"):
+                raise ValidationError(
+                    "UNAUTHORIZED_EXTENSION_ROLE",
+                    f"Extension contract cannot declare {role} canonical role",
+                )
+            self.role(role)
 
         self._extension_contracts[(kind, version)] = deepcopy(contract_entry)
 

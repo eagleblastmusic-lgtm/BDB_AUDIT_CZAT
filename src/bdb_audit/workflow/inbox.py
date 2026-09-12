@@ -69,9 +69,10 @@ def _command_id(seed: str) -> str:
 
 
 def _external_ref(kind: str, val: str, ref_class: str = "CONTENT_OR_PRIOR") -> dict[str, Any]:
+    preimage = f"BDB2/{kind}/1\0".encode("ascii") + canonical_bytes({"reference_id": val})
     return {
         "kind": kind,
-        "revision_digest": hashlib.sha256(val.encode("utf-8")).hexdigest(),
+        "revision_digest": hashlib.sha256(preimage).hexdigest(),
         "digest_profile": "BDB-OBJECT-DIGEST-1",
         "schema_revision_ref": f"BDB_TARGET/{kind}",
         "ref_class": ref_class,

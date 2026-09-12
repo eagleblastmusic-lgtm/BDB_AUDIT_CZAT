@@ -1,9 +1,9 @@
 """Comprehensive adversarial test suite for Etap 1: Canonical Authority Foundation.
 
 Covers:
-- D09: Layered validation & elimination of False Validation PASS (T01 - T10)
-- D12: Migration to canonical domain-separated ObjectDigest (T11 - T12)
-- D16: Pinned ContractRegistry immutability & runtime override defense (T13 - T15)
+- D09: Layered validation & elimination of False Validation PASS (10 mandatory negative controls + parse/inbox)
+- D12: Migration to canonical domain-separated ObjectDigest & mechanical inventory test
+- D16: Pinned ContractRegistry immutability & runtime override defense
 """
 from __future__ import annotations
 
@@ -37,6 +37,7 @@ from bdb_audit.orchestration.e3_reveal import (
     E3RevealEvent,
     FalseNegativeRelationshipAssessment,
 )
+from bdb_audit.orchestration.e3_gate import E3StageCompletionCandidate
 from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
 from bdb_audit.workflow.source_target import ResolvedSource
 from bdb_audit.workflow.packaging import prepare_e1_batch
@@ -45,7 +46,271 @@ from bdb_audit.history.store import TransactionalHistoryStore
 
 
 # ============================================================================
-# D09: LAYERED VALIDATION & ELIMINATION OF FALSE VALIDATION PASS (T01 - T10)
+# D09: 10 MANDATORY NEGATIVE CONTROLS (CTRL 01 - CTRL 10)
+# ============================================================================
+
+def _make_sample_campaign_genesis(cid: str = "CAMP-CORRECT-100") -> dict:
+    """Helper creating a schema-valid campaign_genesis body dictionary."""
+    return {
+        "kind": "campaign_genesis",
+        "version": "1",
+        "campaign_id": cid,
+        "input_history_cut": {"campaign_id": cid, "commit_seq": 0, "commit_hash": "0" * 64},
+        "bootstrap_admission_decision_ref": {
+            "kind": "bootstrap_admission_decision",
+            "revision_digest": "0" * 64,
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::bootstrap_admission_decision/1",
+            "ref_class": "PRIOR_ACCEPTED_ONLY",
+        },
+        "source_generation_ref": {
+            "kind": "source_generation",
+            "revision_digest": "0" * 64,
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::source_generation/1",
+            "ref_class": "CONTENT_OR_PRIOR",
+        },
+        "application_generation_ref": {
+            "kind": "external_profile_ref",
+            "revision_digest": "0" * 64,
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::external_profile_ref/1",
+            "ref_class": "PINNED_PROFILE_REF",
+        },
+        "protocol_policy_bundle_ref": {
+            "kind": "external_profile_ref",
+            "revision_digest": "0" * 64,
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::external_profile_ref/1",
+            "ref_class": "PINNED_PROFILE_REF",
+        },
+        "schema_set_ref": {
+            "kind": "external_profile_ref",
+            "revision_digest": "0" * 64,
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::external_profile_ref/1",
+            "ref_class": "PINNED_PROFILE_REF",
+        },
+        "owner_operator_authority_ref": {
+            "kind": "external_profile_ref",
+            "revision_digest": "0" * 64,
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::external_profile_ref/1",
+            "ref_class": "PINNED_INSTALLATION_REF",
+        },
+        "trust_profile_ref": {
+            "kind": "external_profile_ref",
+            "revision_digest": "0" * 64,
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::external_profile_ref/1",
+            "ref_class": "PINNED_INSTALLATION_REF",
+        },
+        "legacy_origin_refs": [],
+    }
+
+
+def test_d09_ctrl01_schema_valid_without_context_admissible_false():
+    """Ctrl 01: Schema-valid artifact without context yields admissible == False and missing L5."""
+    api = AuditOperationApi()
+    e1_spec = initial_stage_specs()[0]
+    art = {"kind": "stage_spec", "version": "1", **e1_spec.body()}
+
+    res = api.validate_artifact(art)
+    assert res["structural_validation"] == "PASS"
+    assert res["status"] == "PASS"
+    assert res["admissible"] is False
+    assert res["admission_status"] == "NOT_ADMITTED"
+    assert "L5" in res["missing_validation_layers"]
+
+
+def test_d09_ctrl02_wrong_campaign_in_context_rejected():
+    """Ctrl 02: Wrong campaign in context raises CAMPAIGN_BINDING_MISMATCH."""
+    api = AuditOperationApi()
+    art = _make_sample_campaign_genesis("CAMP-ACTUAL-100")
+
+    with pytest.raises(ValidationError) as exc_info:
+        api.validate_artifact(art, context={"campaign_id": "CAMP-WRONG-999"})
+    assert exc_info.value.code == "CAMPAIGN_BINDING_MISMATCH"
+
+
+def test_d09_ctrl03_wrong_source_generation_ref_rejected():
+    """Ctrl 03: Wrong source generation ref in context raises SOURCE_BINDING_MISMATCH."""
+    api = AuditOperationApi()
+    art = _make_sample_campaign_genesis("CAMP-ACTUAL-100")
+
+    with pytest.raises(ValidationError) as exc_info:
+        api.validate_artifact(
+            art,
+            context={
+                "campaign_id": "CAMP-ACTUAL-100",
+                "source_generation_ref": {"revision_digest": "1" * 64},
+            },
+        )
+    assert exc_info.value.code == "SOURCE_BINDING_MISMATCH"
+
+
+def test_d09_ctrl04_stale_wrong_history_cut_rejected():
+    """Ctrl 04: Stale or mismatched history cut raises STALE_HISTORY_CUT."""
+    api = AuditOperationApi()
+    art = _make_sample_campaign_genesis("CAMP-ACTUAL-100")
+
+    with pytest.raises(ValidationError) as exc_info:
+        api.validate_artifact(
+            art,
+            context={
+                "campaign_id": "CAMP-ACTUAL-100",
+                "history_cut": {"commit_seq": 999},  # Artifact has commit_seq: 0
+            },
+        )
+    assert exc_info.value.code == "STALE_HISTORY_CUT"
+
+
+def test_d09_ctrl05_wrong_policy_binding_rejected():
+    """Ctrl 05: Wrong policy binding in context raises POLICY_BINDING_MISMATCH."""
+    api = AuditOperationApi()
+    # Construct an artifact containing a policy ref
+    art = {
+        "kind": "challenger_assignment",
+        "version": "1",
+        "challenge_assignment_id": "ca_pol_ctrl",
+        "candidate_assurance_case_ref": {
+            "kind": "candidate_assurance_case",
+            "revision_digest": "0" * 64,
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::candidate_assurance_case/1",
+            "ref_class": "CONTENT_OR_PRIOR",
+        },
+        "challenger_type": "FALSE_POSITIVE_SKEPTIC",
+        "challenge_scope": "ALL_CLAIMS",
+        "challenge_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0" * 64,
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::policy_revision/1",
+            "ref_class": "CONTENT_OR_PRIOR",
+        },
+        "executor_profile_ref": {
+            "kind": "executor_spec",
+            "revision_digest": "0" * 64,
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::executor_spec/1",
+            "ref_class": "CONTENT_OR_PRIOR",
+        },
+        "assignment_input_history_cut": {"campaign_id": "c", "commit_seq": 1, "commit_hash": "0" * 64},
+    }
+
+    with pytest.raises(ValidationError) as exc_info:
+        api.validate_artifact(
+            art,
+            context={
+                "campaign_id": "c",
+                "governing_policy_ref": {"revision_digest": "f" * 64},
+            },
+        )
+    assert exc_info.value.code == "POLICY_BINDING_MISMATCH"
+
+
+def test_d09_ctrl06_unresolved_typed_reference_rejected():
+    """Ctrl 06: Unresolved typed reference target kind raises UNRESOLVED_REFERENCE_TARGET."""
+    validator = LayeredValidator()
+    bad_target_ref = {
+        "kind": "completely_unregistered_ghost_kind",
+        "revision_digest": "0" * 64,
+        "digest_profile": "BDB-OBJECT-DIGEST-1",
+        "schema_revision_ref": "BDB_SCHEMA_REGISTRY::stage_spec/1",
+        "ref_class": "CONTENT_OR_PRIOR",
+    }
+    with pytest.raises(ValidationError) as exc_info:
+        validator._typed_refs({"ref": bad_target_ref})
+    assert exc_info.value.code == "UNRESOLVED_REFERENCE_TARGET"
+
+
+def test_d09_ctrl07_invalid_schema_revision_ref_syntax_or_mismatch():
+    """Ctrl 07: Invalid schema_revision_ref raises INVALID_SCHEMA_REFERENCE or TYPED_REF_TARGET_MISMATCH."""
+    validator = LayeredValidator()
+
+    # Subcase A: empty or whitespace schema_revision_ref
+    bad_syntax_ref = {
+        "kind": "stage_spec",
+        "revision_digest": "0" * 64,
+        "digest_profile": "BDB-OBJECT-DIGEST-1",
+        "schema_revision_ref": "   ",
+        "ref_class": "CONTENT_OR_PRIOR",
+    }
+    with pytest.raises(ValidationError) as exc_syntax:
+        validator._typed_refs({"ref": bad_syntax_ref})
+    assert exc_syntax.value.code == "INVALID_SCHEMA_REFERENCE"
+
+    # Subcase B: mismatch between target kind and schema_revision_ref
+    mismatch_ref = {
+        "kind": "stage_spec",
+        "revision_digest": "0" * 64,
+        "digest_profile": "BDB-OBJECT-DIGEST-1",
+        "schema_revision_ref": "BDB_SCHEMA_REGISTRY::other_incompatible_spec/1",
+        "ref_class": "CONTENT_OR_PRIOR",
+    }
+    with pytest.raises(ValidationError) as exc_mismatch:
+        validator._typed_refs({"ref": mismatch_ref})
+    assert exc_mismatch.value.code == "TYPED_REF_TARGET_MISMATCH"
+
+
+def test_d09_ctrl08_valid_digest_pointing_to_incompatible_target_kind():
+    """Ctrl 08: Digest pointing to incompatible target kind raises TYPED_REF_TARGET_MISMATCH or OBJECT_DIGEST_MISMATCH."""
+    validator = LayeredValidator()
+    e1_spec = initial_stage_specs()[0]
+    raw = canonical_bytes(e1_spec.body())
+
+    # Subcase A: incompatible expected schema ref
+    with pytest.raises(ValidationError) as exc_schema:
+        validator.validate("stage_spec", raw, expected_schema_ref="BDB_SCHEMA_REGISTRY::wrong_schema/1")
+    assert exc_schema.value.code == "TYPED_REF_TARGET_MISMATCH"
+
+    # Subcase B: valid 64-char hex digest that does not match the actual canonical object digest
+    with pytest.raises(ValidationError) as exc_digest:
+        validator.validate("stage_spec", raw, expected_digest="0" * 64)
+    assert exc_digest.value.code == "OBJECT_DIGEST_MISMATCH"
+
+
+def test_d09_ctrl09_missing_required_validation_layers():
+    """Ctrl 09: Missing contract-required validation layer is reported in missing_validation_layers."""
+    api = AuditOperationApi()
+    e1_spec = initial_stage_specs()[0]
+    art = {"kind": "stage_spec", "version": "1", **e1_spec.body()}
+
+    # stage_spec requires L3, L4, L5
+    res = api.validate_artifact(art)
+    assert "L5" in res["required_validation_layers"]
+    assert "L5" not in res["executed_validation_layers"]
+    assert "L5" in res["missing_validation_layers"]
+    assert res["admissible"] is False
+    assert res["admission_status"] == "NOT_ADMITTED"
+
+
+def test_d09_ctrl10_structural_validation_pass_but_admission_false():
+    """Ctrl 10: Structural validation is PASS, but admission is False when context/layers are incomplete."""
+    api = AuditOperationApi()
+    e1_spec = initial_stage_specs()[0]
+    art = {"kind": "stage_spec", "version": "1", **e1_spec.body()}
+
+    # Without required context: structural is PASS, but admissible is False
+    res_no_ctx = api.validate_artifact(art)
+    assert res_no_ctx["status"] == "PASS"
+    assert res_no_ctx["structural_validation"] == "PASS"
+    assert res_no_ctx["admissible"] is False
+    assert res_no_ctx["admission_status"] == "NOT_ADMITTED"
+    assert len(res_no_ctx["missing_validation_layers"]) > 0
+
+    # With full context matching required layers: both structural and admission PASS
+    res_admitted = api.validate_artifact(art, context={"stage_key": "E1", "qualified_layers": ["L5"]})
+    assert res_admitted["status"] == "PASS"
+    assert res_admitted["structural_validation"] == "PASS"
+    assert res_admitted["admissible"] is True
+    assert res_admitted["admission_status"] == "ADMITTED"
+    assert len(res_admitted["missing_validation_layers"]) == 0
+
+
+# ============================================================================
+# D09: PARSE, INTEGRITY & INBOX CONTROLS
 # ============================================================================
 
 def test_t01_schema_violation_rejected_fail_closed(tmp_path: Path):
@@ -55,7 +320,6 @@ def test_t01_schema_violation_rejected_fail_closed(tmp_path: Path):
         "kind": "stage_spec",
         "version": "1",
         "stage_key": "E1",
-        # Missing all other required fields of stage_spec
     }
     art_file = tmp_path / "incomplete.json"
     art_file.write_text(json.dumps(incomplete_art), encoding="utf-8")
@@ -71,7 +335,6 @@ def test_t02_duplicate_keys_rejected_before_schema(tmp_path: Path):
     e1_spec = initial_stage_specs()[0]
     body = e1_spec.body()
 
-    # Raw bytes containing a duplicate key
     raw_dup = (
         b'{"kind": "stage_spec", "version": "1", "stage_key": "E1", "stage_key": "E2", '
         + canonical_bytes(body)[1:]
@@ -128,62 +391,6 @@ def test_t05_expected_kind_mismatch_rejected(tmp_path: Path):
     assert exc_info.value.code == "ARTIFACT_KIND_MISMATCH"
 
 
-def test_t06_invalid_typed_ref_syntax_rejected():
-    """T06: Typed ref with non-hex, uppercase, or invalid length digest is rejected fail-closed."""
-    validator = LayeredValidator()
-
-    # Upper case in revision_digest
-    bad_ref_upper = {
-        "kind": "stage_spec",
-        "revision_digest": "A" * 64,
-        "digest_profile": "BDB-OBJECT-DIGEST-1",
-        "schema_revision_ref": "BDB_SCHEMA_REGISTRY::stage_spec/1",
-        "ref_class": "CONTENT_OR_PRIOR",
-    }
-    with pytest.raises(ValidationError) as exc_upper:
-        validator._typed_refs({"ref": bad_ref_upper})
-    assert exc_upper.value.code in ("INVALID_DIGEST", "INVALID_TYPED_REF_DIGEST")
-
-    # Invalid length (63 characters)
-    bad_ref_short = {
-        "kind": "stage_spec",
-        "revision_digest": "a" * 63,
-        "digest_profile": "BDB-OBJECT-DIGEST-1",
-        "schema_revision_ref": "BDB_SCHEMA_REGISTRY::stage_spec/1",
-        "ref_class": "CONTENT_OR_PRIOR",
-    }
-    with pytest.raises(ValidationError) as exc_short:
-        validator._typed_refs({"ref": bad_ref_short})
-    assert exc_short.value.code in ("INVALID_DIGEST", "INVALID_TYPED_REF_DIGEST")
-
-    # Non-hex characters
-    bad_ref_nonhex = {
-        "kind": "stage_spec",
-        "revision_digest": "g" * 64,
-        "digest_profile": "BDB-OBJECT-DIGEST-1",
-        "schema_revision_ref": "BDB_SCHEMA_REGISTRY::stage_spec/1",
-        "ref_class": "CONTENT_OR_PRIOR",
-    }
-    with pytest.raises(ValidationError) as exc_nonhex:
-        validator._typed_refs({"ref": bad_ref_nonhex})
-    assert exc_nonhex.value.code in ("INVALID_DIGEST", "INVALID_TYPED_REF_DIGEST")
-
-
-def test_t07_unregistered_typed_ref_target_rejected():
-    """T07: Typed ref pointing to an unregistered target kind is rejected fail-closed."""
-    validator = LayeredValidator()
-    bad_target_ref = {
-        "kind": "completely_unregistered_target_kind",
-        "revision_digest": "0" * 64,
-        "digest_profile": "BDB-OBJECT-DIGEST-1",
-        "schema_revision_ref": "BDB_SCHEMA_REGISTRY::stage_spec/1",
-        "ref_class": "CONTENT_OR_PRIOR",
-    }
-    with pytest.raises(ValidationError) as exc_info:
-        validator._typed_refs({"ref": bad_target_ref})
-    assert exc_info.value.code == "UNRESOLVED_REFERENCE_TARGET"
-
-
 def _setup_inbox(tmp_path: Path):
     store_path = tmp_path / "campaign.sqlite"
     api = AuditOperationApi()
@@ -236,7 +443,6 @@ def test_t10_inbox_schema_invalid_manifest_rejected(tmp_path: Path):
     """T10: Result inbox rejects submission ZIP whose MANIFEST fails schema validation."""
     store, batch, inbox = _setup_inbox(tmp_path)
     job = batch.get_job("E1-A")
-    # Missing required 'source_commit_sha' and invalid lane_slot
     manifest = {
         "kind": "bdb_audit_lane_result",
         "version": "1",
@@ -259,11 +465,11 @@ def test_t10_inbox_schema_invalid_manifest_rejected(tmp_path: Path):
 
 
 # ============================================================================
-# D12: OBJECTDIGEST DOMAIN SEPARATION & PRODUCER MIGRATION (T11 - T12)
+# D12: OBJECTDIGEST DOMAIN SEPARATION & PRODUCER MIGRATION
 # ============================================================================
 
-def test_t11_object_digest_domain_separation():
-    """T11: ObjectDigest is domain-separated (BDB2/<kind>/<version>\\0) and distinct from raw SHA-256."""
+def test_d12_object_digest_domain_separation():
+    """D12.1: ObjectDigest is domain-separated (BDB2/<kind>/<version>\\0) and distinct from raw SHA-256."""
     e1_spec = initial_stage_specs()[0]
     body = e1_spec.body()
 
@@ -284,8 +490,8 @@ def test_t11_object_digest_domain_separation():
     assert domain_obj_digest == hasher.hexdigest()
 
 
-def test_t12_all_authority_bearing_producers_produce_canonical_object_digest():
-    """T12: All migrated authority-bearing producers match CanonicalObject.digest."""
+def test_d12_all_authority_bearing_producers_produce_canonical_object_digest():
+    """D12.2: All registered authority-bearing producers match CanonicalObject.digest."""
     # 1. stage_spec
     e1_spec = initial_stage_specs()[0]
     assert e1_spec.as_object().digest == object_digest("stage_spec", "1", e1_spec.body(), registry_kind="stage_spec").value
@@ -476,58 +682,241 @@ def test_t12_all_authority_bearing_producers_produce_canonical_object_digest():
     assert fna.digest == expected_fna_digest
     assert fna.ref["revision_digest"] == expected_fna_digest
 
+    # 15. E3StageCompletionCandidate
+    e3_cand = E3StageCompletionCandidate(
+        stage_key="E3",
+        stage_spec_digest="0" * 64,
+        e2_completion_digest="0" * 64,
+        blind_checkpoint_digest=chk.digest,
+        positive_projection_digest=proj.digest,
+        blind_discoveries_count=3,
+        gap_discoveries_count=1,
+        fuzzing_executions_count=5,
+        differential_executions_count=5,
+        metamorphic_executions_count=5,
+        adjudicated_decisions_count=4,
+        open_obligations_count=0,
+        unknown_scope_count=0,
+        unsupported_scope_count=0,
+        multi_stage_false_negatives_count=0,
+        completion_digest="0" * 64,
+        gate_verdict="PASS",
+    )
+    expected_e3_digest = CanonicalObject("stage_completion", e3_cand.body()).digest
+    assert e3_cand.digest == expected_e3_digest
+    assert e3_cand.ref["revision_digest"] == expected_e3_digest
 
-# ============================================================================
-# D16: SECURED CONTRACT REGISTRY DEFENSE & IMMUTABILITY (T13 - T15)
-# ============================================================================
 
-def test_t13_registry_rejects_pinned_canonical_collision():
-    """T13: register_extension_contract raises CANONICAL_CONTRACT_COLLISION on pinned kind."""
+def test_d12_mechanical_inventory_classes_and_contracts():
+    """D12.3: Permanent mechanical inventory regression test verifying all registered authority kinds."""
     reg = ContractRegistry()
-    # Attempt to shadow/override pinned canonical contract 'stage_spec'
+    wire_contracts = reg._contracts
+
+    # 1. Verify that all registered wire contracts declare ObjectDigest / BDB-OBJECT-DIGEST-1
+    for key, contract in wire_contracts.items():
+        sem = contract.get("identity_semantics", "")
+        assert "BDB-OBJECT-DIGEST-1" in sem or "ObjectDigest" in sem, (
+            f"Contract {key} must declare ObjectDigest in identity_semantics"
+        )
+        assert "schema_ref" in contract, f"Contract {key} must declare schema_ref"
+
+    # 2. Mechanically assert that domain separation applies to sample bodies across representative kinds
+    sample_kinds = [
+        "stage_spec", "candidate_assurance_case", "challenger_assignment",
+        "challenger_result", "campaign_conclusion", "final_assurance_case",
+        "release_qualification", "successor_campaign_genesis",
+        "stage_completion", "checkpoint", "view_manifest",
+    ]
+    for kind in sample_kinds:
+        dummy_body = {"sample_field": "sample_value", "kind_test": kind}
+        c_obj = CanonicalObject(kind, dummy_body)
+        obj_dig = c_obj.digest
+
+        # Must be 64 lowercase hex
+        assert len(obj_dig) == 64
+        assert obj_dig == obj_dig.lower()
+
+        # Must NOT equal raw sha256
+        raw_sha = hashlib.sha256(canonical_bytes(dummy_body)).hexdigest()
+        assert obj_dig != raw_sha, f"Kind {kind} digest must be domain separated, not raw sha256"
+
+        # Must match exact domain preamble
+        expected_hasher = hashlib.sha256(f"BDB2/{kind}/1\0".encode("utf-8"))
+        expected_hasher.update(canonical_bytes(dummy_body))
+        assert obj_dig == expected_hasher.hexdigest()
+
+        # Check typed ref structure
+        t_ref = c_obj.ref.as_dict()
+        assert t_ref["kind"] == kind
+        assert t_ref["revision_digest"] == obj_dig
+        assert t_ref["digest_profile"] == "BDB-OBJECT-DIGEST-1"
+        assert t_ref["schema_revision_ref"] == reg.contract(kind, "1")["schema_ref"]
+        assert t_ref["ref_class"] in reg.document["reference_class_semantics"]
+
+
+# ============================================================================
+# D16: SECURED CONTRACT REGISTRY DEFENSE & IMMUTABILITY
+# ============================================================================
+
+def test_d16_canonical_contract_collision():
+    """D16.1: register_extension_contract raises CANONICAL_CONTRACT_COLLISION on pinned canonical kind."""
+    reg = ContractRegistry()
     colliding_entry = {
         "kind": "stage_spec",
         "version": "1",
         "authoritative_for": "malicious override",
-        "canonical_role": "PROPOSAL",
+        "canonical_role": "FACT",
+        "validation_profile": "STRUCTURAL",
     }
     with pytest.raises(ValidationError) as exc_info:
         reg.register_extension_contract(colliding_entry)
     assert exc_info.value.code == "CANONICAL_CONTRACT_COLLISION"
 
 
-def test_t14_registry_rejects_duplicate_extension_registration():
-    """T14: register_extension_contract raises DUPLICATE_EXTENSION_CONTRACT on duplicate key."""
+def test_d16_duplicate_extension_registration():
+    """D16.2: register_extension_contract raises DUPLICATE_EXTENSION_CONTRACT on duplicate key."""
     reg = ContractRegistry()
     new_ext = {
         "kind": "custom_extension_artifact",
         "version": "1",
         "authoritative_for": "custom analysis",
         "canonical_role": "FACT",
+        "validation_profile": "STRUCTURAL",
     }
-    # First registration succeeds
     reg.register_extension_contract(new_ext)
     assert reg.contract("custom_extension_artifact", "1")["kind"] == "custom_extension_artifact"
 
-    # Second registration with identical key must fail closed
     with pytest.raises(ValidationError) as exc_info:
         reg.register_extension_contract(new_ext)
     assert exc_info.value.code == "DUPLICATE_EXTENSION_CONTRACT"
 
 
-def test_t15_registry_properties_immutable_and_pinned():
-    """T15: registry_digest, registry_id, registry_version are immutable and byte-pinned."""
+def test_d16_canonical_schema_collision():
+    """D16.3: register_extension_contract raises CANONICAL_SCHEMA_COLLISION when reusing canonical schema."""
+    reg = ContractRegistry()
+    canonical_schema = reg.contract("stage_spec", "1")["schema_ref"]
+
+    colliding_schema_ext = {
+        "kind": "custom_extension_shadow",
+        "version": "1",
+        "authoritative_for": "shadowing test",
+        "canonical_role": "FACT",
+        "validation_profile": "STRUCTURAL",
+        "schema_ref": canonical_schema,
+    }
+    with pytest.raises(ValidationError) as exc_info:
+        reg.register_extension_contract(colliding_schema_ext)
+    assert exc_info.value.code == "CANONICAL_SCHEMA_COLLISION"
+
+
+def test_d16_invalid_validation_profile():
+    """D16.4: register_extension_contract raises INVALID_VALIDATION_PROFILE on missing or invalid profile."""
+    reg = ContractRegistry()
+
+    # Missing profile
+    no_profile_ext = {
+        "kind": "ext_no_profile",
+        "version": "1",
+        "authoritative_for": "test",
+        "canonical_role": "FACT",
+    }
+    with pytest.raises(ValidationError) as exc_none:
+        reg.register_extension_contract(no_profile_ext)
+    assert exc_none.value.code == "INVALID_VALIDATION_PROFILE"
+
+    # Empty profile
+    empty_profile_ext = {
+        "kind": "ext_empty_profile",
+        "version": "1",
+        "authoritative_for": "test",
+        "canonical_role": "FACT",
+        "validation_profile": "   ",
+    }
+    with pytest.raises(ValidationError) as exc_empty:
+        reg.register_extension_contract(empty_profile_ext)
+    assert exc_empty.value.code == "INVALID_VALIDATION_PROFILE"
+
+    # Unknown profile
+    bogus_profile_ext = {
+        "kind": "ext_bogus_profile",
+        "version": "1",
+        "authoritative_for": "test",
+        "canonical_role": "FACT",
+        "validation_profile": "NON_EXISTENT_PROFILE_BOGUS",
+    }
+    with pytest.raises(ValidationError) as exc_bogus:
+        reg.register_extension_contract(bogus_profile_ext)
+    assert exc_bogus.value.code == "INVALID_VALIDATION_PROFILE"
+
+
+def test_d16_unauthorized_extension_roles():
+    """D16.5: register_extension_contract raises UNAUTHORIZED_EXTENSION_ROLE on TRUST_ROOT or CANONICAL_FOUNDATION."""
+    reg = ContractRegistry()
+
+    # TRUST_ROOT role is forbidden
+    trust_root_ext = {
+        "kind": "ext_trust_root",
+        "version": "1",
+        "authoritative_for": "test",
+        "canonical_role": "TRUST_ROOT",
+        "validation_profile": "STRUCTURAL",
+    }
+    with pytest.raises(ValidationError) as exc_trust:
+        reg.register_extension_contract(trust_root_ext)
+    assert exc_trust.value.code == "UNAUTHORIZED_EXTENSION_ROLE"
+
+    # CANONICAL_FOUNDATION role is forbidden
+    foundation_ext = {
+        "kind": "ext_foundation",
+        "version": "1",
+        "authoritative_for": "test",
+        "canonical_role": "CANONICAL_FOUNDATION",
+        "validation_profile": "STRUCTURAL",
+    }
+    with pytest.raises(ValidationError) as exc_foundation:
+        reg.register_extension_contract(foundation_ext)
+    assert exc_foundation.value.code == "UNAUTHORIZED_EXTENSION_ROLE"
+
+
+def test_d16_extension_without_schema_binding_fails_closed():
+    """D16.6: Extension contract without bound schema fails closed with SCHEMA_BYTES_NOT_BOUND on admission path."""
+    reg = ContractRegistry()
+    unbound_ext = {
+        "kind": "unbound_extension_artifact",
+        "version": "1",
+        "authoritative_for": "test unbound",
+        "canonical_role": "FACT",
+        "validation_profile": "STRUCTURAL",
+        "schema_ref": "BDB_SCHEMA_REGISTRY::unbound_custom/1",
+    }
+    reg.register_extension_contract(unbound_ext)
+
+    # LayeredValidator fails closed
+    validator = LayeredValidator(registry=reg)
+    with pytest.raises(ValidationError) as exc_val:
+        validator.validate("unbound_extension_artifact", b'{"test": 123}')
+    assert exc_val.value.code == "SCHEMA_BYTES_NOT_BOUND"
+
+    # AuditOperationApi.validate_artifact fails closed
+    api = AuditOperationApi(registry=reg)
+    with pytest.raises(ValidationError) as exc_api:
+        api.validate_artifact({"kind": "unbound_extension_artifact", "version": "1", "test": 123})
+    assert exc_api.value.code == "SCHEMA_BYTES_NOT_BOUND"
+
+
+def test_d16_registry_properties_immutable_and_pinned():
+    """D16.7: registry_digest, registry_id, registry_version are immutable and byte-pinned."""
     reg = ContractRegistry()
     assert reg.registry_id == REGISTRY_ID
     assert reg.registry_version == REGISTRY_VERSION
     assert reg.registry_digest == REGISTRY_SHA256
 
-    # Registering an extension contract does NOT mutate pinned identity
     new_ext = {
         "kind": "innocent_extension",
         "version": "1",
         "authoritative_for": "test",
         "canonical_role": "FACT",
+        "validation_profile": "STRUCTURAL",
     }
     reg.register_extension_contract(new_ext)
 
