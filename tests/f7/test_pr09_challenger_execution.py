@@ -19,8 +19,8 @@ from bdb_audit.schemas.foundation import executable_schema
 def candidate_and_context():
     hcut = {
         "campaign_id": "CAMP-001",
-        "commit_seq": 15,
-        "commit_hash": "a" * 64,
+        "accepted_head_seq": 15,
+        "accepted_head_hash": "a" * 64,
     }
     camp_ref = {
         "kind": "campaign_genesis",
@@ -65,8 +65,8 @@ def candidate_and_context():
 
 def test_valid_challenger_assignments_and_results_schema(candidate_and_context):
     cac, hcut = candidate_and_context
-    assign_cut = {"campaign_id": "CAMP-001", "commit_seq": 16, "commit_hash": "b" * 64}
-    res_cut = {"campaign_id": "CAMP-001", "commit_seq": 17, "commit_hash": "c" * 64}
+    assign_cut = {"campaign_id": "CAMP-001", "accepted_head_seq": 16, "accepted_head_hash": "b" * 64}
+    res_cut = {"campaign_id": "CAMP-001", "accepted_head_seq": 17, "accepted_head_hash": "c" * 64}
 
     pol_ref = {
         "kind": "policy_revision",
@@ -83,7 +83,6 @@ def test_valid_challenger_assignments_and_results_schema(candidate_and_context):
         "ref_class": "HISTORY_CONTEXT_BINDING",
     }
 
-    # E5-B1 Skeptic Assignment
     asgn_skeptic = ChallengerAssignment(
         challenge_assignment_id="asgn_sk_01",
         candidate_assurance_case_ref=cac.ref,
@@ -95,7 +94,6 @@ def test_valid_challenger_assignments_and_results_schema(candidate_and_context):
     )
     Draft202012Validator(executable_schema("challenger_assignment")).validate(asgn_skeptic.body())
 
-    # E5-B1 Skeptic Result
     res_skeptic = ChallengerResult(
         challenger_result_id="res_sk_01",
         challenge_assignment_ref=asgn_skeptic.ref,
@@ -106,7 +104,6 @@ def test_valid_challenger_assignments_and_results_schema(candidate_and_context):
     )
     Draft202012Validator(executable_schema("challenger_result")).validate(res_skeptic.body())
 
-    # E5-B2 Hunter Assignment
     asgn_hunter = ChallengerAssignment(
         challenge_assignment_id="asgn_hu_01",
         candidate_assurance_case_ref=cac.ref,
@@ -118,7 +115,6 @@ def test_valid_challenger_assignments_and_results_schema(candidate_and_context):
     )
     Draft202012Validator(executable_schema("challenger_assignment")).validate(asgn_hunter.body())
 
-    # E5-B2 Hunter Result
     res_hunter = ChallengerResult(
         challenger_result_id="res_hu_01",
         challenge_assignment_ref=asgn_hunter.ref,
@@ -129,17 +125,36 @@ def test_valid_challenger_assignments_and_results_schema(candidate_and_context):
     )
     Draft202012Validator(executable_schema("challenger_result")).validate(res_hunter.body())
 
-    # Both valid -> StageCompletion eligible!
     eligible, reasons = E5ChallengerOrchestrator.validate_challenger_results_pair(
-        cac, res_skeptic, res_hunter
+        cac,
+        res_skeptic,
+        res_hunter,
+        skeptic_assignment=asgn_skeptic,
+        hunter_assignment=asgn_hunter,
     )
     assert eligible is True
     assert "BOTH_BASELINE_CHALLENGERS_QUALIFIED" in reasons
 
 
+def test_result_only_pair_cannot_self_qualify(candidate_and_context):
+    cac, _ = candidate_and_context
+    assign_cut = {"campaign_id": "CAMP-001", "accepted_head_seq": 16, "accepted_head_hash": "b" * 64}
+    res_cut = {"campaign_id": "CAMP-001", "accepted_head_seq": 17, "accepted_head_hash": "c" * 64}
+    pol_ref = {"kind": "policy_revision", "revision_digest": "p" * 64}
+    exec_ref = {"kind": "executor_spec", "revision_digest": "e" * 64}
+    sk = ChallengerAssignment("asgn_sk", cac.ref, "FALSE_POSITIVE_SKEPTIC", "ALL", pol_ref, exec_ref, assign_cut)
+    hu = ChallengerAssignment("asgn_hu", cac.ref, "FALSE_NEGATIVE_HUNTER", "ALL", pol_ref, exec_ref, assign_cut)
+    sk_result = ChallengerResult("res_sk", sk.ref, cac.ref, res_cut, "NO_MATERIAL_COUNTEREVIDENCE")
+    hu_result = ChallengerResult("res_hu", hu.ref, cac.ref, res_cut, "NO_MATERIAL_COUNTEREVIDENCE")
+
+    eligible, reasons = E5ChallengerOrchestrator.validate_challenger_results_pair(cac, sk_result, hu_result)
+    assert eligible is False
+    assert "MISSING_CHALLENGER_ASSIGNMENT_CONTEXT" in reasons
+
+
 def test_different_candidate_revision_rejected(candidate_and_context):
     cac, hcut = candidate_and_context
-    res_cut = {"campaign_id": "CAMP-001", "commit_seq": 17, "commit_hash": "c" * 64}
+    res_cut = {"campaign_id": "CAMP-001", "accepted_head_seq": 17, "accepted_head_hash": "c" * 64}
     asgn_ref = {"kind": "challenger_assignment", "revision_digest": "asgn"}
 
     res_skeptic = ChallengerResult(
@@ -156,7 +171,7 @@ def test_different_candidate_revision_rejected(candidate_and_context):
     res_hunter = ChallengerResult(
         challenger_result_id="res_hu",
         challenge_assignment_ref=asgn_ref,
-        candidate_assurance_case_ref=other_cac_ref,  # Different!
+        candidate_assurance_case_ref=other_cac_ref,
         result_input_history_cut=res_cut,
         status="NO_MATERIAL_COUNTEREVIDENCE",
     )
@@ -170,10 +185,9 @@ def test_different_candidate_revision_rejected(candidate_and_context):
 
 def test_candidate_revision_change_invalidates_both(candidate_and_context):
     cac, hcut = candidate_and_context
-    res_cut = {"campaign_id": "CAMP-001", "commit_seq": 17, "commit_hash": "c" * 64}
+    res_cut = {"campaign_id": "CAMP-001", "accepted_head_seq": 17, "accepted_head_hash": "c" * 64}
     asgn_ref = {"kind": "challenger_assignment", "revision_digest": "asgn"}
 
-    # Results referencing old candidate
     old_ref = dict(cac.ref)
     old_ref["revision_digest"] = "old_candidate_digest"
 
@@ -192,7 +206,6 @@ def test_candidate_revision_change_invalidates_both(candidate_and_context):
         status="NO_MATERIAL_COUNTEREVIDENCE",
     )
 
-    # Now evaluate against new current candidate
     eligible, reasons = E5ChallengerOrchestrator.validate_challenger_results_pair(
         cac, res_skeptic, res_hunter
     )
@@ -202,7 +215,7 @@ def test_candidate_revision_change_invalidates_both(candidate_and_context):
 
 def test_only_one_challenger_blocks_stage_completion(candidate_and_context):
     cac, hcut = candidate_and_context
-    res_cut = {"campaign_id": "CAMP-001", "commit_seq": 17, "commit_hash": "c" * 64}
+    res_cut = {"campaign_id": "CAMP-001", "accepted_head_seq": 17, "accepted_head_hash": "c" * 64}
     asgn_ref = {"kind": "challenger_assignment", "revision_digest": "asgn"}
 
     res_skeptic = ChallengerResult(
@@ -214,7 +227,7 @@ def test_only_one_challenger_blocks_stage_completion(candidate_and_context):
     )
 
     eligible, reasons = E5ChallengerOrchestrator.validate_challenger_results_pair(
-        cac, res_skeptic, None  # Hunter missing!
+        cac, res_skeptic, None
     )
     assert eligible is False
     assert "MISSING_REQUIRED_CHALLENGER_ROLE" in reasons
@@ -222,8 +235,7 @@ def test_only_one_challenger_blocks_stage_completion(candidate_and_context):
 
 def test_temporal_boundary_assignment_before_candidate(candidate_and_context):
     cac, hcut = candidate_and_context
-    # Assignment with earlier cut than candidate
-    early_cut = {"campaign_id": "CAMP-001", "commit_seq": 10, "commit_hash": "early"}
+    early_cut = {"campaign_id": "CAMP-001", "accepted_head_seq": 10, "accepted_head_hash": "e" * 64}
     pol_ref = {"kind": "policy_revision", "revision_digest": "pol"}
     exec_ref = {"kind": "executor_spec", "revision_digest": "ex"}
 
@@ -238,4 +250,23 @@ def test_temporal_boundary_assignment_before_candidate(candidate_and_context):
     )
 
     with pytest.raises(ValidationError, match="TEMPORAL_ORDER_VIOLATION"):
+        E5ChallengerOrchestrator.validate_assignment_precedes_candidate(cac, assignment)
+
+
+def test_legacy_commit_seq_cut_cannot_qualify_challenger_order(candidate_and_context):
+    cac, _ = candidate_and_context
+    legacy_cut = {"campaign_id": "CAMP-001", "commit_seq": 16, "commit_hash": "b" * 64}
+    pol_ref = {"kind": "policy_revision", "revision_digest": "pol"}
+    exec_ref = {"kind": "executor_spec", "revision_digest": "ex"}
+    assignment = ChallengerAssignment(
+        challenge_assignment_id="asgn_legacy",
+        candidate_assurance_case_ref=cac.ref,
+        challenger_type="FALSE_POSITIVE_SKEPTIC",
+        challenge_scope="ALL",
+        challenge_policy_ref=pol_ref,
+        executor_profile_ref=exec_ref,
+        assignment_input_history_cut=legacy_cut,
+    )
+
+    with pytest.raises(ValidationError, match="NONCANONICAL_HISTORY_CUT"):
         E5ChallengerOrchestrator.validate_assignment_precedes_candidate(cac, assignment)

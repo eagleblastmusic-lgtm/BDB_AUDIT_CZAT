@@ -282,9 +282,12 @@ class AuditOperationApi:
         stage_id: str,
         stage_spec_revision: str = "1",
     ) -> dict[str, Any]:
-        """Validate baseline stage order and accept stage preparation."""
+        """Accept a StageSpec in baseline declaration order without treating preparation as completion."""
         path = Path(store_path).resolve()
         status = self.get_campaign_status(path)
+        if status.get("termination_state", "OPEN") != "OPEN":
+            raise ValidationError("CAMPAIGN_ALREADY_TERMINATED", "Cannot prepare a stage after campaign conclusion")
+
         store = TransactionalHistoryStore(path, registry=self.registry)
         coordinator = Coordinator(store)
         head = store.head()
@@ -301,12 +304,19 @@ class AuditOperationApi:
                 f"Expected next stage {expected_stage}, got {stage_key}",
             )
 
+        stage_ordinal = _BASELINE_STAGE_ORDER.index(stage_key) + 1
+        predecessor_requirements = (
+            (_BASELINE_STAGE_ORDER[stage_ordinal - 2],) if stage_ordinal > 1 else ()
+        )
         spec = StageSpec(
             stage_key=stage_key,
             stage_spec_revision=stage_spec_revision,
             stage_role=stage_key,
-            stage_ordinal=len(prepared_stages) + 1,
+            stage_ordinal=stage_ordinal,
             purpose=f"BDB {stage_key} operational stage",
+            predecessor_requirements=predecessor_requirements,
+            blind_reveal_phase_model="CONTROLLED",
+            transition_policy_ref="TRANSITION_PROFILE_V1",
         )
         spec_obj = spec.as_object()
 
@@ -491,10 +501,11 @@ class AuditOperationApi:
         }
 
     def continue_campaign(self, store_path: str | Path) -> dict[str, Any]:
-        """Evaluate campaign continuation and determine next required action."""
+        """Evaluate continuation from verified completed-stage history, not preparation alone."""
         status = self.get_campaign_status(store_path)
         stage = status["current_stage"]
-        prepared_stages = status["stages_prepared"]
+        prepared_stages = list(status["stages_prepared"])
+        completed_stages = set(status["stages_completed"])
         termination_state = status.get("termination_state", "OPEN")
 
         if termination_state == "COMPLETED":
@@ -504,13 +515,17 @@ class AuditOperationApi:
             action = "CAMPAIGN_TERMINATED_LIMITED"
             state = "COMPLETED_LIMITED"
         else:
-            next_stage = next((s for s in _BASELINE_STAGE_ORDER if s not in prepared_stages), None)
-            if next_stage:
-                action = f"PREPARE_STAGE_{next_stage}"
-                state = "READY_FOR_NEXT_STAGE"
-            else:
+            next_incomplete = next((s for s in _BASELINE_STAGE_ORDER if s not in completed_stages), None)
+            if next_incomplete is None:
                 action = "EVALUATE_STOP_GATE"
                 state = "READY_FOR_STOP_EVALUATION"
+            elif next_incomplete not in prepared_stages:
+                action = f"PREPARE_STAGE_{next_incomplete}"
+                state = "READY_FOR_NEXT_STAGE"
+            else:
+                action = "AWAITING_STAGE_COMPLETION"
+                state = "AWAITING_STAGE_COMPLETION"
+                stage = next_incomplete
 
         return {
             "status": "SUCCESS",

@@ -147,12 +147,23 @@ class E5ChallengerOrchestrator:
 
     @staticmethod
     def _cut_info(cut: Mapping[str, Any]) -> tuple[str, int, str]:
-        camp = str(cut.get("campaign_id", ""))
+        """Return canonical HistoryCut identity; legacy commit_seq fallbacks are forbidden."""
+        camp = cut.get("campaign_id")
         seq = cut.get("accepted_head_seq")
-        if seq is None:
-            seq = cut.get("commit_seq", 0)
-        h = str(cut.get("accepted_head_hash") or cut.get("commit_hash") or "")
-        return camp, int(seq), h
+        accepted_hash = cut.get("accepted_head_hash")
+        if not isinstance(camp, str) or not camp:
+            raise ValidationError("NONCANONICAL_HISTORY_CUT", "HistoryCut requires campaign_id")
+        if type(seq) is not int or seq < 0:
+            raise ValidationError(
+                "NONCANONICAL_HISTORY_CUT",
+                "HistoryCut requires accepted_head_seq; commit_seq fallback is forbidden",
+            )
+        if not isinstance(accepted_hash, str) or not accepted_hash:
+            raise ValidationError(
+                "NONCANONICAL_HISTORY_CUT",
+                "HistoryCut requires accepted_head_hash; commit_hash fallback is forbidden",
+            )
+        return camp, seq, accepted_hash
 
     @classmethod
     def validate_assignment_precedes_candidate(
@@ -160,7 +171,7 @@ class E5ChallengerOrchestrator:
         candidate: CandidateAssuranceCase,
         assignment: ChallengerAssignment,
     ) -> None:
-        """Enforce temporal boundary: Candidate must precede assignment in accepted history."""
+        """Enforce candidate binding and canonical temporal ordering."""
         cand_digest = candidate.digest()
         ref_digest = assignment.candidate_assurance_case_ref.get("revision_digest")
         if cand_digest != ref_digest:
@@ -170,7 +181,7 @@ class E5ChallengerOrchestrator:
             )
         cand_camp, c_seq, _ = cls._cut_info(candidate.candidate_input_history_cut)
         asgn_camp, a_seq, _ = cls._cut_info(assignment.assignment_input_history_cut)
-        if cand_camp and asgn_camp and cand_camp != asgn_camp:
+        if cand_camp != asgn_camp:
             raise ValidationError("CAMPAIGN_MISMATCH", f"Candidate campaign {cand_camp} != assignment {asgn_camp}")
         if a_seq < c_seq:
             raise ValidationError(
@@ -187,61 +198,67 @@ class E5ChallengerOrchestrator:
         skeptic_assignment: ChallengerAssignment | None = None,
         hunter_assignment: ChallengerAssignment | None = None,
     ) -> tuple[bool, list[str]]:
-        """Validate both baseline challenger results against the exact candidate revision.
-        
-        Returns (eligible, reason_codes).
+        """Validate both baseline challenger roles against one exact candidate revision.
+
+        A qualifying PASS requires the exact assignment objects.  Results alone cannot prove
+        challenger role, candidate binding, or assignment-before-result ordering.
         """
         reasons: list[str] = []
 
         if skeptic_result is None or hunter_result is None:
-            reasons.append("MISSING_REQUIRED_CHALLENGER_ROLE")
-            return False, reasons
+            return False, ["MISSING_REQUIRED_CHALLENGER_ROLE"]
 
         is_blocked = False
 
-        # Distinct results: must not be the exact same object or same result ID/digest
         if skeptic_result.challenger_result_id == hunter_result.challenger_result_id:
             reasons.append("DUPLICATE_CHALLENGER_RESULT")
             is_blocked = True
-
         if skeptic_result.digest() == hunter_result.digest():
             if "DUPLICATE_CHALLENGER_RESULT" not in reasons:
                 reasons.append("DUPLICATE_CHALLENGER_RESULT")
             is_blocked = True
 
-        # Distinct challenge assignments
         sk_asgn_ref = skeptic_result.challenge_assignment_ref.get("revision_digest")
         hu_asgn_ref = hunter_result.challenge_assignment_ref.get("revision_digest")
         if sk_asgn_ref and hu_asgn_ref and sk_asgn_ref == hu_asgn_ref:
             reasons.append("SAME_CHALLENGE_ASSIGNMENT")
             is_blocked = True
 
-        # If assignments provided, validate roles and candidate binding
-        if skeptic_assignment is not None:
+        if skeptic_assignment is None or hunter_assignment is None:
+            reasons.append("MISSING_CHALLENGER_ASSIGNMENT_CONTEXT")
+            is_blocked = True
+        else:
+            if skeptic_assignment.digest() == hunter_assignment.digest():
+                if "SAME_CHALLENGE_ASSIGNMENT" not in reasons:
+                    reasons.append("SAME_CHALLENGE_ASSIGNMENT")
+                is_blocked = True
+
             if skeptic_assignment.challenger_type != "FALSE_POSITIVE_SKEPTIC":
                 reasons.append("INVALID_SKEPTIC_ROLE")
                 is_blocked = True
-            cls.validate_assignment_precedes_candidate(candidate, skeptic_assignment)
-            if sk_asgn_ref != skeptic_assignment.digest():
-                reasons.append("RESULT_ASSIGNMENT_MISMATCH")
-                is_blocked = True
-            _, a_seq1, _ = cls._cut_info(skeptic_assignment.assignment_input_history_cut)
-            _, r_seq1, _ = cls._cut_info(skeptic_result.result_input_history_cut)
-            if r_seq1 < a_seq1:
-                reasons.append("RESULT_PRECEDES_ASSIGNMENT")
-                is_blocked = True
-
-        if hunter_assignment is not None:
             if hunter_assignment.challenger_type != "FALSE_NEGATIVE_HUNTER":
                 reasons.append("INVALID_HUNTER_ROLE")
                 is_blocked = True
+
+            cls.validate_assignment_precedes_candidate(candidate, skeptic_assignment)
             cls.validate_assignment_precedes_candidate(candidate, hunter_assignment)
+
+            if sk_asgn_ref != skeptic_assignment.digest():
+                reasons.append("RESULT_ASSIGNMENT_MISMATCH")
+                is_blocked = True
             if hu_asgn_ref != hunter_assignment.digest():
                 reasons.append("RESULT_ASSIGNMENT_MISMATCH")
                 is_blocked = True
-            _, a_seq2, _ = cls._cut_info(hunter_assignment.assignment_input_history_cut)
-            _, r_seq2, _ = cls._cut_info(hunter_result.result_input_history_cut)
-            if r_seq2 < a_seq2:
+
+            sk_asgn_camp, sk_asgn_seq, _ = cls._cut_info(skeptic_assignment.assignment_input_history_cut)
+            hu_asgn_camp, hu_asgn_seq, _ = cls._cut_info(hunter_assignment.assignment_input_history_cut)
+            sk_res_camp, sk_res_seq, _ = cls._cut_info(skeptic_result.result_input_history_cut)
+            hu_res_camp, hu_res_seq, _ = cls._cut_info(hunter_result.result_input_history_cut)
+
+            if sk_res_camp != sk_asgn_camp or hu_res_camp != hu_asgn_camp:
+                reasons.append("CAMPAIGN_MISMATCH")
+                is_blocked = True
+            if sk_res_seq < sk_asgn_seq or hu_res_seq < hu_asgn_seq:
                 reasons.append("RESULT_PRECEDES_ASSIGNMENT")
                 is_blocked = True
 
@@ -249,24 +266,19 @@ class E5ChallengerOrchestrator:
         skeptic_cand = skeptic_result.candidate_assurance_case_ref.get("revision_digest")
         hunter_cand = hunter_result.candidate_assurance_case_ref.get("revision_digest")
 
-        # Both must bind exact same candidate revision
         if skeptic_cand != hunter_cand:
             reasons.append("CHALLENGERS_REFERENCE_DIFFERENT_CANDIDATE_REVISIONS")
             is_blocked = True
-
         if skeptic_cand != cand_digest:
             reasons.append("CHALLENGER_RESULTS_INVALIDATED_BY_CANDIDATE_CHANGE")
             is_blocked = True
 
-        # Temporal order: result cut must be >= candidate cut, using canonical accepted_head_seq
         cand_camp, c_seq, _ = cls._cut_info(candidate.candidate_input_history_cut)
         r_camp1, r_seq1, _ = cls._cut_info(skeptic_result.result_input_history_cut)
         r_camp2, r_seq2, _ = cls._cut_info(hunter_result.result_input_history_cut)
-
-        if (cand_camp and r_camp1 and cand_camp != r_camp1) or (cand_camp and r_camp2 and cand_camp != r_camp2):
+        if cand_camp != r_camp1 or cand_camp != r_camp2:
             reasons.append("CAMPAIGN_MISMATCH")
             is_blocked = True
-
         if r_seq1 < c_seq or r_seq2 < c_seq:
             reasons.append("RESULT_CUT_PRECEDES_CANDIDATE")
             is_blocked = True
@@ -276,7 +288,7 @@ class E5ChallengerOrchestrator:
             is_blocked = True
 
         if is_blocked:
-            return False, reasons
+            return False, list(dict.fromkeys(reasons))
 
         reasons.append("BOTH_BASELINE_CHALLENGERS_QUALIFIED")
         return True, reasons
