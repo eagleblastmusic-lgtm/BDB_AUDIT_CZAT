@@ -331,14 +331,14 @@ class TransactionalHistoryStore:
             raise ValidationError("ACTOR_AUTHORITY_NOT_EFFECTIVE_AT_INPUT_HISTORY")
 
     def _validate_history_cuts(self, objects, *, seq, current, profile, con):
-        """Validate every tagged history input before content ordering.
+        """Validate tagged history cuts without erasing durable assignment context.
 
-        A history cut is context, never a same-commit content dependency.  The
-        sole EMPTY_HISTORY_CUT values are initialization inputs bound to the
-        installation profile; once a head exists all input cuts must bind the
-        exact prior accepted head.  This recursive walk intentionally follows
-        field names from the wire contract rather than treating arbitrary
-        dictionaries as history cuts.
+        Normal command-input cuts bind the exact prior accepted head.  A durable
+        external lane result is different: its root ``history_cut`` records the
+        already-accepted cut assigned before delivery and therefore may be older
+        than the current head after sibling work is accepted.  That exception is
+        narrow and still fail-closed: the historical cut must reconstruct exactly
+        from this campaign's canonical accepted commit chain.
         """
         expected_empty = profile.empty_cut().as_dict() if profile is not None else None
         expected_accepted = None
@@ -358,7 +358,39 @@ class TransactionalHistoryStore:
                 "governing_spec_refs": list(prior.get("governing_spec_refs", ())),
             }
 
-        def walk(value, field_name=""):
+        def validate_historical_accepted_cut(value):
+            if current is None or value.get("variant") != "ACCEPTED_HISTORY_CUT":
+                raise ValidationError("HISTORY_INPUT_MUST_PREEXIST")
+            cut_seq = value.get("accepted_head_seq")
+            if type(cut_seq) is not int or cut_seq < 1 or cut_seq > current.commit_seq:
+                raise ValidationError("ACCEPTED_HISTORY_CUT_NOT_FOUND")
+            if value.get("campaign_id") != current.campaign_id:
+                raise ValidationError("HISTORY_CUT_INPUT_MISMATCH")
+
+            previous = EMPTY_HISTORY
+            found = False
+            for stored_seq, digest, raw in con.execute(
+                    "SELECT seq,commit_hash,body FROM commits WHERE seq<=? ORDER BY seq", (cut_seq,)):
+                body = json.loads(raw)
+                commit = _commit_from_body(body)
+                if commit.digest != digest or body["commit_seq"] != stored_seq or body["prev_history_ref"] != previous:
+                    raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
+                if body["campaign_id"] != current.campaign_id:
+                    raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
+                previous = {"tag": ACCEPTED_HEAD_REF, "campaign_id": current.campaign_id,
+                            "commit_seq": stored_seq, "commit_hash": digest}
+                if stored_seq == cut_seq:
+                    expected = HistoryCut.accepted(
+                        AcceptedHead(current.campaign_id, cut_seq, digest),
+                        body["governing_policy_ref"], body["governing_spec_refs"],
+                    ).as_dict()
+                    if value != expected:
+                        raise ValidationError("HISTORY_CUT_INPUT_MISMATCH")
+                    found = True
+            if not found:
+                raise ValidationError("ACCEPTED_HISTORY_CUT_NOT_FOUND")
+
+        def walk(value, field_name="", *, object_kind="", depth=0):
             if isinstance(value, dict):
                 if "variant" in value and field_name.endswith("history_cut"):
                     variant = value.get("variant")
@@ -367,6 +399,8 @@ class TransactionalHistoryStore:
                             raise ValidationError("HISTORY_INPUT_SAME_COMMIT_FORBIDDEN")
                         if expected_empty is not None and value != expected_empty:
                             raise ValidationError("HISTORY_CUT_PROFILE_BINDING_MISMATCH")
+                    elif object_kind == "bdb_audit_lane_result" and depth == 1 and field_name == "history_cut":
+                        validate_historical_accepted_cut(value)
                     else:
                         if variant != "ACCEPTED_HISTORY_CUT":
                             raise ValidationError("HISTORY_INPUT_MUST_PREEXIST")
@@ -374,13 +408,13 @@ class TransactionalHistoryStore:
                             raise ValidationError("HISTORY_CUT_INPUT_MISMATCH")
                     return
                 for key, child in value.items():
-                    walk(child, str(key))
+                    walk(child, str(key), object_kind=object_kind, depth=depth + 1)
             elif isinstance(value, list):
                 for child in value:
-                    walk(child, field_name)
+                    walk(child, field_name, object_kind=object_kind, depth=depth + 1)
 
         for obj in objects:
-            walk(obj.body)
+            walk(obj.body, object_kind=obj.kind)
 
     def _validate_content_refs(self, objects, con):
         """Validate typed refs independently of order-only precedence.
