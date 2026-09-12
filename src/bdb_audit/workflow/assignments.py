@@ -147,17 +147,26 @@ class AssignmentService:
                     "ASSIGNMENT_PROFILE_DRIFT",
                     f"Accepted assignment for {slot} is bound to a different executor/model/delivery profile",
                 )
-            knowledge_ref = dict(body["knowledge_state_ref"])
-            knowledge = self.store.resolve_accepted(knowledge_ref, cut)["body"]
-            isolation_ref = knowledge.get("isolation_qualification_ref")
+
+            attempt_record = self.store.resolve_accepted(body["attempt_ref"], cut)
+            knowledge_record = self.store.resolve_accepted(body["knowledge_state_ref"], cut)
+            isolation_ref = knowledge_record["body"].get("isolation_qualification_ref")
             if not isinstance(isolation_ref, dict):
                 raise ValidationError("ASSIGNMENT_KNOWLEDGE_BINDING_INVALID", slot)
+            isolation_record = self.store.resolve_accepted(isolation_ref, cut)
+
+            # PreparedAssignment is an API-level view of already accepted facts.
+            # Reconstruct the exact ref classes returned by the initial creation
+            # path rather than leaking consumer-specific ref classes stored inside
+            # AssignmentManifest/KnowledgeState bodies. Otherwise a no-op resume
+            # changes package identity even though the immutable objects are the
+            # same.
             mapped[slot] = PreparedAssignment(
                 lane_slot=slot,
                 assignment_ref=_ref(record, "PRIOR_ACCEPTED_ONLY"),
-                attempt_ref=dict(body["attempt_ref"]),
-                knowledge_state_ref=knowledge_ref,
-                isolation_qualification_ref=dict(isolation_ref),
+                attempt_ref=_ref(attempt_record, "PRIOR_ACCEPTED_ONLY"),
+                knowledge_state_ref=_ref(knowledge_record, "PRIOR_ACCEPTED_ONLY"),
+                isolation_qualification_ref=_ref(isolation_record, "PRIOR_ACCEPTED_ONLY"),
                 assignment_input_history_cut=dict(body["assignment_input_history_cut"]),
                 accepted_history_cut=dict(cut),
             )
