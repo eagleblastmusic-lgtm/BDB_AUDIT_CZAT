@@ -73,8 +73,8 @@ class ChallengerAssignment:
         return data
 
     def digest(self) -> str:
-        b = canonical_bytes(self.body())
-        return hashlib.sha256(b).hexdigest()
+        from ..history.objects import CanonicalObject
+        return CanonicalObject("challenger_assignment", self.body()).digest
 
     @property
     def ref(self) -> dict[str, Any]:
@@ -128,8 +128,8 @@ class ChallengerResult:
         }
 
     def digest(self) -> str:
-        b = canonical_bytes(self.body())
-        return hashlib.sha256(b).hexdigest()
+        from ..history.objects import CanonicalObject
+        return CanonicalObject("challenger_result", self.body()).digest
 
     @property
     def ref(self) -> dict[str, Any]:

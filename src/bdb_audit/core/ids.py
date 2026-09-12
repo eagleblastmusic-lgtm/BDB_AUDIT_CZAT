@@ -27,11 +27,22 @@ def active_registry_document():
     return _active_document()
 
 
+_DEFAULT_REGISTRY = None
+
+
+def _get_default_registry():
+    global _DEFAULT_REGISTRY
+    if _DEFAULT_REGISTRY is None:
+        from .registry import ContractRegistry
+        _DEFAULT_REGISTRY = ContractRegistry()
+    return _DEFAULT_REGISTRY
+
+
 def contract(kind, version="1"):
     for row in _active_document()["contracts"]:
         if row["kind"] == kind and row["version"] == version:
             return row
-    raise ValidationError("UNREGISTERED_CONTRACT_KIND", str(kind))
+    return _get_default_registry().contract(kind, version)
 
 
 def validate_id(value, kind):

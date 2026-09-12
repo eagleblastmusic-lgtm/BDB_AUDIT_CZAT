@@ -89,8 +89,8 @@ class CandidateAssuranceCase:
         return data
 
     def digest(self) -> str:
-        b = canonical_bytes(self.body())
-        return hashlib.sha256(b).hexdigest()
+        from ..history.objects import CanonicalObject
+        return CanonicalObject("candidate_assurance_case", self.body()).digest
 
     @property
     def ref(self) -> dict[str, Any]:

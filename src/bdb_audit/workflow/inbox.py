@@ -20,8 +20,9 @@ from pathlib import Path
 from typing import Any, Sequence
 import zipfile
 
-from ..core.canonical_json import canonical_bytes
+from ..core.canonical_json import canonical_bytes, parse
 from ..core.errors import ValidationError
+from ..schemas.identity import LayeredValidator
 from ..core.ids import deterministic_id
 from ..coordinator import Coordinator
 from ..history.objects import CanonicalObject, CommandEnvelope
@@ -191,7 +192,9 @@ class E1ResultInbox:
 
                 manifest_raw = zf.read("MANIFEST.json")
                 try:
-                    manifest = json.loads(manifest_raw.decode("utf-8"))
+                    manifest = parse(manifest_raw)
+                except ValidationError as exc:
+                    return "UNKNOWN", "REJECTED", f"Corrupted MANIFEST.json in {p.name}: {exc}"
                 except Exception as exc:
                     return "UNKNOWN", "REJECTED", f"Corrupted MANIFEST.json in {p.name}: {exc}"
 
@@ -269,13 +272,13 @@ class E1ResultInbox:
                     )
 
                 # 8. Executor profile / model binding check
-                if "executor_profile" in manifest and manifest["executor_profile"] != expected_job.executor_profile:
+                if "executor_profile" not in manifest or manifest["executor_profile"] != expected_job.executor_profile:
                     return slot, "REJECTED", (
-                        f"EXECUTOR_PROFILE_MISMATCH: Expected '{expected_job.executor_profile}', got '{manifest['executor_profile']}'"
+                        f"EXECUTOR_PROFILE_MISMATCH: Expected '{expected_job.executor_profile}', got '{manifest.get('executor_profile')}'"
                     )
-                if "executor_model" in manifest and manifest["executor_model"] != expected_job.model:
+                if "executor_model" not in manifest or manifest["executor_model"] != expected_job.model:
                     return slot, "REJECTED", (
-                        f"EXECUTOR_MODEL_MISMATCH: Expected model '{expected_job.model}', got '{manifest['executor_model']}'"
+                        f"EXECUTOR_MODEL_MISMATCH: Expected model '{expected_job.model}', got '{manifest.get('executor_model')}'"
                     )
 
                 # 9. Required result / evidence structure check
@@ -289,20 +292,39 @@ class E1ResultInbox:
                     findings = manifest["findings"]
                 elif "FINDINGS.json" in zf.namelist():
                     try:
-                        f_data = json.loads(zf.read("FINDINGS.json").decode("utf-8"))
+                        f_data = parse(zf.read("FINDINGS.json"))
                         if not isinstance(f_data, list):
                             return slot, "REJECTED", "INVALID_FINDING_STRUCTURE: 'FINDINGS.json' must be a list"
                         findings = f_data
+                    except ValidationError as exc:
+                        return slot, "REJECTED", f"Corrupted FINDINGS.json: {exc}"
                     except Exception as exc:
                         return slot, "REJECTED", f"Corrupted FINDINGS.json: {exc}"
+
+                if "findings_count" in manifest:
+                    if manifest["findings_count"] != len(findings):
+                        return slot, "REJECTED", (
+                            f"FINDINGS_COUNT_MISMATCH: Manifest declares findings_count={manifest['findings_count']}, but found {len(findings)} findings"
+                        )
 
                 for idx, f in enumerate(findings):
                     if not isinstance(f, dict):
                         return slot, "REJECTED", f"INVALID_FINDING_STRUCTURE: finding at index {idx} must be a dict"
-                    if not any(k in f for k in ("statement", "title", "finding_id", "description")):
+                    if not f.get("statement") or not (f.get("finding_id") or f.get("title")):
                         return slot, "REJECTED", (
-                            f"INVALID_FINDING_STRUCTURE: finding at index {idx} lacks statement/title/description"
+                            f"INVALID_FINDING_STRUCTURE: finding at index {idx} lacks required 'statement' or 'finding_id'"
                         )
+
+                # 9b. Schema validation of proposal artifact
+                manifest_to_validate = dict(manifest)
+                if "findings" not in manifest_to_validate:
+                    manifest_to_validate["findings"] = findings
+                try:
+                    LayeredValidator(registry=self.store.registry).validate(
+                        "bdb_audit_lane_result", canonical_bytes(manifest_to_validate)
+                    )
+                except ValidationError as val_exc:
+                    return slot, "REJECTED", f"SCHEMA_VALIDATION_FAILED: {val_exc}"
 
                 # NO SYNTHETIC FINDINGS:
                 # If findings is empty, findings remains [] (an audit finding 0 vulnerabilities is valid).

@@ -3,12 +3,19 @@ from dataclasses import dataclass
 from typing import Mapping
 import hashlib
 
+import re
+
 from ..core.canonical_json import canonical_bytes, parse
 from ..core.errors import ValidationError
 from ..core.hashing import object_digest
 from ..core.registry import ContractRegistry
 from ..history.objects import CanonicalObject
-from .foundation import F2_KINDS, foundation_schema_bindings, schema_identity_manifest
+from .foundation import (
+    F2_KINDS,
+    ALL_EXECUTABLE_KINDS,
+    foundation_schema_bindings,
+    schema_identity_manifest,
+)
 
 
 @dataclass(frozen=True)
@@ -24,7 +31,7 @@ class LayeredValidator:
     """Parse → schema → digest → typed refs → context, fail-closed."""
     def __init__(self, *, bindings=None, registry=None):
         self.registry = registry or ContractRegistry()
-        self.bindings = bindings or foundation_schema_bindings(kinds=tuple(F2_KINDS))
+        self.bindings = bindings or foundation_schema_bindings(kinds=tuple(ALL_EXECUTABLE_KINDS))
 
     def validate(self, kind, raw, *, version="1", expected_digest=None,
                  expected_schema_ref=None, context=None):
@@ -37,7 +44,7 @@ class LayeredValidator:
         # Layer 3 canonical bytes/digest is computed from the parsed body; the
         # body itself never carries its own revision digest.
         canonical = canonical_bytes(body)
-        digest = object_digest(kind, version, body, registry_kind=kind).value
+        digest = object_digest(kind, version, body, registry_kind=kind, registry=self.registry).value
         if expected_digest is not None and digest != expected_digest:
             raise ValidationError("OBJECT_DIGEST_MISMATCH")
         # Layer 4: every typed ref carries the exact profile/schema key and a
@@ -53,12 +60,10 @@ class LayeredValidator:
     def _typed_refs(self, value):
         if isinstance(value, Mapping):
             if {"kind", "revision_digest", "digest_profile", "schema_revision_ref"}.issubset(value):
-                if value["kind"] not in self.registry.document["reference_target_classes"]:
-                    # Registered canonical kinds are also valid targets.
-                    self.registry.contract(value["kind"])
+                self.registry.target(value["kind"])
                 if value["digest_profile"] != "BDB-OBJECT-DIGEST-1":
                     raise ValidationError("TYPED_REF_DIGEST_PROFILE")
-                if type(value["revision_digest"]) is not str or len(value["revision_digest"]) != 64:
+                if type(value["revision_digest"]) is not str or re.fullmatch(r"[0-9a-f]{64}", value["revision_digest"]) is None:
                     raise ValidationError("INVALID_DIGEST")
                 if value.get("ref_class") not in self.registry.document["reference_class_semantics"]:
                     raise ValidationError("UNREGISTERED_REFERENCE_CLASS")

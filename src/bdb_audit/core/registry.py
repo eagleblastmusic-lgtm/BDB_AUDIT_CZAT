@@ -60,19 +60,61 @@ class ContractRegistry:
     def document(self):
         return deepcopy(self._doc)
 
+    @property
+    def registry_digest(self) -> str:
+        return hashlib.sha256(self._raw).hexdigest()
+
+    @property
+    def registry_id(self) -> str:
+        return self._doc["registry_id"]
+
+    @property
+    def registry_version(self) -> int:
+        return self._doc["registry_version"]
+
     def register_extension_contract(self, contract_entry: dict) -> None:
-        """Register a versioned artifact contract dynamically."""
-        kind = contract_entry["kind"]
-        version = contract_entry.get("version", "1")
+        """Register a versioned artifact contract dynamically.
+
+        Fail-closed rules:
+        - Cannot override or shadow any pinned canonical contract.
+        - Cannot register duplicate extension keys.
+        - Canonical contracts are strictly immutable.
+        """
+        if not isinstance(contract_entry, dict):
+            raise ValidationError("INVALID_CONTRACT_ENTRY", "Contract entry must be a dictionary")
+        kind = contract_entry.get("kind")
+        if not kind or not isinstance(kind, str):
+            raise ValidationError("MISSING_CONTRACT_KIND", "Contract entry must specify kind")
+        version = str(contract_entry.get("version", "1"))
+
+        if (kind, version) in self._contracts:
+            raise ValidationError(
+                "CANONICAL_CONTRACT_COLLISION",
+                f"Cannot override pinned canonical contract ({kind}, {version})",
+            )
+
+        if hasattr(self, "_extension_contracts") and (kind, version) in self._extension_contracts:
+            raise ValidationError(
+                "DUPLICATE_EXTENSION_CONTRACT",
+                f"Extension contract ({kind}, {version}) is already registered",
+            )
+
+        if "canonical_role" in contract_entry:
+            self.role(contract_entry["canonical_role"])
+
         self._extension_contracts[(kind, version)] = deepcopy(contract_entry)
 
     def contract(self, kind, version="1"):
-        if hasattr(self, "_extension_contracts") and (kind, version) in self._extension_contracts:
-            return deepcopy(self._extension_contracts[(kind, version)])
+        version_str = str(version)
         try:
-            return deepcopy(self._contracts[(kind, version)])
-        except (KeyError, TypeError) as exc:
-            raise ValidationError("UNREGISTERED_CONTRACT_KIND", str(kind)) from exc
+            return deepcopy(self._contracts[(kind, version_str)])
+        except (KeyError, TypeError):
+            pass
+
+        if hasattr(self, "_extension_contracts") and (kind, version_str) in self._extension_contracts:
+            return deepcopy(self._extension_contracts[(kind, version_str)])
+
+        raise ValidationError("UNREGISTERED_CONTRACT_KIND", str(kind))
 
     def role(self, role):
         if role not in self._doc["canonical_role_domain"]:

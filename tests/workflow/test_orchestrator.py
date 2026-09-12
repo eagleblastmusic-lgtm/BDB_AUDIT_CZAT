@@ -26,7 +26,7 @@ def _create_lane_result_zip(path: Path, batch, slot: str) -> Path:
         "executor_model": job.model,
         "input_package_digest": job.package_digest,
         "history_cut": batch.frozen_history_cut,
-        "findings": [{"statement": f"Valid finding for {slot}", "claim_outcome": "SUPPORTED"}],
+        "findings": [{"finding_id": f"{slot}-01", "statement": f"Valid finding for {slot}", "claim_outcome": "SUPPORTED"}],
     }
     with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         zf.writestr("MANIFEST.json", json.dumps(manifest, indent=2))

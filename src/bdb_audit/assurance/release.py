@@ -112,8 +112,8 @@ class ReleaseQualification:
         return data
 
     def digest(self) -> str:
-        b = canonical_bytes(self.body())
-        return hashlib.sha256(b).hexdigest()
+        from ..history.objects import CanonicalObject
+        return CanonicalObject("release_qualification", self.body()).digest
 
     @property
     def ref(self) -> dict[str, Any]:
@@ -162,8 +162,8 @@ class SuccessorCampaignGenesis:
         }
 
     def digest(self) -> str:
-        b = canonical_bytes(self.body())
-        return hashlib.sha256(b).hexdigest()
+        from ..history.objects import CanonicalObject
+        return CanonicalObject("successor_campaign_genesis", self.body()).digest
 
     @property
     def ref(self) -> dict[str, Any]:
@@ -216,8 +216,8 @@ class SuccessorCampaignSelectionDecision:
         }
 
     def digest(self) -> str:
-        b = canonical_bytes(self.body())
-        return hashlib.sha256(b).hexdigest()
+        from ..history.objects import CanonicalObject
+        return CanonicalObject("successor_campaign_selection_decision", self.body()).digest
 
     @property
     def ref(self) -> dict[str, Any]:

@@ -96,14 +96,12 @@ def test_m47_happy_path_workflow(temp_store, capsys):
     # 6. validate valid artifact
     with tempfile.TemporaryDirectory() as td:
         art_path = Path(td) / "test_artifact.json"
+        from bdb_audit.orchestration.stages import initial_stage_specs
+        e1_spec = initial_stage_specs()[0]
         art_path.write_text(json.dumps({
             "kind": "stage_spec",
             "version": "1",
-            "key": "E1",
-            "revision": "1",
-            "policy_ref": "policy:test",
-            "ordinal": 1,
-            "description": "test stage",
+            **e1_spec.body(),
         }))
         rc = run_cli(["validate", "--artifact", str(art_path), "--kind", "stage_spec", "--json"])
         assert rc == EXIT_SUCCESS

@@ -64,7 +64,8 @@ class E3BlindCheckpoint:
 
     @property
     def digest(self) -> str:
-        return hashlib.sha256(self.canonical_bytes()).hexdigest()
+        from ..history.objects import CanonicalObject
+        return CanonicalObject("checkpoint", self.body()).digest
 
     @property
     def ref(self) -> dict:
@@ -147,7 +148,8 @@ class PositiveGapProjection:
 
     @property
     def digest(self) -> str:
-        return hashlib.sha256(self.canonical_bytes()).hexdigest()
+        from ..history.objects import CanonicalObject
+        return CanonicalObject("view_manifest", self.body()).digest
 
     @property
     def ref(self) -> dict:
@@ -188,7 +190,8 @@ class E3RevealEvent:
 
     @property
     def digest(self) -> str:
-        return hashlib.sha256(self.canonical_bytes()).hexdigest()
+        from ..history.objects import CanonicalObject
+        return CanonicalObject("view_manifest", self.body()).digest
 
     @property
     def ref(self) -> dict:
@@ -488,7 +491,8 @@ class FalseNegativeRelationshipAssessment:
 
     @property
     def digest(self) -> str:
-        return hashlib.sha256(self.canonical_bytes()).hexdigest()
+        from ..history.objects import CanonicalObject
+        return CanonicalObject("blind_origin_eligibility_assessment", self.body()).digest
 
     @property
     def ref(self) -> dict:

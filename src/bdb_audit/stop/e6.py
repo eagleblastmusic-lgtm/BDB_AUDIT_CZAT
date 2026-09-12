@@ -53,8 +53,8 @@ class AdaptiveE6Spec:
         }
 
     def digest(self) -> str:
-        b = canonical_bytes(self.body())
-        return hashlib.sha256(b).hexdigest()
+        from ..history.objects import CanonicalObject
+        return CanonicalObject("stage_spec", self.body()).digest
 
     @property
     def ref(self) -> dict[str, Any]:

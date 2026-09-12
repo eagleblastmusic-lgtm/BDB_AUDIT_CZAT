@@ -84,8 +84,8 @@ class CampaignConclusion:
         return data
 
     def digest(self) -> str:
-        b = canonical_bytes(self.body())
-        return hashlib.sha256(b).hexdigest()
+        from ..history.objects import CanonicalObject
+        return CanonicalObject("campaign_conclusion", self.body()).digest
 
     @property
     def ref(self) -> dict[str, Any]:
@@ -138,8 +138,8 @@ class FinalAssuranceCase:
         return data
 
     def digest(self) -> str:
-        b = canonical_bytes(self.body())
-        return hashlib.sha256(b).hexdigest()
+        from ..history.objects import CanonicalObject
+        return CanonicalObject("final_assurance_case", self.body()).digest
 
     @property
     def ref(self) -> dict[str, Any]:

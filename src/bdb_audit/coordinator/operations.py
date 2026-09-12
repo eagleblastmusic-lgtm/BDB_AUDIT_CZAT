@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 import time
 from typing import Any
-from ..core.canonical_json import canonical_bytes
+from ..core.canonical_json import canonical_bytes, parse
 from ..core.errors import ValidationError
 from ..core.registry import ContractRegistry
 from ..history.objects import (
@@ -474,47 +474,79 @@ class AuditOperationApi:
 
     def validate_artifact(
         self,
-        artifact_input: str | Path | dict[str, Any],
+        artifact_input: str | Path | dict[str, Any] | bytes,
         expected_kind: str | None = None,
+        context: Any = None,
     ) -> dict[str, Any]:
         """Validate artifact against registry contract, schemas, and canonical hashing."""
+        from ..schemas.identity import LayeredValidator
+
         if isinstance(artifact_input, (str, Path)):
             p = Path(artifact_input)
             if not p.exists():
                 raise ValidationError("ARTIFACT_FILE_NOT_FOUND", f"File does not exist: {p}")
-            try:
-                data = json.loads(p.read_text(encoding="utf-8"))
-            except Exception as exc:
-                raise ValidationError("MALFORMED_ARTIFACT", f"Could not parse JSON: {exc}")
+            raw_bytes = p.read_bytes()
+        elif isinstance(artifact_input, bytes):
+            raw_bytes = artifact_input
         elif isinstance(artifact_input, dict):
-            data = artifact_input
+            raw_bytes = canonical_bytes(artifact_input)
         else:
             raise ValidationError("MALFORMED_ARTIFACT", "Invalid input type for artifact")
+
+        # 1. Transport / Parse validation with duplicate-key rejection (ADR-006 fail closed)
+        try:
+            data = parse(raw_bytes)
+        except ValidationError:
+            raise
+        except Exception as exc:
+            raise ValidationError("MALFORMED_ARTIFACT", f"Could not parse JSON: {exc}") from exc
 
         if not isinstance(data, dict):
             raise ValidationError("MALFORMED_ARTIFACT", "Artifact root must be a JSON object")
 
+        # 2. Kind & version resolution
         kind = data.get("kind")
-        if not kind:
+        if not kind or not isinstance(kind, str):
             raise ValidationError("MISSING_ARTIFACT_KIND", "Artifact does not declare 'kind'")
 
         if expected_kind and kind != expected_kind:
             raise ValidationError("ARTIFACT_KIND_MISMATCH", f"Expected {expected_kind}, got {kind}")
 
-        try:
-            self.registry.contract(kind, version=data.get("version", "1"))
-        except Exception as exc:
-            raise ValidationError("UNREGISTERED_CONTRACT_KIND", f"Contract kind {kind} unregistered: {exc}")
+        version = str(data.get("version", "1"))
 
-        raw = canonical_bytes(data)
-        digest = hashlib.sha256(raw).hexdigest()
+        # 3. Pinned contract resolution
+        contract_row = self.registry.contract(kind, version=version)
+
+        # 4. Layered validation (Schema, Canonical ObjectDigest, TypedRefs, Context)
+        validator = LayeredValidator(registry=self.registry)
+        schema_ref = contract_row["schema_ref"]
+        validator.bindings.require_bound(schema_ref)
+        schema_dict = validator.bindings._validators[schema_ref].schema
+        props = schema_dict.get("properties", {})
+
+        if "body" in data and isinstance(data["body"], dict):
+            body_dict = data["body"]
+        elif "kind" not in props:
+            # Canonical object whose schema governs the body only
+            body_dict = {k: v for k, v in data.items() if k not in ("kind", "version")}
+        else:
+            # Self-describing proposal artifact (e.g. bdb_audit_lane_result)
+            body_dict = data
+
+        raw_body_bytes = canonical_bytes(body_dict)
+        validated = validator.validate(kind, raw_body_bytes, version=version, context=context)
 
         return {
             "status": "PASS",
+            "admissible": True,
             "kind": kind,
-            "digest": digest,
+            "version": version,
+            "digest": validated.revision_digest,
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": contract_row["schema_ref"],
             "contract_registered": True,
-            "byte_length": len(raw),
+            "validation_layers": ["TRANSPORT", "SCHEMA", "SEMANTIC", "REFERENTIAL"] + (["CONTEXT"] if context else []),
+            "byte_length": len(raw_bytes),
         }
 
     def continue_campaign(self, store_path: str | Path) -> dict[str, Any]:

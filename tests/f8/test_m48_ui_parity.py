@@ -56,14 +56,12 @@ def test_m48_ui_and_api_and_cli_parity():
         assert lane_api["commit_hash"] == lane_ui["commit_hash"]
 
         # 5. Validation parity
+        from bdb_audit.orchestration.stages import initial_stage_specs
+        e1_spec = initial_stage_specs()[0]
         art = {
             "kind": "stage_spec",
             "version": "1",
-            "stage_key": "E1",
-            "stage_spec_revision": "1",
-            "stage_role": "E1",
-            "stage_ordinal": 1,
-            "purpose": "Parity test stage",
+            **e1_spec.body(),
         }
         art_path = Path(td) / "test_stage.json"
         art_path.write_text(json.dumps(art))

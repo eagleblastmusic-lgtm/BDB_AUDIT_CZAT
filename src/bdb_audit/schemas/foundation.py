@@ -96,6 +96,8 @@ F7_KINDS = (
     "successor_campaign_selection_decision",
 )
 
+ALL_EXECUTABLE_KINDS = tuple(dict.fromkeys((*F7_KINDS, "bdb_audit_lane_result")))
+
 
 def executable_schema(kind, *, registry=None):
     registry = registry or ContractRegistry()

@@ -78,14 +78,17 @@ The generic primitive also supports the normative test_object golden vector.
     return digest.hexdigest()
 
 
-def object_digest(kind, version, body, *, registry_kind, post_acceptance_sidecar=False):
+def object_digest(kind, version, body, *, registry_kind, post_acceptance_sidecar=False, registry=None):
     """Registered-object path; unregistered aliases cannot create identities."""
-    from .ids import contract
     if kind != registry_kind:
         raise ValidationError("OBJECT_DIGEST_KIND_REGISTRY_MISMATCH")
     if kind in ("evidence_qualification", "evidence_applicability"):
         raise ValidationError("LEGACY_SHORT_KIND_ALIAS_FORBIDDEN")
-    contract(registry_kind, version)
+    if registry is not None:
+        registry.contract(registry_kind, version)
+    else:
+        from .ids import contract
+        contract(registry_kind, version)
     if type(body) is not dict:
         raise ValidationError("OBJECT_BODY_REQUIRED")
     forbidden = {"revision_digest", "accepting_commit_ref", "post_acceptance_history_cut"}
