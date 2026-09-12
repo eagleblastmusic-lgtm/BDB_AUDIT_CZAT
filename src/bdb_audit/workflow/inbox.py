@@ -1,53 +1,68 @@
-"""Result Inbox and safe multi-ZIP ingestion for BDB Audit v2.0.3.
+"""Durable, raw-first E1 result ingestion (RU03 / D02/D05/D06/D08/D19/G02).
 
-Provides robust, fail-closed handling for external auditor submissions:
-- Strict artifact contract validation (kind='bdb_audit_lane_result', version='1').
-- Mechanical ZIP security: Zip-Slip traversal protection, duplicate paths, bomb bounds.
-- Exact provenance bindings: campaign_id, stage_id, lane_slot, exact HistoryCut,
-  source commit SHA, package identity digest, executor profile and model.
-- Coordinator authority path: accepted immutable objects (lane_run, attempt,
-  isolation_qualification, knowledge_state, discovery_records, lane_completion).
-- StageCompletion predicate evaluation and canonical acceptance only after all
-  5 lanes are durably accepted in the history store.
-- Process restart resilience: reconstructs accepted state from the campaign database.
+The inbox treats every external ZIP as hostile transport. Exact bytes are staged
+in a content-addressed vault before parsing. Strong ZIP validation runs on one
+owned immutable snapshot. Semantic proposal content is then bound to the exact
+pre-delivery AssignmentManifest and Attempt and accepted through Coordinator.
+
+Acceptance of a result is distinct from claiming stronger isolation than the
+assignment actually had. Manual ChatGPT transport remains DECLARED unless a
+separate enforcement profile provides receipts.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 import hashlib
-import json
 from pathlib import Path
 from typing import Any, Sequence
-import zipfile
 
+from ..assurance.zip_safety import Limits as ZipLimits, read_bytes as read_zip_bytes
+from ..coordinator import Coordinator
 from ..core.canonical_json import canonical_bytes, parse
 from ..core.errors import ValidationError
-from ..schemas.identity import LayeredValidator
 from ..core.ids import deterministic_id
-from ..coordinator import Coordinator
-from ..history.objects import CanonicalObject, CommandEnvelope
+from ..history.objects import CanonicalObject, CommandEnvelope, HistoryCut
 from ..history.store import TransactionalHistoryStore
-from ..orchestration.native_ensemble import (
-    E1_LANE_SLOTS,
-    E1CompletionResult,
-    execute_e1_ensemble,
-)
-from ..stop.models import StageCompletion, LaneCompletion
-from .packaging import E1Batch
+from ..orchestration.native_ensemble import E1_LANE_SLOTS, E1CompletionResult, execute_e1_ensemble
+from ..schemas.foundation import F3_KINDS, foundation_schema_bindings
+from ..schemas.identity import LayeredValidator
+from ..stop.models import LaneCompletion, StageCompletion
+from ..vault.raw_store import RawArtifactVault
+from .packaging import E1Batch, E1LaneJob
 
-MAX_ALLOWED_UNCOMPRESSED_BYTES = 50 * 1024 * 1024  # 50 MB safety bound
+_RESULT_ZIP_LIMITS = ZipLimits(
+    input_bytes=64 * 1024 * 1024,
+    central_bytes=4 * 1024 * 1024,
+    members=512,
+    member_bytes=32 * 1024 * 1024,
+    expanded_bytes=50 * 1024 * 1024,
+    ratio=500,
+)
 
 
 @dataclass
 class LaneInboxStatus:
     lane_slot: str
-    status: str  # "ACCEPTED" | "MISSING" | "REJECTED"
+    status: str  # ACCEPTED | MISSING | REJECTED
     result_zip_path: Path | None = None
     result_digest: str | None = None
     findings_count: int = 0
     findings: list[dict[str, Any]] = field(default_factory=list)
     rejection_reason: str | None = None
     lane_completion_id: str | None = None
+    result_proposal_ref: dict[str, Any] | None = None
+    completion_status: str | None = None
+
+
+@dataclass(frozen=True)
+class ImportFileResult:
+    path: str
+    lane_slot: str
+    status: str
+    code: str
+    reason: str | None
+    raw_digest: str | None
+    next_action: str | None
 
 
 @dataclass
@@ -61,6 +76,7 @@ class ImportedResultSummary:
     stage_complete: bool = False
     completion_digest: str | None = None
     error: str | None = None
+    file_results: list[ImportFileResult] = field(default_factory=list)
 
 
 def _command_id(seed: str) -> str:
@@ -68,8 +84,8 @@ def _command_id(seed: str) -> str:
     return f"command_{h[:8]}-{h[8:12]}-4{h[13:16]}-8{h[17:20]}-{h[20:32]}"
 
 
-def _external_ref(kind: str, val: str, ref_class: str = "CONTENT_OR_PRIOR") -> dict[str, Any]:
-    preimage = f"BDB2/{kind}/1\0".encode("ascii") + canonical_bytes({"reference_id": val})
+def _external_ref(kind: str, value: str, ref_class: str = "CONTENT_OR_PRIOR") -> dict[str, Any]:
+    preimage = f"BDB2/{kind}/1\0".encode("ascii") + canonical_bytes({"reference_id": value})
     return {
         "kind": kind,
         "revision_digest": hashlib.sha256(preimage).hexdigest(),
@@ -79,630 +95,542 @@ def _external_ref(kind: str, val: str, ref_class: str = "CONTENT_OR_PRIOR") -> d
     }
 
 
-def _ref_dict(ref: Any) -> dict[str, Any]:
-    if hasattr(ref, "as_dict"):
-        return dict(ref.as_dict())
-    return dict(ref)
+def _with_ref_class(ref: dict[str, Any], ref_class: str) -> dict[str, Any]:
+    result = dict(ref)
+    result["ref_class"] = ref_class
+    return result
 
 
-def _validate_zip_safety(zf: zipfile.ZipFile) -> None:
-    """Verify archive is free of directory traversal, duplicate entries, and size bombs."""
-    namelist = zf.namelist()
-    seen_names = set()
-    total_uncompressed = 0
+def _same_ref(left: Any, right: Any) -> bool:
+    if not isinstance(left, dict) or not isinstance(right, dict):
+        return False
+    keys = ("kind", "revision_digest", "schema_revision_ref")
+    return all(left.get(key) == right.get(key) for key in keys)
 
-    for name in namelist:
-        if name in seen_names:
-            raise ValidationError("ZIP_DUPLICATE_PATH", f"Duplicate path entry inside ZIP: {name}")
-        seen_names.add(name)
 
-        norm = name.replace("\\", "/")
-        parts = norm.split("/")
-        if (
-            norm.startswith("/")
-            or ".." in parts
-            or ":" in norm
-            or norm.startswith("~")
-        ):
-            raise ValidationError("ZIP_PATH_TRAVERSAL", f"Illegal or escaping path inside ZIP: {name}")
+def _current_cut(store: TransactionalHistoryStore) -> tuple[dict[str, Any], dict[str, Any]]:
+    head = store.head()
+    if head is None:
+        raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+    commits = store.commits()
+    if not commits:
+        raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
+    body = commits[-1]
+    if body.get("commit_seq") != head.commit_seq or body.get("campaign_id") != head.campaign_id:
+        raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
+    return (
+        HistoryCut.accepted(head, body["governing_policy_ref"], body["governing_spec_refs"]).as_dict(),
+        body,
+    )
 
-        info = zf.getinfo(name)
-        total_uncompressed += info.file_size
-        if total_uncompressed > MAX_ALLOWED_UNCOMPRESSED_BYTES:
-            raise ValidationError("ZIP_BOMB_LIMIT_EXCEEDED", "Uncompressed archive size exceeds safety threshold")
+
+def _media_type(name: str) -> str:
+    lower = name.lower()
+    if lower.endswith(".json"):
+        return "application/json"
+    if lower.endswith((".md", ".txt", ".log")):
+        return "text/plain"
+    if lower.endswith(".xml"):
+        return "application/xml"
+    return "application/octet-stream"
+
+
+def _translate_zip_error(exc: ValidationError) -> ValidationError:
+    code = getattr(exc, "code", "ZIP_INTEGRITY_FAILURE")
+    if code == "UNSAFE_ZIP_PATH":
+        return ValidationError("ZIP_PATH_TRAVERSAL", str(exc))
+    if code in {"DUPLICATE_ZIP_MEMBER_NAMES", "ZIP_NORMALIZED_PATH_COLLISION"}:
+        return ValidationError("ZIP_DUPLICATE_PATH", str(exc))
+    if code == "ZIP_RESOURCE_LIMIT":
+        return ValidationError("ZIP_BOMB_LIMIT_EXCEEDED", str(exc))
+    return exc
 
 
 class E1ResultInbox:
-    """Manages collection, strict contract validation, and canonical acceptance of E1 audit results."""
+    """Strict result staging, validation, durable acceptance, and restart recovery."""
 
     def __init__(self, store: TransactionalHistoryStore, e1_batch: E1Batch):
         self.store = store
         self.batch = e1_batch
+        result_kinds = tuple(dict.fromkeys((*F3_KINDS, "bdb_audit_lane_result")))
+        self.store.schemas = foundation_schema_bindings(kinds=result_kinds)
         self.coordinator = Coordinator(store)
+        self.vault = RawArtifactVault(Path(store.path).resolve().parent / "raw_vault")
         self.lane_statuses: dict[str, LaneInboxStatus] = {
-            slot: LaneInboxStatus(lane_slot=slot, status="MISSING")
-            for slot in E1_LANE_SLOTS
+            slot: LaneInboxStatus(lane_slot=slot, status="MISSING") for slot in E1_LANE_SLOTS
         }
-        self.stage_complete: bool = False
+        self.stage_complete = False
+        self.stage_completion_digest: str | None = None
         self.e1_completion_result: E1CompletionResult | None = None
+        self._last_file_result: ImportFileResult | None = None
         self._load_accepted_state_from_store()
 
-    def _load_accepted_state_from_store(self) -> None:
-        """Reconstruct accepted lane and stage completion state directly from SQLite history."""
-        conn = self.store._connect()
-        try:
-            # Map lane_spec digest -> slot
-            spec_rows = conn.execute("SELECT digest, body FROM immutable_objects WHERE kind='lane_spec'").fetchall()
-            digest_to_slot: dict[str, str] = {}
-            for r_dig, r_body in spec_rows:
-                s_doc = json.loads(r_body.decode("utf-8"))
-                lkey = s_doc.get("lane_key", "")
-                for slot in E1_LANE_SLOTS:
-                    if lkey in (slot, f"lane_E1_{slot}"):
-                        digest_to_slot[r_dig] = slot
+    def _accepted_results(self, cut: dict[str, Any]) -> tuple[dict[str, Any], ...]:
+        return tuple(self.store.accepted_records("bdb_audit_lane_result", cut))
 
-            # Inspect accepted lane completions
-            rows = conn.execute("SELECT body FROM immutable_objects WHERE kind='lane_completion'").fetchall()
-            for (body_bytes,) in rows:
-                doc = json.loads(body_bytes.decode("utf-8"))
-                cid = doc.get("lane_completion_id", "")
-                pred = doc.get("completion_predicate_result")
-                ls_ref = doc.get("lane_spec_ref", {})
-                ls_dig = ls_ref.get("revision_digest")
-                target_slot: str | None = digest_to_slot.get(ls_dig) if ls_dig else None
-                if not target_slot:
-                    for s in E1_LANE_SLOTS:
-                        if f"_{s}_" in cid or cid.endswith(f"_{s}"):
-                            target_slot = s
-                            break
-                if pred == "LANE_COMPLETED" and target_slot:
-                    outputs = doc.get("required_output_refs", [])
-                    self.lane_statuses[target_slot] = LaneInboxStatus(
-                        lane_slot=target_slot,
-                        status="ACCEPTED",
-                        findings_count=len(outputs),
-                        lane_completion_id=cid,
-                    )
-            # Inspect accepted stage completions
-            s_row = conn.execute("SELECT body FROM immutable_objects WHERE kind='stage_completion' LIMIT 1").fetchone()
-            if s_row:
-                s_doc = json.loads(s_row[0].decode("utf-8"))
-                if s_doc.get("completion_predicate_result") == "STAGE_COMPLETED":
-                    self.stage_complete = True
-        finally:
-            conn.close()
+    def _accepted_result_for_job(self, job: E1LaneJob, cut: dict[str, Any]) -> dict[str, Any] | None:
+        matches = [
+            row for row in self._accepted_results(cut)
+            if _same_ref(row["body"].get("assignment_ref"), job.assignment_ref)
+        ]
+        if len(matches) > 1:
+            raise ValidationError("MULTIPLE_RESULTS_FOR_ASSIGNMENT")
+        return matches[0] if matches else None
+
+    def _load_accepted_state_from_store(self) -> None:
+        """Rebuild state only from verified accepted closure at the current cut."""
+        cut, _ = _current_cut(self.store)
+        for slot, job in self.batch.jobs.items():
+            accepted = self._accepted_result_for_job(job, cut)
+            if accepted is None:
+                continue
+            body = accepted["body"]
+            findings = body.get("findings") if isinstance(body.get("findings"), list) else []
+            lane_completion_id = None
+            completion_status = None
+            for completion in self.store.accepted_records("lane_completion", cut):
+                outputs = completion["body"].get("required_output_refs", [])
+                if any(
+                    isinstance(ref, dict) and ref.get("revision_digest") == accepted["ref"]["revision_digest"]
+                    for ref in outputs
+                ):
+                    lane_completion_id = completion["body"].get("lane_completion_id")
+                    completion_status = completion["body"].get("completion_predicate_result")
+                    break
+            self.lane_statuses[slot] = LaneInboxStatus(
+                lane_slot=slot,
+                status="ACCEPTED",
+                result_digest=body.get("raw_result_digest"),
+                findings_count=len(findings),
+                findings=[dict(item) for item in findings if isinstance(item, dict)],
+                lane_completion_id=lane_completion_id,
+                result_proposal_ref=dict(accepted["ref"]),
+                completion_status=completion_status,
+            )
+
+        stage_rows = tuple(self.store.accepted_records("stage_completion", cut))
+        completed = [row for row in stage_rows if row["body"].get("completion_predicate_result") == "STAGE_COMPLETED"]
+        if len(completed) > 1:
+            raise ValidationError("MULTIPLE_STAGE_COMPLETIONS")
+        if completed:
+            self.stage_complete = True
+            self.stage_completion_digest = completed[0]["ref"]["revision_digest"]
+
+    def _record_file_result(
+        self,
+        path: Path,
+        lane_slot: str,
+        status: str,
+        code: str,
+        reason: str | None,
+        raw_digest: str | None,
+        next_action: str | None,
+    ) -> tuple[str, str, str | None]:
+        self._last_file_result = ImportFileResult(
+            path=str(path), lane_slot=lane_slot, status=status, code=code,
+            reason=reason, raw_digest=raw_digest, next_action=next_action,
+        )
+        return lane_slot, status, reason
+
+    def _reject(
+        self,
+        path: Path,
+        lane_slot: str,
+        code: str,
+        detail: str,
+        raw_digest: str | None,
+        next_action: str = "CORRECT_AND_REIMPORT",
+    ) -> tuple[str, str, str | None]:
+        reason = f"{code}: {detail}" if detail else code
+        return self._record_file_result(path, lane_slot, "REJECTED", code, reason, raw_digest, next_action)
+
+    def _read_and_stage(self, path: Path) -> tuple[bytes, str, dict[str, bytes], list[dict[str, Any]]]:
+        raw = path.read_bytes()
+        receipt = self.vault.put_bytes(raw, media_type="application/zip")
+        try:
+            members = read_zip_bytes(raw, limits=_RESULT_ZIP_LIMITS)
+        except ValidationError as exc:
+            raise _translate_zip_error(exc) from exc
+        evidence: list[dict[str, Any]] = []
+        for name, data in sorted(members.items(), key=lambda item: item[0].encode("utf-8")):
+            member_receipt = self.vault.put_bytes(data, media_type=_media_type(name))
+            evidence.append({
+                "path": name,
+                "raw_digest": member_receipt.raw_digest,
+                "byte_length": member_receipt.byte_length,
+                "media_type": member_receipt.media_type,
+            })
+        return raw, receipt.raw_digest, members, evidence
 
     def ingest_zip(self, zip_path: Path | str) -> tuple[str, str, str | None]:
-        """Validate result contract and canonically accept through Coordinator.
+        """Stage raw bytes, validate proposal, and accept one result idempotently."""
+        path = Path(zip_path).resolve()
+        self._last_file_result = None
+        if not path.is_file():
+            return self._reject(path, "UNKNOWN", "FILE_NOT_FOUND", f"File does not exist: {path}", None)
 
-        Returns: (lane_slot, status, rejection_reason)
-        """
-        p = Path(zip_path).resolve()
-        if not p.exists() or not p.is_file():
-            return "UNKNOWN", "REJECTED", f"File does not exist: {p}"
-
-        if not zipfile.is_zipfile(p):
-            return "UNKNOWN", "REJECTED", f"File is not a valid ZIP archive: {p.name}"
-
+        raw_digest: str | None = None
         try:
-            with zipfile.ZipFile(p, "r") as zf:
-                _validate_zip_safety(zf)
+            try:
+                raw, raw_digest, members, evidence_files = self._read_and_stage(path)
+            except ValidationError as exc:
+                code = getattr(exc, "code", "ZIP_INTEGRITY_FAILURE")
+                if code in {"ZIP_OPEN_FAILURE", "ZIP_INTEGRITY_FAILURE"}:
+                    return self._reject(path, "UNKNOWN", "INVALID_ZIP", "not a valid ZIP archive", raw_digest)
+                return self._reject(path, "UNKNOWN", code, str(exc), raw_digest)
 
-                if "MANIFEST.json" not in zf.namelist():
-                    return "UNKNOWN", "REJECTED", f"Archive {p.name} lacks root MANIFEST.json"
+            if "MANIFEST.json" not in members:
+                return self._reject(path, "UNKNOWN", "MISSING_MANIFEST", "Archive lacks root MANIFEST.json", raw_digest)
+            try:
+                manifest = parse(members["MANIFEST.json"])
+            except ValidationError as exc:
+                return self._reject(path, "UNKNOWN", "MALFORMED_MANIFEST", f"Corrupted MANIFEST.json: {exc}", raw_digest)
+            if not isinstance(manifest, dict):
+                return self._reject(path, "UNKNOWN", "MALFORMED_MANIFEST", "MANIFEST.json root must be a JSON object", raw_digest)
 
-                manifest_raw = zf.read("MANIFEST.json")
-                try:
-                    manifest = parse(manifest_raw)
-                except ValidationError as exc:
-                    return "UNKNOWN", "REJECTED", f"Corrupted MANIFEST.json in {p.name}: {exc}"
-                except Exception as exc:
-                    return "UNKNOWN", "REJECTED", f"Corrupted MANIFEST.json in {p.name}: {exc}"
-
-                if not isinstance(manifest, dict):
-                    return "UNKNOWN", "REJECTED", "MANIFEST.json root must be a JSON object"
-
-                # 1. Kind & Version check
-                kind = manifest.get("kind")
-                if kind != "bdb_audit_lane_result":
-                    return "UNKNOWN", "REJECTED", (
-                        f"INVALID_CONTRACT_KIND: Manifest declares kind '{kind}', expected 'bdb_audit_lane_result'"
-                    )
-
-                version = str(manifest.get("version", ""))
-                if version != "1":
-                    return "UNKNOWN", "REJECTED", (
-                        f"INVALID_CONTRACT_VERSION: Manifest declares version '{version}', expected '1'"
-                    )
-
-                # 2. Campaign ID check
-                result_cid = manifest.get("campaign_id")
-                if not result_cid:
-                    return "UNKNOWN", "REJECTED", "MISSING_MANDATORY_FIELD: Manifest missing 'campaign_id'"
-                if result_cid != self.batch.campaign_id:
-                    return "UNKNOWN", "REJECTED", (
-                        f"FOREIGN_CAMPAIGN: Manifest campaign_id '{result_cid}' does not match active campaign '{self.batch.campaign_id}'"
-                    )
-
-                # 3. Stage ID check
-                stage_id = manifest.get("stage_id")
-                if stage_id != "E1":
-                    return "UNKNOWN", "REJECTED", f"WRONG_STAGE: Manifest declares stage '{stage_id}', expected 'E1'"
-
-                # 4. Lane Slot check
-                slot = manifest.get("lane_slot")
-                if not slot or slot not in E1_LANE_SLOTS:
-                    return "UNKNOWN", "REJECTED", f"UNKNOWN_LANE: Manifest declares invalid lane slot '{slot}'"
-
-                expected_job = self.batch.get_job(slot)
-
-                # 5. Exact Source Commit SHA binding
-                res_sha = manifest.get("source_commit_sha")
-                if not res_sha:
-                    return slot, "REJECTED", "MISSING_SOURCE_BINDING: Manifest missing mandatory 'source_commit_sha'"
-                if expected_job.source_commit_sha and res_sha.strip().lower() != expected_job.source_commit_sha.strip().lower():
-                    return slot, "REJECTED", (
-                        f"SOURCE_COMMIT_MISMATCH: Result bound to commit {res_sha[:12]}, expected {expected_job.source_commit_sha[:12]}"
-                    )
-
-                # 6. HistoryCut binding check
-                res_cut = manifest.get("history_cut")
-                if not isinstance(res_cut, dict):
-                    return slot, "REJECTED", "MISSING_MANDATORY_FIELD: Manifest missing 'history_cut' object"
-                expected_cut = self.batch.frozen_history_cut
-                if (
-                    res_cut.get("campaign_id") != expected_cut.get("campaign_id")
-                    or res_cut.get("accepted_head_seq") != expected_cut.get("accepted_head_seq")
-                    or res_cut.get("accepted_head_hash") != expected_cut.get("accepted_head_hash")
-                ):
-                    return slot, "REJECTED", (
-                        f"STALE_CUT: Result history_cut ({res_cut}) does not match frozen E1 cut ({expected_cut})"
-                    )
-
-                # 7. Input Package Digest binding check
-                pkg_digest = manifest.get("input_package_digest")
-                if not pkg_digest:
-                    return slot, "REJECTED", "MISSING_INPUT_PACKAGE_DIGEST: Manifest missing mandatory 'input_package_digest'"
-                if (
-                    pkg_digest != expected_job.package_digest
-                    and pkg_digest != expected_job.package_zip_sha256
-                ):
-                    return slot, "REJECTED", (
-                        f"PACKAGE_DIGEST_MISMATCH: Result bound to package {pkg_digest[:16]}..., "
-                        f"expected {expected_job.package_digest[:16]}..."
-                    )
-
-                # 8. Executor profile / model binding check
-                if "executor_profile" not in manifest or manifest["executor_profile"] != expected_job.executor_profile:
-                    return slot, "REJECTED", (
-                        f"EXECUTOR_PROFILE_MISMATCH: Expected '{expected_job.executor_profile}', got '{manifest.get('executor_profile')}'"
-                    )
-                if "executor_model" not in manifest or manifest["executor_model"] != expected_job.model:
-                    return slot, "REJECTED", (
-                        f"EXECUTOR_MODEL_MISMATCH: Expected model '{expected_job.model}', got '{manifest.get('executor_model')}'"
-                    )
-
-                # 9. Required result / evidence structure check
-                if "findings" not in manifest and "FINDINGS.json" not in zf.namelist():
-                    return slot, "REJECTED", "MISSING_MANDATORY_FIELD: Manifest must contain 'findings' list"
-
-                findings: list[dict[str, Any]] = []
-                if "findings" in manifest:
-                    if not isinstance(manifest["findings"], list):
-                        return slot, "REJECTED", "INVALID_FINDING_STRUCTURE: 'findings' must be a list"
-                    findings = manifest["findings"]
-                elif "FINDINGS.json" in zf.namelist():
-                    try:
-                        f_data = parse(zf.read("FINDINGS.json"))
-                        if not isinstance(f_data, list):
-                            return slot, "REJECTED", "INVALID_FINDING_STRUCTURE: 'FINDINGS.json' must be a list"
-                        findings = f_data
-                    except ValidationError as exc:
-                        return slot, "REJECTED", f"Corrupted FINDINGS.json: {exc}"
-                    except Exception as exc:
-                        return slot, "REJECTED", f"Corrupted FINDINGS.json: {exc}"
-
-                if "findings_count" in manifest:
-                    if manifest["findings_count"] != len(findings):
-                        return slot, "REJECTED", (
-                            f"FINDINGS_COUNT_MISMATCH: Manifest declares findings_count={manifest['findings_count']}, but found {len(findings)} findings"
-                        )
-
-                for idx, f in enumerate(findings):
-                    if not isinstance(f, dict):
-                        return slot, "REJECTED", f"INVALID_FINDING_STRUCTURE: finding at index {idx} must be a dict"
-                    if not f.get("statement") or not (f.get("finding_id") or f.get("title")):
-                        return slot, "REJECTED", (
-                            f"INVALID_FINDING_STRUCTURE: finding at index {idx} lacks required 'statement' or 'finding_id'"
-                        )
-
-                # 9b. Schema validation of proposal artifact
-                manifest_to_validate = dict(manifest)
-                if "findings" not in manifest_to_validate:
-                    manifest_to_validate["findings"] = findings
-                try:
-                    LayeredValidator(registry=self.store.registry).validate(
-                        "bdb_audit_lane_result", canonical_bytes(manifest_to_validate)
-                    )
-                except ValidationError as val_exc:
-                    return slot, "REJECTED", f"SCHEMA_VALIDATION_FAILED: {val_exc}"
-
-                # NO SYNTHETIC FINDINGS:
-                # If findings is empty, findings remains [] (an audit finding 0 vulnerabilities is valid).
-                # Absence of data is NEVER converted to synthetic positive evidence!
-
-                raw_bytes = p.read_bytes()
-                res_digest = hashlib.sha256(raw_bytes).hexdigest()
-
-                # 10. Idempotency vs Conflicting Replacement
-                current = self.lane_statuses[slot]
-                if current.status == "ACCEPTED":
-                    if current.result_digest == res_digest or current.lane_completion_id:
-                        # If digest matches, return idempotent PASS
-                        if current.result_digest == res_digest:
-                            return slot, "ACCEPTED", None
-                        # If different incoming ZIP for already accepted lane: fail-closed rejection
-                        return slot, "REJECTED", (
-                            f"CONFLICTING_RESULT_REJECTED: Lane {slot} already accepted in campaign history. "
-                            "Replacement is forbidden without canonical retry / new attempt."
-                        )
-
-                # 11. Coordinator Authority Path — Commit accepted facts to history
-                lane_comp_id = self._accept_lane_to_coordinator(slot, manifest, findings, res_digest)
-
-                self.lane_statuses[slot] = LaneInboxStatus(
-                    lane_slot=slot,
-                    status="ACCEPTED",
-                    result_zip_path=p,
-                    result_digest=res_digest,
-                    findings_count=len(findings),
-                    findings=findings,
-                    rejection_reason=None,
-                    lane_completion_id=lane_comp_id,
+            if manifest.get("kind") != "bdb_audit_lane_result":
+                return self._reject(path, "UNKNOWN", "INVALID_CONTRACT_KIND", f"Manifest declares kind '{manifest.get('kind')}'", raw_digest)
+            if str(manifest.get("version", "")) != "1":
+                return self._reject(path, "UNKNOWN", "INVALID_CONTRACT_VERSION", "Expected version '1'", raw_digest)
+            if not manifest.get("campaign_id"):
+                return self._reject(path, "UNKNOWN", "MISSING_MANDATORY_FIELD", "Manifest missing campaign_id", raw_digest)
+            if manifest.get("campaign_id") != self.batch.campaign_id:
+                return self._reject(
+                    path, "UNKNOWN", "FOREIGN_CAMPAIGN",
+                    f"Manifest campaign_id '{manifest.get('campaign_id')}' does not match active campaign '{self.batch.campaign_id}'",
+                    raw_digest, "SELECT_CORRECT_CAMPAIGN",
                 )
-                return slot, "ACCEPTED", None
+            if manifest.get("stage_id") != "E1":
+                return self._reject(path, "UNKNOWN", "WRONG_STAGE", f"Expected E1, got {manifest.get('stage_id')}", raw_digest)
 
+            slot = manifest.get("lane_slot")
+            if slot not in E1_LANE_SLOTS:
+                return self._reject(path, "UNKNOWN", "UNKNOWN_LANE", f"Invalid lane slot '{slot}'", raw_digest)
+            job = self.batch.get_job(slot)
+
+            source_sha = manifest.get("source_commit_sha")
+            if not source_sha:
+                return self._reject(path, slot, "MISSING_SOURCE_BINDING", "Manifest missing source_commit_sha", raw_digest)
+            if source_sha.lower() != job.source_commit_sha.lower():
+                return self._reject(path, slot, "SOURCE_COMMIT_MISMATCH", "Result is bound to a different source commit", raw_digest)
+
+            result_cut = manifest.get("history_cut")
+            expected_cut = self.batch.frozen_history_cut
+            if not isinstance(result_cut, dict):
+                return self._reject(path, slot, "MISSING_MANDATORY_FIELD", "Manifest missing history_cut", raw_digest)
+            if any(result_cut.get(key) != expected_cut.get(key) for key in ("campaign_id", "accepted_head_seq", "accepted_head_hash")):
+                return self._reject(path, slot, "STALE_CUT", "Result does not match the assignment input cut", raw_digest)
+
+            package_digest = manifest.get("input_package_digest")
+            if not package_digest:
+                return self._reject(path, slot, "MISSING_INPUT_PACKAGE_DIGEST", "Manifest missing input_package_digest", raw_digest)
+            if package_digest != job.package_digest:
+                return self._reject(path, slot, "PACKAGE_DIGEST_MISMATCH", "Result is not bound to the semantic input package", raw_digest)
+
+            if manifest.get("executor_profile") != job.executor_profile:
+                return self._reject(path, slot, "EXECUTOR_PROFILE_MISMATCH", "Executor profile differs from assignment", raw_digest)
+            if manifest.get("executor_model") != job.model:
+                return self._reject(path, slot, "EXECUTOR_MODEL_MISMATCH", "Executor model differs from assignment", raw_digest)
+
+            if manifest.get("assignment_ref") is not None and not _same_ref(manifest.get("assignment_ref"), job.assignment_ref):
+                return self._reject(path, slot, "ASSIGNMENT_REF_MISMATCH", "Result is bound to another assignment", raw_digest)
+            if manifest.get("attempt_ref") is not None and not _same_ref(manifest.get("attempt_ref"), job.attempt_ref):
+                return self._reject(path, slot, "ATTEMPT_REF_MISMATCH", "Result is bound to another attempt", raw_digest)
+
+            findings: list[dict[str, Any]]
+            if "findings" in manifest:
+                if not isinstance(manifest["findings"], list):
+                    return self._reject(path, slot, "INVALID_FINDING_STRUCTURE", "findings must be a list", raw_digest)
+                findings = manifest["findings"]
+            elif "FINDINGS.json" in members:
+                try:
+                    parsed_findings = parse(members["FINDINGS.json"])
+                except ValidationError as exc:
+                    return self._reject(path, slot, "INVALID_FINDING_STRUCTURE", str(exc), raw_digest)
+                if not isinstance(parsed_findings, list):
+                    return self._reject(path, slot, "INVALID_FINDING_STRUCTURE", "FINDINGS.json must be a list", raw_digest)
+                findings = parsed_findings
+            else:
+                return self._reject(path, slot, "MISSING_MANDATORY_FIELD", "Result must contain findings", raw_digest)
+
+            if "findings_count" in manifest and manifest["findings_count"] != len(findings):
+                return self._reject(path, slot, "FINDINGS_COUNT_MISMATCH", "findings_count does not equal findings length", raw_digest)
+            for index, finding in enumerate(findings):
+                if not isinstance(finding, dict):
+                    return self._reject(path, slot, "INVALID_FINDING_STRUCTURE", f"finding {index} is not an object", raw_digest)
+                if not finding.get("statement") or not (finding.get("finding_id") or finding.get("title")):
+                    return self._reject(path, slot, "INVALID_FINDING_STRUCTURE", f"finding {index} lacks statement/id", raw_digest)
+
+            canonical_proposal = dict(manifest)
+            canonical_proposal["findings"] = findings
+            canonical_proposal["findings_count"] = len(findings)
+            canonical_proposal["assignment_ref"] = dict(job.assignment_ref)
+            canonical_proposal["attempt_ref"] = dict(job.attempt_ref)
+            canonical_proposal["raw_result_digest"] = raw_digest
+            canonical_proposal["raw_result_byte_length"] = len(raw)
+            canonical_proposal["evidence_files"] = evidence_files
+
+            try:
+                LayeredValidator(registry=self.store.registry).validate(
+                    "bdb_audit_lane_result", canonical_bytes(canonical_proposal)
+                )
+            except ValidationError as exc:
+                return self._reject(path, slot, "SCHEMA_VALIDATION_FAILED", str(exc), raw_digest)
+
+            cut, _ = _current_cut(self.store)
+            existing = self._accepted_result_for_job(job, cut)
+            if existing is not None:
+                if existing["body"].get("raw_result_digest") == raw_digest:
+                    self._load_accepted_state_from_store()
+                    return self._record_file_result(path, slot, "ACCEPTED", "EXACT_RETRY", None, raw_digest, None)
+                return self._reject(
+                    path, slot, "CONFLICTING_RESULT_REJECTED",
+                    "This assignment already has a different accepted result; create an explicit new attempt",
+                    raw_digest, "CREATE_NEW_ATTEMPT",
+                )
+
+            try:
+                lane_completion_id = self._accept_result(
+                    slot=slot, job=job, proposal_body=canonical_proposal,
+                    findings=findings, raw_digest=raw_digest,
+                )
+            except ValidationError as exc:
+                if getattr(exc, "code", "") != "EXPECTED_HEAD_CONFLICT":
+                    raise
+                cut, _ = _current_cut(self.store)
+                existing = self._accepted_result_for_job(job, cut)
+                if existing is not None:
+                    if existing["body"].get("raw_result_digest") == raw_digest:
+                        self._load_accepted_state_from_store()
+                        return self._record_file_result(path, slot, "ACCEPTED", "EXACT_RETRY", None, raw_digest, None)
+                    return self._reject(
+                        path, slot, "CONFLICTING_RESULT_REJECTED",
+                        "Concurrent different result won the assignment acceptance race",
+                        raw_digest, "CREATE_NEW_ATTEMPT",
+                    )
+                lane_completion_id = self._accept_result(
+                    slot=slot, job=job, proposal_body=canonical_proposal,
+                    findings=findings, raw_digest=raw_digest,
+                )
+
+            self._load_accepted_state_from_store()
+            self.lane_statuses[slot].result_zip_path = path
+            self.lane_statuses[slot].lane_completion_id = lane_completion_id
+            return self._record_file_result(path, slot, "ACCEPTED", "ACCEPTED", None, raw_digest, None)
         except ValidationError as exc:
-            return "UNKNOWN", "REJECTED", str(exc)
+            return self._reject(path, "UNKNOWN", getattr(exc, "code", "VALIDATION_ERROR"), str(exc), raw_digest)
         except Exception as exc:
-            return "UNKNOWN", "REJECTED", f"Unexpected ingestion error: {exc}"
+            return self._reject(path, "UNKNOWN", "UNEXPECTED_INGESTION_ERROR", type(exc).__name__, raw_digest, "REVIEW_IMPORT_ERROR")
 
-    def _accept_lane_to_coordinator(
+    def _accept_result(
         self,
+        *,
         slot: str,
-        manifest: dict[str, Any],
+        job: E1LaneJob,
+        proposal_body: dict[str, Any],
         findings: list[dict[str, Any]],
-        res_digest: str,
+        raw_digest: str,
     ) -> str:
-        """Durable acceptance: create and commit canonical immutable objects via Coordinator."""
-        head = self.store.head()
-        conn = self.store._connect()
-        try:
-            row_commit = conn.execute("SELECT body FROM commits WHERE commit_hash=?", (head.commit_hash,)).fetchone()
-            prior_commit = json.loads(row_commit[0]) if row_commit else {}
+        cut, prior_commit = _current_cut(self.store)
+        assignment_record = self.store.resolve_accepted(job.assignment_ref, cut)
+        assignment = assignment_record["body"]
+        if not _same_ref(assignment.get("attempt_ref"), job.attempt_ref):
+            raise ValidationError("ASSIGNMENT_ATTEMPT_BINDING_MISMATCH")
 
-            # Look up source_generation ref
-            sg_row = conn.execute("SELECT digest, schema_ref FROM immutable_objects WHERE kind='source_generation' LIMIT 1").fetchone()
-            sg_digest = sg_row[0] if sg_row else "0" * 64
-            sg_schema = sg_row[1] if sg_row else "BDB_SCHEMA_REGISTRY::source_generation/1"
+        attempt_record = self.store.resolve_accepted(assignment["attempt_ref"], cut)
+        lane_run_record = self.store.resolve_accepted(attempt_record["body"]["lane_run_ref"], cut)
+        knowledge_record = self.store.resolve_accepted(assignment["knowledge_state_ref"], cut)
+        isolation_record = self.store.resolve_accepted(knowledge_record["body"]["isolation_qualification_ref"], cut)
+        lane_spec_record = self.store.resolve_accepted(assignment["lane_spec_ref"], cut)
+        source_record = self.store.resolve_accepted(assignment["source_generation_ref"], cut)
 
-            # Look up stage_spec ref
-            ss_row = conn.execute("SELECT digest, schema_ref, body FROM immutable_objects WHERE kind='stage_spec' LIMIT 1").fetchone()
-            ss_digest = ss_row[0] if ss_row else "0" * 64
-            ss_schema = ss_row[1] if ss_row else "BDB_SCHEMA_REGISTRY::stage_spec/1"
-            ss_body = json.loads(ss_row[2].decode("utf-8")) if ss_row else {}
+        lane_run_ref = _with_ref_class(lane_run_record["ref"], "PRIOR_ACCEPTED_ONLY")
+        attempt_ref = _with_ref_class(attempt_record["ref"], "PRIOR_ACCEPTED_ONLY")
+        knowledge_ref = _with_ref_class(knowledge_record["ref"], "PRIOR_ACCEPTED_ONLY")
+        isolation_ref = _with_ref_class(isolation_record["ref"], "PRIOR_ACCEPTED_ONLY")
+        lane_spec_ref = _with_ref_class(lane_spec_record["ref"], "HISTORY_CONTEXT_BINDING")
+        source_ref = _with_ref_class(source_record["ref"], "PRIOR_ACCEPTED_ONLY")
 
-            # Look up lane_spec ref for this slot
-            ls_rows = conn.execute("SELECT digest, schema_ref, body FROM immutable_objects WHERE kind='lane_spec'").fetchall()
-            ls_digest, ls_schema, ls_body = "0" * 64, "BDB_SCHEMA_REGISTRY::lane_spec/1", {}
-            for row in ls_rows:
-                doc = json.loads(row[2].decode("utf-8"))
-                if doc.get("lane_key") in (slot, f"lane_E1_{slot}"):
-                    ls_digest, ls_schema, ls_body = row[0], row[1], doc
-                    break
+        required_assurance = lane_spec_record["body"].get("required_isolation_assurance", "UNKNOWN")
+        actual_assurance = isolation_record["body"].get("result", "UNKNOWN")
+        ranks = {"UNKNOWN": 0, "DECLARED": 1, "ENFORCED": 2}
+        isolation_sufficient = ranks.get(actual_assurance, -1) >= ranks.get(required_assurance, 99)
 
-            # Look up existing stage_run in store
-            sr_row = conn.execute("SELECT digest, schema_ref, body FROM immutable_objects WHERE kind='stage_run' LIMIT 1").fetchone()
-        finally:
-            conn.close()
-
-        source_gen_ref = {
-            "kind": "source_generation",
-            "revision_digest": sg_digest,
-            "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": sg_schema,
-            "ref_class": "PRIOR_ACCEPTED_ONLY",
-        }
-        stage_spec_ref = {
-            "kind": "stage_spec",
-            "revision_digest": ss_digest,
-            "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": ss_schema,
-            "ref_class": "HISTORY_CONTEXT_BINDING",
-        }
-        lane_spec_ref = {
-            "kind": "lane_spec",
-            "revision_digest": ls_digest,
-            "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": ls_schema,
-            "ref_class": "HISTORY_CONTEXT_BINDING",
-        }
-
-        current_cut = {
-            "variant": "ACCEPTED_HISTORY_CUT",
-            "campaign_id": head.campaign_id,
-            "accepted_head_seq": head.commit_seq,
-            "accepted_head_hash": head.commit_hash,
-            "governing_policy_ref": prior_commit.get("governing_policy_ref"),
-            "governing_spec_refs": list(prior_commit.get("governing_spec_refs", ())),
-        }
-
-        immutable_objs: list[CanonicalObject] = []
-
-        if sr_row:
-            stage_run_doc = json.loads(sr_row[2].decode("utf-8"))
-            stage_run = CanonicalObject("stage_run", stage_run_doc)
-        else:
-            stage_run = CanonicalObject("stage_run", {
-                "stage_run_id": f"stage_run_E1_{head.commit_seq + 1}",
-                "campaign_ref": head.campaign_id,
-                "stage_spec_ref": stage_spec_ref,
-                "source_generation_ref": source_gen_ref,
-                "creation_input_history_cut": current_cut,
-                "assigned_history_cut": current_cut,
-                "predecessor_stage_completion_refs": [],
-                "required_lane_slot_contract_refs": [_external_ref("result_slot_contract_ref", "slot_contract", "HISTORY_CONTEXT_BINDING")],
-            })
-            immutable_objs.append(stage_run)
-
-        stage_run_ref = stage_run.as_ref().as_dict()
-
-        # 1. Lane Run
-        lane_run = CanonicalObject("lane_run", {
-            "lane_run_id": f"lane_run_E1_{slot}_{head.commit_seq + 1}",
-            "stage_run_ref": stage_run_ref,
-            "lane_spec_ref": lane_spec_ref,
-            "source_generation_ref": source_gen_ref,
-            "creation_input_history_cut": current_cut,
-            "required_result_slots": [_external_ref("result_slot_contract_ref", f"slot_{slot}", "HISTORY_CONTEXT_BINDING")],
-        })
-        immutable_objs.append(lane_run)
-
-        # 2. Attempt
-        attempt = CanonicalObject("attempt", {
-            "attempt_id": f"attempt_E1_{slot}_{head.commit_seq + 1}",
-            "lane_run_ref": lane_run.as_ref().as_dict(),
-            "attempt_nonce": f"nonce_{slot}_{res_digest[:16]}",
-            "executor_profile_ref": _external_ref("executor_spec", manifest.get("executor_profile", "chatgpt_github"), "HISTORY_CONTEXT_BINDING"),
-            "delivery_profile_ref": _external_ref("delivery_spec", "ZIP_PROMPT_CLIPBOARD", "HISTORY_CONTEXT_BINDING"),
-            "assigned_history_cut": current_cut,
-            "result_slot_contracts": [_external_ref("result_slot_contract_ref", f"slot_{slot}", "HISTORY_CONTEXT_BINDING")],
-        })
-        immutable_objs.append(attempt)
-
-        # 3. Isolation Qualification
-        isolation = CanonicalObject("isolation_qualification", {
-            "isolation_qualification_id": f"iso_qual_E1_{slot}_{head.commit_seq + 1}",
-            "attempt_ref": attempt.as_ref().as_dict(),
-            "assessment_input_history_cut": current_cut,
-            "executor_profile_ref": _external_ref("executor_spec", manifest.get("executor_profile", "chatgpt_github"), "HISTORY_CONTEXT_BINDING"),
-            "delivery_profile_ref": _external_ref("delivery_spec", "ZIP_PROMPT_CLIPBOARD", "HISTORY_CONTEXT_BINDING"),
-            "channel_inventory_ref": _external_ref("registered_immutable_object", "ch_inv", "CONTENT_OR_PRIOR"),
-            "enforcement_receipt_refs": [],
-            "filesystem_boundary_evidence_refs": [],
-            "network_boundary_evidence_refs": [],
-            "tool_boundary_evidence_refs": [],
-            "session_boundary_evidence_refs": [],
-            "contamination_assessment_refs": [],
-            "required_isolation_assurance": "ENFORCED",
-            "result": "ENFORCED",
-            "scope": "LOCAL_SANDBOX",
-            "limitations": [],
-            "reason_codes": [],
-        })
-        immutable_objs.append(isolation)
-
-        # 4. Knowledge State
-        kstate = CanonicalObject("knowledge_state", {
-            "knowledge_state_id": f"kstate_E1_{slot}_{head.commit_seq + 1}",
-            "attempt_ref": attempt.as_ref().as_dict(),
-            "basis_history_cut": current_cut,
-            "isolation_qualification_ref": isolation.as_ref().as_dict(),
-            "allowed_view_refs": [],
-            "contamination_assessment_refs": [],
-            "potential_exposure_refs": [],
-        })
-        immutable_objs.append(kstate)
-
-        # 5. Discovery Records (one per genuine finding, if any)
-        discovery_objs: list[CanonicalObject] = []
-        for idx, f in enumerate(findings):
-            stmt = f.get("statement") or f.get("title") or f.get("description") or f"Finding {idx + 1}"
-            disc_obj = CanonicalObject("discovery_record", {
-                "discovery_id": f"disc_E1_{slot}_{head.commit_seq + 1}_{idx + 1}",
-                "lane_run_ref": lane_run.as_ref(ref_class="PRIOR_ACCEPTED_ONLY").as_dict(),
-                "attempt_ref": attempt.as_ref(ref_class="PRIOR_ACCEPTED_ONLY").as_dict(),
-                "source_generation_ref": source_gen_ref,
-                "discovery_input_history_cut": current_cut,
-                "knowledge_state_ref": kstate.as_ref(ref_class="PRIOR_ACCEPTED_ONLY").as_dict(),
-                "method_ref": _external_ref("external_profile_ref", "disc_method", "HISTORY_CONTEXT_BINDING"),
-                "producer_ref": _external_ref("actor_or_authority_ref", f"auditor_{slot}", "PRIOR_ACCEPTED_ONLY"),
+        proposal = CanonicalObject("bdb_audit_lane_result", proposal_body)
+        objects: list[CanonicalObject] = [proposal]
+        discoveries: list[CanonicalObject] = []
+        for index, _finding in enumerate(findings):
+            discovery = CanonicalObject("discovery_record", {
+                "discovery_id": f"disc_E1_{slot}_{proposal.digest[:12]}_{index + 1}",
+                "lane_run_ref": lane_run_ref,
+                "attempt_ref": attempt_ref,
+                "source_generation_ref": source_ref,
+                "discovery_input_history_cut": cut,
+                "knowledge_state_ref": knowledge_ref,
+                "method_ref": _external_ref("external_profile_ref", "manual_external_audit", "HISTORY_CONTEXT_BINDING"),
+                "producer_ref": _external_ref("actor_or_authority_ref", f"external_auditor_{slot}", "PRIOR_ACCEPTED_ONLY"),
                 "surface_location_refs": [],
                 "own_observation_refs": [],
             })
-            discovery_objs.append(disc_obj)
-            immutable_objs.append(disc_obj)
+            discoveries.append(discovery)
+            objects.append(discovery)
 
-        # 6. Lane Completion
-        lane_comp_id = deterministic_id("lane_completion", f"lane_comp_{head.campaign_id}_{slot}_{res_digest}")
-        lane_comp = LaneCompletion(
-            lane_completion_id=lane_comp_id,
-            lane_run_ref=_ref_dict(lane_run.as_ref().as_dict()),
-            lane_spec_ref=_ref_dict(lane_spec_ref),
-            input_history_cut=current_cut,
-            final_knowledge_state_ref=_ref_dict(kstate.as_ref().as_dict()),
-            isolation_qualification_ref=_ref_dict(isolation.as_ref().as_dict()),
-            attempt_refs=[_ref_dict(attempt.as_ref().as_dict())],
-            required_output_refs=[_ref_dict(d.as_ref().as_dict()) for d in discovery_objs],
-            completion_predicate_result="LANE_COMPLETED",
+        output_refs = [proposal.as_ref().as_dict(), *[discovery.as_ref().as_dict() for discovery in discoveries]]
+        completion_result = "LANE_COMPLETED" if isolation_sufficient else "LANE_COMPLETION_BLOCKED"
+        lane_completion_id = deterministic_id(
+            "lane_completion",
+            f"{assignment_record['ref']['revision_digest']}:{proposal.digest}",
         )
-        lane_comp_obj = lane_comp.as_object()
-        immutable_objs.append(lane_comp_obj)
+        lane_completion = LaneCompletion(
+            lane_completion_id=lane_completion_id,
+            lane_run_ref=lane_run_ref,
+            lane_spec_ref=lane_spec_ref,
+            input_history_cut=cut,
+            final_knowledge_state_ref=knowledge_ref,
+            isolation_qualification_ref=isolation_ref,
+            attempt_refs=[attempt_ref],
+            required_output_refs=output_refs,
+            completion_predicate_result=completion_result,
+        )
+        objects.append(lane_completion.as_object())
 
-        # Accept command atomically
-        cmd = CommandEnvelope(
-            command_id=_command_id(f"lane_accept_{slot}_{head.commit_seq + 1}"),
+        head = self.store.head()
+        if head is None:
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        command = CommandEnvelope(
+            command_id=_command_id(f"result:{assignment_record['ref']['revision_digest']}:{raw_digest}"),
             command_kind="RECORD_FOUNDATION_FACT",
             actor_ref=prior_commit.get("actor_ref", "installation-owner"),
             expected_parent_head={"tag": "ACCEPTED_HEAD_REF", **head.as_dict()},
-            governing_policy_ref=prior_commit.get("governing_policy_ref", "pin:initial_governing_policy_ref"),
-            governing_spec_refs=tuple(prior_commit.get("governing_spec_refs", ("pin:initial_transition_profile_ref",))),
-            idempotency_scope=f"lane_accept_{slot}_{head.commit_seq + 1}_{res_digest[:16]}",
+            governing_policy_ref=prior_commit["governing_policy_ref"],
+            governing_spec_refs=tuple(prior_commit.get("governing_spec_refs", ())),
+            idempotency_scope=f"result:{assignment_record['ref']['revision_digest']}:{raw_digest}",
             campaign_ref=head.campaign_id,
         )
-
-        self.coordinator.accept(cmd, immutable_objects=immutable_objs, expected_head=head)
-        return lane_comp_id
+        self.coordinator.accept(command, immutable_objects=objects, expected_head=head)
+        return lane_completion_id
 
     def ingest_multiple_zips(self, zip_paths: Sequence[Path | str]) -> ImportedResultSummary:
-        """Ingest a batch of ZIP files and finalize stage completion if all 5 are accepted."""
-        for zp in zip_paths:
-            self.ingest_zip(zp)
+        reports: list[ImportFileResult] = []
+        for zip_path in zip_paths:
+            self.ingest_zip(zip_path)
+            if self._last_file_result is not None:
+                reports.append(self._last_file_result)
 
-        accepted_lanes = [slot for slot, s in self.lane_statuses.items() if s.status == "ACCEPTED"]
-        missing_lanes = [slot for slot, s in self.lane_statuses.items() if s.status != "ACCEPTED"]
+        self._load_accepted_state_from_store()
+        accepted = [slot for slot, state in self.lane_statuses.items() if state.status == "ACCEPTED"]
+        missing = [slot for slot, state in self.lane_statuses.items() if state.status != "ACCEPTED"]
+        error: str | None = None
 
-        # Check if all 5 lanes are accepted
-        if len(accepted_lanes) == len(E1_LANE_SLOTS) and not self.stage_complete:
-            self._finalize_e1_stage_completion()
+        if len(accepted) == len(E1_LANE_SLOTS) and not self.stage_complete:
+            blocked = [slot for slot, state in self.lane_statuses.items() if state.completion_status != "LANE_COMPLETED"]
+            if blocked:
+                error = "STAGE_COMPLETION_BLOCKED: " + ", ".join(blocked)
+            else:
+                try:
+                    self._finalize_e1_stage_completion()
+                except ValidationError as exc:
+                    error = str(exc)
 
-        comp_digest = self.e1_completion_result.completion_digest if self.e1_completion_result else None
         return ImportedResultSummary(
             campaign_id=self.batch.campaign_id,
             stage_id="E1",
             total_required_lanes=len(E1_LANE_SLOTS),
-            accepted_count=len(accepted_lanes),
-            missing_lanes=missing_lanes,
+            accepted_count=len(accepted),
+            missing_lanes=missing,
             lane_statuses=dict(self.lane_statuses),
             stage_complete=self.stage_complete,
-            completion_digest=comp_digest,
+            completion_digest=self.stage_completion_digest,
+            error=error,
+            file_results=reports,
         )
 
     def _finalize_e1_stage_completion(self) -> None:
-        """Commit StageCompletion to campaign history once all 5 lanes are durably accepted."""
-        head = self.store.head()
-        conn = self.store._connect()
-        try:
-            row_commit = conn.execute("SELECT body FROM commits WHERE commit_hash=?", (head.commit_hash,)).fetchone()
-            prior_commit = json.loads(row_commit[0]) if row_commit else {}
+        cut, prior_commit = _current_cut(self.store)
+        lane_completions = tuple(self.store.accepted_records("lane_completion", cut))
+        proposal_rows = self._accepted_results(cut)
 
-            sg_row = conn.execute("SELECT digest, schema_ref FROM immutable_objects WHERE kind='source_generation' LIMIT 1").fetchone()
-            sg_digest = sg_row[0] if sg_row else "0" * 64
-            sg_schema = sg_row[1] if sg_row else "BDB_SCHEMA_REGISTRY::source_generation/1"
+        completion_by_assignment: dict[str, dict[str, Any]] = {}
+        for completion in lane_completions:
+            outputs = completion["body"].get("required_output_refs", [])
+            for proposal in proposal_rows:
+                if any(
+                    isinstance(ref, dict) and ref.get("revision_digest") == proposal["ref"]["revision_digest"]
+                    for ref in outputs
+                ):
+                    assignment_digest = proposal["body"].get("assignment_ref", {}).get("revision_digest")
+                    if assignment_digest:
+                        completion_by_assignment[assignment_digest] = completion
 
-            ss_row = conn.execute("SELECT digest, schema_ref FROM immutable_objects WHERE kind='stage_spec' LIMIT 1").fetchone()
-            ss_digest = ss_row[0] if ss_row else "0" * 64
-            ss_schema = ss_row[1] if ss_row else "BDB_SCHEMA_REGISTRY::stage_spec/1"
+        required_completion_refs: list[dict[str, Any]] = []
+        proposal_refs: list[dict[str, Any]] = []
+        stage_run_digests: set[str] = set()
+        stage_run_ref: dict[str, Any] | None = None
+        stage_spec_ref: dict[str, Any] | None = None
+        lane_discoveries: dict[str, list[dict]] = {}
 
-            sr_row = conn.execute("SELECT digest, schema_ref FROM immutable_objects WHERE kind='stage_run' LIMIT 1").fetchone()
-            sr_digest = sr_row[0] if sr_row else "0" * 64
-            sr_schema = sr_row[1] if sr_row else "BDB_SCHEMA_REGISTRY::stage_run/1"
+        for slot in E1_LANE_SLOTS:
+            job = self.batch.get_job(slot)
+            completion = completion_by_assignment.get(job.assignment_ref.get("revision_digest"))
+            if completion is None or completion["body"].get("completion_predicate_result") != "LANE_COMPLETED":
+                raise ValidationError("STAGE_COMPLETION_BLOCKED", f"Missing completed lane {slot}")
+            required_completion_refs.append(_with_ref_class(completion["ref"], "PRIOR_ACCEPTED_ONLY"))
 
-            lc_rows = conn.execute("SELECT digest, schema_ref, body FROM immutable_objects WHERE kind='lane_completion'").fetchall()
-            disc_rows = conn.execute("SELECT digest, schema_ref FROM immutable_objects WHERE kind='discovery_record'").fetchall()
-        finally:
-            conn.close()
+            proposal = self._accepted_result_for_job(job, cut)
+            if proposal is None:
+                raise ValidationError("STAGE_COMPLETION_BLOCKED", f"Missing accepted result {slot}")
+            proposal_refs.append(_with_ref_class(proposal["ref"], "PRIOR_ACCEPTED_ONLY"))
+            lane_discoveries[slot] = [dict(finding) for finding in proposal["body"].get("findings", []) if isinstance(finding, dict)]
 
-        source_gen_ref = {
-            "kind": "source_generation",
-            "revision_digest": sg_digest,
-            "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": sg_schema,
-            "ref_class": "PRIOR_ACCEPTED_ONLY",
-        }
-        stage_spec_ref = {
-            "kind": "stage_spec",
-            "revision_digest": ss_digest,
-            "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": ss_schema,
-            "ref_class": "HISTORY_CONTEXT_BINDING",
-        }
-        stage_run_ref = {
-            "kind": "stage_run",
-            "revision_digest": sr_digest,
-            "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": sr_schema,
-            "ref_class": "CONTENT_OR_PRIOR",
-        }
+            assignment = self.store.resolve_accepted(job.assignment_ref, cut)["body"]
+            attempt = self.store.resolve_accepted(assignment["attempt_ref"], cut)["body"]
+            lane_run = self.store.resolve_accepted(attempt["lane_run_ref"], cut)["body"]
+            current_stage_run_ref = lane_run["stage_run_ref"]
+            stage_run_digests.add(current_stage_run_ref["revision_digest"])
+            stage_run_ref = _with_ref_class(current_stage_run_ref, "PRIOR_ACCEPTED_ONLY")
+            stage_spec_ref = _with_ref_class(assignment["stage_spec_ref"], "HISTORY_CONTEXT_BINDING")
 
-        # Build lane completion refs for all 5 lanes
-        lane_comp_refs = []
-        for r in lc_rows:
-            lane_comp_refs.append({
-                "kind": "lane_completion",
-                "revision_digest": r[0],
-                "digest_profile": "BDB-OBJECT-DIGEST-1",
-                "schema_revision_ref": r[1],
-                "ref_class": "CONTENT_OR_PRIOR",
-            })
+        if len(stage_run_digests) != 1 or stage_run_ref is None or stage_spec_ref is None:
+            raise ValidationError("STAGE_RUN_BINDING_CONFLICT")
 
-        # Build discovery record refs
-        all_disc_refs = []
-        for r in disc_rows:
-            all_disc_refs.append({
-                "kind": "discovery_record",
-                "revision_digest": r[0],
-                "digest_profile": "BDB-OBJECT-DIGEST-1",
-                "schema_revision_ref": r[1],
-                "ref_class": "CONTENT_OR_PRIOR",
-            })
-
-        # Collect discoveries for native ensemble validation
-        discoveries: dict[str, list[dict]] = {slot: self.lane_statuses[slot].findings for slot in E1_LANE_SLOTS}
-
-        e1_result = execute_e1_ensemble(source_gen_ref, discoveries)
-
-        current_cut = {
-            "variant": "ACCEPTED_HISTORY_CUT",
-            "campaign_id": head.campaign_id,
-            "accepted_head_seq": head.commit_seq,
-            "accepted_head_hash": head.commit_hash,
-            "governing_policy_ref": prior_commit.get("governing_policy_ref"),
-            "governing_spec_refs": list(prior_commit.get("governing_spec_refs", ())),
-        }
-
-        # Construct and accept StageCompletion
-        stage_comp = StageCompletion(
-            stage_completion_id=deterministic_id("stage_completion", f"stage_comp_{head.campaign_id}_E1"),
+        stage_completion = StageCompletion(
+            stage_completion_id=deterministic_id(
+                "stage_completion",
+                ":".join(sorted(ref["revision_digest"] for ref in required_completion_refs)),
+            ),
             stage_run_ref=stage_run_ref,
             stage_spec_ref=stage_spec_ref,
-            input_history_cut=current_cut,
-            required_lane_slot_results=lane_comp_refs,
-            required_output_refs=all_disc_refs,
-            mandatory_obligation_summary={"total_mandatory": 5, "qualified": 5},
+            input_history_cut=cut,
+            required_lane_slot_results=required_completion_refs,
+            required_output_refs=proposal_refs,
+            mandatory_obligation_summary={"required_lanes": len(E1_LANE_SLOTS), "completed_lanes": len(required_completion_refs)},
+            unresolved_material_refs=[],
+            unknown_blocked_summary={"unknown_surfaces_count": 0},
             completion_predicate_result="STAGE_COMPLETED",
         )
-        stage_comp_obj = stage_comp.as_object()
+        stage_obj = stage_completion.as_object()
 
-        cmd = CommandEnvelope(
-            command_id=_command_id(f"stage_complete_E1_{head.commit_seq + 1}"),
+        first_assignment = self.store.resolve_accepted(self.batch.get_job("E1-A").assignment_ref, cut)["body"]
+        source_ref = self.store.resolve_accepted(first_assignment["source_generation_ref"], cut)["ref"]
+        self.e1_completion_result = execute_e1_ensemble(source_ref, lane_discoveries)
+
+        head = self.store.head()
+        if head is None:
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        command = CommandEnvelope(
+            command_id=_command_id("stage_completion:" + stage_obj.digest),
             command_kind="RECORD_FOUNDATION_FACT",
             actor_ref=prior_commit.get("actor_ref", "installation-owner"),
             expected_parent_head={"tag": "ACCEPTED_HEAD_REF", **head.as_dict()},
-            governing_policy_ref=prior_commit.get("governing_policy_ref", "pin:initial_governing_policy_ref"),
-            governing_spec_refs=tuple(prior_commit.get("governing_spec_refs", ("pin:initial_transition_profile_ref",))),
-            idempotency_scope=f"stage_complete_E1_{head.commit_seq + 1}",
+            governing_policy_ref=prior_commit["governing_policy_ref"],
+            governing_spec_refs=tuple(prior_commit.get("governing_spec_refs", ())),
+            idempotency_scope="stage_completion:" + stage_obj.digest,
             campaign_ref=head.campaign_id,
         )
-
-        self.coordinator.accept(cmd, immutable_objects=[stage_comp_obj], expected_head=head)
-        self.e1_completion_result = e1_result
+        self.coordinator.accept(command, immutable_objects=[stage_obj], expected_head=head)
         self.stage_complete = True
+        self.stage_completion_digest = stage_obj.digest
+        self._load_accepted_state_from_store()
 
 
-__all__ = [
-    "MAX_ALLOWED_UNCOMPRESSED_BYTES",
-    "LaneInboxStatus",
-    "ImportedResultSummary",
-    "E1ResultInbox",
-]
+__all__ = ["LaneInboxStatus", "ImportFileResult", "ImportedResultSummary", "E1ResultInbox"]
