@@ -53,7 +53,7 @@ def _current_cut(store: TransactionalHistoryStore) -> tuple[dict[str, Any], dict
 
     ``TransactionalHistoryStore.commits()`` returns canonical commit bodies; the
     commit hash itself lives in the accepted-head pointer and is intentionally
-    not duplicated into the self-hashed body.  Verify sequence/campaign binding
+    not duplicated into the self-hashed body. Verify sequence/campaign binding
     here and use the head hash when constructing HistoryCut.
     """
     head = store.head()
@@ -117,7 +117,20 @@ class AssignmentService:
             raise ValidationError("ASSIGNMENT_PREREQUISITE_MISSING", ",".join(missing))
         return source, stage, lanes
 
-    def _existing(self, cut: dict[str, Any], lanes: dict[str, dict]) -> AssignmentSet | None:
+    def _existing(
+        self,
+        cut: dict[str, Any],
+        lanes: dict[str, dict],
+        *,
+        executor_ref: dict[str, Any],
+        delivery_ref: dict[str, Any],
+    ) -> AssignmentSet | None:
+        """Reconstruct the exact accepted assignment set from history.
+
+        Current user settings are comparison inputs only. They cannot silently
+        rewrite an already delivered attempt: profile/model/delivery drift is a
+        blocker requiring an explicit new attempt.
+        """
         records = tuple(self.store.accepted_records("assignment_manifest", cut))
         if not records:
             return None
@@ -128,12 +141,22 @@ class AssignmentService:
             slot = lane_digest_to_slot.get(body.get("lane_spec_ref", {}).get("revision_digest"))
             if slot is None:
                 continue
+            if body.get("executor_profile_ref") != executor_ref or body.get("delivery_profile_ref") != delivery_ref:
+                raise ValidationError(
+                    "ASSIGNMENT_PROFILE_DRIFT",
+                    f"Accepted assignment for {slot} is bound to a different executor/model/delivery profile",
+                )
+            knowledge_ref = dict(body["knowledge_state_ref"])
+            knowledge = self.store.resolve_accepted(knowledge_ref, cut)["body"]
+            isolation_ref = knowledge.get("isolation_qualification_ref")
+            if not isinstance(isolation_ref, dict):
+                raise ValidationError("ASSIGNMENT_KNOWLEDGE_BINDING_INVALID", slot)
             mapped[slot] = PreparedAssignment(
                 lane_slot=slot,
                 assignment_ref=_ref(record, "PRIOR_ACCEPTED_ONLY"),
                 attempt_ref=dict(body["attempt_ref"]),
-                knowledge_state_ref=dict(body["knowledge_state_ref"]),
-                isolation_qualification_ref={},
+                knowledge_state_ref=knowledge_ref,
+                isolation_qualification_ref=dict(isolation_ref),
                 assignment_input_history_cut=dict(body["assignment_input_history_cut"]),
                 accepted_history_cut=dict(cut),
             )
@@ -161,15 +184,20 @@ class AssignmentService:
     ) -> AssignmentSet:
         input_cut, prior_commit = _current_cut(self.store)
         source, stage, lanes = self._prerequisites(input_cut)
-        existing = self._existing(input_cut, lanes)
+        executor_ref = _external_ref("executor_spec", f"{executor_profile}:{model}", "HISTORY_CONTEXT_BINDING")
+        delivery_ref = _external_ref("delivery_spec", delivery_profile, "HISTORY_CONTEXT_BINDING")
+        existing = self._existing(
+            input_cut,
+            lanes,
+            executor_ref=executor_ref,
+            delivery_ref=delivery_ref,
+        )
         if existing is not None:
             return existing
 
         seed_root = f"{input_cut['campaign_id']}:{input_cut['accepted_head_hash']}:E1"
         source_ref = _ref(source, "CONTENT_OR_PRIOR")
         stage_ref = _ref(stage, "HISTORY_CONTEXT_BINDING")
-        executor_ref = _external_ref("executor_spec", f"{executor_profile}:{model}", "HISTORY_CONTEXT_BINDING")
-        delivery_ref = _external_ref("delivery_spec", delivery_profile, "HISTORY_CONTEXT_BINDING")
 
         objects: list[CanonicalObject] = []
         stage_run = CanonicalObject("stage_run", {
