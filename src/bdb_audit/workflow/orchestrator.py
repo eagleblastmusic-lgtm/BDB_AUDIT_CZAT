@@ -1,41 +1,41 @@
 """Full Audit Orchestrator for BDB Audit v2.0.3.
 
-Provides an application-level state machine orchestrating preflight checks,
-exact source identity resolution, frozen parallel E1 batch packaging, sequential
-delivery UX, multi-ZIP inbox ingestion, fail-closed stage progression, and true resume.
+Application-level state machine for preflight, exact source resolution, durable
+E1 assignment/package preparation, manual delivery, raw-first result import, and
+fail-closed resume.  Mutable user settings are configuration for *new* work;
+they are never allowed to rewrite an already accepted assignment on resume.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
-import hashlib
-import json
 from pathlib import Path
 from typing import Any, Sequence
 
-from ..core.errors import ValidationError
 from ..coordinator.operations import AuditOperationApi
+from ..core.errors import ValidationError
+from ..core.registry import ContractRegistry
 from ..history.store import TransactionalHistoryStore
 from ..orchestration.native_ensemble import E1_LANE_SLOTS
 from ..orchestration.templates import TemplateRegistry
-from ..core.registry import ContractRegistry
-from .settings import UserSettings, SettingsManager
-from .platform import PlatformAdapter, DefaultPlatformAdapter
 from .executors import get_executor_profile
+from .inbox import E1ResultInbox, ImportedResultSummary
+from .package_resume import load_e1_batch
+from .packaging import E1Batch, prepare_e1_batch
+from .platform import DefaultPlatformAdapter, PlatformAdapter
+from .settings import SettingsManager, UserSettings
 from .source_target import ResolvedSource, resolve_source_identity
-from .packaging import E1Batch, E1LaneJob, prepare_e1_batch
-from .inbox import E1ResultInbox, ImportedResultSummary, LaneInboxStatus
 
 
 @dataclass(frozen=True)
 class PreflightCheckResult:
     check_name: str
-    status: str  # "PASS" | "BLOCKED" | "NEEDS_INPUT"
+    status: str  # PASS | BLOCKED | NEEDS_INPUT
     details: str
 
 
 @dataclass(frozen=True)
 class PreflightReport:
-    overall_status: str  # "PASS" | "BLOCKED" | "NEEDS_INPUT"
+    overall_status: str
     checks: tuple[PreflightCheckResult, ...]
 
     @property
@@ -44,7 +44,7 @@ class PreflightReport:
 
 
 class FullAuditOrchestrator:
-    """End-to-end audit orchestrator driving the v2.0.3 user workflow."""
+    """End-to-end user workflow over the canonical history engine."""
 
     def __init__(
         self,
@@ -61,11 +61,17 @@ class FullAuditOrchestrator:
         self.e1_batch: E1Batch | None = None
         self.e1_inbox: E1ResultInbox | None = None
 
+    def _artifact_root(self) -> Path:
+        if self.active_store_path is None:
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        # Campaign artifacts travel with the exact campaign-store partition.
+        # This removes mutable output_work_dir from resume authority.
+        return self.active_store_path.parent / "artifacts"
+
     def run_preflight(self, explicit_target_sha: str | None = None) -> PreflightReport:
-        """Run all 8 preflight checks before running any lanes."""
+        """Run all preflight checks before creating new lane assignments."""
         checks: list[PreflightCheckResult] = []
 
-        # 1. Source / target check
         target_loc = (
             self.settings.github_repo_url
             if self.settings.execution_mode == "ChatGPT / GitHub"
@@ -76,7 +82,6 @@ class FullAuditOrchestrator:
         else:
             checks.append(PreflightCheckResult("Source / target", "PASS", f"Configured: {target_loc}"))
 
-        # 2. Exact source identity resolution
         target_ref = (
             self.settings.github_default_ref
             if self.settings.execution_mode == "ChatGPT / GitHub"
@@ -91,20 +96,21 @@ class FullAuditOrchestrator:
                 explicit_sha=explicit_target_sha,
             )
             self.resolved_source = resolved_src
+            tree_suffix = f" tree {resolved_src.exact_tree_sha[:12]}" if resolved_src.exact_tree_sha else ""
             checks.append(PreflightCheckResult(
-                "Exact source identity", "PASS", f"{resolved_src.ref} @ {resolved_src.exact_commit_sha[:12]}"
+                "Exact source identity", "PASS",
+                f"{resolved_src.ref} @ {resolved_src.exact_commit_sha[:12]}{tree_suffix}",
             ))
         except Exception as exc:
             checks.append(PreflightCheckResult(
-                "Exact source identity", "NEEDS_INPUT", f"Could not resolve exact commit SHA: {exc}"
+                "Exact source identity", "NEEDS_INPUT", f"Could not verify exact source identity: {exc}"
             ))
 
-        # 3. Executor profile check (Block unsupported modes)
         if self.settings.execution_mode != "ChatGPT / GitHub":
             checks.append(PreflightCheckResult(
-                "Executor profile",
-                "BLOCKED",
-                f"Execution mode '{self.settings.execution_mode}' delivery and result lifecycle is not implemented in v2.0.3 (NEEDS_IMPLEMENTATION)",
+                "Executor profile", "BLOCKED",
+                f"Execution mode '{self.settings.execution_mode}' delivery and result lifecycle is not implemented "
+                "in v2.0.3 (NEEDS_IMPLEMENTATION)",
             ))
         else:
             profile = get_executor_profile(self.settings.execution_mode)
@@ -115,14 +121,12 @@ class FullAuditOrchestrator:
             else:
                 checks.append(PreflightCheckResult("Executor profile", "BLOCKED", "Invalid executor profile"))
 
-        # 4. Delivery profile check
         profile = get_executor_profile(self.settings.execution_mode)
         if profile.delivery_profile and self.settings.execution_mode == "ChatGPT / GitHub":
             checks.append(PreflightCheckResult("Delivery profile", "PASS", profile.delivery_profile))
         else:
             checks.append(PreflightCheckResult("Delivery profile", "BLOCKED", "Delivery profile not implemented"))
 
-        # 5. Output directory check
         out_dir = Path(self.settings.output_work_dir).resolve()
         try:
             out_dir.mkdir(parents=True, exist_ok=True)
@@ -133,39 +137,35 @@ class FullAuditOrchestrator:
         except Exception as exc:
             checks.append(PreflightCheckResult("Output directory", "BLOCKED", f"Output directory not writable: {exc}"))
 
-        # 6. Campaign store check
         try:
             default_store = out_dir / "campaign.sqlite"
             checks.append(PreflightCheckResult("Campaign store", "PASS", str(default_store)))
         except Exception as exc:
             checks.append(PreflightCheckResult("Campaign store", "BLOCKED", str(exc)))
 
-        # 7. Required templates check
         try:
             reg = TemplateRegistry()
-            t = reg.get("e1_ensemble")
-            checks.append(PreflightCheckResult("Required templates", "PASS", f"Verified template {t.template_id}"))
+            template = reg.get("e1_ensemble")
+            checks.append(PreflightCheckResult("Required templates", "PASS", f"Verified template {template.template_id}"))
         except Exception as exc:
             checks.append(PreflightCheckResult("Required templates", "BLOCKED", str(exc)))
 
-        # 8. Required contracts check
         try:
-            creg = ContractRegistry()
-            creg.contract("stage_spec", version="1")
-            creg.contract("lane_spec", version="1")
-            creg.contract("bdb_audit_lane_result", version="1")
+            registry = ContractRegistry()
+            registry.contract("stage_spec", version="1")
+            registry.contract("lane_spec", version="1")
+            registry.contract("bdb_audit_lane_result", version="1")
             checks.append(PreflightCheckResult("Required contracts", "PASS", "Verified canonical schemas"))
         except Exception as exc:
             checks.append(PreflightCheckResult("Required contracts", "BLOCKED", str(exc)))
 
         overall = "PASS"
-        for c in checks:
-            if c.status == "BLOCKED":
+        for check in checks:
+            if check.status == "BLOCKED":
                 overall = "BLOCKED"
                 break
-            if c.status == "NEEDS_INPUT" and overall != "BLOCKED":
+            if check.status == "NEEDS_INPUT" and overall != "BLOCKED":
                 overall = "NEEDS_INPUT"
-
         return PreflightReport(overall_status=overall, checks=tuple(checks))
 
     def initialize_campaign(
@@ -173,76 +173,67 @@ class FullAuditOrchestrator:
         store_path: Path | str | None = None,
         campaign_seed: str | None = None,
     ) -> dict[str, Any]:
-        """Create or locate the campaign store with verified source identity binding."""
+        """Create or locate a campaign store with source-identity partitioning."""
         out_dir = Path(self.settings.output_work_dir).resolve()
         target_display = self.resolved_source.display_name if self.resolved_source else "Audit Target"
         current_sha = self.resolved_source.exact_commit_sha if self.resolved_source else "seed"
         target_location = self.resolved_source.location if self.resolved_source else "target"
 
         if store_path:
-            p = Path(store_path).resolve()
-            if p.exists() and p.stat().st_size > 0:
-                # Verify source identity match
-                existing_src = self.api.get_campaign_source_identity(p)
+            path = Path(store_path).resolve()
+            if path.exists() and path.stat().st_size > 0:
+                existing_src = self.api.get_campaign_source_identity(path)
                 stored_sha = existing_src.get("git_commit_object_id")
                 if stored_sha and stored_sha != current_sha:
                     raise ValidationError(
                         "SOURCE_IDENTITY_MISMATCH",
-                        f"Store at {p} is bound to commit {stored_sha}, but current target is {current_sha}. "
-                        "Reusing campaign store for a different commit is forbidden.",
+                        f"Store at {path} is bound to commit {stored_sha}, but current target is {current_sha}",
                     )
         else:
             safe_name = target_display.replace("/", "_").replace("\\", "_").replace(":", "_")
-            # Store partitioned by commit sha to ensure distinct commits never collide
-            p = out_dir / safe_name / current_sha[:12] / "campaign.sqlite"
+            path = out_dir / safe_name / current_sha[:12] / "campaign.sqlite"
 
-        p.parent.mkdir(parents=True, exist_ok=True)
-        self.active_store_path = p
-
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self.active_store_path = path
         seed = campaign_seed or f"{target_display}_{current_sha}"
-        if not p.exists() or p.stat().st_size == 0:
+        if not path.exists() or path.stat().st_size == 0:
             created = self.api.create_campaign(
-                p,
+                path,
                 seed=seed,
                 target_repo=target_location,
                 commit_sha=current_sha if self.resolved_source else None,
             )
-            cid = created["campaign_id"]
+            campaign_id = created["campaign_id"]
         else:
-            status = self.api.get_campaign_status(p)
-            cid = status["campaign_id"]
+            campaign_id = self.api.get_campaign_status(path)["campaign_id"]
 
-        self.settings_mgr.record_campaign(p, cid, target_display)
-        return {"status": "SUCCESS", "campaign_id": cid, "store_path": str(p)}
+        self.settings_mgr.record_campaign(path, campaign_id, target_display)
+        return {"status": "SUCCESS", "campaign_id": campaign_id, "store_path": str(path)}
 
     def prepare_e1_orchestration(self) -> E1Batch:
-        """Prepare Stage E1, all 5 lanes in store, and generate frozen E1Batch packages."""
+        """Prepare E1 specs, accept assignments, then publish deterministic packages."""
         if not self.active_store_path or not self.active_store_path.exists():
-            raise ValueError("Active campaign store not initialized")
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
         if not self.resolved_source:
-            raise ValueError("Resolved source identity required before preparing E1")
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
 
         status = self.api.get_campaign_status(self.active_store_path)
-        stages_prep = status.get("stages_prepared", [])
-
-        # 1. Prepare stage E1 if not yet prepared
-        if "E1" not in stages_prep:
+        if "E1" not in status.get("stages_prepared", []):
             self.api.prepare_stage(self.active_store_path, "E1")
 
-        # 2. Prepare all 5 lanes in store if not yet prepared
-        lanes_prep = status.get("lanes_prepared", [])
+        # Refresh after StageSpec acceptance so LaneSpec preparation is based on
+        # accepted state rather than a pre-stage cached status snapshot.
+        status = self.api.get_campaign_status(self.active_store_path)
+        lanes_prepared = set(status.get("lanes_prepared", []))
         for slot in E1_LANE_SLOTS:
             lane_key = f"lane_E1_{slot}"
-            if lane_key not in lanes_prep:
+            if lane_key not in lanes_prepared:
                 self.api.prepare_lane(self.active_store_path, "E1", slot=slot)
 
-        # 3. Create frozen batch across all 5 lanes against the exact same cut
         store = TransactionalHistoryStore(self.active_store_path)
-        out_dir = Path(self.settings.output_work_dir).resolve()
-
         batch = prepare_e1_batch(
             store=store,
-            output_dir=out_dir,
+            output_dir=self._artifact_root(),
             source_info=self.resolved_source,
             execution_mode=self.settings.execution_mode,
             model=self.settings.model,
@@ -252,88 +243,92 @@ class FullAuditOrchestrator:
         return batch
 
     def deliver_lane_to_user(self, slot: str) -> dict[str, Any]:
-        """Perform platform delivery actions (clipboard copy, explorer select) for one lane."""
+        """Deliver one already accepted assignment/package through the UI adapter."""
         if not self.e1_batch:
-            raise ValueError("E1 batch has not been prepared")
-
+            raise ValidationError("E1_BATCH_NOT_PREPARED")
         job = self.e1_batch.get_job(slot)
         clipboard_ok = False
         explorer_ok = False
-
         if self.settings.auto_copy_clipboard:
             clipboard_ok = self.platform.copy_to_clipboard(job.prompt_text)
-
         if self.settings.auto_open_explorer:
             explorer_ok = self.platform.open_and_select(job.package_zip_path)
-
         return {
             "lane_slot": slot,
             "package_zip_path": str(job.package_zip_path),
             "package_zip_name": job.package_zip_path.name,
+            "assignment_ref": dict(job.assignment_ref),
+            "attempt_ref": dict(job.attempt_ref),
             "prompt_copied": clipboard_ok if self.settings.auto_copy_clipboard else None,
             "explorer_selected": explorer_ok if self.settings.auto_open_explorer else None,
         }
 
+    # Compatibility alias used by existing UI/tests.
+    def deliver_e1_lane(self, slot: str) -> dict[str, Any]:
+        result = self.deliver_lane_to_user(slot)
+        return {"status": "SUCCESS", **result}
+
     def import_results(self, zip_paths: Sequence[Path | str]) -> ImportedResultSummary:
-        """Ingest multiple result ZIPs through the E1ResultInbox."""
         if not self.e1_inbox:
-            raise ValueError("E1 result inbox not initialized")
+            raise ValidationError("E1_RESULT_INBOX_NOT_INITIALIZED")
         return self.e1_inbox.ingest_multiple_zips(zip_paths)
 
     def resume_campaign(self, store_path: Path | str) -> dict[str, Any]:
-        """Resume an existing campaign strictly from its transactional history store."""
-        p = Path(store_path).resolve()
-        if not p.exists() or p.stat().st_size == 0:
-            raise ValidationError("CAMPAIGN_NOT_FOUND", f"No database found at {p}")
+        """Resume from accepted history + exact durable package bytes only.
 
-        status = self.api.get_campaign_status(p)
-        cid = status["campaign_id"]
-        self.active_store_path = p
+        Current settings (model, executor profile, repository ref, output path)
+        are deliberately ignored for the already assigned E1 work.
+        """
+        path = Path(store_path).resolve()
+        if not path.exists() or path.stat().st_size == 0:
+            return {
+                "status": "ERROR",
+                "error": "CAMPAIGN_NOT_FOUND",
+                "store_path": str(path),
+            }
 
-        # Reconstruct source identity from genesis
-        src_info = self.api.get_campaign_source_identity(p)
-        commit_sha = src_info.get("git_commit_object_id") or "0" * 40
-        repo_ref = src_info.get("repository_authority_ref", {})
-        repo_str = repo_ref.get("schema_revision_ref", "")
-        repo_loc = repo_str.split("repo:", 1)[-1] if "repo:" in repo_str else self.settings.github_repo_url
+        try:
+            status = self.api.get_campaign_status(path)
+            campaign_id = status["campaign_id"]
+            self.active_store_path = path
+            store = TransactionalHistoryStore(path)
+            batch, durable_source = load_e1_batch(store, self._artifact_root())
+            self.resolved_source = durable_source
+            self.e1_batch = batch
+            self.e1_inbox = E1ResultInbox(store, batch)
+        except ValidationError as exc:
+            self.e1_batch = None
+            self.e1_inbox = None
+            return {
+                "status": "ERROR",
+                "error": exc.code,
+                "details": str(exc),
+                "store_path": str(path),
+            }
 
-        self.resolved_source = ResolvedSource(
-            target_type="github" if self.settings.execution_mode == "ChatGPT / GitHub" else "local",
-            location=repo_loc,
-            display_name=Path(repo_loc).name or repo_loc,
-            ref=self.settings.github_default_ref,
-            exact_commit_sha=commit_sha,
+        accepted_count = sum(
+            1 for lane in self.e1_inbox.lane_statuses.values() if lane.status == "ACCEPTED"
         )
-
-        store = TransactionalHistoryStore(p)
-        out_dir = Path(self.settings.output_work_dir).resolve()
-
-        batch = prepare_e1_batch(
-            store=store,
-            output_dir=out_dir,
-            source_info=self.resolved_source,
-            execution_mode=self.settings.execution_mode,
-            model=self.settings.model,
-        )
-        self.e1_batch = batch
-        self.e1_inbox = E1ResultInbox(store, batch)
-
-        accepted_count = sum(1 for s in self.e1_inbox.lane_statuses.values() if s.status == "ACCEPTED")
-        missing = [slot for slot, s in self.e1_inbox.lane_statuses.items() if s.status != "ACCEPTED"]
-
+        missing = [
+            slot for slot, lane in self.e1_inbox.lane_statuses.items() if lane.status != "ACCEPTED"
+        ]
         return {
             "status": "SUCCESS",
-            "campaign_id": cid,
-            "store_path": str(p),
+            "campaign_id": campaign_id,
+            "store_path": str(path),
             "current_stage": status.get("current_stage", "E1"),
             "accepted_lanes_count": accepted_count,
             "total_required_lanes": len(E1_LANE_SLOTS),
             "missing_lanes": missing,
             "stage_complete": self.e1_inbox.stage_complete,
+            "source_commit_sha": durable_source.exact_commit_sha,
+            "source_tree_sha": durable_source.exact_tree_sha,
+            "executor_profile": batch.executor_profile,
+            "executor_model": batch.model,
         }
 
     def advance_to_next_stage(self) -> dict[str, Any]:
-        """Evaluate progression after E1. Fail closed if subsequent stages need implementation."""
+        """Fail closed at E2 until its real orchestration path exists."""
         if not self.e1_inbox or not self.e1_inbox.stage_complete:
             return {
                 "status": "BLOCKED",
@@ -341,7 +336,6 @@ class FullAuditOrchestrator:
                 "reason": "E1 is not yet complete",
                 "next_action": "IMPORT_MISSING_E1_RESULTS",
             }
-
         return {
             "status": "HALTED",
             "current_stage": "E1",
@@ -350,10 +344,24 @@ class FullAuditOrchestrator:
             "next_action": "NEEDS_IMPLEMENTATION",
         }
 
+    # Compatibility name retained for tests/UI.
+    def advance_after_e1(self) -> dict[str, Any]:
+        result = self.advance_to_next_stage()
+        if result.get("status") == "HALTED" and result.get("next_action") == "NEEDS_IMPLEMENTATION":
+            return {**result, "status": "NEEDS_IMPLEMENTATION"}
+        return result
+
+    def get_status(self) -> dict[str, Any]:
+        if not self.active_store_path:
+            return {"status": "NO_ACTIVE_CAMPAIGN"}
+        summary = self.get_dashboard_summary()
+        return {"status": "ACTIVE", "stage": "E1", **summary}
+
     def get_dashboard_summary(self) -> dict[str, Any]:
-        """Construct structured dashboard state matching Section 20."""
         target = self.resolved_source.display_name if self.resolved_source else (
-            self.settings.github_repo_url if self.settings.execution_mode == "ChatGPT / GitHub" else self.settings.local_repo_path
+            self.settings.github_repo_url
+            if self.settings.execution_mode == "ChatGPT / GitHub"
+            else self.settings.local_repo_path
         )
         exact_sha = self.resolved_source.exact_commit_sha if self.resolved_source else "<unresolved>"
         store_str = str(self.active_store_path) if self.active_store_path else "<none>"
@@ -366,30 +374,30 @@ class FullAuditOrchestrator:
             "E5": "NOT_STARTED",
             "STOP": "PENDING",
         }
-
-        lanes_detail = {}
+        lanes_detail: dict[str, str] = {}
         if self.e1_inbox:
-            if self.e1_inbox.stage_complete:
-                stage_status["E1"] = "COMPLETE"
-            else:
-                stage_status["E1"] = "IN_PROGRESS"
-            for slot, st in self.e1_inbox.lane_statuses.items():
-                lanes_detail[slot] = st.status
+            stage_status["E1"] = "COMPLETE" if self.e1_inbox.stage_complete else "IN_PROGRESS"
+            for slot, lane in self.e1_inbox.lane_statuses.items():
+                lanes_detail[slot] = lane.status
 
+        if self.e1_batch:
+            execution_profile = f"{self.e1_batch.executor_profile} ({self.e1_batch.model})"
+            campaign_id = self.e1_batch.campaign_id
+        else:
+            execution_profile = f"{self.settings.execution_mode} ({self.settings.model})"
+            campaign_id = "<none>"
+
+        source_type = self.resolved_source.target_type if self.resolved_source else self.settings.execution_mode
         return {
             "project": target,
-            "source_type": self.settings.execution_mode,
+            "source_type": source_type,
             "pinned_revision": exact_sha,
-            "execution_profile": f"{self.settings.execution_mode} ({self.settings.model})",
+            "execution_profile": execution_profile,
             "campaign_store": store_str,
-            "campaign_id": self.e1_batch.campaign_id if self.e1_batch else "<none>",
+            "campaign_id": campaign_id,
             "stages": stage_status,
             "e1_lanes": lanes_detail,
         }
 
 
-__all__ = [
-    "PreflightCheckResult",
-    "PreflightReport",
-    "FullAuditOrchestrator",
-]
+__all__ = ["PreflightCheckResult", "PreflightReport", "FullAuditOrchestrator"]
