@@ -6,7 +6,6 @@ participate in storage paths; identity is the RawDigest of exact bytes.
 from __future__ import annotations
 
 from dataclasses import dataclass
-import json
 import os
 from pathlib import Path
 import tempfile
@@ -52,6 +51,9 @@ class RawArtifactVault:
 
     @staticmethod
     def _sync_dir(path: Path) -> None:
+        # fsync on directory descriptors is not portable to Windows.  File
+        # descriptors are flushed before publication; POSIX additionally syncs
+        # the containing directory after the atomic link/replace.
         if os.name == "nt":
             return
         fd = os.open(str(path), os.O_RDONLY)
@@ -131,10 +133,14 @@ class RawArtifactVault:
             return
         tmp = path.with_suffix(".json.tmp")
         try:
-            tmp.write_bytes(raw)
-            with tmp.open("rb") as stream:
+            # Keep the descriptor writable while flushing.  On Windows,
+            # os.fsync() on a read-only descriptor can fail with EBADF.
+            with tmp.open("wb") as stream:
+                stream.write(raw)
+                stream.flush()
                 os.fsync(stream.fileno())
             os.replace(tmp, path)
+            self._sync_dir(path.parent)
         except OSError as exc:
             raise ValidationError("RAW_VAULT_WRITE_FAILED", type(exc).__name__) from exc
         finally:
