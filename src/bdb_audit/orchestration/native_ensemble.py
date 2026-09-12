@@ -171,16 +171,21 @@ def execute_e1_ensemble(
 
     released = broker.release_checkpoint_for_e2()
 
-    # Compute deterministic completion digest
+    # Bind the exact quarantined content, not merely its count.  This makes the
+    # library-level checkpoint change when the evidence-bearing discovery set
+    # changes even if lane/count summaries remain constant.
     completion_body = {
         "stage_key": "E1",
         "stage_spec_digest": spec.revision_digest,
         "completed_lanes": sorted(spec.required_lane_slots),
         "source_generation_ref": _ref_dict(source_generation_ref),
         "total_discoveries": total_count,
+        "quarantined_claims": sorted(
+            all_quarantined_claims,
+            key=lambda item: canonical_bytes(item),
+        ),
     }
-    c_bytes = canonical_bytes(completion_body)
-    comp_digest = hashlib.sha256(c_bytes).hexdigest()
+    comp_digest = hashlib.sha256(canonical_bytes(completion_body)).hexdigest()
 
     return E1CompletionResult(
         stage_key="E1",
@@ -228,6 +233,103 @@ def validate_stage_transition(
         )
 
 
+def _typed_evidence_refs(value: Any) -> list[dict]:
+    """Return only complete typed evidence refs; incomplete labels are not evidence."""
+    if value is None:
+        return []
+    values = value if isinstance(value, (list, tuple)) else [value]
+    refs: list[dict] = []
+    required = {"kind", "revision_digest", "digest_profile", "schema_revision_ref"}
+    for item in values:
+        if isinstance(item, dict) and required.issubset(item):
+            refs.append(dict(item))
+    return refs
+
+
+def _generic_evidence(item: Mapping[str, Any]) -> list[dict]:
+    refs = _typed_evidence_refs(item.get("evidence_ref"))
+    refs.extend(_typed_evidence_refs(item.get("evidence_refs")))
+    by_digest = {ref["revision_digest"]: ref for ref in refs}
+    return [by_digest[key] for key in sorted(by_digest)]
+
+
+def _axis_evidence(item: Mapping[str, Any], axis: str) -> list[dict]:
+    raw = item.get("axis_evidence_refs")
+    refs = []
+    if isinstance(raw, Mapping):
+        refs.extend(_typed_evidence_refs(raw.get(axis)))
+    refs.extend(_generic_evidence(item))
+    by_digest = {ref["revision_digest"]: ref for ref in refs}
+    return [by_digest[key] for key in sorted(by_digest)]
+
+
+def _stable_convergence_key(item: Mapping[str, Any]) -> bytes:
+    """Build a conservative dedup key that never relies on statement text alone.
+
+    A pre-existing typed root-cause reference is strongest.  Otherwise a claim
+    can converge only when invariant + component + source location are all
+    explicitly supplied.  Without either, the discovery remains a distinct
+    claim candidate, keyed by its lane/finding identity or exact content.
+    """
+    root = item.get("root_cause_ref")
+    if isinstance(root, dict) and {"kind", "revision_digest"}.issubset(root):
+        return canonical_bytes({"root_cause_ref": root})
+
+    invariant = item.get("invariant_ref") or item.get("violated_invariant_ref")
+    component = item.get("affected_component")
+    location = item.get("source_location") or item.get("location")
+    if isinstance(invariant, dict) and component and location:
+        return canonical_bytes({
+            "invariant_ref": invariant,
+            "affected_component": component,
+            "source_location": location,
+        })
+
+    finding_id = item.get("finding_id") or item.get("id")
+    if finding_id:
+        return canonical_bytes({
+            "originating_lane": item.get("originating_lane"),
+            "finding_id": str(finding_id),
+        })
+    return canonical_bytes({
+        "originating_lane": item.get("originating_lane"),
+        "exact_discovery": dict(item),
+    })
+
+
+def _claim_outcome_with_evidence(item: Mapping[str, Any]) -> str:
+    outcome = item.get("claim_outcome")
+    if outcome not in {"SUPPORTED", "REFUTED"}:
+        return "INCONCLUSIVE"
+    if not _generic_evidence(item):
+        return "INCONCLUSIVE"
+    return str(outcome)
+
+
+def _axis_outcome(items: Sequence[Mapping[str, Any]], axis: str) -> tuple[str, list[dict]]:
+    observed: list[str] = []
+    evidence: list[dict] = []
+    for item in items:
+        raw = item.get("axis_outcomes")
+        outcome = raw.get(axis) if isinstance(raw, Mapping) else None
+        refs = _axis_evidence(item, axis)
+        if outcome in {"SUPPORTED", "REFUTED", "INCONCLUSIVE", "BLOCKED", "NOT_APPLICABLE"} and refs:
+            observed.append(str(outcome))
+            evidence.extend(refs)
+    unique = set(observed)
+    if not unique:
+        result = "INCONCLUSIVE"
+    elif "SUPPORTED" in unique and "REFUTED" in unique:
+        result = "INCONCLUSIVE"
+    elif len(unique) == 1:
+        result = next(iter(unique))
+    else:
+        # Mixed epistemic states are not promoted to positive evidence.
+        result = "INCONCLUSIVE"
+    by_digest = {ref["revision_digest"]: ref for ref in evidence}
+    return result, [by_digest[key] for key in sorted(by_digest)]
+
+
 def execute_e2_convergence(
     e1_completion: E1CompletionResult,
     source_generation_ref: Any,
@@ -235,95 +337,101 @@ def execute_e2_convergence(
     input_history_cut: dict,
     policy_ref: Any,
 ) -> E2CompletionResult:
-    """Execute E2 convergence, claim deduplication, 4-axis adjudication, and contradiction detection."""
+    """Execute fail-closed E2 convergence and four-axis adjudication.
+
+    Discovery text is never sufficient proof.  Missing evidence/outcomes remain
+    INCONCLUSIVE, statement similarity alone cannot merge findings, and each
+    axis is promoted only from explicitly supplied axis evidence.
+    """
     e2_spec = build_e2_stage_spec()
     validate_stage_transition(e1_completion, e2_spec)
 
-    # Group quarantined claims by canonical deduplication key: statement + invariant
-    grouped: dict[str, list[dict]] = {}
-    for c in e1_completion.quarantined_claims:
-        stmt = c.get("statement", "")
-        grouped.setdefault(stmt, []).append(c)
+    grouped: dict[bytes, list[dict]] = {}
+    for raw_claim in e1_completion.quarantined_claims:
+        claim_data = dict(raw_claim)
+        grouped.setdefault(_stable_convergence_key(claim_data), []).append(claim_data)
 
     adjudicated_decisions: list[FindingAdjudicationDecision] = []
     contradictions: list[ContradictionRevision] = []
+    decision_digests: list[str] = []
+    contradiction_digests: list[str] = []
 
-    for stmt, items in sorted(grouped.items()):
-        # Create canonical FindingClaimRevision
+    for group_key in sorted(grouped):
+        items = grouped[group_key]
+        statements = sorted({str(item.get("statement", "")).strip() for item in items if str(item.get("statement", "")).strip()})
+        statement = statements[0] if len(statements) == 1 else " | ".join(statements)
+        if not statement:
+            statement = "UNSPECIFIED_CLAIM"
+
+        invariant_refs: list[dict] = []
+        scope_refs: list[dict] = []
+        for item in items:
+            invariant_refs.extend(_typed_evidence_refs(item.get("invariant_ref") or item.get("violated_invariant_ref")))
+            scope_refs.extend(_typed_evidence_refs(item.get("scope_ref") or item.get("scope_refs")))
+        inv_by_digest = {ref["revision_digest"]: ref for ref in invariant_refs}
+        scope_by_digest = {ref["revision_digest"]: ref for ref in scope_refs}
+
         claim = FindingClaimRevision(
-            statement=stmt,
+            statement=statement,
             source_generation_ref=_ref_dict(source_generation_ref),
+            scope_refs=[scope_by_digest[key] for key in sorted(scope_by_digest)],
+            violated_invariant_refs=[inv_by_digest[key] for key in sorted(inv_by_digest)],
         )
 
-        # Check for cross-lane contradictions (e.g. one lane found evidence supporting, another found refuting)
-        lane_outcomes = {item.get("originating_lane"): item.get("claim_outcome", "SUPPORTED") for item in items}
-        outcomes_set = set(lane_outcomes.values())
-
-        if len(outcomes_set) > 1 and "SUPPORTED" in outcomes_set and "REFUTED" in outcomes_set:
-            # Create ContradictionRevision
+        # Contradiction requires both an explicit supported/refuted outcome and
+        # typed evidence on both sides. Missing evidence is merely inconclusive.
+        evidence_by_outcome: dict[str, list[dict]] = {"SUPPORTED": [], "REFUTED": []}
+        for item in items:
+            outcome = _claim_outcome_with_evidence(item)
+            if outcome in evidence_by_outcome:
+                evidence_by_outcome[outcome].extend(_generic_evidence(item))
+        if evidence_by_outcome["SUPPORTED"] and evidence_by_outcome["REFUTED"]:
+            refs = evidence_by_outcome["SUPPORTED"] + evidence_by_outcome["REFUTED"]
+            unique_refs = {ref["revision_digest"]: ref for ref in refs}
             contra = ContradictionRevision(
                 claim_revision_ref=claim.as_object().as_ref().as_dict(),
-                contradicting_evidence_refs=[
-                    _ref_dict(item.get("evidence_ref")) for item in items if item.get("evidence_ref")
-                ],
+                contradicting_evidence_refs=[unique_refs[key] for key in sorted(unique_refs)],
                 input_history_cut=input_history_cut,
                 status="OPEN",
             )
             contradictions.append(contra)
-            epistemic = "INCONCLUSIVE"
-        else:
-            epistemic = "SUPPORTED" if "SUPPORTED" in outcomes_set else "REFUTED"
+            contradiction_digests.append(contra.digest)
 
-        # Create 4 axes
-        m = FindingAxisAssessment(
-            claim_revision_ref=claim.as_object().as_ref().as_dict(),
-            assessment_input_history_cut=input_history_cut,
-            assessment_policy_ref=_ref_dict(policy_ref),
-            axis="MECHANISM",
-            epistemic_outcome=epistemic,
-            method="E2_CONVERGENCE_SYNTHESIS",
-        )
-        r = FindingAxisAssessment(
-            claim_revision_ref=claim.as_object().as_ref().as_dict(),
-            assessment_input_history_cut=input_history_cut,
-            assessment_policy_ref=_ref_dict(policy_ref),
-            axis="REACHABILITY",
-            epistemic_outcome=epistemic,
-            method="E2_CONVERGENCE_SYNTHESIS",
-        )
-        i = FindingAxisAssessment(
-            claim_revision_ref=claim.as_object().as_ref().as_dict(),
-            assessment_input_history_cut=input_history_cut,
-            assessment_policy_ref=_ref_dict(policy_ref),
-            axis="IMPACT",
-            epistemic_outcome=epistemic,
-            method="E2_CONVERGENCE_SYNTHESIS",
-        )
-        s = FindingAxisAssessment(
-            claim_revision_ref=claim.as_object().as_ref().as_dict(),
-            assessment_input_history_cut=input_history_cut,
-            assessment_policy_ref=_ref_dict(policy_ref),
-            axis="SEVERITY",
-            epistemic_outcome="SUPPORTED",
-            method="E2_SEVERITY_ESTIMATE",
-        )
+        axis_assessments: dict[str, FindingAxisAssessment] = {}
+        all_axis_evidence: dict[str, dict] = {}
+        for axis in ("MECHANISM", "REACHABILITY", "IMPACT", "SEVERITY"):
+            outcome, evidence_refs = _axis_outcome(items, axis)
+            for ref in evidence_refs:
+                all_axis_evidence[ref["revision_digest"]] = ref
+            axis_assessments[axis] = FindingAxisAssessment(
+                claim_revision_ref=claim.as_object().as_ref().as_dict(),
+                assessment_input_history_cut=input_history_cut,
+                assessment_policy_ref=_ref_dict(policy_ref),
+                axis=axis,
+                epistemic_outcome=outcome,
+                method="E2_EXPLICIT_AXIS_EVIDENCE" if evidence_refs else "E2_INSUFFICIENT_EVIDENCE",
+                evidence_qualification_refs=evidence_refs,
+            )
 
         dec = adjudicate_finding(
             claim=claim,
-            mechanism=m,
-            reachability=r,
-            impact=i,
-            severity=s,
+            mechanism=axis_assessments["MECHANISM"],
+            reachability=axis_assessments["REACHABILITY"],
+            impact=axis_assessments["IMPACT"],
+            severity=axis_assessments["SEVERITY"],
             adjudicator_ref=_ref_dict(adjudicator_ref),
             input_history_cut=input_history_cut,
+            evidence_refs=[all_axis_evidence[key] for key in sorted(all_axis_evidence)],
         )
         adjudicated_decisions.append(dec)
+        decision_digests.append(dec.digest)
 
+    # Bind exact decision/contradiction identities, not only cardinalities.
     e2_body = {
         "stage_key": "E2",
         "e1_completion_digest": e1_completion.completion_digest,
-        "adjudicated_decisions_count": len(adjudicated_decisions),
-        "contradictions_count": len(contradictions),
+        "adjudication_decision_digests": sorted(decision_digests),
+        "contradiction_digests": sorted(contradiction_digests),
     }
     e2_digest = hashlib.sha256(canonical_bytes(e2_body)).hexdigest()
 
