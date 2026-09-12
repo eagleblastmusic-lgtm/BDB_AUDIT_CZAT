@@ -198,6 +198,18 @@ class InteractiveAuditUI:
             reason = f" ({st.rejection_reason})" if st and st.rejection_reason else ""
             output_func(f"{slot} {dots} {status_text}{reason}")
 
+        if summary.file_results:
+            output_func("\nPer-file import report:")
+            for item in summary.file_results:
+                name = Path(item.path).name
+                lane = item.lane_slot or "UNKNOWN"
+                digest = f" raw={item.raw_digest[:12]}..." if item.raw_digest else ""
+                reason = f" | {item.reason}" if item.reason else ""
+                next_action = f" | next={item.next_action}" if item.next_action else ""
+                output_func(
+                    f"- {name}: {item.status} [{item.code}] lane={lane}{digest}{reason}{next_action}"
+                )
+
         output_func(f"\n{summary.accepted_count} / {summary.total_required_lanes} required results accepted.")
         if summary.missing_lanes:
             output_func(f"Waiting for: {', '.join(summary.missing_lanes)}")
