@@ -12,93 +12,355 @@ on:
 permissions:
   contents: read
 
+env:
+  PYTHONUTF8: '1'
+  PYTHON_VERSION: '3.14.7'
+  PIP_VERSION: '26.2.1'
+  PYTEST_VERSION: '9.1.1'
+  RUFF_VERSION: '0.16.7'
+  MYPY_VERSION: '2.3.1'
+  ARTIFACT_PATH: dist/BDB_AUDIT_ASSISTANT_v2.0.3.py
+  CANDIDATE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+  CANDIDATE_REPOSITORY: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+
 concurrency:
-  group: v2-0-3-qualification-${{ github.ref }}
+  group: v2-0-3-qualification-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   qualify-windows:
-    name: Windows Python 3.14 qualification
-    runs-on: windows-latest
-    timeout-minutes: 30
+    name: Candidate qualification / Windows CPython 3.14.7
+    runs-on: windows-2025
+    timeout-minutes: 35
+    outputs:
+      candidate_sha: ${{ steps.source_identity.outputs.candidate_sha }}
+      tested_head_sha: ${{ steps.source_identity.outputs.tested_head_sha }}
+      artifact_sha256: ${{ steps.artifact_identity.outputs.sha256 }}
+      artifact_size: ${{ steps.artifact_identity.outputs.size }}
 
     steps:
-      - name: Checkout exact commit
+      - name: Checkout declared candidate SHA
         uses: actions/checkout@v4
+        with:
+          repository: ${{ env.CANDIDATE_REPOSITORY }}
+          ref: ${{ env.CANDIDATE_SHA }}
+          fetch-depth: 1
 
-      - name: Set up Python 3.14
+      - name: Prove candidate source identity
+        id: source_identity
+        shell: pwsh
+        run: |
+          $declared = "${{ env.CANDIDATE_SHA }}"
+          $actual = (git rev-parse HEAD).Trim()
+          Write-Host "DECLARED_CANDIDATE_SHA=$declared"
+          Write-Host "TESTED_HEAD_SHA=$actual"
+          if ($actual -ne $declared) { throw "Checked-out HEAD does not equal declared candidate SHA" }
+          "candidate_sha=$declared" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "tested_head_sha=$actual" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Set up exact Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.14'
-          cache: 'pip'
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Show environment identity
+      - name: Record environment identity
         shell: pwsh
         run: |
           python --version
-          python -c "import platform,sys,sysconfig; print(platform.platform()); print(platform.machine()); print(sys.implementation.name); print(sysconfig.get_config_var('SOABI'))"
-          git rev-parse HEAD
-          git status --short
+          python -c "import json,platform,sys,sysconfig; print(json.dumps({'platform':platform.platform(),'machine':platform.machine(),'implementation':sys.implementation.name,'python':platform.python_version(),'soabi':sysconfig.get_config_var('SOABI') or ''}, sort_keys=True))"
 
-      - name: Install exact runtime closure and qualification tools
+      - name: Pin pip
         shell: pwsh
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements-f2.lock
-          python -m pip install pytest==9.1.1 ruff==0.16.7 mypy==2.3.1
+        run: python -m pip install pip==${{ env.PIP_VERSION }}
+
+      - name: Install exact runtime closure
+        shell: pwsh
+        run: python -m pip install --no-deps -r requirements-f2.lock
+
+      - name: Install exact qualification tools
+        shell: pwsh
+        run: python -m pip install pytest==${{ env.PYTEST_VERSION }} ruff==${{ env.RUFF_VERSION }} mypy==${{ env.MYPY_VERSION }}
+
+      - name: Install candidate project for validator CLI
+        shell: pwsh
+        run: python -m pip install --no-deps -e .
 
       - name: Full pytest suite
+        id: pytest_gate
         shell: pwsh
         run: python -m pytest -q
 
       - name: Ruff release lane
+        id: ruff_gate
         shell: pwsh
         run: python -m ruff check src build
 
       - name: Mypy release lane
+        id: mypy_gate
         shell: pwsh
         run: python -m mypy --config-file pyproject.toml
 
-      - name: Build v2.0.3 standalone
+      - name: Build candidate standalone
+        id: build_gate
         shell: pwsh
         run: python build/build_single_file.py
 
-      - name: Release validator verification
-        shell: pwsh
-        run: python -m bdb_audit.release_validator dist/BDB_AUDIT_ASSISTANT_v2.0.3.py
-
-      - name: Standalone isolated smoke
+      - name: Record candidate artifact identity
+        id: artifact_identity
         shell: pwsh
         run: |
-          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.3.py --version
-          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.3.py --verify-payload
-          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.3.py self-test
-          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.3.py --help
+          $item = Get-Item "${{ env.ARTIFACT_PATH }}"
+          $hash = (Get-FileHash $item.FullName -Algorithm SHA256).Hash.ToLower()
+          Write-Host "ARTIFACT_SHA256=$hash"
+          Write-Host "ARTIFACT_SIZE=$($item.Length)"
+          "sha256=$hash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "size=$($item.Length)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "SHA256=$hash" | Set-Content -Encoding ascii dist/SHA256SUMS.txt
 
-      - name: Verify tested HEAD is remote branch HEAD
+      - name: Release validator CLI
+        id: validator_gate
+        shell: pwsh
+        run: python -m bdb_audit.release_validator_cli "${{ env.ARTIFACT_PATH }}" --output dist/RELEASE_VALIDATOR.json
+
+      - name: Standalone version
+        id: standalone_version_gate
+        shell: pwsh
+        run: python -I "${{ env.ARTIFACT_PATH }}" --version
+
+      - name: Standalone payload verification
+        id: standalone_payload_gate
+        shell: pwsh
+        run: python -I "${{ env.ARTIFACT_PATH }}" --verify-payload
+
+      - name: Standalone self-test
+        id: standalone_selftest_gate
+        shell: pwsh
+        run: python -I "${{ env.ARTIFACT_PATH }}" self-test
+
+      - name: Standalone deep self-test
+        id: standalone_deep_gate
+        shell: pwsh
+        run: python -I "${{ env.ARTIFACT_PATH }}" self-test --deep
+
+      - name: Standalone capability matrix
+        id: standalone_capabilities_gate
+        shell: pwsh
+        run: python -I "${{ env.ARTIFACT_PATH }}" capabilities
+
+      - name: Standalone build capability fails closed
+        id: standalone_build_rejection_gate
+        shell: pwsh
+        run: |
+          $stdout = New-TemporaryFile
+          $stderr = New-TemporaryFile
+          try {
+            & python -I "${{ env.ARTIFACT_PATH }}" build --json 1> $stdout 2> $stderr
+            $rc = $LASTEXITCODE
+            $err = Get-Content -Raw -Encoding utf8 $stderr
+            Write-Host $err
+            if ($rc -eq 0) { throw "Standalone build unexpectedly succeeded" }
+            if ($err -notmatch 'DISTRIBUTION_CAPABILITY_UNAVAILABLE') { throw "Standalone build did not fail with the required controlled capability error" }
+          } finally {
+            Remove-Item -Force $stdout,$stderr -ErrorAction SilentlyContinue
+          }
+
+      - name: Standalone help
+        id: standalone_help_gate
+        shell: pwsh
+        run: python -I "${{ env.ARTIFACT_PATH }}" --help
+
+      - name: Verify push candidate is current remote branch HEAD
         if: github.event_name == 'push'
         shell: pwsh
         run: |
-          $local = git rev-parse HEAD
           $remoteLine = git ls-remote origin "refs/heads/feature/v2.0.3-user-orchestration"
           $remote = ($remoteLine -split "`t")[0]
-          Write-Host "LOCAL_HEAD=$local"
+          $declared = "${{ env.CANDIDATE_SHA }}"
           Write-Host "REMOTE_HEAD=$remote"
-          if ($local -ne $remote) { throw "Tested HEAD is not the remote branch HEAD" }
+          if ($remote -ne $declared) { throw "Declared candidate SHA is not current remote branch HEAD" }
 
-      - name: Record artifact SHA-256
+      - name: Build truthful candidate gate receipt
         shell: pwsh
         run: |
-          $hash = (Get-FileHash dist/BDB_AUDIT_ASSISTANT_v2.0.3.py -Algorithm SHA256).Hash.ToLower()
-          "SHA256=$hash" | Tee-Object -FilePath dist/SHA256SUMS.txt
-          Get-Item dist/BDB_AUDIT_ASSISTANT_v2.0.3.py | Select-Object FullName,Length
+          $validator = Get-Content -Raw -Encoding utf8 dist/RELEASE_VALIDATOR.json | ConvertFrom-Json
+          $required = @(
+            "${{ steps.pytest_gate.outcome }}",
+            "${{ steps.ruff_gate.outcome }}",
+            "${{ steps.mypy_gate.outcome }}",
+            "${{ steps.build_gate.outcome }}",
+            "${{ steps.validator_gate.outcome }}",
+            "${{ steps.standalone_version_gate.outcome }}",
+            "${{ steps.standalone_payload_gate.outcome }}",
+            "${{ steps.standalone_selftest_gate.outcome }}",
+            "${{ steps.standalone_deep_gate.outcome }}",
+            "${{ steps.standalone_capabilities_gate.outcome }}",
+            "${{ steps.standalone_build_rejection_gate.outcome }}",
+            "${{ steps.standalone_help_gate.outcome }}"
+          )
+          $overall = if (@($required | Where-Object { $_ -ne "success" }).Count -eq 0) { "PASS" } else { "FAIL" }
+          $receipt = [ordered]@{
+            status = $overall
+            qualification_scope = "CANDIDATE_GATES"
+            repository = "${{ env.CANDIDATE_REPOSITORY }}"
+            workflow_run_id = "${{ github.run_id }}"
+            workflow_run_attempt = "${{ github.run_attempt }}"
+            declared_candidate_sha = "${{ steps.source_identity.outputs.candidate_sha }}"
+            tested_head_sha = "${{ steps.source_identity.outputs.tested_head_sha }}"
+            artifact_source_sha = "${{ steps.source_identity.outputs.tested_head_sha }}"
+            artifact_sha256 = "${{ steps.artifact_identity.outputs.sha256 }}"
+            artifact_size = [int64]"${{ steps.artifact_identity.outputs.size }}"
+            python_version = "${{ env.PYTHON_VERSION }}"
+            pip_version = "${{ env.PIP_VERSION }}"
+            runner = "windows-2025"
+            runtime_lock = $validator.runtime_lock
+            runtime_platform = $validator.runtime_platform
+            gates = [ordered]@{
+              pytest = "${{ steps.pytest_gate.outcome }}"
+              ruff = "${{ steps.ruff_gate.outcome }}"
+              mypy = "${{ steps.mypy_gate.outcome }}"
+              build = "${{ steps.build_gate.outcome }}"
+              release_validator = "${{ steps.validator_gate.outcome }}"
+              standalone_version = "${{ steps.standalone_version_gate.outcome }}"
+              standalone_payload = "${{ steps.standalone_payload_gate.outcome }}"
+              standalone_self_test = "${{ steps.standalone_selftest_gate.outcome }}"
+              standalone_deep_self_test = "${{ steps.standalone_deep_gate.outcome }}"
+              standalone_capabilities = "${{ steps.standalone_capabilities_gate.outcome }}"
+              standalone_build_rejection = "${{ steps.standalone_build_rejection_gate.outcome }}"
+              standalone_help = "${{ steps.standalone_help_gate.outcome }}"
+            }
+            clean_room_rebuild_identity = "NOT_RUN"
+          }
+          $receipt | ConvertTo-Json -Depth 8 | Set-Content -Encoding utf8 dist/CANDIDATE_GATE_RECEIPT.json
+          if ($overall -ne "PASS") { throw "Candidate gate receipt is not PASS" }
 
-      - name: Upload qualified candidate artifact
+      - name: Upload candidate qualification bundle
         uses: actions/upload-artifact@v4
         with:
-          name: BDB-Audit-v2.0.3-windows-py314-candidate
+          name: BDB-Audit-v2.0.3-candidate-${{ env.CANDIDATE_SHA }}
           path: |
             dist/BDB_AUDIT_ASSISTANT_v2.0.3.py
             dist/SHA256SUMS.txt
+            dist/RELEASE_VALIDATOR.json
+            dist/CANDIDATE_GATE_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 14
+
+  clean-room-rebuild:
+    name: Independent clean-room rebuild / raw identity
+    needs: qualify-windows
+    runs-on: windows-2025
+    timeout-minutes: 25
+    env:
+      QUALIFIED_CANDIDATE_SHA: ${{ needs.qualify-windows.outputs.candidate_sha }}
+
+    steps:
+      - name: Checkout exact qualified candidate SHA
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.CANDIDATE_REPOSITORY }}
+          ref: ${{ env.QUALIFIED_CANDIDATE_SHA }}
+          fetch-depth: 1
+
+      - name: Prove clean-room source identity
+        shell: pwsh
+        run: |
+          $actual = (git rev-parse HEAD).Trim()
+          $declared = "${{ env.QUALIFIED_CANDIDATE_SHA }}"
+          Write-Host "DECLARED_CANDIDATE_SHA=$declared"
+          Write-Host "CLEAN_ROOM_HEAD_SHA=$actual"
+          if ($actual -ne $declared) { throw "Clean-room HEAD does not equal qualified candidate SHA" }
+
+      - name: Set up exact Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Pin pip
+        shell: pwsh
+        run: python -m pip install pip==${{ env.PIP_VERSION }}
+
+      - name: Install exact runtime closure
+        shell: pwsh
+        run: python -m pip install --no-deps -r requirements-f2.lock
+
+      - name: Install exact qualification tools
+        shell: pwsh
+        run: python -m pip install pytest==${{ env.PYTEST_VERSION }} ruff==${{ env.RUFF_VERSION }} mypy==${{ env.MYPY_VERSION }}
+
+      - name: Install candidate project
+        shell: pwsh
+        run: python -m pip install --no-deps -e .
+
+      - name: Download candidate qualification bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: BDB-Audit-v2.0.3-candidate-${{ env.QUALIFIED_CANDIDATE_SHA }}
+          path: candidate-dist
+
+      - name: Independently rebuild standalone
+        shell: pwsh
+        run: python build/build_single_file.py
+
+      - name: Compare raw artifact identity
+        id: clean_identity
+        shell: pwsh
+        run: |
+          $candidate = Get-Item candidate-dist/BDB_AUDIT_ASSISTANT_v2.0.3.py
+          $rebuilt = Get-Item dist/BDB_AUDIT_ASSISTANT_v2.0.3.py
+          $candidateHash = (Get-FileHash $candidate.FullName -Algorithm SHA256).Hash.ToLower()
+          $rebuiltHash = (Get-FileHash $rebuilt.FullName -Algorithm SHA256).Hash.ToLower()
+          Write-Host "CANDIDATE_SHA256=$candidateHash"
+          Write-Host "REBUILT_SHA256=$rebuiltHash"
+          Write-Host "CANDIDATE_SIZE=$($candidate.Length)"
+          Write-Host "REBUILT_SIZE=$($rebuilt.Length)"
+          if ($candidateHash -ne $rebuiltHash -or $candidate.Length -ne $rebuilt.Length) {
+            throw "Clean-room raw artifact identity mismatch"
+          }
+          "candidate_sha256=$candidateHash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "rebuilt_sha256=$rebuiltHash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "candidate_size=$($candidate.Length)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "rebuilt_size=$($rebuilt.Length)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Build final qualification receipt
+        shell: pwsh
+        run: |
+          $candidateReceipt = Get-Content -Raw -Encoding utf8 candidate-dist/CANDIDATE_GATE_RECEIPT.json | ConvertFrom-Json
+          $sameHash = "${{ steps.clean_identity.outputs.candidate_sha256 }}" -eq "${{ steps.clean_identity.outputs.rebuilt_sha256 }}"
+          $sameSize = "${{ steps.clean_identity.outputs.candidate_size }}" -eq "${{ steps.clean_identity.outputs.rebuilt_size }}"
+          $shaTruth = $candidateReceipt.declared_candidate_sha -eq $candidateReceipt.tested_head_sha -and $candidateReceipt.tested_head_sha -eq $candidateReceipt.artifact_source_sha
+          $cleanRoomStatus = if ($sameHash -and $sameSize) { "PASS" } else { "FAIL" }
+          $overall = if ($candidateReceipt.status -eq "PASS" -and $cleanRoomStatus -eq "PASS" -and $shaTruth) { "PASS" } else { "FAIL" }
+          New-Item -ItemType Directory -Force qualification | Out-Null
+          $receipt = [ordered]@{
+            status = $overall
+            qualification_scope = "RU07_RELEASE_TRUTH_AND_REPRODUCIBILITY"
+            declared_candidate_sha = $candidateReceipt.declared_candidate_sha
+            tested_head_sha = $candidateReceipt.tested_head_sha
+            artifact_source_sha = $candidateReceipt.artifact_source_sha
+            candidate_artifact_sha256 = "${{ steps.clean_identity.outputs.candidate_sha256 }}"
+            clean_room_artifact_sha256 = "${{ steps.clean_identity.outputs.rebuilt_sha256 }}"
+            candidate_artifact_size = [int64]"${{ steps.clean_identity.outputs.candidate_size }}"
+            clean_room_artifact_size = [int64]"${{ steps.clean_identity.outputs.rebuilt_size }}"
+            clean_room_rebuild_identity = $cleanRoomStatus
+            candidate_gates = $candidateReceipt.gates
+            candidate_workflow_run_id = $candidateReceipt.workflow_run_id
+            clean_room_workflow_run_id = "${{ github.run_id }}"
+            python_version = "${{ env.PYTHON_VERSION }}"
+            pip_version = "${{ env.PIP_VERSION }}"
+            runner = "windows-2025"
+          }
+          $receipt | ConvertTo-Json -Depth 8 | Set-Content -Encoding utf8 qualification/RU07_RELEASE_QUALIFICATION.json
+          if ($overall -ne "PASS") { throw "RU07 final qualification receipt is not PASS" }
+
+      - name: Upload final qualified release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: BDB-Audit-v2.0.3-RU07-qualified-${{ env.QUALIFIED_CANDIDATE_SHA }}
+          path: |
+            candidate-dist/BDB_AUDIT_ASSISTANT_v2.0.3.py
+            candidate-dist/SHA256SUMS.txt
+            candidate-dist/RELEASE_VALIDATOR.json
+            candidate-dist/CANDIDATE_GATE_RECEIPT.json
+            qualification/RU07_RELEASE_QUALIFICATION.json
           if-no-files-found: error
           retention-days: 14

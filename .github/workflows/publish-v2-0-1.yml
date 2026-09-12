@@ -48,26 +48,59 @@ jobs:
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m pip install -r requirements-f2.lock
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m pip install pytest==9.1.1 ruff==0.16.7 mypy==2.3.1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Final release qualification
+      - name: Final pytest qualification
+        id: pytest_gate
         if: steps.gate.outputs.release_ready == 'true'
         shell: pwsh
-        run: |
-          python -m pytest -q
-          python -m ruff check src build
-          python -m mypy --config-file pyproject.toml
+        run: python -m pytest -q
 
-      - name: Build and smoke-test standalone
+      - name: Final Ruff qualification
+        id: ruff_gate
         if: steps.gate.outputs.release_ready == 'true'
         shell: pwsh
-        run: |
-          python build/build_single_file.py
-          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py --version
-          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py --verify-payload
-          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py self-test
-          python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py --help
+        run: python -m ruff check src build
+
+      - name: Final Mypy qualification
+        id: mypy_gate
+        if: steps.gate.outputs.release_ready == 'true'
+        shell: pwsh
+        run: python -m mypy --config-file pyproject.toml
+
+      - name: Build standalone
+        id: build_gate
+        if: steps.gate.outputs.release_ready == 'true'
+        shell: pwsh
+        run: python build/build_single_file.py
+
+      - name: Standalone version smoke
+        id: standalone_version_gate
+        if: steps.gate.outputs.release_ready == 'true'
+        shell: pwsh
+        run: python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py --version
+
+      - name: Standalone payload smoke
+        id: standalone_payload_gate
+        if: steps.gate.outputs.release_ready == 'true'
+        shell: pwsh
+        run: python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py --verify-payload
+
+      - name: Standalone self-test smoke
+        id: standalone_selftest_gate
+        if: steps.gate.outputs.release_ready == 'true'
+        shell: pwsh
+        run: python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py self-test
+
+      - name: Standalone help smoke
+        id: standalone_help_gate
+        if: steps.gate.outputs.release_ready == 'true'
+        shell: pwsh
+        run: python -I dist/BDB_AUDIT_ASSISTANT_v2.0.1.py --help
 
       - name: Prepare release evidence
         if: steps.gate.outputs.release_ready == 'true'
@@ -75,16 +108,24 @@ jobs:
         run: |
           $artifactHash = (Get-FileHash dist/BDB_AUDIT_ASSISTANT_v2.0.1.py -Algorithm SHA256).Hash.ToLower()
           "SHA256=$artifactHash" | Set-Content -Encoding ascii dist/SHA256SUMS.txt
+          $smokeOutcomes = @(
+            "${{ steps.standalone_version_gate.outcome }}",
+            "${{ steps.standalone_payload_gate.outcome }}",
+            "${{ steps.standalone_selftest_gate.outcome }}",
+            "${{ steps.standalone_help_gate.outcome }}"
+          )
+          $standaloneSmoke = if (@($smokeOutcomes | Where-Object { $_ -ne "success" }).Count -eq 0) { "PASS" } else { "FAIL" }
           $qualification = [ordered]@{
             release = "BDB Audit v2.0.1"
             tag = "bdb-audit-v2.0.1"
             commit = $env:GITHUB_SHA
             python = "3.14"
             platform = "windows-latest"
-            pytest = "PASS"
-            ruff = "PASS"
-            mypy = "PASS"
-            standalone_smoke = "PASS"
+            pytest = "${{ steps.pytest_gate.outcome }}"
+            ruff = "${{ steps.ruff_gate.outcome }}"
+            mypy = "${{ steps.mypy_gate.outcome }}"
+            build = "${{ steps.build_gate.outcome }}"
+            standalone_smoke = $standaloneSmoke
             artifact_sha256 = $artifactHash
           }
           $qualification | ConvertTo-Json | Set-Content -Encoding utf8 dist/V2_0_1_RELEASE_QUALIFICATION.json
@@ -95,9 +136,9 @@ jobs:
 
           ## Fixes
           - embeds the pinned runtime closure in the single-file standalone build, including the native rpds runtime;
-          - fixes campaign Stage/Lane status projection so canonical `stage_key` / `lane_key` values are reported correctly;
+          - fixes campaign Stage/Lane status projection so canonical stage/lane values are reported correctly;
           - fixes campaign continuation to use the canonical E1-E5 stage sequence consistently;
-          - preserves compatibility aliases such as `F2_FOUNDATION` as input-only aliases;
+          - preserves compatibility aliases as input-only aliases;
           - qualifies the release on Windows / CPython 3.14 with full pytest, Ruff, mypy, isolated standalone smoke, and payload verification.
 
           ## Standalone

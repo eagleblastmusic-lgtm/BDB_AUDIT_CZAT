@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Deterministic standalone build system for BDB Audit v2.
+"""Deterministic standalone build system for BDB Audit v2.0.3.
 
-The v2.0.1 patch artifact embeds both the BDB Audit source payload and the
-qualified third-party runtime closure from ``requirements-f2.lock``.  The
-resulting single-file script must therefore start on a clean compatible Python
-installation without using repository ``src/``, a project virtualenv, user
-site-packages, or a prior ``pip install`` of the validator dependencies.
+The artifact embeds both the BDB Audit source payload and the qualified
+third-party runtime closure from ``requirements-f2.lock``. The resulting
+single-file script must start on a clean compatible Python installation without
+using repository ``src/``, a project virtualenv, user site-packages, or a prior
+``pip install`` of the validator dependencies.
 """
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import runpy
 import sys
 import sysconfig
 import zipfile
@@ -25,9 +26,10 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = REPO_ROOT / "src"
 DIST_DIR = REPO_ROOT / "dist"
 RUNTIME_LOCK_PATH = REPO_ROOT / "requirements-f2.lock"
-DEFAULT_OUTPUT_NAME = "BDB_AUDIT_ASSISTANT_v2.0.3.py"
-APP_VERSION = "2.0.3"
-BUILD_ID = "BDB-V2-STANDALONE-2.0.3"
+_VERSION_NAMESPACE = runpy.run_path(str(SRC_DIR / "bdb_audit" / "version.py"))
+APP_VERSION = str(_VERSION_NAMESPACE["APP_VERSION"])
+BUILD_ID = str(_VERSION_NAMESPACE["BUILD_ID"])
+DEFAULT_OUTPUT_NAME = f"BDB_AUDIT_ASSISTANT_v{APP_VERSION}.py"
 FIXED_ZIP_DATETIME = (2026, 9, 11, 0, 0, 0)
 _RUNTIME_META_PREFIX = "__bdb_runtime__"
 
@@ -119,8 +121,8 @@ def collect_runtime_files(requirements: dict[str, str] | None = None) -> list[tu
     """Collect exact installed files for every pinned runtime distribution.
 
     Native extension modules (for example rpds ``.pyd``/``.so`` files) are
-    intentionally retained.  Console scripts installed outside site-packages
-    are excluded because they are not import-time runtime dependencies.
+    intentionally retained. Console scripts installed outside site-packages are
+    excluded because they are not import-time runtime dependencies.
     """
     requirements = requirements or parse_runtime_lock()
     collected: dict[str, bytes] = {}
@@ -144,7 +146,7 @@ def collect_runtime_files(requirements: dict[str, str] | None = None) -> list[tu
         for package_path in sorted(dist_files, key=lambda p: str(p).replace("\\", "/")):
             rel = _safe_relative_path(str(package_path))
             if rel is None:
-                # RECORD may list ../../../Scripts/* console entry points.  They
+                # RECORD may list ../../../Scripts/* console entry points. They
                 # are outside the import runtime and must never escape payload root.
                 continue
             if rel.endswith((".pyc", ".pyo")) or "/__pycache__/" in f"/{rel}/":
@@ -219,7 +221,7 @@ def create_payload_zip(files: list[tuple[str, bytes]]) -> bytes:
 
 
 STANDALONE_STUB_TEMPLATE = '''#!/usr/bin/env python3
-"""BDB Audit Assistant v2.0.3 — self-contained standalone distribution."""
+"""BDB Audit Assistant v{APP_VERSION} — self-contained standalone distribution."""
 from __future__ import annotations
 
 import base64
@@ -432,6 +434,20 @@ def bootstrap_environment() -> Path:
     return extracted_dir
 
 
+def _standalone_capabilities() -> dict[str, object]:
+    return {{
+        "status": "SUCCESS",
+        "distribution": "standalone",
+        "app_version": APP_VERSION,
+        "build_id": BUILD_ID,
+        "capabilities": {{
+            "build": "UNSUPPORTED",
+            "self_test": "SUPPORTED",
+            "audit_cli": "SUPPORTED",
+        }},
+    }}
+
+
 def main(argv: list[str] | None = None) -> int:
     if argv is None:
         argv = sys.argv[1:]
@@ -439,6 +455,21 @@ def main(argv: list[str] | None = None) -> int:
     if "--version" in argv:
         print(f"BDB Audit v{{APP_VERSION}} (Standalone {{BUILD_ID}})")
         return 0
+
+    if argv and argv[0] == "capabilities":
+        print(json.dumps(_standalone_capabilities(), indent=2, sort_keys=True))
+        return 0
+
+    if argv and argv[0] == "build":
+        error = {{
+            "status": "FAIL",
+            "error": "DISTRIBUTION_CAPABILITY_UNAVAILABLE",
+            "detail": "The standalone distribution cannot build a new standalone artifact; use the source/repository distribution.",
+            "distribution": "standalone",
+            "capability": "build",
+        }}
+        print(json.dumps(error, indent=2, sort_keys=True), file=sys.stderr)
+        return 1
 
     if "--verify-payload" in argv:
         try:
@@ -464,11 +495,11 @@ def main(argv: list[str] | None = None) -> int:
             bootstrap_environment()
             from bdb_audit.coordinator.operations import AuditOperationApi
             api = AuditOperationApi()
-            result = api.run_self_test()
-            print(json.dumps(result, indent=2))
+            result = api.run_self_test(deep="--deep" in argv)
+            print(json.dumps(result, indent=2, sort_keys=True))
             return 0 if result.get("status") == "PASS" else 1
         except Exception as exc:
-            print(f"SELF_TEST_FAILED: {{exc}}", file=sys.stderr)
+            print(json.dumps({{"status": "FAIL", "error": "SELF_TEST_FAILED", "detail": str(exc)}}, indent=2), file=sys.stderr)
             return 1
 
     bootstrap_environment()

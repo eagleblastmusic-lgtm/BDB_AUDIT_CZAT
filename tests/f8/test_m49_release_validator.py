@@ -21,14 +21,30 @@ def valid_standalone():
         yield out_path
 
 
-def test_m49_valid_standalone_passes_all_checks(valid_standalone):
-    """Untampered standalone must pass all release validator checks."""
+def test_m49_valid_standalone_reports_truthful_local_checks(valid_standalone):
+    """Untampered standalone passes executed local checks without inventing unexecuted gates."""
     res = validate_release_artifact(valid_standalone)
     assert res["status"] == "PASS"
+    assert res["qualification_scope"] == "LOCAL_ARTIFACT_VALIDATION"
     assert res["app_version"] == "2.0.3"
     assert res["runtime_lock"]["jsonschema"] == "4.25.1"
-    for check_name, status in res["checks"].items():
-        assert status == "PASS", f"Check {check_name} failed"
+    assert res["checks"]["9_foundation_golden_vectors_pin"] == "PASS"
+    assert res["checks"]["9b_compatibility_corpus"] == "NOT_RUN"
+    assert res["checks"]["10_same_environment_rebuild_identity"] == "PASS"
+    assert res["checks"]["10b_clean_room_rebuild_identity"] == "NOT_RUN"
+    executed = {
+        key: value
+        for key, value in res["checks"].items()
+        if key not in {"9b_compatibility_corpus", "10b_clean_room_rebuild_identity"}
+    }
+    assert all(value == "PASS" for value in executed.values())
+
+
+def test_m49_skipped_reproducibility_is_not_pass(valid_standalone):
+    res = validate_release_artifact(valid_standalone, check_reproducibility=False)
+    assert res["status"] == "PASS"
+    assert res["checks"]["10_same_environment_rebuild_identity"] == "NOT_RUN"
+    assert res["checks"]["10b_clean_room_rebuild_identity"] == "NOT_RUN"
 
 
 def test_m49_negative_wrong_sha(valid_standalone):

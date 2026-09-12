@@ -10,6 +10,7 @@ Commands:
   stop evaluate     Evaluate the STOP gate from accepted history or preview input
   self-test         Execute offline-critical self-test suite
   build             Trigger deterministic standalone single-file build
+  capabilities      Report distribution capability matrix
   ui                Launch interactive terminal interface
 """
 from __future__ import annotations
@@ -22,9 +23,7 @@ from typing import Sequence
 from .coordinator.operations import AuditOperationApi
 from .core.errors import ValidationError
 from .stop.operation import evaluate_stop_gate
-
-APP_VERSION = "2.0.3"
-BUILD_ID = "BDB-V2-STANDALONE-2.0.3"
+from .version import APP_VERSION, BUILD_ID
 
 # Explicit Exit Codes
 EXIT_SUCCESS = 0
@@ -32,6 +31,12 @@ EXIT_DOMAIN_ERROR = 1
 EXIT_MALFORMED_ARGS = 2
 EXIT_CAMPAIGN_NOT_FOUND = 3
 EXIT_CONFLICT_ERROR = 4
+
+SOURCE_CAPABILITIES = {
+    "build": "SUPPORTED",
+    "self_test": "SUPPORTED",
+    "audit_cli": "SUPPORTED",
+}
 
 
 def _emit_output(data: dict, as_json: bool = False) -> None:
@@ -116,6 +121,9 @@ def create_parser() -> argparse.ArgumentParser:
     bld_p = subparsers.add_parser("build", help="Trigger deterministic standalone build")
     bld_p.add_argument("--output", help="Custom output path for standalone file")
     bld_p.add_argument("--json", action="store_true", help="Machine-readable output")
+
+    cap_p = subparsers.add_parser("capabilities", help="Report capabilities of this distribution")
+    cap_p.add_argument("--json", action="store_true", help="Machine-readable output")
 
     subparsers.add_parser("ui", help="Launch interactive UI")
 
@@ -202,6 +210,17 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
 
         elif args.command == "build":
             res = api.run_build(output_path=args.output)
+            _emit_output(res, is_json)
+            return EXIT_SUCCESS
+
+        elif args.command == "capabilities":
+            res = {
+                "status": "SUCCESS",
+                "distribution": "source",
+                "app_version": APP_VERSION,
+                "build_id": BUILD_ID,
+                "capabilities": SOURCE_CAPABILITIES,
+            }
             _emit_output(res, is_json)
             return EXIT_SUCCESS
 
