@@ -479,7 +479,14 @@ class AuditOperationApi:
         expected_kind: str | None = None,
         context: Any = None,
     ) -> dict[str, Any]:
-        """Validate artifact against registry contract, schemas, and canonical hashing."""
+        """Validate structure/identity without allowing caller data to self-certify admission.
+
+        ``context`` is comparison data only: it may make validation fail, but it is
+        never itself evidence that L5/L6/L7 ran.  Those authority/epistemic/final
+        layers are owned by their dedicated application services and accepted
+        receipts.  The generic validator therefore reports them as missing rather
+        than manufacturing an ADMISSIBLE result from user-supplied labels.
+        """
         from ..schemas.identity import LayeredValidator
 
         if isinstance(artifact_input, (str, Path)):
@@ -518,7 +525,7 @@ class AuditOperationApi:
         # 3. Pinned contract resolution
         contract_row = self.registry.contract(kind, version=version)
 
-        # 4. Layered validation (Schema, Canonical ObjectDigest, TypedRefs, Context)
+        # 4. Schema, ObjectDigest, typed refs, and non-qualifying context comparisons.
         validator = LayeredValidator(registry=self.registry)
         schema_ref = contract_row.get("schema_ref")
         if not schema_ref or not isinstance(schema_ref, str):
@@ -540,24 +547,22 @@ class AuditOperationApi:
         raw_body_bytes = canonical_bytes(body_dict)
         validated = validator.validate(kind, raw_body_bytes, version=version, context=context)
 
-        # 5. Layer execution evaluation & admission determination
-        executed_layers = ["L1", "L3", "L4"]
-        if context is not None:
-            executed_layers.append("L5")
-            if isinstance(context, dict) and "qualified_layers" in context:
-                for ql in context["qualified_layers"]:
-                    if ql not in executed_layers:
-                        executed_layers.append(ql)
-
+        # L3 and L4 are the only admission layers this generic API actually
+        # executes.  Mapping/callable context may reject mismatches, but cannot
+        # elevate the result.  In particular, caller-controlled ``qualified_layers``
+        # is intentionally ignored to prevent self-asserted L5/L6/L7 PASS.
+        executed_layers = ["L3", "L4"]
         required_layers = list(contract_row.get("required_validation_layers", ["L3", "L4", "L5"]))
         missing_layers = [layer for layer in required_layers if layer not in executed_layers]
-        is_admissible = (len(missing_layers) == 0)
+        is_admissible = not missing_layers
 
         return {
             "status": "PASS",
             "structural_validation": "PASS",
             "admissible": is_admissible,
             "admission_status": "ADMITTED" if is_admissible else "NOT_ADMITTED",
+            "validation_scope": "GENERIC_STRUCTURAL_IDENTITY_ONLY",
+            "context_checked": context is not None,
             "kind": kind,
             "version": version,
             "digest": validated.revision_digest,
