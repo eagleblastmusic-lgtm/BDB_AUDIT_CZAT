@@ -12,7 +12,10 @@ FIELDS = {
 OPTIONAL = {
     "stage_run": ("successor_of_stage_run_ref",), "lane_run": ("successor_of_lane_run_ref",),
     "attempt": ("retry_of_attempt_ref", "retry_reason_ref"),
-    "bdb_audit_lane_result": ("findings_count", "notes", "evidence_files"),
+    "bdb_audit_lane_result": (
+        "findings_count", "notes", "evidence_files", "assignment_ref", "attempt_ref",
+        "raw_result_digest", "raw_result_byte_length",
+    ),
 }
 ARRAYS = set("predecessor_requirements required_lane_slots optional_lane_slots allowed_corpus_roles forbidden_corpus_roles required_stage_completion_outputs scope_selectors allowed_view_classes forbidden_knowledge_classes required_outputs executor_capability_requirements predecessor_stage_completion_refs required_lane_slot_contract_refs required_result_slots result_slot_contracts findings evidence_files".split())
 ARRAYS.update("enforcement_receipt_refs filesystem_boundary_evidence_refs network_boundary_evidence_refs tool_boundary_evidence_refs session_boundary_evidence_refs contamination_assessment_refs limitations reason_codes".split())
@@ -28,10 +31,13 @@ def orchestration_schema(kind):
             properties[name] = {"type": "array", "uniqueItems": True}
         elif name.endswith("history_cut"):
             properties[name] = {"type": "object"}
-        elif name.endswith("_ref") and kind in {"stage_run", "lane_run", "attempt", "isolation_qualification"} and name != "campaign_ref":
+        elif name.endswith("_ref") and (
+            kind in {"stage_run", "lane_run", "attempt", "isolation_qualification"}
+            or kind == "bdb_audit_lane_result"
+        ) and name != "campaign_ref":
             properties[name] = {"type": "object", "required": ["kind", "revision_digest", "digest_profile", "schema_revision_ref", "ref_class"]}
-        elif name == "stage_ordinal":
-            properties[name] = {"type": "integer", "minimum": 1}
+        elif name in {"stage_ordinal", "raw_result_byte_length"}:
+            properties[name] = {"type": "integer", "minimum": 0 if name == "raw_result_byte_length" else 1}
         else:
             properties[name] = {"type": "string"}
     if kind == "attempt":
@@ -48,4 +54,5 @@ def orchestration_schema(kind):
         properties["stage_id"] = {"const": "E1"}
         properties["kind"] = {"const": "bdb_audit_lane_result"}
         properties["version"] = {"const": "1"}
+        properties["raw_result_digest"] = {"type": "string", "format": "bdb-sha256"}
     return {"type": "object", "required": fields, "properties": properties, "additionalProperties": False}
