@@ -196,7 +196,8 @@ class AssignmentService:
             return existing
 
         seed_root = f"{input_cut['campaign_id']}:{input_cut['accepted_head_hash']}:E1"
-        source_ref = _ref(source, "CONTENT_OR_PRIOR")
+        source_prior_ref = _ref(source, "PRIOR_ACCEPTED_ONLY")
+        source_content_ref = _ref(source, "CONTENT_OR_PRIOR")
         stage_ref = _ref(stage, "HISTORY_CONTEXT_BINDING")
 
         objects: list[CanonicalObject] = []
@@ -204,12 +205,12 @@ class AssignmentService:
             "stage_run_id": f"stage_run_E1_{hashlib.sha256(seed_root.encode()).hexdigest()[:16]}",
             "campaign_ref": input_cut["campaign_id"],
             "stage_spec_ref": stage_ref,
-            "source_generation_ref": source_ref,
+            "source_generation_ref": source_prior_ref,
             "creation_input_history_cut": input_cut,
             "assigned_history_cut": input_cut,
             "predecessor_stage_completion_refs": [],
             "required_lane_slot_contract_refs": [
-                _external_ref("result_slot_contract_ref", f"E1:{slot}", "CONTENT_OR_PRIOR")
+                _external_ref("result_slot_contract_ref", f"E1:{slot}", "HISTORY_CONTEXT_BINDING")
                 for slot in E1_LANE_SLOTS
             ],
         })
@@ -222,9 +223,11 @@ class AssignmentService:
                 "lane_run_id": f"lane_run_E1_{slot}_{hashlib.sha256(seed_root.encode()).hexdigest()[:12]}",
                 "stage_run_ref": stage_run.as_ref().as_dict(),
                 "lane_spec_ref": lane_ref,
-                "source_generation_ref": source_ref,
+                "source_generation_ref": source_prior_ref,
                 "creation_input_history_cut": input_cut,
-                "required_result_slots": [_external_ref("result_slot_contract_ref", f"E1:{slot}", "CONTENT_OR_PRIOR")],
+                "required_result_slots": [
+                    _external_ref("result_slot_contract_ref", f"E1:{slot}", "HISTORY_CONTEXT_BINDING")
+                ],
             })
             attempt = CanonicalObject("attempt", {
                 "attempt_id": f"attempt_E1_{slot}_{hashlib.sha256((seed_root+slot).encode()).hexdigest()[:16]}",
@@ -233,7 +236,9 @@ class AssignmentService:
                 "executor_profile_ref": executor_ref,
                 "delivery_profile_ref": delivery_ref,
                 "assigned_history_cut": input_cut,
-                "result_slot_contracts": [_external_ref("result_slot_contract_ref", f"E1:{slot}", "CONTENT_OR_PRIOR")],
+                "result_slot_contracts": [
+                    _external_ref("result_slot_contract_ref", f"E1:{slot}", "HISTORY_CONTEXT_BINDING")
+                ],
             })
             isolation = CanonicalObject("isolation_qualification", {
                 "isolation_qualification_id": f"iso_E1_{slot}_{hashlib.sha256(seed_root.encode()).hexdigest()[:12]}",
@@ -266,7 +271,7 @@ class AssignmentService:
             assignment = CanonicalObject("assignment_manifest", {
                 "assignment_manifest_id": f"assignment_E1_{slot}_{hashlib.sha256((seed_root+':assignment:'+slot).encode()).hexdigest()[:16]}",
                 "attempt_ref": attempt.as_ref().as_dict(),
-                "source_generation_ref": source_ref,
+                "source_generation_ref": source_content_ref,
                 "assignment_input_history_cut": input_cut,
                 "knowledge_state_ref": knowledge.as_ref().as_dict(),
                 "grant_refs": [],
@@ -275,7 +280,9 @@ class AssignmentService:
                 "delivery_profile_ref": delivery_ref,
                 "stage_spec_ref": stage_ref,
                 "lane_spec_ref": lane_ref,
-                "result_slot_contract_refs": [_external_ref("result_slot_contract_ref", f"E1:{slot}", "CONTENT_OR_PRIOR")],
+                "result_slot_contract_refs": [
+                    _external_ref("result_slot_contract_ref", f"E1:{slot}", "CONTENT_OR_PRIOR")
+                ],
             })
             objects.extend((lane_run, attempt, isolation, knowledge, assignment))
             built[slot] = (lane_run, attempt, isolation, knowledge, assignment)
