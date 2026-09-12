@@ -147,8 +147,8 @@ def test_import_canonicalizes_partial_matching_history_cut_to_assignment_cut(tmp
     result_path = _write_result(tmp_path / "partial_cut.zip", manifest)
 
     slot, status, reason = inbox.ingest_zip(result_path)
-    assert slot == "E1-A"
     assert status == "ACCEPTED", reason
+    assert slot == "E1-A", reason
 
     accepted_cut = _accepted_cut(store)
     rows = store.accepted_records("bdb_audit_lane_result", accepted_cut)
@@ -176,7 +176,7 @@ def test_stage_completion_uses_consumer_specific_reference_classes(tmp_path: Pat
     ]
 
     summary = inbox.ingest_multiple_zips(paths)
-    assert summary.accepted_count == len(E1_LANE_SLOTS)
+    assert summary.accepted_count == len(E1_LANE_SLOTS), summary.file_results
     assert summary.stage_complete is True, summary.error
 
     rows = store.accepted_records("stage_completion", _accepted_cut(store))
