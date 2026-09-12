@@ -568,9 +568,9 @@ class E1ResultInbox:
                     isinstance(ref, dict) and ref.get("revision_digest") == proposal["ref"]["revision_digest"]
                     for ref in outputs
                 ):
-                    assignment_digest = proposal["body"].get("assignment_ref", {}).get("revision_digest")
-                    if assignment_digest:
-                        completion_by_assignment[assignment_digest] = completion
+                    proposal_assignment_digest = proposal["body"].get("assignment_ref", {}).get("revision_digest")
+                    if isinstance(proposal_assignment_digest, str):
+                        completion_by_assignment[proposal_assignment_digest] = completion
 
         required_completion_refs: list[dict[str, Any]] = []
         proposal_refs: list[dict[str, Any]] = []
@@ -581,16 +581,23 @@ class E1ResultInbox:
 
         for slot in E1_LANE_SLOTS:
             job = self.batch.get_job(slot)
-            completion = completion_by_assignment.get(job.assignment_ref.get("revision_digest"))
+            assignment_digest = job.assignment_ref.get("revision_digest")
+            if not isinstance(assignment_digest, str):
+                raise ValidationError("ASSIGNMENT_REF_INVALID", slot)
+            completion = completion_by_assignment.get(assignment_digest)
             if completion is None or completion["body"].get("completion_predicate_result") != "LANE_COMPLETED":
                 raise ValidationError("STAGE_COMPLETION_BLOCKED", f"Missing completed lane {slot}")
             required_completion_refs.append(_with_ref_class(completion["ref"], "CONTENT_OR_PRIOR"))
 
-            proposal = self._accepted_result_for_job(job, cut)
-            if proposal is None:
+            accepted_proposal = self._accepted_result_for_job(job, cut)
+            if accepted_proposal is None:
                 raise ValidationError("STAGE_COMPLETION_BLOCKED", f"Missing accepted result {slot}")
-            proposal_refs.append(_with_ref_class(proposal["ref"], "CONTENT_OR_PRIOR"))
-            lane_discoveries[slot] = [dict(finding) for finding in proposal["body"].get("findings", []) if isinstance(finding, dict)]
+            proposal_refs.append(_with_ref_class(accepted_proposal["ref"], "CONTENT_OR_PRIOR"))
+            lane_discoveries[slot] = [
+                dict(finding)
+                for finding in accepted_proposal["body"].get("findings", [])
+                if isinstance(finding, dict)
+            ]
 
             assignment = self.store.resolve_accepted(job.assignment_ref, cut)["body"]
             attempt = self.store.resolve_accepted(assignment["attempt_ref"], cut)["body"]
