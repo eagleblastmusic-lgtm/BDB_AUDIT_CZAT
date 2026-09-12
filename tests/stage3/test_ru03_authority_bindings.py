@@ -5,6 +5,7 @@ from pathlib import Path
 import zipfile
 
 from bdb_audit.coordinator.operations import AuditOperationApi
+from bdb_audit.core.registry import canonical_reference_set
 from bdb_audit.history.objects import HistoryCut
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
@@ -78,9 +79,9 @@ def test_assignment_producers_use_consumer_specific_reference_classes(tmp_path: 
     assert len(stage_runs) == 1
     stage_run = stage_runs[0]["body"]
     assert stage_run["source_generation_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
-    assert {
-        ref["ref_class"] for ref in stage_run["required_lane_slot_contract_refs"]
-    } == {"HISTORY_CONTEXT_BINDING"}
+    stage_slot_refs = stage_run["required_lane_slot_contract_refs"]
+    assert stage_slot_refs == canonical_reference_set(stage_slot_refs)
+    assert {ref["ref_class"] for ref in stage_slot_refs} == {"HISTORY_CONTEXT_BINDING"}
 
     lane_runs = store.accepted_records("lane_run", cut)
     assert len(lane_runs) == len(E1_LANE_SLOTS)
