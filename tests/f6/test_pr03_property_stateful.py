@@ -43,7 +43,6 @@ class MockSUT:
 
     def step(self, event, context=None):
         if self.buggy and event == "FINISH":
-            # Buggy SUT transitions to ERROR instead of DONE
             self.state = "ERROR"
             return self.state
         if self.state == "IDLE" and event == "START":
@@ -67,8 +66,6 @@ def test_positive_property_adapter():
     )
 
     cleanup_called = []
-
-    # Property: x*x >= 0
     res = adapter.run_property_test(
         seed=42,
         count=20,
@@ -90,8 +87,6 @@ def test_adversarial_property_adapter_and_shrinking():
         target_ref={"target": "even_check"},
         policy_ref={"policy_id": "pol_even"},
     )
-
-    # Property: n is even (will fail on odd integers)
     res = adapter.run_property_test(
         seed=123,
         count=20,
@@ -101,9 +96,41 @@ def test_adversarial_property_adapter_and_shrinking():
 
     assert res.passed is False
     assert res.failing_input is not None
-    # Shrunk input should be minimal odd positive number
     assert res.shrunk_input is not None
     assert res.shrunk_input % 2 != 0
+
+
+def test_none_is_a_real_counterexample_not_no_failure_sentinel():
+    adapter = PropertyTestAdapter(
+        adapter_id="prop_adapter_none",
+        target_ref={"target": "nullable_input"},
+        policy_ref={"policy_id": "nonnull_policy"},
+    )
+    res = adapter.run_property_test(
+        seed=1,
+        count=3,
+        generator=lambda rng: None,
+        property_fn=lambda value: value is not None,
+    )
+    assert res.cases_tested == 1
+    assert res.passed is False
+    assert res.failing_input is None
+    assert res.shrunk_input is None
+
+
+def test_zero_property_cases_cannot_qualify_as_pass():
+    adapter = PropertyTestAdapter(
+        adapter_id="prop_adapter_zero",
+        target_ref={"target": "t"},
+        policy_ref={"policy_id": "p"},
+    )
+    with pytest.raises(ValidationError, match="PROPERTY_TEST_NO_CASES"):
+        adapter.run_property_test(
+            seed=1,
+            count=0,
+            generator=lambda rng: 1,
+            property_fn=lambda x: True,
+        )
 
 
 def test_property_adapter_capability_violation():
@@ -117,7 +144,7 @@ def test_property_adapter_capability_violation():
     with pytest.raises(ValidationError) as exc:
         adapter.run_property_test(
             seed=1,
-            count=15,  # exceeds max_operations 10
+            count=15,
             generator=lambda rng: 1,
             property_fn=lambda x: True,
         )
@@ -166,14 +193,14 @@ def test_stateful_adapter_adversarial_divergence_and_shrinking():
     )
 
     assert res.passed is False
-    assert res.failing_step == 1  # FINISH is at index 1
+    assert res.failing_step == 1
     assert res.failing_action[0] == "FINISH"
     assert len(res.shrunk_trace) > 0
 
 
 def test_stateful_adapter_capability_unauthorized_command():
     model = make_sample_model()
-    cap = AdapterCapability(allowed_commands=("START", "FINISH"))  # RESET not allowed
+    cap = AdapterCapability(allowed_commands=("START", "FINISH"))
     adapter = StatefulTestAdapter(
         adapter_id="stateful_adapter_03",
         target_ref={"target": "job_manager"},
@@ -203,7 +230,7 @@ def test_observation_emission_no_finding_shortcut():
         seed=1,
         count=5,
         generator=lambda rng: 3,
-        property_fn=lambda x: x == 4,  # fails
+        property_fn=lambda x: x == 4,
     )
     assert res.passed is False
 
@@ -211,6 +238,5 @@ def test_observation_emission_no_finding_shortcut():
     assert isinstance(obs, Observation)
     assert obs.observation_channel == "PROPERTY_TEST_ADAPTER"
     assert obs.raw_observation_ref["passed"] is False
-    # Verifying no finding authority bypass
     assert not hasattr(obs, "finding_id")
     assert not hasattr(obs, "lifecycle_status")
