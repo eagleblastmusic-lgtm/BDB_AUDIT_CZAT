@@ -62,6 +62,26 @@ def _ref_dict(ref: Any) -> dict:
     raise ValidationError("REF_REQUIRED", f"Cannot convert {type(ref)} to ref dict")
 
 
+def _discovery_binding_digest(discovery: Mapping[str, Any]) -> str:
+    """Return a domain-separated content binding for one sealed blind discovery.
+
+    This is a derived checkpoint binding, not a canonical ObjectDigest claim. It
+    exists so equal finding counts cannot mask materially different discoveries.
+    """
+    preimage = b"BDB2/E3_BLIND_DISCOVERY_BINDING/1\0" + canonical_bytes(dict(discovery))
+    return hashlib.sha256(preimage).hexdigest()
+
+
+def _discovery_bindings_by_lane(
+    discoveries: Mapping[str, Sequence[Mapping[str, Any]]],
+) -> dict[str, list[str]]:
+    """Bind exact discovery content with deterministic, order-independent lists."""
+    return {
+        slot: sorted(_discovery_binding_digest(item) for item in discoveries.get(slot, ()))
+        for slot in E3_LANE_SLOTS
+    }
+
+
 def build_e3_stage_spec(revision: str = "1") -> StageSpec:
     """Construct normative E3 StageSpec (R5.3 §23)."""
     return StageSpec(
@@ -139,6 +159,10 @@ class E3QuarantineBroker:
     @property
     def checkpoint_digest(self) -> str | None:
         return self._checkpoint_digest
+
+    def discovery_bindings(self) -> dict[str, list[str]]:
+        """Return deterministic bindings for all currently sealed discoveries."""
+        return _discovery_bindings_by_lane(self._sealed_findings)
 
     def check_for_disallowed_leak(self, data: Any, path: str = "") -> None:
         """Scan input data recursively for forbidden leak fields."""
@@ -250,6 +274,7 @@ class E3QuarantineBroker:
             "checkpoint_type": "E3_BLIND_NOVELTY_CHECKPOINT",
             "accepted_history_cut": dict(accepted_history_cut),
             "lane_discoveries_count": {slot: len(self._sealed_findings[slot]) for slot in E3_LANE_SLOTS},
+            "sealed_discovery_digests": self.discovery_bindings(),
             "lane_slots": list(E3_LANE_SLOTS),
         }
         self._checkpoint_digest = hashlib.sha256(canonical_bytes(body)).hexdigest()
@@ -423,6 +448,7 @@ def execute_e3_blind_ensemble(
         "source_generation_ref": _ref_dict(source_generation_ref),
         "assigned_history_cut": dict(assigned_history_cut),
         "total_discoveries": total_count,
+        "sealed_discovery_digests": broker.discovery_bindings(),
     }
     blind_comp_digest = hashlib.sha256(canonical_bytes(completion_body)).hexdigest()
 
