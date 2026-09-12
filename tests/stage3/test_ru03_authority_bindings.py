@@ -5,6 +5,7 @@ from pathlib import Path
 import zipfile
 
 from bdb_audit.coordinator.operations import AuditOperationApi
+from bdb_audit.history.objects import HistoryCut
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
 from bdb_audit.workflow.assignments import AssignmentService
@@ -83,24 +84,33 @@ def test_assignment_producers_use_consumer_specific_reference_classes(tmp_path: 
 
     lane_runs = store.accepted_records("lane_run", cut)
     assert len(lane_runs) == len(E1_LANE_SLOTS)
-    assert all(row["body"]["source_generation_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY" for row in lane_runs)
     assert all(
-        {ref["ref_class"] for ref in row["body"]["required_result_slots"]} == {"HISTORY_CONTEXT_BINDING"}
+        row["body"]["source_generation_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
+        for row in lane_runs
+    )
+    assert all(
+        {ref["ref_class"] for ref in row["body"]["required_result_slots"]}
+        == {"HISTORY_CONTEXT_BINDING"}
         for row in lane_runs
     )
 
     attempts = store.accepted_records("attempt", cut)
     assert len(attempts) == len(E1_LANE_SLOTS)
     assert all(
-        {ref["ref_class"] for ref in row["body"]["result_slot_contracts"]} == {"HISTORY_CONTEXT_BINDING"}
+        {ref["ref_class"] for ref in row["body"]["result_slot_contracts"]}
+        == {"HISTORY_CONTEXT_BINDING"}
         for row in attempts
     )
 
     assignments = store.accepted_records("assignment_manifest", cut)
     assert len(assignments) == len(E1_LANE_SLOTS)
-    assert all(row["body"]["source_generation_ref"]["ref_class"] == "CONTENT_OR_PRIOR" for row in assignments)
     assert all(
-        {ref["ref_class"] for ref in row["body"]["result_slot_contract_refs"]} == {"CONTENT_OR_PRIOR"}
+        row["body"]["source_generation_ref"]["ref_class"] == "CONTENT_OR_PRIOR"
+        for row in assignments
+    )
+    assert all(
+        {ref["ref_class"] for ref in row["body"]["result_slot_contract_refs"]}
+        == {"CONTENT_OR_PRIOR"}
         for row in assignments
     )
 
@@ -121,19 +131,14 @@ def test_import_canonicalizes_partial_matching_history_cut_to_assignment_cut(tmp
     assert slot == "E1-A"
     assert status == "ACCEPTED", reason
 
-    current_cut = inbox._accepted_results  # keep the assertion below tied to accepted history, not transport bytes
-    del current_cut
     head = store.head()
     assert head is not None
-    commits = store.commits()
-    commit = commits[-1]
-    accepted_cut = {
-        "campaign_id": head.campaign_id,
-        "accepted_head_seq": head.commit_seq,
-        "accepted_head_hash": head.commit_hash,
-        "governing_policy_ref": commit["governing_policy_ref"],
-        "governing_spec_refs": commit["governing_spec_refs"],
-    }
+    commit = store.commits()[-1]
+    accepted_cut = HistoryCut.accepted(
+        head,
+        commit["governing_policy_ref"],
+        commit["governing_spec_refs"],
+    ).as_dict()
     rows = store.accepted_records("bdb_audit_lane_result", accepted_cut)
     assert len(rows) == 1
     assert rows[0]["body"]["history_cut"] == full_cut
