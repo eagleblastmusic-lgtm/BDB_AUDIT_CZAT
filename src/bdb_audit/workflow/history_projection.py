@@ -9,10 +9,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 from ..coordinator.operations import AuditOperationApi
-from ..history.store import TransactionalHistoryStore
 from .settings import SettingsManager
 
 
@@ -30,7 +28,7 @@ class CampaignProjection:
     accepted_head_seq: int
     accepted_head_hash: str
     is_finished: bool
-    status_label: str  # "IN_PROGRESS" | "COMPLETED" | "NOT_FOUND"
+    status_label: str  # IN_PROGRESS | COMPLETED | COMPLETED_LIMITED | NOT_FOUND | ERROR
     error: str | None = None
 
 
@@ -76,8 +74,14 @@ class CampaignHistoryService:
                 stages_prep = status.get("stages_prepared", [])
                 lanes_prep = status.get("lanes_prepared", [])
                 completions = status.get("stage_completions_count", 0)
-                is_completed = current_stage == "STOP" or completions >= 5
-                status_label = "COMPLETED" if is_completed else "IN_PROGRESS"
+                termination = status.get("termination_state", "OPEN")
+                is_completed = termination in {"COMPLETED", "COMPLETED_LIMITED"}
+                if termination == "COMPLETED_LIMITED":
+                    status_label = "COMPLETED_LIMITED"
+                elif termination == "COMPLETED":
+                    status_label = "COMPLETED"
+                else:
+                    status_label = "IN_PROGRESS"
 
                 projections.append(CampaignProjection(
                     campaign_id=status.get("campaign_id", cid),
