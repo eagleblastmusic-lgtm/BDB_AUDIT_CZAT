@@ -67,7 +67,11 @@ def test_assignments_are_accepted_before_delivery_and_resume_exactly(tmp_path: P
         executor_profile="ChatGPT / GitHub", model="Sol 5.6"
     )
     assert resumed.assignment_input_history_cut == prepared.assignment_input_history_cut
-    assert {s: a.assignment_ref["revision_digest"] for s, a in resumed.assignments.items()} == {
-        s: a.assignment_ref["revision_digest"] for s, a in prepared.assignments.items()
-    }
+    for slot in E1_LANE_SLOTS:
+        original = prepared.assignments[slot]
+        restored = resumed.assignments[slot]
+        assert restored.assignment_ref == original.assignment_ref
+        assert restored.attempt_ref == original.attempt_ref
+        assert restored.knowledge_state_ref == original.knowledge_state_ref
+        assert restored.isolation_qualification_ref == original.isolation_qualification_ref
     assert resumed_store.head().commit_hash == after.commit_hash
