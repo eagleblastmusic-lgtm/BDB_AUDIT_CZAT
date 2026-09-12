@@ -152,6 +152,16 @@ def test_import_canonicalizes_partial_matching_history_cut_to_assignment_cut(tmp
     assert rows[0]["body"]["history_cut"] == full_cut
     assert rows[0]["body"]["findings_count"] == 1
 
+    completions = store.accepted_records("lane_completion", accepted_cut)
+    assert len(completions) == 1
+    completion = completions[0]["body"]
+    assert completion["lane_run_ref"]["ref_class"] == "CONTENT_OR_PRIOR"
+    assert completion["final_knowledge_state_ref"]["ref_class"] == "CONTENT_OR_PRIOR"
+    assert completion["isolation_qualification_ref"]["ref_class"] == "CONTENT_OR_PRIOR"
+    assert {ref["ref_class"] for ref in completion["attempt_refs"]} == {"CONTENT_OR_PRIOR"}
+    assert completion["lane_spec_ref"]["ref_class"] == "HISTORY_CONTEXT_BINDING"
+    assert {ref["ref_class"] for ref in completion["required_output_refs"]} == {"CONTENT_OR_PRIOR"}
+
 
 def test_import_rejects_conflicting_non_identity_history_cut_field(tmp_path: Path) -> None:
     store, batch = _prepared_batch(tmp_path)
