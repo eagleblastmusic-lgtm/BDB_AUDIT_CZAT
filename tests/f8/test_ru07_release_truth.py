@@ -121,6 +121,23 @@ def test_ru07_validator_module_entrypoint_missing_artifact_is_nonzero():
     assert doc["error"] == "ARTIFACT_NOT_FOUND"
 
 
+def test_ru07_source_collection_excludes_generated_install_metadata():
+    with tempfile.TemporaryDirectory() as td:
+        src_root = Path(td) / "src"
+        package = src_root / "bdb_audit"
+        egg_info = src_root / "bdb_audit.egg-info"
+        dist_info = src_root / "bdb_audit-2.0.3.dist-info"
+        package.mkdir(parents=True)
+        egg_info.mkdir()
+        dist_info.mkdir()
+        (package / "__init__.py").write_text("VALUE = 1\n", encoding="utf-8")
+        (egg_info / "SOURCES.txt").write_text("volatile\n", encoding="utf-8")
+        (dist_info / "RECORD").write_text("volatile\n", encoding="utf-8")
+
+        paths = {path for path, _data in build_single_file.collect_source_files(src_root)}
+        assert paths == {"bdb_audit/__init__.py"}
+
+
 def test_ru07_current_workflow_binds_exact_candidate_and_separates_python_gates():
     workflow = (REPO_ROOT / ".github" / "workflows" / "v2-0-3-qualification.yml").read_text(encoding="utf-8")
     assert "github.event.pull_request.head.sha" in workflow
