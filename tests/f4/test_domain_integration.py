@@ -49,6 +49,7 @@ from bdb_audit.execution import (
     ExecutionDescriptor,
     validate_execution_dag,
     ExecutionAdapter,
+    ExecutionRunOutput,
 )
 from bdb_audit.evidence import (
     Observation,
@@ -92,6 +93,18 @@ def ref(kind: str, seed: str) -> dict:
         "schema_revision_ref": f"BDB_SCHEMA_REGISTRY::{kind}/1",
         "ref_class": "CONTENT_OR_PRIOR",
     }
+
+
+def integration_runner(_descriptor: ExecutionDescriptor) -> ExecutionRunOutput:
+    """Explicit deterministic test runner; integration PASS never implies missing execution."""
+    return ExecutionRunOutput(
+        exit_code=0,
+        status="SUCCESS",
+        raw_observations=[ref("raw_artifact_ref", "integration_exec_observation")],
+        fault_activated=False,
+        cleanup_status="CLEAN",
+        residual_cleared=True,
+    )
 
 
 def test_full_domain_integration_lifecycle():
@@ -283,6 +296,7 @@ def test_full_domain_integration_lifecycle():
         history_cut=cut,
         environment_actuals={"env": "sandbox"},
         execution_nonce="nonce_integration_001",
+        runner_fn=integration_runner,
     )
     assert res.status == "SUCCESS"
     assert len(obs_list) >= 1
