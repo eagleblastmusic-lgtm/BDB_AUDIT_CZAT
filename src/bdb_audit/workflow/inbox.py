@@ -448,12 +448,18 @@ class E1ResultInbox:
         lane_spec_record = self.store.resolve_accepted(assignment["lane_spec_ref"], cut)
         source_record = self.store.resolve_accepted(assignment["source_generation_ref"], cut)
 
-        lane_run_ref = _with_ref_class(lane_run_record["ref"], "PRIOR_ACCEPTED_ONLY")
-        attempt_ref = _with_ref_class(attempt_record["ref"], "PRIOR_ACCEPTED_ONLY")
-        knowledge_ref = _with_ref_class(knowledge_record["ref"], "PRIOR_ACCEPTED_ONLY")
-        isolation_ref = _with_ref_class(isolation_record["ref"], "PRIOR_ACCEPTED_ONLY")
+        # DiscoveryRecord and LaneCompletion are different consumers and their
+        # canonical contracts require different ref classes for the same facts.
+        lane_run_prior_ref = _with_ref_class(lane_run_record["ref"], "PRIOR_ACCEPTED_ONLY")
+        attempt_prior_ref = _with_ref_class(attempt_record["ref"], "PRIOR_ACCEPTED_ONLY")
+        knowledge_prior_ref = _with_ref_class(knowledge_record["ref"], "PRIOR_ACCEPTED_ONLY")
+        source_prior_ref = _with_ref_class(source_record["ref"], "PRIOR_ACCEPTED_ONLY")
+
+        lane_run_content_ref = _with_ref_class(lane_run_record["ref"], "CONTENT_OR_PRIOR")
+        attempt_content_ref = _with_ref_class(attempt_record["ref"], "CONTENT_OR_PRIOR")
+        knowledge_content_ref = _with_ref_class(knowledge_record["ref"], "CONTENT_OR_PRIOR")
+        isolation_content_ref = _with_ref_class(isolation_record["ref"], "CONTENT_OR_PRIOR")
         lane_spec_ref = _with_ref_class(lane_spec_record["ref"], "HISTORY_CONTEXT_BINDING")
-        source_ref = _with_ref_class(source_record["ref"], "PRIOR_ACCEPTED_ONLY")
 
         required_assurance = lane_spec_record["body"].get("required_isolation_assurance", "UNKNOWN")
         actual_assurance = isolation_record["body"].get("result", "UNKNOWN")
@@ -466,11 +472,11 @@ class E1ResultInbox:
         for index, _finding in enumerate(findings):
             discovery = CanonicalObject("discovery_record", {
                 "discovery_id": f"disc_E1_{slot}_{proposal.digest[:12]}_{index + 1}",
-                "lane_run_ref": lane_run_ref,
-                "attempt_ref": attempt_ref,
-                "source_generation_ref": source_ref,
+                "lane_run_ref": lane_run_prior_ref,
+                "attempt_ref": attempt_prior_ref,
+                "source_generation_ref": source_prior_ref,
                 "discovery_input_history_cut": cut,
-                "knowledge_state_ref": knowledge_ref,
+                "knowledge_state_ref": knowledge_prior_ref,
                 "method_ref": _external_ref("external_profile_ref", "manual_external_audit", "HISTORY_CONTEXT_BINDING"),
                 "producer_ref": _external_ref("actor_or_authority_ref", f"external_auditor_{slot}", "PRIOR_ACCEPTED_ONLY"),
                 "surface_location_refs": [],
@@ -487,12 +493,12 @@ class E1ResultInbox:
         )
         lane_completion = LaneCompletion(
             lane_completion_id=lane_completion_id,
-            lane_run_ref=lane_run_ref,
+            lane_run_ref=lane_run_content_ref,
             lane_spec_ref=lane_spec_ref,
             input_history_cut=cut,
-            final_knowledge_state_ref=knowledge_ref,
-            isolation_qualification_ref=isolation_ref,
-            attempt_refs=[attempt_ref],
+            final_knowledge_state_ref=knowledge_content_ref,
+            isolation_qualification_ref=isolation_content_ref,
+            attempt_refs=[attempt_content_ref],
             required_output_refs=output_refs,
             completion_predicate_result=completion_result,
         )
@@ -578,12 +584,12 @@ class E1ResultInbox:
             completion = completion_by_assignment.get(job.assignment_ref.get("revision_digest"))
             if completion is None or completion["body"].get("completion_predicate_result") != "LANE_COMPLETED":
                 raise ValidationError("STAGE_COMPLETION_BLOCKED", f"Missing completed lane {slot}")
-            required_completion_refs.append(_with_ref_class(completion["ref"], "PRIOR_ACCEPTED_ONLY"))
+            required_completion_refs.append(_with_ref_class(completion["ref"], "CONTENT_OR_PRIOR"))
 
             proposal = self._accepted_result_for_job(job, cut)
             if proposal is None:
                 raise ValidationError("STAGE_COMPLETION_BLOCKED", f"Missing accepted result {slot}")
-            proposal_refs.append(_with_ref_class(proposal["ref"], "PRIOR_ACCEPTED_ONLY"))
+            proposal_refs.append(_with_ref_class(proposal["ref"], "CONTENT_OR_PRIOR"))
             lane_discoveries[slot] = [dict(finding) for finding in proposal["body"].get("findings", []) if isinstance(finding, dict)]
 
             assignment = self.store.resolve_accepted(job.assignment_ref, cut)["body"]
@@ -591,7 +597,7 @@ class E1ResultInbox:
             lane_run = self.store.resolve_accepted(attempt["lane_run_ref"], cut)["body"]
             current_stage_run_ref = lane_run["stage_run_ref"]
             stage_run_digests.add(current_stage_run_ref["revision_digest"])
-            stage_run_ref = _with_ref_class(current_stage_run_ref, "PRIOR_ACCEPTED_ONLY")
+            stage_run_ref = _with_ref_class(current_stage_run_ref, "CONTENT_OR_PRIOR")
             stage_spec_ref = _with_ref_class(assignment["stage_spec_ref"], "HISTORY_CONTEXT_BINDING")
 
         if len(stage_run_digests) != 1 or stage_run_ref is None or stage_spec_ref is None:
