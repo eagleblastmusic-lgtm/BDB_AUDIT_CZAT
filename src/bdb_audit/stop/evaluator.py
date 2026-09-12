@@ -121,9 +121,9 @@ def evaluate_stop(
             remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
         )
 
-    # 4. FINAL_POST_E5 context
-    if ctx == "FINAL_POST_E5":
-        # Check pending stages
+    # 4. FINAL_POST_E5 and POST_E6 contexts
+    if ctx in ("FINAL_POST_E5", "POST_E6"):
+        # Check if any required stages are pending
         if stop_input.pending_required_stage_refs:
             reasons = ["REQUIRED_STAGES_PENDING"]
             if insufficient_data:
@@ -138,138 +138,133 @@ def evaluate_stop(
                 remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
             )
 
-        # Unresolved evidence invalidation -> BLOCKED
+        # Accumulate all failure reasons across hard invariants
+        failure_reasons: list[str] = []
+        is_hard_blocked = False
+
         if stop_input.evidence_invalidation_refs:
-            return StopEvaluation(
-                stop_evaluation_id=stop_evaluation_id,
-                stop_input_ref=input_ref,
-                continuation_decision="BLOCKED",
-                assurance_level="INSUFFICIENT",
-                release_readiness="QUALIFICATION_BLOCKED",
-                reason_codes=("UNRESOLVED_EVIDENCE_INVALIDATION", "INVALIDATED_EVIDENCE"),
-                blocking_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
-                remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
-            )
+            failure_reasons.extend(["UNRESOLVED_EVIDENCE_INVALIDATION", "INVALIDATED_EVIDENCE"])
+            is_hard_blocked = True
 
-        # Open contradictions -> BLOCKED
         if stop_input.contradiction_refs:
-            return StopEvaluation(
-                stop_evaluation_id=stop_evaluation_id,
-                stop_input_ref=input_ref,
-                continuation_decision="BLOCKED",
-                assurance_level="INSUFFICIENT",
-                release_readiness="QUALIFICATION_BLOCKED",
-                reason_codes=("OPEN_CONTRADICTION",),
-                blocking_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
-                remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
-            )
+            failure_reasons.append("OPEN_CONTRADICTION")
+            is_hard_blocked = True
 
-        # Missing CandidateAssuranceCase ref
         if not stop_input.candidate_assurance_case_ref:
-            return StopEvaluation(
-                stop_evaluation_id=stop_evaluation_id,
-                stop_input_ref=input_ref,
-                continuation_decision="BLOCKED",
-                assurance_level="INSUFFICIENT",
-                release_readiness="QUALIFICATION_BLOCKED",
-                reason_codes=("MISSING_CANDIDATE_ASSURANCE_CASE",),
-                blocking_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
-                remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
-            )
+            failure_reasons.append("MISSING_CANDIDATE_ASSURANCE_CASE")
+            is_hard_blocked = True
 
-        # Missing required challengers
         if not stop_input.challenger_refs or len(stop_input.challenger_refs) < 2:
+            failure_reasons.append("MISSING_REQUIRED_CHALLENGERS")
+            is_hard_blocked = True
+
+        if insufficient_data or ub_summary.get("insufficient_data", False):
+            failure_reasons.append("INSUFFICIENT_DATA")
+
+        # Mandatory obligations vs qualifications check:
+        # Every mandatory obligation ref must have a corresponding qualification ref
+        # (or qualify if qualifications cover all mandatory obligations)
+        has_mandatory_obligations = bool(stop_input.mandatory_obligation_refs)
+        has_qualifications = bool(stop_input.current_obligation_qualification_refs)
+        has_unqualified_obligations = False
+        if has_mandatory_obligations:
+            if not has_qualifications:
+                has_unqualified_obligations = True
+            else:
+                qual_digests = {
+                    r.get("revision_digest")
+                    for r in stop_input.current_obligation_qualification_refs
+                    if isinstance(r, dict) and r.get("revision_digest")
+                }
+                mand_digests = {
+                    r.get("revision_digest")
+                    for r in stop_input.mandatory_obligation_refs
+                    if isinstance(r, dict) and r.get("revision_digest")
+                }
+                # Check for direct digest match or presence of qualification records
+                if not mand_digests.issubset(qual_digests) and len(stop_input.current_obligation_qualification_refs) < len(stop_input.mandatory_obligation_refs):
+                    has_unqualified_obligations = True
+
+        if has_unqualified_obligations:
+            failure_reasons.append("UNQUALIFIED_MANDATORY_OBLIGATIONS")
+
+        # Deduplicate reasons while preserving order
+        seen_reasons: set[str] = set()
+        deduped_reasons: list[str] = []
+        for r in failure_reasons:
+            if r not in seen_reasons:
+                seen_reasons.add(r)
+                deduped_reasons.append(r)
+
+        # If any hard blocker exists, decision is BLOCKED
+        if is_hard_blocked:
             return StopEvaluation(
                 stop_evaluation_id=stop_evaluation_id,
                 stop_input_ref=input_ref,
                 continuation_decision="BLOCKED",
                 assurance_level="INSUFFICIENT",
                 release_readiness="QUALIFICATION_BLOCKED",
-                reason_codes=("MISSING_REQUIRED_CHALLENGERS",),
+                reason_codes=tuple(deduped_reasons),
                 blocking_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
                 remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
             )
 
-        # Insufficient data in post-E5
-        if insufficient_data:
+        # If insufficient data or unqualified obligations remain:
+        if "INSUFFICIENT_DATA" in seen_reasons or has_unqualified_obligations:
             if e6_plan_approved:
+                e6_reasons = list(deduped_reasons)
+                if "INSUFFICIENT_DATA" in seen_reasons:
+                    e6_reasons.append("E6_REQUIRED_TO_ACQUIRE_DATA")
+                if has_unqualified_obligations and "E6_REQUIRED" not in seen_reasons:
+                    e6_reasons.extend(["E6_REQUIRED", "BOUNDED_ADDITIONAL_PLAN_APPROVED"])
+                if ctx == "POST_E6":
+                    e6_reasons.append("POST_E6_ADDITIONAL_ROUND_REQUIRED")
+                
+                # Deduplicate e6_reasons
+                final_e6_reasons: list[str] = []
+                s_e6: set[str] = set()
+                for r in e6_reasons:
+                    if r not in s_e6:
+                        s_e6.add(r)
+                        final_e6_reasons.append(r)
+
                 return StopEvaluation(
                     stop_evaluation_id=stop_evaluation_id,
                     stop_input_ref=input_ref,
                     continuation_decision="E6_REQUIRED",
                     assurance_level="BOUNDED",
                     release_readiness="QUALIFICATION_BLOCKED",
-                    reason_codes=("INSUFFICIENT_DATA", "E6_REQUIRED_TO_ACQUIRE_DATA"),
+                    reason_codes=tuple(final_e6_reasons),
                     blocking_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
                     remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
                 )
-            return StopEvaluation(
-                stop_evaluation_id=stop_evaluation_id,
-                stop_input_ref=input_ref,
-                continuation_decision="BLOCKED",
-                assurance_level="INSUFFICIENT",
-                release_readiness="QUALIFICATION_BLOCKED",
-                reason_codes=("INSUFFICIENT_DATA",),
-                blocking_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
-                remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
-            )
+            else:
+                return StopEvaluation(
+                    stop_evaluation_id=stop_evaluation_id,
+                    stop_input_ref=input_ref,
+                    continuation_decision="BLOCKED",
+                    assurance_level="INSUFFICIENT",
+                    release_readiness="QUALIFICATION_BLOCKED",
+                    reason_codes=tuple(deduped_reasons),
+                    blocking_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
+                    remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
+                )
 
-        # Check if there are material gaps that need E6
-        if e6_plan_approved and stop_input.mandatory_obligation_refs:
-            # If obligations are pending and approved bounded E6 exists
-            return StopEvaluation(
-                stop_evaluation_id=stop_evaluation_id,
-                stop_input_ref=input_ref,
-                continuation_decision="E6_REQUIRED",
-                assurance_level="BOUNDED",
-                release_readiness="QUALIFICATION_BLOCKED",
-                reason_codes=("E6_REQUIRED", "BOUNDED_ADDITIONAL_PLAN_APPROVED"),
-                blocking_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
-                remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
-            )
-
+        # If e6_plan_approved and mandatory_obligation_refs exist (and not qualified): handled above.
         # Complete satisfaction -> PASS
         release_readiness = (
             "READY_WITH_RESIDUAL_RISK"
             if stop_input.residual_risk_refs
             else "READY"
         )
+        pass_code = "POST_E6_SATISFIED" if ctx == "POST_E6" else "ALL_REQUIREMENTS_SATISFIED"
         return StopEvaluation(
             stop_evaluation_id=stop_evaluation_id,
             stop_input_ref=input_ref,
             continuation_decision="PASS",
             assurance_level="ADEQUATE_FOR_DECLARED_SCOPE",
             release_readiness=release_readiness,
-            reason_codes=("ALL_REQUIREMENTS_SATISFIED",),
-            blocking_obligation_refs=(),
-            remaining_obligation_refs=(),
-        )
-
-    # 5. POST_E6 context
-    if ctx == "POST_E6":
-        if e6_plan_approved and stop_input.mandatory_obligation_refs:
-            return StopEvaluation(
-                stop_evaluation_id=stop_evaluation_id,
-                stop_input_ref=input_ref,
-                continuation_decision="E6_REQUIRED",
-                assurance_level="BOUNDED",
-                release_readiness="QUALIFICATION_BLOCKED",
-                reason_codes=("POST_E6_ADDITIONAL_ROUND_REQUIRED",),
-                blocking_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
-                remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
-            )
-        release_readiness = (
-            "READY_WITH_RESIDUAL_RISK"
-            if stop_input.residual_risk_refs
-            else "READY"
-        )
-        return StopEvaluation(
-            stop_evaluation_id=stop_evaluation_id,
-            stop_input_ref=input_ref,
-            continuation_decision="PASS",
-            assurance_level="ADEQUATE_FOR_DECLARED_SCOPE",
-            release_readiness=release_readiness,
-            reason_codes=("POST_E6_SATISFIED",),
+            reason_codes=(pass_code,),
             blocking_obligation_refs=(),
             remaining_obligation_refs=(),
         )

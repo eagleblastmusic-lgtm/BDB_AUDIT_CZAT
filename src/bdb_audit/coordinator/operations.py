@@ -495,14 +495,22 @@ class AuditOperationApi:
         status = self.get_campaign_status(store_path)
         stage = status["current_stage"]
         prepared_stages = status["stages_prepared"]
+        termination_state = status.get("termination_state", "OPEN")
 
-        next_stage = next((s for s in _BASELINE_STAGE_ORDER if s not in prepared_stages), None)
-        if next_stage:
-            action = f"PREPARE_STAGE_{next_stage}"
-            state = "READY_FOR_NEXT_STAGE"
+        if termination_state == "COMPLETED":
+            action = "CAMPAIGN_FINISHED"
+            state = "COMPLETED"
+        elif termination_state == "COMPLETED_LIMITED":
+            action = "CAMPAIGN_TERMINATED_LIMITED"
+            state = "COMPLETED_LIMITED"
         else:
-            action = "EVALUATE_STOP_GATE"
-            state = "READY_FOR_STOP_EVALUATION"
+            next_stage = next((s for s in _BASELINE_STAGE_ORDER if s not in prepared_stages), None)
+            if next_stage:
+                action = f"PREPARE_STAGE_{next_stage}"
+                state = "READY_FOR_NEXT_STAGE"
+            else:
+                action = "EVALUATE_STOP_GATE"
+                state = "READY_FOR_STOP_EVALUATION"
 
         return {
             "status": "SUCCESS",

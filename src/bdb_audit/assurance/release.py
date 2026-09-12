@@ -263,7 +263,10 @@ class ReleaseLifecycleManager:
         if final_case.stop_evaluation_ref.get("revision_digest") != stop_eval_digest:
             raise ValidationError("FINALIZATION_BINDING_CONFLICT", "final_case does not bind stop_eval")
 
-        if assessment_basis == "STOP_AXIS_MATERIALIZATION":
+        prev_ref: dict[str, Any] | None = None
+        if conclusion.termination_state != "COMPLETED":
+            result = "QUALIFICATION_BLOCKED"
+        elif assessment_basis == "STOP_AXIS_MATERIALIZATION":
             if has_release_drift:
                 raise ValidationError("DRIFT_DETECTED_MATERIALIZATION_INVALID", "Cannot materialize STOP axis if release drift occurred")
             result = stop_eval.release_readiness
@@ -278,6 +281,10 @@ class ReleaseLifecycleManager:
             prev_ref = previous_qualification_ref
         else:
             raise ValidationError("INVALID_ASSESSMENT_BASIS", f"Unknown {assessment_basis}")
+
+        # Fail-closed safeguard: if conclusion is COMPLETED_LIMITED, never produce READY
+        if conclusion.termination_state == "COMPLETED_LIMITED" and result in ("READY", "READY_WITH_RESIDUAL_RISK"):
+            result = "QUALIFICATION_BLOCKED"
 
         return ReleaseQualification(
             release_qualification_id=qualification_id,

@@ -49,15 +49,15 @@ def _artifact_body(path: Path) -> dict[str, Any]:
     )
 
 
-def _latest_accepted_stop_input(store: TransactionalHistoryStore) -> tuple[dict[str, Any], str] | None:
-    """Return the newest stop_input referenced by an accepted commit."""
+def _latest_accepted_stop_input(store: TransactionalHistoryStore) -> tuple[dict[str, Any], str, int] | None:
+    """Return the newest stop_input referenced by an accepted commit along with commit seq."""
     conn = store._connect()
     try:
         rows = conn.execute("SELECT seq, body FROM commits ORDER BY seq DESC").fetchall()
     finally:
         conn.close()
 
-    for _seq, raw in rows:
+    for seq, raw in rows:
         commit = json.loads(raw)
         refs = commit.get("immutable_object_refs", [])
         for ref in reversed(refs):
@@ -68,11 +68,17 @@ def _latest_accepted_stop_input(store: TransactionalHistoryStore) -> tuple[dict[
                 continue
             record = store.object_record(digest)
             if record and isinstance(record.get("body"), dict):
-                return dict(record["body"]), digest
+                return dict(record["body"]), digest, seq
     return None
 
 
-def _require_current_campaign_cut(stop_input: StopInput, store: TransactionalHistoryStore) -> None:
+def _require_current_campaign_cut(
+    stop_input: StopInput,
+    store: TransactionalHistoryStore,
+    *,
+    authoritative: bool = True,
+    accepted_commit_seq: int | None = None,
+) -> None:
     head = store.head()
     if head is None:
         raise ValidationError("CAMPAIGN_NOT_FOUND", "Campaign contains no accepted head")
@@ -85,13 +91,58 @@ def _require_current_campaign_cut(stop_input: StopInput, store: TransactionalHis
 
     cut = dict(stop_input.input_history_cut)
     cut_campaign = cut.get("campaign_id")
-    cut_seq = cut.get("accepted_head_seq", cut.get("commit_seq"))
-    cut_hash = cut.get("accepted_head_hash", cut.get("commit_hash"))
-    if cut_campaign != head.campaign_id or cut_seq != head.commit_seq or cut_hash != head.commit_hash:
+    cut_seq = cut.get("accepted_head_seq")
+    if cut_seq is None:
+        cut_seq = cut.get("commit_seq")
+    cut_hash = cut.get("accepted_head_hash") or cut.get("commit_hash")
+
+    if cut_campaign != head.campaign_id:
         raise ValidationError(
             "STOP_INPUT_CUT_MISMATCH",
-            "STOP input is stale or is not bound to the current accepted campaign head",
+            f"STOP input cut campaign {cut_campaign} does not match head {head.campaign_id}",
         )
+
+    # For preview / non-authoritative inputs, cut must match the active campaign head exactly
+    if not authoritative or accepted_commit_seq is None:
+        if cut_seq != head.commit_seq or cut_hash != head.commit_hash:
+            raise ValidationError(
+                "STOP_INPUT_CUT_MISMATCH",
+                "STOP input is stale or is not bound to the current accepted campaign head",
+            )
+        return
+
+    # For accepted history stop_input: cut_seq cannot be greater than the commit where it was accepted
+    if cut_seq > accepted_commit_seq:
+        raise ValidationError(
+            "STOP_INPUT_CUT_MISMATCH",
+            f"Accepted STOP input cut {cut_seq} exceeds its acceptance commit {accepted_commit_seq}",
+        )
+
+    # If head has moved past cut_seq, verify no material audit drift occurred in intermediate commits.
+    # Allowed intermediate commits are administrative: stop_input, stop_evaluation, campaign_conclusion,
+    # final_assurance_case, release_qualification. Any stages, findings, or claims invalidate the cut.
+    if cut_seq < head.commit_seq:
+        administrative_kinds = {
+            "command_envelope",
+            "stop_input",
+            "stop_evaluation",
+            "campaign_conclusion",
+            "final_assurance_case",
+            "release_qualification",
+            "successor_campaign_selection_decision",
+        }
+        for commit in store.commits():
+            c_seq = commit.get("commit_seq", 0)
+            if c_seq <= cut_seq or c_seq > head.commit_seq:
+                continue
+            refs = commit.get("immutable_object_refs", [])
+            for ref in refs:
+                kind = ref.get("kind") if isinstance(ref, dict) else None
+                if kind and kind not in administrative_kinds:
+                    raise ValidationError(
+                        "STOP_INPUT_CUT_MISMATCH",
+                        f"Material audit changes occurred after STOP input cut at commit seq {c_seq} (kind: {kind})",
+                    )
 
 
 def _next_action(decision: str, authoritative: bool) -> str:
@@ -133,6 +184,7 @@ def evaluate_stop_gate(
     source = "accepted_history" if authoritative else "preview_file"
     input_digest: str | None = None
 
+    accepted_seq: int | None = None
     if stop_input_path is None:
         accepted = _latest_accepted_stop_input(store)
         if accepted is None:
@@ -149,7 +201,7 @@ def evaluate_stop_gate(
                 "reason_codes": ["MISSING_ACCEPTED_STOP_INPUT"],
                 "next_action": "PROVIDE_OR_ACCEPT_STOP_INPUT",
             }
-        body, input_digest = accepted
+        body, input_digest, accepted_seq = accepted
     else:
         body = _artifact_body(Path(stop_input_path).resolve())
 
@@ -158,7 +210,12 @@ def evaluate_stop_gate(
     except TypeError as exc:
         raise ValidationError("MALFORMED_STOP_INPUT", str(exc)) from exc
 
-    _require_current_campaign_cut(stop_input, store)
+    _require_current_campaign_cut(
+        stop_input,
+        store,
+        authoritative=authoritative,
+        accepted_commit_seq=accepted_seq,
+    )
     if input_digest is None:
         input_digest = stop_input.as_object().digest
 
