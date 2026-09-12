@@ -116,20 +116,29 @@ class ExecutionAdapter:
         if runner_fn is not None:
             run_output = runner_fn(desc)
         else:
-            # Default success runner
+            # Compatibility runner retained until RU05 removes synthetic
+            # execution outcomes.  Its observation identity must nevertheless
+            # be a real BDB-OBJECT-DIGEST-1 identity, never SHA256(CJSON).
+            observation_body = {
+                "observation_id": deterministic_id("observation", f"obs_{desc_id}"),
+                "execution_descriptor_ref": desc_ref,
+                "raw_observation_ref": desc_ref,
+                "observation_channel": "SYNTHETIC_DEFAULT_RUNNER",
+                "observed_at": "UNRECORDED",
+            }
+            observation_obj = CanonicalObject("observation", observation_body)
+            observation = {
+                "kind": "observation",
+                "revision_digest": observation_obj.digest,
+                "digest_profile": "BDB-OBJECT-DIGEST-1",
+                "schema_revision_ref": observation_obj.schema_revision_ref,
+                "ref_class": "CONTENT_OR_PRIOR",
+                "execution_descriptor_ref": desc_ref,
+            }
             run_output = ExecutionRunOutput(
                 exit_code=0,
                 status="SUCCESS",
-                raw_observations=[
-                    {
-                        "kind": "observation",
-                        "revision_digest": hashlib.sha256(f"obs_{desc_id}".encode()).hexdigest(),
-                        "digest_profile": "BDB-OBJECT-DIGEST-1",
-                        "schema_revision_ref": "BDB_SCHEMA_REGISTRY::observation/1",
-                        "ref_class": "CONTENT_OR_PRIOR",
-                        "execution_descriptor_ref": desc_ref,
-                    }
-                ],
+                raw_observations=[observation],
                 fault_activated=fault_spec is not None,
                 cleanup_status="CLEAN",
                 residual_cleared=True,
