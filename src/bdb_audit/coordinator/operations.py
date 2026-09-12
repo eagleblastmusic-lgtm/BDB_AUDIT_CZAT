@@ -80,7 +80,7 @@ class AuditOperationApi:
             try:
                 store = TransactionalHistoryStore(path, registry=self.registry)
                 head = store.head()
-                if head.commit_seq > 0:
+                if head is not None and head.commit_seq > 0:
                     raise ValidationError("CAMPAIGN_ALREADY_EXISTS", f"Store at {path} already has accepted head seq {head.commit_seq}")
             except ValidationError:
                 raise
@@ -259,96 +259,24 @@ class AuditOperationApi:
         }
 
     def get_campaign_status(self, store_path: str | Path) -> dict[str, Any]:
-        """Inspect store and return current campaign projection."""
+        """Return a verified current projection derived only from accepted history."""
         path = Path(store_path).resolve()
         if not path.exists() or path.stat().st_size == 0:
             raise ValidationError("CAMPAIGN_NOT_FOUND", f"No database found at {path}")
+        from ..workflow.read_models import campaign_status
 
         store = TransactionalHistoryStore(path, registry=self.registry)
-        head = store.head()
-        if head.commit_seq == 0:
-            raise ValidationError("CAMPAIGN_NOT_FOUND", f"Store at {path} contains no accepted commits")
-
-        campaign_id = head.campaign_id
-
-        conn = store._connect()
-        try:
-            rows = conn.execute("SELECT kind, body FROM immutable_objects").fetchall()
-
-            stage_records: list[tuple[int, str]] = []
-            for kind, body in rows:
-                if kind != "stage_spec":
-                    continue
-                doc = json.loads(body.decode("utf-8"))
-                stage_key = doc.get("stage_key") or doc.get("stage_id") or doc.get("key")
-                ordinal = doc.get("stage_ordinal")
-                if stage_key is None:
-                    raise ValidationError("STAGE_SPEC_PROJECTION_INVALID", "stage_spec missing stage_key")
-                try:
-                    canonical_key = _canonical_stage_key(str(stage_key))
-                except ValidationError as exc:
-                    raise ValidationError("STAGE_SPEC_PROJECTION_INVALID", str(exc)) from exc
-                if type(ordinal) is not int or ordinal < 1:
-                    # Compatibility fallback for v2.0.0 objects that did not expose
-                    # an ordinal under the current body shape.
-                    ordinal = len(stage_records) + 1
-                stage_records.append((ordinal, canonical_key))
-
-            stage_records.sort(key=lambda item: (item[0], item[1]))
-            stages = [stage_key for _, stage_key in stage_records]
-
-            lanes: list[str] = []
-            for kind, body in rows:
-                if kind != "lane_spec":
-                    continue
-                doc = json.loads(body.decode("utf-8"))
-                lane_key = doc.get("lane_key") or doc.get("lane_id") or doc.get("slot")
-                if not lane_key:
-                    raise ValidationError("LANE_SPEC_PROJECTION_INVALID", "lane_spec missing lane_key")
-                lanes.append(str(lane_key))
-            lanes.sort()
-
-            stage_completions = [kind for kind, _ in rows if kind == "stage_completion"]
-            stop_evaluations = [kind for kind, _ in rows if kind == "stop_evaluation"]
-
-            current_stage = stages[-1] if stages else "GENESIS"
-        finally:
-            conn.close()
-
-        return {
-            "status": "SUCCESS",
-            "campaign_id": campaign_id,
-            "accepted_head_seq": head.commit_seq,
-            "accepted_head_hash": head.commit_hash,
-            "current_stage": current_stage,
-            "stages_prepared": stages,
-            "lanes_prepared": lanes,
-            "stage_completions_count": len(stage_completions),
-            "stop_evaluations_count": len(stop_evaluations),
-            "total_objects_count": len(rows),
-        }
+        return campaign_status(store, _canonical_stage_key)
 
     def get_campaign_source_identity(self, store_path: str | Path) -> dict[str, Any]:
-        """Inspect store and return authoritative source identity from campaign genesis."""
+        """Resolve authoritative source identity through accepted campaign genesis."""
         path = Path(store_path).resolve()
         if not path.exists() or path.stat().st_size == 0:
             raise ValidationError("CAMPAIGN_NOT_FOUND", f"No database found at {path}")
+        from ..workflow.read_models import campaign_source_identity
+
         store = TransactionalHistoryStore(path, registry=self.registry)
-        conn = store._connect()
-        try:
-            row = conn.execute("SELECT body FROM immutable_objects WHERE kind='source_identity' LIMIT 1").fetchone()
-            if not row:
-                return {}
-            doc = json.loads(row[0].decode("utf-8"))
-            repo_ref = doc.get("authorized_repository_or_snapshot_ref", {})
-            return {
-                "authority_mode": doc.get("authority_mode"),
-                "git_commit_object_id": doc.get("git_commit_object_id"),
-                "git_tree_object_id": doc.get("git_tree_object_id"),
-                "repository_authority_ref": repo_ref,
-            }
-        finally:
-            conn.close()
+        return campaign_source_identity(store)
 
     def prepare_stage(
         self,
