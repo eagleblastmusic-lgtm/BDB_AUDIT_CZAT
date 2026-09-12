@@ -39,6 +39,21 @@ SOURCE_CAPABILITIES = {
 }
 
 
+def _ensure_utf8_stdio() -> None:
+    """Make CLI bytes deterministic on Windows pipes/consoles when possible."""
+    for stream in (sys.stdout, sys.stderr):
+        encoding = str(getattr(stream, "encoding", "") or "").lower().replace("-", "")
+        if encoding == "utf8":
+            continue
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            try:
+                reconfigure(encoding="utf-8", errors="strict")
+            except (AttributeError, ValueError):
+                # Some in-memory/captured streams intentionally cannot be reconfigured.
+                pass
+
+
 def _emit_output(data: dict, as_json: bool = False) -> None:
     if as_json:
         print(json.dumps(data, indent=2, sort_keys=True))
@@ -131,6 +146,7 @@ def create_parser() -> argparse.ArgumentParser:
 
 
 def run_cli(argv: Sequence[str] | None = None) -> int:
+    _ensure_utf8_stdio()
     parser = create_parser()
 
     if argv is not None and len(argv) == 0:
