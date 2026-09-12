@@ -1,9 +1,9 @@
 """Verified campaign read models derived only from accepted history.
 
-RU04 / D07 boundary: immutable object-table presence is storage, never authority.
+RU04 / D07 / D22 boundary: immutable object-table presence is storage, never authority.
 Every projected fact below is resolved through the canonical accepted commit
-closure at one exact current HistoryCut.  Orphan, uncommitted, wrong-run, or
-corrupted rows therefore cannot advance operational state.
+closure at one exact current HistoryCut. Orphan, uncommitted, wrong-run, wrong-stage,
+wrong-campaign, or corrupted rows therefore cannot advance operational state.
 """
 from __future__ import annotations
 
@@ -90,78 +90,172 @@ def campaign_source_identity(
     }
 
 
+class VerifiedCampaignReadModel:
+    """Unified application-level read model projecting state strictly from accepted closure.
+
+    Authority guarantee:
+    1. Direct immutable_objects queries are forbidden for operational decisions.
+    2. Projections are resolved on an exact, verified HistoryCut.
+    3. Prepared state != completed state: presence of StageSpec or LaneSpec never marks
+       a stage as completed.
+    4. Exact stage/run binding: stage completions must resolve to an accepted StageSpec,
+       verifying campaign identity and exact cut closure. Multiple conflicting completions
+       for the same stage fail closed.
+    5. Termination and readiness: only an accepted CampaignConclusion with COMPLETED or
+       COMPLETED_LIMITED can mark the campaign finished.
+    """
+
+    def __init__(
+        self,
+        store: TransactionalHistoryStore,
+        canonical_stage: CanonicalStage | None = None,
+        cut: dict[str, Any] | None = None,
+    ):
+        self.store = store
+        if canonical_stage is not None:
+            self.canonical_stage = canonical_stage
+        else:
+            from ..coordinator.operations import _canonical_stage_key
+            self.canonical_stage = _canonical_stage_key
+
+        self.cut = cut or current_accepted_cut(store)
+        self.head = store.head()
+        if self.head is None:
+            raise ValidationError("CAMPAIGN_NOT_FOUND")
+
+    def project_status(self) -> dict[str, Any]:
+        """Project operational status exclusively from accepted records on current cut."""
+        cut = self.cut
+        head = self.head
+
+        # 1. Accepted StageSpecs
+        stage_rows = self.store.accepted_records("stage_spec", cut)
+        stage_records: list[tuple[int, str, dict[str, Any]]] = []
+        spec_by_stage_key: dict[str, dict[str, Any]] = {}
+        for index, row in enumerate(stage_rows, start=1):
+            doc = row["body"]
+            stage_key = doc.get("stage_key") or doc.get("stage_id") or doc.get("key")
+            ordinal = doc.get("stage_ordinal")
+            if stage_key is None:
+                raise ValidationError("STAGE_SPEC_PROJECTION_INVALID", "stage_spec missing stage_key")
+            try:
+                canonical_key = self.canonical_stage(str(stage_key))
+            except ValidationError as exc:
+                raise ValidationError("STAGE_SPEC_PROJECTION_INVALID", str(exc)) from exc
+            if type(ordinal) is not int or ordinal < 1:
+                ordinal = index
+            if canonical_key in spec_by_stage_key:
+                raise ValidationError("STAGE_SPEC_PROJECTION_INVALID", f"Duplicate accepted stage key {canonical_key}")
+            spec_by_stage_key[canonical_key] = row
+            stage_records.append((ordinal, canonical_key, row))
+
+        stage_records.sort(key=lambda item: (item[0], item[1]))
+        stages_prepared = [stage_key for _, stage_key, _ in stage_records]
+
+        # 2. Accepted LaneSpecs
+        lane_rows = self.store.accepted_records("lane_spec", cut)
+        lanes_prepared: list[str] = []
+        for row in lane_rows:
+            doc = row["body"]
+            lane_key = doc.get("lane_key") or doc.get("lane_id") or doc.get("slot")
+            if not lane_key:
+                raise ValidationError("LANE_SPEC_PROJECTION_INVALID", "lane_spec missing lane_key")
+            lanes_prepared.append(str(lane_key))
+        lanes_prepared.sort()
+        if len(lanes_prepared) != len(set(lanes_prepared)):
+            raise ValidationError("LANE_SPEC_PROJECTION_INVALID", "Duplicate accepted lane key")
+
+        # 3. Accepted StageCompletions with exact stage binding and ambiguity rejection
+        completion_rows = self.store.accepted_records("stage_completion", cut)
+        completed_stages: list[str] = []
+        completed_by_stage: dict[str, str] = {}  # stage_key -> completion_digest
+
+        for row in completion_rows:
+            doc = row["body"]
+            if doc.get("completion_predicate_result") != "STAGE_COMPLETED":
+                continue
+
+            spec_ref = doc.get("stage_spec_ref")
+            if not isinstance(spec_ref, dict):
+                raise ValidationError("STAGE_COMPLETION_PROJECTION_INVALID", "Missing stage_spec_ref in stage_completion")
+
+            # Resolve accepted stage_spec to verify campaign and cut binding
+            spec_record = self.store.resolve_accepted(spec_ref, cut)
+            spec_body = spec_record["body"]
+            sk = spec_body.get("stage_key") or spec_body.get("stage_id")
+            if not sk:
+                raise ValidationError("STAGE_COMPLETION_PROJECTION_INVALID", "stage_spec has no stage_key")
+            canonical_sk = self.canonical_stage(str(sk))
+
+            if canonical_sk in completed_by_stage:
+                existing_digest = completed_by_stage[canonical_sk]
+                new_digest = row["ref"]["revision_digest"]
+                if existing_digest != new_digest:
+                    raise ValidationError(
+                        "MULTIPLE_STAGE_COMPLETIONS",
+                        f"Ambiguous conflicting completions for stage {canonical_sk}",
+                    )
+            else:
+                completed_by_stage[canonical_sk] = row["ref"]["revision_digest"]
+                completed_stages.append(canonical_sk)
+
+        # 4. Accepted StopEvaluations & CampaignConclusions
+        stop_rows = self.store.accepted_records("stop_evaluation", cut)
+        conclusion_rows = self.store.accepted_records("campaign_conclusion", cut)
+        conclusion_rows = tuple(sorted(conclusion_rows, key=lambda row: row["accepted_seq"]))
+        latest_conclusion = conclusion_rows[-1]["body"] if conclusion_rows else None
+        termination_state = latest_conclusion.get("termination_state") if latest_conclusion else "OPEN"
+        if termination_state not in {"OPEN", "COMPLETED", "COMPLETED_LIMITED"}:
+            raise ValidationError("CAMPAIGN_CONCLUSION_PROJECTION_INVALID", str(termination_state))
+
+        # 5. Determine current_stage rigorously:
+        # If there are prepared stages, current_stage is the first prepared stage that is NOT completed.
+        # If all prepared stages are completed, current_stage is the last prepared stage (or GENESIS if none).
+        current_stage = "GENESIS"
+        for st in stages_prepared:
+            if st not in completed_by_stage:
+                current_stage = st
+                break
+        else:
+            if stages_prepared:
+                current_stage = stages_prepared[-1]
+
+        source = campaign_source_identity(self.store, cut)
+
+        return {
+            "status": "SUCCESS",
+            "campaign_id": head.campaign_id,
+            "accepted_head_seq": head.commit_seq,
+            "accepted_head_hash": head.commit_hash,
+            "current_stage": current_stage,
+            "stages_prepared": stages_prepared,
+            "stages_completed": completed_stages,
+            "lanes_prepared": lanes_prepared,
+            "stage_completions_count": len(completion_rows),
+            "stop_evaluations_count": len(stop_rows),
+            "campaign_conclusions_count": len(conclusion_rows),
+            "termination_state": termination_state,
+            "campaign_completed": termination_state in {"COMPLETED", "COMPLETED_LIMITED"},
+            "total_objects_count": _accepted_object_count(self.store, cut),
+            "source_generation_id": source.get("source_generation_id"),
+        }
+
+    def project_source_identity(self) -> dict[str, Any]:
+        return campaign_source_identity(self.store, self.cut)
+
+
 def campaign_status(
     store: TransactionalHistoryStore,
     canonical_stage: CanonicalStage,
 ) -> dict[str, Any]:
     """Build operational status exclusively from accepted records on current cut."""
-    cut = current_accepted_cut(store)
-    head = store.head()
-    if head is None:  # guarded by current_accepted_cut; keeps typing explicit.
-        raise ValidationError("CAMPAIGN_NOT_FOUND")
-
-    stage_rows = store.accepted_records("stage_spec", cut)
-    stage_records: list[tuple[int, str]] = []
-    for index, row in enumerate(stage_rows, start=1):
-        doc = row["body"]
-        stage_key = doc.get("stage_key") or doc.get("stage_id") or doc.get("key")
-        ordinal = doc.get("stage_ordinal")
-        if stage_key is None:
-            raise ValidationError("STAGE_SPEC_PROJECTION_INVALID", "stage_spec missing stage_key")
-        try:
-            canonical_key = canonical_stage(str(stage_key))
-        except ValidationError as exc:
-            raise ValidationError("STAGE_SPEC_PROJECTION_INVALID", str(exc)) from exc
-        if type(ordinal) is not int or ordinal < 1:
-            ordinal = index
-        stage_records.append((ordinal, canonical_key))
-    stage_records.sort(key=lambda item: (item[0], item[1]))
-    stages = [stage_key for _, stage_key in stage_records]
-    if len(stages) != len(set(stages)):
-        raise ValidationError("STAGE_SPEC_PROJECTION_INVALID", "Duplicate accepted stage key")
-
-    lane_rows = store.accepted_records("lane_spec", cut)
-    lanes: list[str] = []
-    for row in lane_rows:
-        doc = row["body"]
-        lane_key = doc.get("lane_key") or doc.get("lane_id") or doc.get("slot")
-        if not lane_key:
-            raise ValidationError("LANE_SPEC_PROJECTION_INVALID", "lane_spec missing lane_key")
-        lanes.append(str(lane_key))
-    lanes.sort()
-    if len(lanes) != len(set(lanes)):
-        raise ValidationError("LANE_SPEC_PROJECTION_INVALID", "Duplicate accepted lane key")
-
-    completion_rows = store.accepted_records("stage_completion", cut)
-    stop_rows = store.accepted_records("stop_evaluation", cut)
-    conclusion_rows = store.accepted_records("campaign_conclusion", cut)
-    conclusion_rows = tuple(sorted(conclusion_rows, key=lambda row: row["accepted_seq"]))
-    latest_conclusion = conclusion_rows[-1]["body"] if conclusion_rows else None
-    termination_state = latest_conclusion.get("termination_state") if latest_conclusion else "OPEN"
-    if termination_state not in {"OPEN", "COMPLETED", "COMPLETED_LIMITED"}:
-        raise ValidationError("CAMPAIGN_CONCLUSION_PROJECTION_INVALID", str(termination_state))
-
-    source = campaign_source_identity(store, cut)
-    return {
-        "status": "SUCCESS",
-        "campaign_id": head.campaign_id,
-        "accepted_head_seq": head.commit_seq,
-        "accepted_head_hash": head.commit_hash,
-        "current_stage": stages[-1] if stages else "GENESIS",
-        "stages_prepared": stages,
-        "lanes_prepared": lanes,
-        "stage_completions_count": len(completion_rows),
-        "stop_evaluations_count": len(stop_rows),
-        "campaign_conclusions_count": len(conclusion_rows),
-        "termination_state": termination_state,
-        "campaign_completed": termination_state in {"COMPLETED", "COMPLETED_LIMITED"},
-        "total_objects_count": _accepted_object_count(store, cut),
-        "source_generation_id": source.get("source_generation_id"),
-    }
+    model = VerifiedCampaignReadModel(store, canonical_stage=canonical_stage)
+    return model.project_status()
 
 
 __all__ = [
     "current_accepted_cut",
     "campaign_source_identity",
     "campaign_status",
+    "VerifiedCampaignReadModel",
 ]
