@@ -73,7 +73,14 @@ class ExecutionAdapter:
         runner_fn: Callable[[ExecutionDescriptor], ExecutionRunOutput] | None = None,
         fault_spec: Mapping[str, Any] | None = None,
     ) -> tuple[ExecutionDescriptor, ExecutionResult, list[dict], CleanupResult, FaultRunRecord | None]:
-        """Execute experiment according to the strict 2-phase preregistered DAG model."""
+        """Execute experiment according to the strict 2-phase preregistered DAG model.
+
+        Absence of a runner is a truthful non-execution result, never a synthetic
+        successful experiment.  RU10 may later provide controlled production
+        runners; until then the adapter records ``UNSUPPORTED`` with zero target
+        observations so no downstream qualifier can mistake a missing runner for
+        evidence.
+        """
         # 1. Capability enforcement: check that executor supports required techniques
         supported_capabilities = set(executor_profile.get("supported_capabilities", []))
         declared_techniques = set(executor_profile.get("allowed_techniques", supported_capabilities))
@@ -115,31 +122,16 @@ class ExecutionAdapter:
         desc_ref = _ref_dict(desc.as_object().as_ref())
         if runner_fn is not None:
             run_output = runner_fn(desc)
+            if not isinstance(run_output, ExecutionRunOutput):
+                raise ValidationError("INVALID_RUNNER_OUTPUT", type(run_output).__name__)
         else:
-            # Compatibility runner retained until RU05 removes synthetic
-            # execution outcomes.  Its observation identity must nevertheless
-            # be a real BDB-OBJECT-DIGEST-1 identity, never SHA256(CJSON).
-            observation_body = {
-                "observation_id": deterministic_id("observation", f"obs_{desc_id}"),
-                "execution_descriptor_ref": desc_ref,
-                "raw_observation_ref": desc_ref,
-                "observation_channel": "SYNTHETIC_DEFAULT_RUNNER",
-                "observed_at": "UNRECORDED",
-            }
-            observation_obj = CanonicalObject("observation", observation_body)
-            observation = {
-                "kind": "observation",
-                "revision_digest": observation_obj.digest,
-                "digest_profile": "BDB-OBJECT-DIGEST-1",
-                "schema_revision_ref": observation_obj.schema_revision_ref,
-                "ref_class": "CONTENT_OR_PRIOR",
-                "execution_descriptor_ref": desc_ref,
-            }
+            # No production runner is implemented in this layer.  Do not invent
+            # target observations or successful execution semantics.
             run_output = ExecutionRunOutput(
-                exit_code=0,
-                status="SUCCESS",
-                raw_observations=[observation],
-                fault_activated=fault_spec is not None,
+                exit_code=125,
+                status="UNSUPPORTED",
+                raw_observations=(),
+                fault_activated=False,
                 cleanup_status="CLEAN",
                 residual_cleared=True,
             )
