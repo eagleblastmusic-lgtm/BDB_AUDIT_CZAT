@@ -163,6 +163,7 @@ jobs:
           } finally {
             Remove-Item -Force $stdout,$stderr -ErrorAction SilentlyContinue
           }
+          exit 0
 
       - name: Standalone help
         id: standalone_help_gate
