@@ -32,6 +32,7 @@ BUILD_ID = str(_VERSION_NAMESPACE["BUILD_ID"])
 DEFAULT_OUTPUT_NAME = f"BDB_AUDIT_ASSISTANT_v{APP_VERSION}.py"
 FIXED_ZIP_DATETIME = (2026, 9, 11, 0, 0, 0)
 _RUNTIME_META_PREFIX = "__bdb_runtime__"
+_SOURCE_GENERATED_METADATA_SUFFIXES = (".egg-info", ".dist-info")
 
 
 def _normalized_arch(value: str) -> str:
@@ -98,12 +99,16 @@ def _normalize_source_bytes(path: Path, raw_bytes: bytes) -> bytes:
 
 
 def collect_source_files(src_root: Path) -> list[tuple[str, bytes]]:
-    """Collect all BDB source/data files in deterministic order."""
+    """Collect canonical product source/data, excluding generated install metadata."""
     collected: list[tuple[str, bytes]] = []
     base_path = src_root.resolve()
     all_files: list[Path] = []
     for root, dirs, files in os.walk(base_path):
-        dirs[:] = sorted(d for d in dirs if d != "__pycache__")
+        dirs[:] = sorted(
+            d
+            for d in dirs
+            if d != "__pycache__" and not d.endswith(_SOURCE_GENERATED_METADATA_SUFFIXES)
+        )
         for filename in sorted(files):
             if filename.endswith((".pyc", ".pyo")):
                 continue
