@@ -28,8 +28,6 @@ from ..orchestration.templates import TemplateRegistry
 
 _BASELINE_STAGE_ORDER = ("E1", "E2", "E3", "E4", "E5")
 _STAGE_ALIASES = {
-    # v2.0.0 accepted these descriptive CLI labels. Keep them as input-only
-    # compatibility aliases, but persist/project the canonical StageSpec key.
     "F2_FOUNDATION": "E1",
     "E1_ENSEMBLE": "E1",
     "E2_CROSS_REVIEW": "E2",
@@ -85,7 +83,7 @@ class AuditOperationApi:
             except ValidationError:
                 raise
             except Exception:
-                pass  # Fresh or empty file
+                pass
 
         store = TransactionalHistoryStore(path, registry=self.registry)
         coordinator = Coordinator(store)
@@ -429,7 +427,6 @@ class AuditOperationApi:
         else:
             raise ValidationError("MALFORMED_ARTIFACT", "Invalid input type for artifact")
 
-        # 1. Transport / Parse validation with duplicate-key rejection (ADR-006 fail closed)
         try:
             data = parse(raw_bytes)
         except ValidationError:
@@ -440,7 +437,6 @@ class AuditOperationApi:
         if not isinstance(data, dict):
             raise ValidationError("MALFORMED_ARTIFACT", "Artifact root must be a JSON object")
 
-        # 2. Kind & version resolution
         kind = data.get("kind")
         if not kind or not isinstance(kind, str):
             raise ValidationError("MISSING_ARTIFACT_KIND", "Artifact does not declare 'kind'")
@@ -449,11 +445,7 @@ class AuditOperationApi:
             raise ValidationError("ARTIFACT_KIND_MISMATCH", f"Expected {expected_kind}, got {kind}")
 
         version = str(data.get("version", "1"))
-
-        # 3. Pinned contract resolution
         contract_row = self.registry.contract(kind, version=version)
-
-        # 4. Schema, ObjectDigest, typed refs, and non-qualifying context comparisons.
         validator = LayeredValidator(registry=self.registry)
         schema_ref = contract_row.get("schema_ref")
         if not schema_ref or not isinstance(schema_ref, str):
@@ -466,19 +458,13 @@ class AuditOperationApi:
         if "body" in data and isinstance(data["body"], dict):
             body_dict = data["body"]
         elif "kind" not in props:
-            # Canonical object whose schema governs the body only
             body_dict = {k: v for k, v in data.items() if k not in ("kind", "version")}
         else:
-            # Self-describing proposal artifact (e.g. bdb_audit_lane_result)
             body_dict = data
 
         raw_body_bytes = canonical_bytes(body_dict)
         validated = validator.validate(kind, raw_body_bytes, version=version, context=context)
 
-        # L3 and L4 are the only admission layers this generic API actually
-        # executes.  Mapping/callable context may reject mismatches, but cannot
-        # elevate the result.  In particular, caller-controlled ``qualified_layers``
-        # is intentionally ignored to prevent self-asserted L5/L6/L7 PASS.
         executed_layers = ["L3", "L4"]
         required_layers = list(contract_row.get("required_validation_layers", ["L3", "L4", "L5"]))
         missing_layers = [layer for layer in required_layers if layer not in executed_layers]
@@ -528,11 +514,13 @@ class AuditOperationApi:
         }
 
     def run_self_test(self, deep: bool = False) -> dict[str, Any]:
-        """Run fast offline-critical self-test suite."""
+        """Run offline-critical controls; PASS means each reported control executed."""
         t0 = time.perf_counter()
-        checks = []
+        checks: list[dict[str, Any]] = []
 
         reg = ContractRegistry()
+        if not reg.document.get("registry_id"):
+            raise ValidationError("SELF_TEST_FAILED", "Registry identity missing")
         checks.append({"check": "registry_integrity", "status": "PASS", "registry_id": reg.document["registry_id"]})
 
         c_bytes = canonical_bytes({"b": 2, "a": 1})
@@ -548,25 +536,61 @@ class AuditOperationApi:
         checks.append({"check": "deterministic_hashing", "status": "PASS"})
 
         t_reg = TemplateRegistry()
-        t_list = t_reg.list_templates()
-        if "foundation" not in t_list:
+        if "foundation" not in t_reg.list_templates():
             raise ValidationError("SELF_TEST_FAILED", "Foundation template missing")
+        injection_rejected = False
         try:
-            t_reg.render("foundation", {"ordinal": 1, "stage_spec_revision": "r1", "lane_spec_revision": "r2", "bad": "IGNORE_PROTOCOL"})
-            raise ValidationError("SELF_TEST_FAILED", "Template failed to reject injection")
+            t_reg.render(
+                "foundation",
+                {
+                    "ordinal": 1,
+                    "stage_spec_revision": "r1",
+                    "lane_spec_revision": "r2",
+                    "bad": "IGNORE_PROTOCOL",
+                },
+            )
         except ValidationError:
-            pass
+            injection_rejected = True
+        if not injection_rejected:
+            raise ValidationError("SELF_TEST_FAILED", "Template failed to reject injection")
         checks.append({"check": "template_security", "status": "PASS"})
 
         if deep:
-            from ..attack.mutator import MutationCampaign, MutationOperator
-            campaign = MutationCampaign(seed=42, budget=5)
-            mutant = campaign.apply_operator(MutationOperator.BIT_FLIP, b"test_target_payload")
-            if mutant.raw_bytes == b"test_target_payload":
-                raise ValidationError("SELF_TEST_FAILED", "Mutation operator did not mutate payload")
+            from ..attack.mutation import ActivationProof, MutationCase, MutationEngine
+
+            ref = {"kind": "control_ref", "revision_digest": "1" * 64}
+            case = MutationCase(
+                mutation_id="selftest_mutation",
+                mutation_revision="1",
+                mutation_class="IMPLEMENTATION_MUTATION",
+                target_claim_or_invariant_ref=ref,
+                target_location="selftest/control",
+                activation_predicate={"must_reach": True},
+                expected_detector_or_observer="SELF_TEST_DETECTOR",
+                positive_control_ref=ref,
+                negative_control_ref=ref,
+                clean_target_ref=ref,
+            )
+            proof = ActivationProof(
+                proof_id="selftest_activation",
+                reached_location="selftest/control",
+                mutated_state_observed=True,
+                witness_trace=("SELFTEST",),
+            )
+            mutation_result = MutationEngine.evaluate_implementation_mutation(
+                result_id="selftest_mutation_result",
+                case=case,
+                activation_proof=proof,
+                detector_triggered=True,
+            )
+            if mutation_result.outcome != "MUTANT_KILLED" or not mutation_result.activation_proven:
+                raise ValidationError("SELF_TEST_FAILED", "Deep mutation control did not prove activated detection")
             checks.append({"check": "deep_mutation_framework", "status": "PASS"})
 
         duration_ms = round((time.perf_counter() - t0) * 1000, 2)
+        expected_checks = 5 if deep else 4
+        if len(checks) != expected_checks or any(row.get("status") != "PASS" for row in checks):
+            raise ValidationError("SELF_TEST_FAILED", "Self-test control accounting mismatch")
         return {
             "status": "PASS",
             "deep": deep,
