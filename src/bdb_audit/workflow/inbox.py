@@ -320,6 +320,9 @@ class E1ResultInbox:
                 return self._reject(path, slot, "MISSING_MANDATORY_FIELD", "Manifest missing history_cut", raw_digest)
             if any(result_cut.get(key) != expected_cut.get(key) for key in ("campaign_id", "accepted_head_seq", "accepted_head_hash")):
                 return self._reject(path, slot, "STALE_CUT", "Result does not match the assignment input cut", raw_digest)
+            for key, expected_value in expected_cut.items():
+                if key in result_cut and result_cut[key] != expected_value:
+                    return self._reject(path, slot, "STALE_CUT", f"Result history_cut conflicts on {key}", raw_digest)
 
             package_digest = manifest.get("input_package_digest")
             if not package_digest:
@@ -362,6 +365,7 @@ class E1ResultInbox:
                     return self._reject(path, slot, "INVALID_FINDING_STRUCTURE", f"finding {index} lacks statement/id", raw_digest)
 
             canonical_proposal = dict(manifest)
+            canonical_proposal["history_cut"] = dict(expected_cut)
             canonical_proposal["findings"] = findings
             canonical_proposal["findings_count"] = len(findings)
             canonical_proposal["assignment_ref"] = dict(job.assignment_ref)
