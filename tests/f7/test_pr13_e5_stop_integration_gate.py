@@ -89,19 +89,20 @@ def test_adv_calibration_unseeded_finding_not_false_positive():
 
 
 def test_adv_challenger_before_candidate_and_different_revisions():
-    cand_cut = {"campaign_id": "CAMP", "commit_seq": 15, "commit_hash": "a" * 64}
-    early_cut = {"campaign_id": "CAMP", "commit_seq": 10, "commit_hash": "e" * 64}
+    cand_cut = {"campaign_id": "CAMP", "accepted_head_seq": 15, "accepted_head_hash": "a" * 64}
+    early_cut = {"campaign_id": "CAMP", "accepted_head_seq": 10, "accepted_head_hash": "e" * 64}
+    result_cut = {"campaign_id": "CAMP", "accepted_head_seq": 16, "accepted_head_hash": "b" * 64}
     cac = CandidateAssuranceCaseBuilder("cac1", _ref("cg", "1"), _ref("sg", "1"), cand_cut, _ref("inv", "1"), _ref("cs", "1")).build()
 
     asgn = ChallengerAssignment("a1", cac.ref, "FALSE_POSITIVE_SKEPTIC", "ALL", _ref("p", "1"), _ref("e", "1"), early_cut)
     with pytest.raises(ValidationError, match="TEMPORAL_ORDER_VIOLATION"):
         E5ChallengerOrchestrator.validate_assignment_precedes_candidate(cac, asgn)
 
-    # Different candidate revisions
-    r1 = ChallengerResult("r1", _ref("a", "1"), cac.ref, {"commit_seq": 16}, "NO_MATERIAL_COUNTEREVIDENCE")
+    # Different candidate revisions remain a distinct failure even without assignment context.
+    r1 = ChallengerResult("r1", _ref("a", "1"), cac.ref, result_cut, "NO_MATERIAL_COUNTEREVIDENCE")
     other_ref = dict(cac.ref)
     other_ref["revision_digest"] = "different" * 4 + "0" * 32
-    r2 = ChallengerResult("r2", _ref("a", "1"), other_ref, {"commit_seq": 16}, "NO_MATERIAL_COUNTEREVIDENCE")
+    r2 = ChallengerResult("r2", _ref("b", "1"), other_ref, result_cut, "NO_MATERIAL_COUNTEREVIDENCE")
 
     eligible, reasons = E5ChallengerOrchestrator.validate_challenger_results_pair(cac, r1, r2)
     assert eligible is False
@@ -109,11 +110,12 @@ def test_adv_challenger_before_candidate_and_different_revisions():
 
 
 def test_adv_candidate_revision_changed_invalidates_both():
-    cand_cut = {"campaign_id": "CAMP", "commit_seq": 15, "commit_hash": "a" * 64}
+    cand_cut = {"campaign_id": "CAMP", "accepted_head_seq": 15, "accepted_head_hash": "a" * 64}
+    result_cut = {"campaign_id": "CAMP", "accepted_head_seq": 16, "accepted_head_hash": "b" * 64}
     cac = CandidateAssuranceCaseBuilder("cac1", _ref("cg", "1"), _ref("sg", "1"), cand_cut, _ref("inv", "1"), _ref("cs", "1")).build()
     stale_ref = {"kind": "candidate_assurance_case", "revision_digest": "stale" * 12 + "0000"}
-    r1 = ChallengerResult("r1", _ref("a", "1"), stale_ref, {"commit_seq": 16}, "NO_MATERIAL_COUNTEREVIDENCE")
-    r2 = ChallengerResult("r2", _ref("a", "1"), stale_ref, {"commit_seq": 16}, "NO_MATERIAL_COUNTEREVIDENCE")
+    r1 = ChallengerResult("r1", _ref("a", "1"), stale_ref, result_cut, "NO_MATERIAL_COUNTEREVIDENCE")
+    r2 = ChallengerResult("r2", _ref("b", "1"), stale_ref, result_cut, "NO_MATERIAL_COUNTEREVIDENCE")
 
     eligible, reasons = E5ChallengerOrchestrator.validate_challenger_results_pair(cac, r1, r2)
     assert eligible is False

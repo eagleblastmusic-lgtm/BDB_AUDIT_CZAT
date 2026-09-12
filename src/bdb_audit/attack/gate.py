@@ -234,7 +234,7 @@ class E5StopSyntheticBenchmark:
         summary["m42_risks"] = len(risk_reg.records)
 
         # 7. M43 Candidate Assurance Case (Cut 15)
-        cut_15 = {"campaign_id": "CAMP-001", "commit_seq": 15, "commit_hash": "b" * 64}
+        cut_15 = {"campaign_id": "CAMP-001", "accepted_head_seq": 15, "accepted_head_hash": "b" * 64}
         builder = CandidateAssuranceCaseBuilder(
             "cac_f7_01", _ref("campaign_genesis", "cg1", "PRIOR_ACCEPTED_ONLY"),
             _ref("source_generation", "sg1"), cut_15, _ref("inventory_revision", "inv1"),
@@ -246,8 +246,8 @@ class E5StopSyntheticBenchmark:
         summary["m43_cac_digest"] = cac.digest()
 
         # 8. M43B Challengers & StageCompletion (Cut 16 & 17)
-        cut_16 = {"campaign_id": "CAMP-001", "commit_seq": 16, "commit_hash": "c" * 64}
-        cut_17 = {"campaign_id": "CAMP-001", "commit_seq": 17, "commit_hash": "d" * 64}
+        cut_16 = {"campaign_id": "CAMP-001", "accepted_head_seq": 16, "accepted_head_hash": "c" * 64}
+        cut_17 = {"campaign_id": "CAMP-001", "accepted_head_seq": 17, "accepted_head_hash": "d" * 64}
         pol_ref = _ref("policy_revision", "p1", "HISTORY_CONTEXT_BINDING")
         ex_ref = _ref("executor_spec", "ex1", "HISTORY_CONTEXT_BINDING")
 
@@ -257,7 +257,13 @@ class E5StopSyntheticBenchmark:
         asgn_hu = ChallengerAssignment("asgn_hu", cac.ref, "FALSE_NEGATIVE_HUNTER", "ALL", pol_ref, ex_ref, cut_16)
         res_hu = ChallengerResult("res_hu", asgn_hu.ref, cac.ref, cut_17, "NO_MATERIAL_COUNTEREVIDENCE")
 
-        eligible, reasons = E5ChallengerOrchestrator.validate_challenger_results_pair(cac, res_sk, res_hu)
+        eligible, reasons = E5ChallengerOrchestrator.validate_challenger_results_pair(
+            cac,
+            res_sk,
+            res_hu,
+            skeptic_assignment=asgn_sk,
+            hunter_assignment=asgn_hu,
+        )
         assert eligible is True
         summary["m43b_stage_completion_eligible"] = eligible
 

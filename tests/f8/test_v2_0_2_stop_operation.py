@@ -68,7 +68,8 @@ def test_v202_missing_accepted_stop_input_fails_closed(tmp_path: Path):
         api.prepare_stage(store, stage)
 
     cont = api.continue_campaign(store)
-    assert cont["next_action"] == "EVALUATE_STOP_GATE"
+    assert cont["continuation_state"] == "AWAITING_STAGE_COMPLETION"
+    assert cont["next_action"] == "AWAITING_STAGE_COMPLETION"
 
     result = evaluate_stop_gate(store)
     assert result["status"] == "SUCCESS"

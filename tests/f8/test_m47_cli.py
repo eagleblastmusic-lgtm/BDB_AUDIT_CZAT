@@ -84,14 +84,14 @@ def test_m47_happy_path_workflow(temp_store, capsys):
     assert out["stages_prepared"] == ["E1"]
     assert out["lanes_prepared"] == ["lane_E1_L1"]
 
-    # 5. continuation follows the same canonical stage key domain
+    # 5. prepared is not completed: continuation waits for accepted stage completion.
     rc = run_cli(["continue", "--store", store_str, "--json"])
     assert rc == EXIT_SUCCESS
     out = json.loads(capsys.readouterr().out)
     assert out["status"] == "SUCCESS"
     assert out["current_stage"] == "E1"
-    assert out["continuation_state"] == "READY_FOR_NEXT_STAGE"
-    assert out["next_action"] == "PREPARE_STAGE_E2"
+    assert out["continuation_state"] == "AWAITING_STAGE_COMPLETION"
+    assert out["next_action"] == "AWAITING_STAGE_COMPLETION"
 
     # 6. validate valid artifact
     with tempfile.TemporaryDirectory() as td:
@@ -144,7 +144,7 @@ def test_m47_legacy_descriptive_stage_alias_projects_canonical_key(temp_store, c
 
     assert run_cli(["continue", "--store", store_str, "--json"]) == EXIT_SUCCESS
     out = json.loads(capsys.readouterr().out)
-    assert out["next_action"] == "PREPARE_STAGE_E2"
+    assert out["next_action"] == "AWAITING_STAGE_COMPLETION"
 
 
 def test_m47_stage_order_and_lane_parent_fail_closed(temp_store, capsys):
