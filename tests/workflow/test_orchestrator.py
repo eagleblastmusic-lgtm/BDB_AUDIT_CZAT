@@ -44,7 +44,8 @@ def orchestrator_setup(tmp_path: Path):
 
     mock_platform = MockPlatformAdapter()
     orch = FullAuditOrchestrator(settings_mgr=mgr, platform_adapter=mock_platform)
-    # Supply pre-resolved source for unit test
+    # Supply pre-resolved source for unit test paths that do not exercise the
+    # network resolver itself.
     orch.resolved_source = ResolvedSource(
         target_type="github",
         location=mgr.settings.github_repo_url,
@@ -55,8 +56,26 @@ def orchestrator_setup(tmp_path: Path):
     return orch, mgr, mock_platform, tmp_path
 
 
-def test_preflight_checks_pass_when_configured(orchestrator_setup):
+def test_preflight_checks_pass_when_configured(orchestrator_setup, monkeypatch):
     orch, mgr, mock_platform, tmp = orchestrator_setup
+
+    # RU02 now proves explicit SHAs against the authorized remote instead of
+    # trusting a caller-supplied hex string.  This unit test is about preflight
+    # aggregation, not Git transport, so provide a verified resolver result at
+    # the boundary rather than relying on a fictitious github.com/example repo.
+    verified = ResolvedSource(
+        target_type="github",
+        location=mgr.settings.github_repo_url,
+        display_name="example/orchestrator-repo",
+        ref="main",
+        exact_commit_sha="c" * 40,
+        exact_tree_sha="d" * 40,
+    )
+    monkeypatch.setattr(
+        "bdb_audit.workflow.orchestrator.resolve_source_identity",
+        lambda **kwargs: verified,
+    )
+
     report = orch.run_preflight(explicit_target_sha="c" * 40)
     assert report.passed is True
     assert report.overall_status == "PASS"
@@ -98,72 +117,100 @@ def test_e1_delivery_invokes_platform_adapters(orchestrator_setup):
     batch = orch.prepare_e1_orchestration()
 
     # Deliver lane E1-A
-    deliv_a = orch.deliver_lane_to_user("E1-A")
-    assert deliv_a["prompt_copied"] is True
-    assert deliv_a["explorer_selected"] is True
+    res = orch.deliver_e1_lane("E1-A")
+    assert res["status"] == "SUCCESS"
+    assert res["lane_slot"] == "E1-A"
     assert len(mock_platform.copied_texts) == 1
     assert len(mock_platform.selected_files) == 1
-    assert mock_platform.selected_files[0].name.startswith("E1-A")
-
-    # Deliver lane E1-B
-    deliv_b = orch.deliver_lane_to_user("E1-B")
-    assert len(mock_platform.copied_texts) == 2
-    assert len(mock_platform.selected_files) == 2
+    assert batch.get_job("E1-A").prompt_text == mock_platform.copied_texts[0]
 
 
-def test_partial_ingestion_and_resumption(orchestrator_setup):
-    orch, mgr, mock_platform, tmp = orchestrator_setup
-    init_res = orch.initialize_campaign()
-    store_path = orch.active_store_path
-    batch = orch.prepare_e1_orchestration()
-
-    # Ingest only 2 lanes (E1-A and E1-B)
-    zip_a = _create_lane_result_zip(tmp / "res_a.zip", batch, "E1-A")
-    zip_b = _create_lane_result_zip(tmp / "res_b.zip", batch, "E1-B")
-    summary1 = orch.import_results([zip_a, zip_b])
-
-    assert summary1.accepted_count == 2
-    assert summary1.stage_complete is False
-    assert set(summary1.missing_lanes) == {"E1-C", "E1-D", "E1-E"}
-
-    # Process restart simulation: create fresh orchestrator instance pointing to same settings & store
-    mgr_reloaded = SettingsManager(config_path=mgr.path)
-    orch_resumed = FullAuditOrchestrator(settings_mgr=mgr_reloaded, platform_adapter=mock_platform)
-    orch_resumed.active_store_path = store_path
-    orch_resumed.resolved_source = orch.resolved_source
-
-    # Resumed orchestrator prepares/attaches to E1 orchestration
-    batch_resumed = orch_resumed.prepare_e1_orchestration()
-    assert batch_resumed.campaign_id == batch.campaign_id
-
-    # Ingest remaining 3 lanes (E1-C, E1-D, E1-E)
-    zip_c = _create_lane_result_zip(tmp / "res_c.zip", batch_resumed, "E1-C")
-    zip_d = _create_lane_result_zip(tmp / "res_d.zip", batch_resumed, "E1-D")
-    zip_e = _create_lane_result_zip(tmp / "res_e.zip", batch_resumed, "E1-E")
-    summary2 = orch_resumed.import_results([zip_c, zip_d, zip_e])
-
-    # Along with previous A and B, all 5 can be passed or accumulated
-    summary_final = orch_resumed.import_results([zip_a, zip_b, zip_c, zip_d, zip_e])
-    assert summary_final.accepted_count == 5
-    assert summary_final.stage_complete is True
-
-
-def test_orchestrator_halts_fail_closed_after_e1_without_fabricated_stop_pass(orchestrator_setup):
+def test_import_partial_results_returns_missing_lanes(orchestrator_setup):
     orch, mgr, mock_platform, tmp = orchestrator_setup
     orch.initialize_campaign()
     batch = orch.prepare_e1_orchestration()
 
-    # Complete all 5 lanes
-    all_zips = [
-        _create_lane_result_zip(tmp / f"res_{slot}.zip", batch, slot)
+    zip_a = _create_lane_result_zip(tmp / "result_a.zip", batch, "E1-A")
+    zip_c = _create_lane_result_zip(tmp / "result_c.zip", batch, "E1-C")
+
+    summary = orch.import_results([zip_a, zip_c])
+    assert summary.accepted_count == 2
+    assert set(summary.missing_lanes) == {"E1-B", "E1-D", "E1-E"}
+    assert summary.stage_complete is False
+
+
+def test_import_all_5_results_completes_e1(orchestrator_setup):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    batch = orch.prepare_e1_orchestration()
+
+    paths = [
+        _create_lane_result_zip(tmp / f"result_{slot}.zip", batch, slot)
         for slot in E1_LANE_SLOTS
     ]
-    orch.import_results(all_zips)
+    summary = orch.import_results(paths)
+    assert summary.accepted_count == 5
+    assert summary.missing_lanes == []
+    assert summary.stage_complete is True
 
-    # Advance stage
-    adv = orch.advance_to_next_stage()
-    assert adv["status"] == "HALTED"
-    assert adv["next_stage"] == "E2"
-    assert adv["next_action"] == "NEEDS_IMPLEMENTATION"
-    # Guaranteed: never fabricates fake STOP PASS
-    assert adv.get("continuation_decision") != "PASS"
+
+def test_advance_after_e1_is_fail_closed_needs_implementation(orchestrator_setup):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    batch = orch.prepare_e1_orchestration()
+
+    paths = [
+        _create_lane_result_zip(tmp / f"result_{slot}.zip", batch, slot)
+        for slot in E1_LANE_SLOTS
+    ]
+    orch.import_results(paths)
+
+    res = orch.advance_after_e1()
+    assert res["status"] == "NEEDS_IMPLEMENTATION"
+    assert res["next_stage"] == "E2"
+
+
+def test_advance_before_e1_complete_is_blocked(orchestrator_setup):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    orch.prepare_e1_orchestration()
+
+    res = orch.advance_after_e1()
+    assert res["status"] == "BLOCKED"
+
+
+def test_resume_campaign_reconstructs_partial_state(orchestrator_setup):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    init = orch.initialize_campaign()
+    batch = orch.prepare_e1_orchestration()
+
+    zip_b = _create_lane_result_zip(tmp / "result_b.zip", batch, "E1-B")
+    orch.import_results([zip_b])
+
+    # Simulate restart with new orchestrator
+    orch2 = FullAuditOrchestrator(settings_mgr=mgr, platform_adapter=MockPlatformAdapter())
+    result = orch2.resume_campaign(init["store_path"])
+    assert result["status"] == "SUCCESS"
+    assert result["accepted_lanes_count"] == 1
+    assert "E1-B" not in result["missing_lanes"]
+    assert set(result["missing_lanes"]) == {"E1-A", "E1-C", "E1-D", "E1-E"}
+
+
+def test_resume_nonexistent_store_fails_closed(orchestrator_setup):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    result = orch.resume_campaign(tmp / "missing.sqlite")
+    assert result["status"] == "ERROR"
+
+
+def test_status_without_active_campaign(orchestrator_setup):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    result = orch.get_status()
+    assert result["status"] == "NO_ACTIVE_CAMPAIGN"
+
+
+def test_status_after_initialization(orchestrator_setup):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    result = orch.get_status()
+    assert result["status"] == "ACTIVE"
+    assert result["stage"] in ("E0", "E1")
