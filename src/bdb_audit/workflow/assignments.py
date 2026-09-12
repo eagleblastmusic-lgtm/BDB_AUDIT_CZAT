@@ -13,6 +13,7 @@ from typing import Any, Iterable
 from ..coordinator import Coordinator
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
+from ..core.registry import canonical_reference_set
 from ..history.objects import CanonicalObject, CommandEnvelope, HistoryCut
 from ..history.store import TransactionalHistoryStore
 from ..orchestration.native_ensemble import E1_LANE_SLOTS
@@ -201,6 +202,10 @@ class AssignmentService:
         stage_ref = _ref(stage, "HISTORY_CONTEXT_BINDING")
 
         objects: list[CanonicalObject] = []
+        stage_slot_refs = canonical_reference_set([
+            _external_ref("result_slot_contract_ref", f"E1:{slot}", "HISTORY_CONTEXT_BINDING")
+            for slot in E1_LANE_SLOTS
+        ])
         stage_run = CanonicalObject("stage_run", {
             "stage_run_id": f"stage_run_E1_{hashlib.sha256(seed_root.encode()).hexdigest()[:16]}",
             "campaign_ref": input_cut["campaign_id"],
@@ -209,10 +214,7 @@ class AssignmentService:
             "creation_input_history_cut": input_cut,
             "assigned_history_cut": input_cut,
             "predecessor_stage_completion_refs": [],
-            "required_lane_slot_contract_refs": [
-                _external_ref("result_slot_contract_ref", f"E1:{slot}", "HISTORY_CONTEXT_BINDING")
-                for slot in E1_LANE_SLOTS
-            ],
+            "required_lane_slot_contract_refs": stage_slot_refs,
         })
         objects.append(stage_run)
 
