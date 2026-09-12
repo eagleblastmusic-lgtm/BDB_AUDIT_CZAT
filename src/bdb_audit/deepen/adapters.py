@@ -122,18 +122,27 @@ class PropertyTestAdapter:
         cleanup_fn: Callable[[], None] | None = None,
     ) -> PropertyTestResult:
         self.capability.validate_operation_count(count)
+        if type(count) is not int or count <= 0:
+            raise ValidationError(
+                "PROPERTY_TEST_NO_CASES",
+                "Property qualification requires at least one executed case",
+            )
         rng = random.Random(seed)
         cleanup_done = False
-        failing_input = None
-        shrunk_input = None
+        failure_observed = False
+        failing_input: Any | None = None
+        shrunk_input: Any | None = None
         cases_tested = 0
 
         try:
-            for i in range(count):
+            for _ in range(count):
                 cases_tested += 1
                 inp = generator(rng)
                 is_valid = property_fn(inp)
                 if not is_valid:
+                    # ``None`` is a legal generated value and therefore cannot
+                    # double as the sentinel for "no counterexample observed".
+                    failure_observed = True
                     failing_input = inp
                     shrunk_input = self._shrink_input(inp, property_fn)
                     break
@@ -148,7 +157,7 @@ class PropertyTestAdapter:
             result_id=new_id("execution_result"),
             seed=seed,
             cases_tested=cases_tested,
-            passed=(failing_input is None),
+            passed=not failure_observed,
             failing_input=failing_input,
             shrunk_input=shrunk_input,
             policy_ref=self.policy_ref,
