@@ -68,6 +68,17 @@ def _write_result(path: Path, manifest: dict) -> Path:
     return path
 
 
+def _accepted_cut(store: TransactionalHistoryStore) -> dict:
+    head = store.head()
+    assert head is not None
+    commit = store.commits()[-1]
+    return HistoryCut.accepted(
+        head,
+        commit["governing_policy_ref"],
+        commit["governing_spec_refs"],
+    ).as_dict()
+
+
 def test_lane_result_findings_count_contract_is_nonnegative_integer() -> None:
     schema = orchestration_schema("bdb_audit_lane_result")
     assert schema is not None
@@ -139,14 +150,7 @@ def test_import_canonicalizes_partial_matching_history_cut_to_assignment_cut(tmp
     assert slot == "E1-A"
     assert status == "ACCEPTED", reason
 
-    head = store.head()
-    assert head is not None
-    commit = store.commits()[-1]
-    accepted_cut = HistoryCut.accepted(
-        head,
-        commit["governing_policy_ref"],
-        commit["governing_spec_refs"],
-    ).as_dict()
+    accepted_cut = _accepted_cut(store)
     rows = store.accepted_records("bdb_audit_lane_result", accepted_cut)
     assert len(rows) == 1
     assert rows[0]["body"]["history_cut"] == full_cut
@@ -160,6 +164,27 @@ def test_import_canonicalizes_partial_matching_history_cut_to_assignment_cut(tmp
     assert completion["isolation_qualification_ref"]["ref_class"] == "CONTENT_OR_PRIOR"
     assert {ref["ref_class"] for ref in completion["attempt_refs"]} == {"CONTENT_OR_PRIOR"}
     assert completion["lane_spec_ref"]["ref_class"] == "HISTORY_CONTEXT_BINDING"
+    assert {ref["ref_class"] for ref in completion["required_output_refs"]} == {"CONTENT_OR_PRIOR"}
+
+
+def test_stage_completion_uses_consumer_specific_reference_classes(tmp_path: Path) -> None:
+    store, batch = _prepared_batch(tmp_path)
+    inbox = E1ResultInbox(store, batch)
+    paths = [
+        _write_result(tmp_path / f"result_{slot}.zip", _manifest(batch, slot))
+        for slot in E1_LANE_SLOTS
+    ]
+
+    summary = inbox.ingest_multiple_zips(paths)
+    assert summary.accepted_count == len(E1_LANE_SLOTS)
+    assert summary.stage_complete is True, summary.error
+
+    rows = store.accepted_records("stage_completion", _accepted_cut(store))
+    assert len(rows) == 1
+    completion = rows[0]["body"]
+    assert completion["stage_run_ref"]["ref_class"] == "CONTENT_OR_PRIOR"
+    assert completion["stage_spec_ref"]["ref_class"] == "HISTORY_CONTEXT_BINDING"
+    assert {ref["ref_class"] for ref in completion["required_lane_slot_results"]} == {"CONTENT_OR_PRIOR"}
     assert {ref["ref_class"] for ref in completion["required_output_refs"]} == {"CONTENT_OR_PRIOR"}
 
 
