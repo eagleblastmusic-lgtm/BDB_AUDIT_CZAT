@@ -18,6 +18,7 @@ env:
   PIP_VERSION: '26.2.1'
   PYTEST_VERSION: '9.1.1'
   RUFF_VERSION: '0.16.7'
+  MYP_VERSION: '2.3.1'
   MYPY_VERSION: '2.3.1'
   ARTIFACT_PATH: dist/BDB_AUDIT_ASSISTANT_v2.0.3.py
   CANDIDATE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
@@ -99,6 +100,11 @@ jobs:
         id: mypy_gate
         shell: pwsh
         run: python -m mypy --config-file pyproject.toml
+
+      - name: Normalize runtime metadata for deterministic build
+        id: runtime_metadata_gate
+        shell: pwsh
+        run: python build/normalize_runtime_metadata.py
 
       - name: Build candidate standalone
         id: build_gate
@@ -188,6 +194,7 @@ jobs:
             "${{ steps.pytest_gate.outcome }}",
             "${{ steps.ruff_gate.outcome }}",
             "${{ steps.mypy_gate.outcome }}",
+            "${{ steps.runtime_metadata_gate.outcome }}",
             "${{ steps.build_gate.outcome }}",
             "${{ steps.validator_gate.outcome }}",
             "${{ steps.standalone_version_gate.outcome }}",
@@ -219,6 +226,7 @@ jobs:
               pytest = "${{ steps.pytest_gate.outcome }}"
               ruff = "${{ steps.ruff_gate.outcome }}"
               mypy = "${{ steps.mypy_gate.outcome }}"
+              runtime_metadata_normalization = "${{ steps.runtime_metadata_gate.outcome }}"
               build = "${{ steps.build_gate.outcome }}"
               release_validator = "${{ steps.validator_gate.outcome }}"
               standalone_version = "${{ steps.standalone_version_gate.outcome }}"
@@ -297,6 +305,10 @@ jobs:
         with:
           name: BDB-Audit-v2.0.3-candidate-${{ env.QUALIFIED_CANDIDATE_SHA }}
           path: candidate-dist
+
+      - name: Normalize runtime metadata for deterministic rebuild
+        shell: pwsh
+        run: python build/normalize_runtime_metadata.py
 
       - name: Independently rebuild standalone
         shell: pwsh
