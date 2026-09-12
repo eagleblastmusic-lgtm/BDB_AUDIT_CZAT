@@ -49,13 +49,22 @@ def _ref(record_or_obj: Any, ref_class: str) -> dict[str, Any]:
 
 
 def _current_cut(store: TransactionalHistoryStore) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Return the exact accepted-head cut and its commit body.
+
+    ``TransactionalHistoryStore.commits()`` returns canonical commit bodies; the
+    commit hash itself lives in the accepted-head pointer and is intentionally
+    not duplicated into the self-hashed body.  Verify sequence/campaign binding
+    here and use the head hash when constructing HistoryCut.
+    """
     head = store.head()
     if head is None:
         raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
     commits = store.commits()
-    if not commits or commits[-1]["commit_hash"] != head.commit_hash:
+    if not commits:
         raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
     current = commits[-1]
+    if current.get("commit_seq") != head.commit_seq or current.get("campaign_id") != head.campaign_id:
+        raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
     cut = HistoryCut.accepted(head, current["governing_policy_ref"], current["governing_spec_refs"]).as_dict()
     return cut, current
 
