@@ -9,6 +9,7 @@ from bdb_audit.core.registry import canonical_reference_set
 from bdb_audit.history.objects import HistoryCut
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
+from bdb_audit.schemas.orchestration import orchestration_schema
 from bdb_audit.workflow.assignments import AssignmentService
 from bdb_audit.workflow.inbox import E1ResultInbox
 from bdb_audit.workflow.packaging import prepare_e1_batch
@@ -65,6 +66,12 @@ def _write_result(path: Path, manifest: dict) -> Path:
     with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("MANIFEST.json", json.dumps(manifest))
     return path
+
+
+def test_lane_result_findings_count_contract_is_nonnegative_integer() -> None:
+    schema = orchestration_schema("bdb_audit_lane_result")
+    assert schema is not None
+    assert schema["properties"]["findings_count"] == {"type": "integer", "minimum": 0}
 
 
 def test_assignment_producers_use_consumer_specific_reference_classes(tmp_path: Path) -> None:
@@ -143,6 +150,7 @@ def test_import_canonicalizes_partial_matching_history_cut_to_assignment_cut(tmp
     rows = store.accepted_records("bdb_audit_lane_result", accepted_cut)
     assert len(rows) == 1
     assert rows[0]["body"]["history_cut"] == full_cut
+    assert rows[0]["body"]["findings_count"] == 1
 
 
 def test_import_rejects_conflicting_non_identity_history_cut_field(tmp_path: Path) -> None:
