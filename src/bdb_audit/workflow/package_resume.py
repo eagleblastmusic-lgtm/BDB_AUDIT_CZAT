@@ -92,7 +92,7 @@ def _load_one(path: Path, store: TransactionalHistoryStore, cut: dict[str, Any])
     if slot not in E1_LANE_SLOTS or manifest.get("stage_id") != "E1":
         raise ValidationError("RESUME_PACKAGE_LANE_INVALID", path.name)
     campaign_id = manifest.get("campaign_id")
-    if campaign_id != cut.get("campaign_id"):
+    if not isinstance(campaign_id, str) or campaign_id != cut.get("campaign_id"):
         raise ValidationError("RESUME_PACKAGE_CAMPAIGN_MISMATCH", path.name)
 
     assignment_ref = manifest.get("assignment_ref")
