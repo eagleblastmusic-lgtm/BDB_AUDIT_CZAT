@@ -12,6 +12,7 @@ _COMMANDS = {
     "lanes": ("bdb_audit.strategy.entrypoints", "run_lanes_cli"),
     "budget": ("bdb_audit.strategy.entrypoints", "run_budget_cli"),
     "exposure": ("bdb_audit.strategy.entrypoints", "run_exposure_cli"),
+    "opportunities": ("bdb_audit.opportunities.cli", "run_cli"),
 }
 
 
