@@ -6,6 +6,7 @@ from typing import Sequence
 
 _COMMANDS = {
     "features": ("bdb_audit.features.cli", "run_cli"),
+    "workbench": ("bdb_audit.workbench.cli", "run_cli"),
 }
 
 
