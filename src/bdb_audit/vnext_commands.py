@@ -5,7 +5,7 @@ import importlib
 from typing import Sequence
 
 _COMMANDS = {
-    "features": ("bdb_audit.features.cli", "run_cli"),
+    "features": ("bdb_audit.features.cli", "run_features_cli"),
 }
 
 
