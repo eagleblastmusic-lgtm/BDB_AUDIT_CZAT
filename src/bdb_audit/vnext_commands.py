@@ -16,6 +16,8 @@ _COMMANDS = {
     "audit": ("bdb_audit.incremental.cli", "run_audit_cli"),
     "evidence": ("bdb_audit.incremental.cli", "run_evidence_cli"),
     "regression": ("bdb_audit.incremental.cli", "run_regression_cli"),
+    "history": ("bdb_audit.history_view.cli", "run_history_cli"),
+    "share": ("bdb_audit.history_view.cli", "run_share_cli"),
 }
 
 
