@@ -194,6 +194,24 @@ def score_reference_controls(
     )
 
 
+def _canonical_metrics_dict(metrics: MethodologyMetrics) -> dict[str, Any]:
+    """Project metrics into the project's integer/string canonical JSON domain.
+
+    MethodologyMetrics intentionally exposes convenience floating-point ratios
+    to callers. Canonical evidence artifacts must never inherit those floats,
+    because the BDB canonical serializer forbids floating-point authority.
+    Ratios therefore remain presentation values encoded as fixed-scale strings;
+    all qualification decisions continue to derive from integer counters.
+    """
+    body = metrics.to_dict()
+    for key in ("precision", "recall", "anti_bypass_rate"):
+        value = body.get(key)
+        if not isinstance(value, float):
+            raise ValidationError("REFERENCE_METRIC_RATIO_INVALID", key)
+        body[key] = f"{value:.4f}"
+    return body
+
+
 def _receipt_dict(receipt: ActualRunReceipt) -> dict[str, Any]:
     return {
         "receipt_id": receipt.receipt_id,
@@ -244,7 +262,7 @@ def run_v21_reference_corpus(workspace: str | Path) -> dict[str, Any]:
         "observed_results": dict(sorted(observed.items())),
         "receipts": [_receipt_dict(receipt) for receipt in receipts],
         "truth_manifest_digests": [manifest.manifest_digest() for manifest in manifests],
-        "metrics": metrics.to_dict(),
+        "metrics": _canonical_metrics_dict(metrics),
     }
     body["result_digest"] = _result_digest(body)
     return body
@@ -296,7 +314,8 @@ def verify_v21_reference_result(result: Mapping[str, Any]) -> dict[str, Any]:
     if result.get("truth_manifest_digests") != expected_manifest_digests:
         raise ValidationError("REFERENCE_TRUTH_PARTITION_MISMATCH")
     metrics = score_reference_controls(manifests, {str(k): str(v) for k, v in observed.items()})
-    if result.get("metrics") != metrics.to_dict():
+    canonical_metrics = _canonical_metrics_dict(metrics)
+    if result.get("metrics") != canonical_metrics:
         raise ValidationError("REFERENCE_METRICS_MISMATCH")
     expected_status = "QUALIFIED" if metrics.is_methodology_qualified else "FAILED"
     if result.get("status") != expected_status:
@@ -307,7 +326,7 @@ def verify_v21_reference_result(result: Mapping[str, Any]) -> dict[str, Any]:
         "corpus_digest": result["corpus_digest"],
         "result_digest": result["result_digest"],
         "case_count": len(receipts),
-        "metrics": metrics.to_dict(),
+        "metrics": canonical_metrics,
     }
 
 
