@@ -360,6 +360,7 @@ class FullAuditOrchestrator:
         completed = set(status.get("stages_completed", []))
         prepared = set(status.get("stages_prepared", []))
 
+        target_stage: str | None
         if stage_id is not None:
             target_stage = stage_id.upper()
         else:
