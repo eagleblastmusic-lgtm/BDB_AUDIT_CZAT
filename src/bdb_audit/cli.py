@@ -135,14 +135,14 @@ def _run_tools(argv: Sequence[str]) -> int:
     try:
         profile = CapabilityProfile()
         if args.subcommand == "inspect":
-            source = source_manifest(args.source)
+            source_info = source_manifest(args.source)
             data = {
                 "status": "PASS",
                 "action": "tools.inspect",
                 "capability_profile": profile.as_dict(),
                 "capability_profile_digest": profile.digest,
-                "source_manifest_digest": source["manifest_digest"],
-                "source_member_count": len(source["members"]),
+                "source_manifest_digest": source_info["manifest_digest"],
+                "source_member_count": len(source_info["members"]),
                 "limitations": [
                     name
                     for name, enforced in (
@@ -162,14 +162,14 @@ def _run_tools(argv: Sequence[str]) -> int:
 
         spec = _tool_spec(args)
         if args.subcommand == "plan":
-            source, evidence = validate_run_spec(spec, profile)
+            source_path, evidence_path = validate_run_spec(spec, profile)
             data = {
                 "status": "PASS",
                 "action": "tools.plan",
                 "spec": spec.as_dict(),
                 "spec_digest": spec.digest,
-                "source": str(source),
-                "evidence": str(evidence),
+                "source": str(source_path),
+                "evidence": str(evidence_path),
                 "capability_profile": profile.as_dict(),
                 "capability_profile_digest": profile.digest,
             }
