@@ -8,6 +8,10 @@ _COMMANDS = {
     "features": ("bdb_audit.features.cli", "run_features_cli"),
     "workbench": ("bdb_audit.workbench.cli", "run_cli"),
     "qualification": ("bdb_audit.qualification.cli", "run_cli"),
+    "strategy": ("bdb_audit.strategy.cli", "run_cli"),
+    "lanes": ("bdb_audit.strategy.entrypoints", "run_lanes_cli"),
+    "budget": ("bdb_audit.strategy.entrypoints", "run_budget_cli"),
+    "exposure": ("bdb_audit.strategy.entrypoints", "run_exposure_cli"),
 }
 
 
