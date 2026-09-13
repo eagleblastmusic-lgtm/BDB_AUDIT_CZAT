@@ -13,6 +13,9 @@ _COMMANDS = {
     "budget": ("bdb_audit.strategy.entrypoints", "run_budget_cli"),
     "exposure": ("bdb_audit.strategy.entrypoints", "run_exposure_cli"),
     "opportunities": ("bdb_audit.opportunities.cli", "run_cli"),
+    "audit": ("bdb_audit.incremental.cli", "run_audit_cli"),
+    "evidence": ("bdb_audit.incremental.cli", "run_evidence_cli"),
+    "regression": ("bdb_audit.incremental.cli", "run_regression_cli"),
 }
 
 
