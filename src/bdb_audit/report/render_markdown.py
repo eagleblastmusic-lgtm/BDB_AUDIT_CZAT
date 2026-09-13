@@ -7,7 +7,13 @@ from .models import ReportItem, ReportModel
 
 
 def _escape(text: str) -> str:
-    return text.replace("\\", "\\\\").replace("`", "\\`").replace("<", "&lt;").replace(">", "&gt;")
+    return (
+        text.replace("&", "&amp;")
+        .replace("\\", "\\\\")
+        .replace("`", "\\`")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
 
 
 def _render_items(title: str, items: tuple[ReportItem, ...]) -> list[str]:
@@ -23,7 +29,10 @@ def _render_items(title: str, items: tuple[ReportItem, ...]) -> list[str]:
         lines.append(f"Classification: **{item.classification}**  ")
         lines.append(f"Accepted seq: `{item.accepted_seq}`")
         lines.append("")
-        payload = json.dumps(item.payload, ensure_ascii=False, sort_keys=True, indent=2)
+        # Markdown render is a display surface. Escape HTML-significant payload
+        # characters even inside a fenced block so hostile audit payload text can
+        # never become active HTML in permissive Markdown renderers.
+        payload = _escape(json.dumps(item.payload, ensure_ascii=False, sort_keys=True, indent=2))
         lines.extend(["```json", payload.replace("```", "` ` `"), "```", ""])
     return lines
 
