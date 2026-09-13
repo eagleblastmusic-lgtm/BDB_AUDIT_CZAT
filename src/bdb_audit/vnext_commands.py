@@ -7,6 +7,7 @@ from typing import Sequence
 _COMMANDS = {
     "features": ("bdb_audit.features.cli", "run_features_cli"),
     "workbench": ("bdb_audit.workbench.cli", "run_cli"),
+    "qualification": ("bdb_audit.qualification.cli", "run_cli"),
 }
 
 
