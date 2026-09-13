@@ -1,9 +1,10 @@
 """Derived, evidence-backed report projections for BDB Audit.
 
-The package façade keeps core report models/builders eager and loads bundle/
-renderer helpers lazily. This prevents the intentional report↔remediation
-relationship from becoming a Python import cycle while preserving the public
-``bdb_audit.report`` convenience API.
+The package façade keeps core report models/builders and pure renderers eager,
+while bundle helpers are loaded lazily.  The bundle imports remediation
+planning, so keeping only that edge lazy prevents the intentional
+report↔remediation relationship from becoming a Python import cycle and avoids
+Python resolving renderer names as submodule objects.
 """
 from __future__ import annotations
 
@@ -11,6 +12,8 @@ from typing import Any
 
 from .builder import REPORT_RECORD_KINDS, ReportBuilder, extract_unknown_tokens
 from .models import ReportItem, ReportModel
+from .render_html import render_html
+from .render_markdown import render_markdown
 from .validation import validate_report_model, validate_report_references
 
 _LAZY_EXPORTS = {
@@ -18,8 +21,6 @@ _LAZY_EXPORTS = {
     "export_report_bundle": (".bundle", "export_report_bundle"),
     "validate_q09": (".bundle", "validate_q09"),
     "verify_report_bundle": (".bundle", "verify_report_bundle"),
-    "render_html": (".render_html", "render_html"),
-    "render_markdown": (".render_markdown", "render_markdown"),
 }
 
 
