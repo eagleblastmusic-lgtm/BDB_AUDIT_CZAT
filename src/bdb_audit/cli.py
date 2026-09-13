@@ -75,6 +75,24 @@ def create_parser() -> argparse.ArgumentParser:
 
     subparsers = parser.add_subparsers(dest="command", help="Operational commands")
 
+    audit_p = subparsers.add_parser("audit", help="Audit user workflow")
+    audit_subs = audit_p.add_subparsers(dest="subcommand", help="Audit operations")
+    a_start_p = audit_subs.add_parser("start", help="Start new audit campaign")
+    a_start_p.add_argument("--store", required=True, help="Path to SQLite history store")
+    a_start_p.add_argument("--target", help="Target repository URL or path")
+    a_start_p.add_argument("--commit-sha", help="Target commit SHA")
+    a_start_p.add_argument("--seed", default="audit_campaign", help="Campaign seed string")
+    a_start_p.add_argument("--campaign-id", help="Explicit campaign ID")
+    a_start_p.add_argument("--json", action="store_true", help="Machine-readable output")
+
+    a_res_p = audit_subs.add_parser("resume", help="Resume active audit campaign")
+    a_res_p.add_argument("--store", required=True, help="Path to SQLite history store")
+    a_res_p.add_argument("--json", action="store_true", help="Machine-readable output")
+
+    a_stat_p = audit_subs.add_parser("status", help="Get audit campaign status")
+    a_stat_p.add_argument("--store", required=True, help="Path to SQLite history store")
+    a_stat_p.add_argument("--json", action="store_true", help="Machine-readable output")
+
     campaign_p = subparsers.add_parser("campaign", help="Campaign lifecycle management")
     campaign_subs = campaign_p.add_subparsers(dest="subcommand", help="Campaign operations")
 
@@ -88,6 +106,12 @@ def create_parser() -> argparse.ArgumentParser:
     status_p.add_argument("--store", required=True, help="Path to SQLite history store")
     status_p.add_argument("--json", action="store_true", help="Machine-readable output")
 
+    concl_p = campaign_subs.add_parser("conclude", help="Conclude campaign")
+    concl_p.add_argument("--store", required=True, help="Path to SQLite history store")
+    concl_p.add_argument("--termination-state", choices=["COMPLETED", "COMPLETED_LIMITED"], help="Termination state")
+    concl_p.add_argument("--statement", default="Campaign concluded via post-E5 finalization", help="Conclusion statement")
+    concl_p.add_argument("--json", action="store_true", help="Machine-readable output")
+
     stage_p = subparsers.add_parser("stage", help="Stage lifecycle management")
     stage_subs = stage_p.add_subparsers(dest="subcommand", help="Stage operations")
     st_prep_p = stage_subs.add_parser("prepare", help="Prepare an operational stage")
@@ -95,6 +119,11 @@ def create_parser() -> argparse.ArgumentParser:
     st_prep_p.add_argument("--stage", required=True, help="Canonical StageSpec key E1..E5")
     st_prep_p.add_argument("--stage-spec-revision", default="1", help="StageSpec revision")
     st_prep_p.add_argument("--json", action="store_true", help="Machine-readable output")
+
+    st_qual_p = stage_subs.add_parser("qualify", help="Qualify and complete an operational stage")
+    st_qual_p.add_argument("--store", required=True, help="Path to SQLite history store")
+    st_qual_p.add_argument("--stage", required=True, help="Canonical StageSpec key E1..E5")
+    st_qual_p.add_argument("--json", action="store_true", help="Machine-readable output")
 
     lane_p = subparsers.add_parser("lane", help="Lane lifecycle management")
     lane_subs = lane_p.add_subparsers(dest="subcommand", help="Lane operations")
@@ -166,13 +195,36 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
     is_json = getattr(args, "json", False)
 
     try:
-        if args.command == "campaign":
+        if args.command == "audit":
+            if args.subcommand == "start":
+                res = api.create_campaign(args.store, seed=args.seed, campaign_id=args.campaign_id, target_repo=args.target, commit_sha=args.commit_sha)
+                prep_e1 = api.prepare_stage(args.store, "E1")
+                res["stage_e1_prepared"] = prep_e1["status"] == "SUCCESS"
+                _emit_output(res, is_json)
+                return EXIT_SUCCESS
+            elif args.subcommand == "resume":
+                res = api.continue_campaign(args.store)
+                _emit_output(res, is_json)
+                return EXIT_SUCCESS
+            elif args.subcommand == "status":
+                res = api.get_campaign_status(args.store)
+                _emit_output(res, is_json)
+                return EXIT_SUCCESS
+            else:
+                parser.parse_args(["audit", "--help"])
+                return EXIT_MALFORMED_ARGS
+
+        elif args.command == "campaign":
             if args.subcommand == "create":
                 res = api.create_campaign(args.store, seed=args.seed, campaign_id=args.campaign_id)
                 _emit_output(res, is_json)
                 return EXIT_SUCCESS
             elif args.subcommand == "status":
                 res = api.get_campaign_status(args.store)
+                _emit_output(res, is_json)
+                return EXIT_SUCCESS
+            elif args.subcommand == "conclude":
+                res = api.conclude_campaign(args.store, termination_state=args.termination_state, bounded_statement=args.statement)
                 _emit_output(res, is_json)
                 return EXIT_SUCCESS
             else:
@@ -182,6 +234,10 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
         elif args.command == "stage":
             if args.subcommand == "prepare":
                 res = api.prepare_stage(args.store, stage_id=args.stage, stage_spec_revision=args.stage_spec_revision)
+                _emit_output(res, is_json)
+                return EXIT_SUCCESS
+            elif args.subcommand == "qualify":
+                res = api.qualify_stage(args.store, stage_id=args.stage)
                 _emit_output(res, is_json)
                 return EXIT_SUCCESS
             else:
@@ -209,11 +265,17 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
 
         elif args.command == "stop":
             if args.subcommand == "evaluate":
-                res = evaluate_stop_gate(
-                    args.store,
-                    stop_input_path=args.input,
-                    e6_plan_approved=args.e6_plan_approved,
-                )
+                if args.input:
+                    res = evaluate_stop_gate(
+                        args.store,
+                        stop_input_path=args.input,
+                        e6_plan_approved=args.e6_plan_approved,
+                    )
+                else:
+                    res = api.evaluate_stop_gate(
+                        args.store,
+                        e6_plan_approved=args.e6_plan_approved,
+                    )
                 _emit_output(res, is_json)
                 return EXIT_SUCCESS
             parser.parse_args(["stop", "--help"])

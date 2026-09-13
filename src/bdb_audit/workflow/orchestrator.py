@@ -351,6 +351,74 @@ class FullAuditOrchestrator:
             return {**result, "status": "NEEDS_IMPLEMENTATION"}
         return result
 
+    def advance_stage(self, stage_id: str | None = None) -> dict[str, Any]:
+        """Advance a specific or next incomplete stage via StageService."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+
+        status = self.api.get_campaign_status(self.active_store_path)
+        completed = set(status.get("stages_completed", []))
+        prepared = set(status.get("stages_prepared", []))
+
+        if stage_id is not None:
+            target_stage = stage_id.upper()
+        else:
+            target_stage = next((s for s in ("E1", "E2", "E3", "E4", "E5") if s not in completed), None)
+            if target_stage is None:
+                return {"status": "ALL_STAGES_COMPLETED", "next_action": "EVALUATE_STOP_GATE"}
+
+        if target_stage not in prepared:
+            self.api.prepare_stage(self.active_store_path, target_stage)
+
+        res = self.api.qualify_stage(self.active_store_path, target_stage)
+        return {
+            "status": "SUCCESS",
+            "stage": target_stage,
+            "stage_completion_digest": res.get("stage_completion_digest"),
+            "commit_seq": res.get("commit_seq"),
+            "commit_hash": res.get("commit_hash"),
+        }
+
+    def run_full_audit_workflow(self) -> dict[str, Any]:
+        """Execute complete resumable E1 -> E2 -> E3 -> E4 -> E5 -> STOP -> Conclusion workflow."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+
+        status = self.api.get_campaign_status(self.active_store_path)
+        if "E1" not in status.get("stages_prepared", []):
+            self.prepare_e1_orchestration()
+
+        for st in ("E1", "E2", "E3", "E4", "E5"):
+            status = self.api.get_campaign_status(self.active_store_path)
+            if st not in status.get("stages_completed", []):
+                self.advance_stage(st)
+
+        store = TransactionalHistoryStore(self.active_store_path)
+        stop_records = store.accepted_records("stop_evaluation", store.head().as_dict())
+        if not stop_records:
+            stop_res = self.api.evaluate_stop_gate(self.active_store_path)
+        else:
+            stop_res = {"continuation_decision": stop_records[-1]["body"].get("continuation_decision")}
+
+        concl_records = store.accepted_records("campaign_conclusion", store.head().as_dict())
+        if not concl_records:
+            concl_res = self.api.conclude_campaign(self.active_store_path)
+        else:
+            concl_res = {
+                "termination_state": concl_records[-1]["body"].get("termination_state"),
+                "assurance_level": concl_records[-1]["body"].get("assurance_level"),
+            }
+
+        final_status = self.api.get_campaign_status(self.active_store_path)
+        return {
+            "status": "SUCCESS",
+            "campaign_id": final_status["campaign_id"],
+            "stages_completed": final_status["stages_completed"],
+            "stop_decision": stop_res.get("continuation_decision"),
+            "termination_state": concl_res.get("termination_state"),
+            "campaign_completed": final_status.get("campaign_completed", False),
+        }
+
     def get_status(self) -> dict[str, Any]:
         if not self.active_store_path:
             return {"status": "NO_ACTIVE_CAMPAIGN"}

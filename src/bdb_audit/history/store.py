@@ -15,7 +15,7 @@ from ..core.canonical_json import canonical_bytes, parse
 from ..core.errors import ValidationError
 from ..core.hashing import object_digest
 from ..core.registry import ContractRegistry, canonical_reference_set
-from ..schemas.foundation import F2_KINDS, F3_KINDS, M5_KINDS, foundation_schema_bindings
+from ..schemas.foundation import ALL_EXECUTABLE_KINDS, F2_KINDS, F3_KINDS, M5_KINDS, foundation_schema_bindings
 from .closure import canonical_order, ClosureNode
 from .objects import (
     EMPTY_HISTORY, ACCEPTED_HEAD_REF, AcceptedHead, CanonicalObject, CommandEnvelope,
@@ -61,7 +61,7 @@ class TransactionalHistoryStore:
         # Bind every foundation kind up front.  This is still a prerequisite
         # substrate (M10 qualification is separate), but no accepted closure
         # can reach an unbound registered dependency.
-        self.schemas = schema_bindings or foundation_schema_bindings(kinds=tuple(F3_KINDS))
+        self.schemas = schema_bindings or foundation_schema_bindings(kinds=tuple(ALL_EXECUTABLE_KINDS))
         self.crash_hook = crash_hook
         if crash_hook is not None and not callable(crash_hook):
             raise TypeError("crash_hook must be callable")

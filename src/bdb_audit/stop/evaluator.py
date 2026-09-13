@@ -250,7 +250,19 @@ def evaluate_stop(
                     remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
                 )
 
-        # If e6_plan_approved and mandatory_obligation_refs exist (and not qualified): handled above.
+        # Check if E6 plan was approved for gap resolution / bounded additional round
+        if e6_plan_approved and ctx == "FINAL_POST_E5":
+            return StopEvaluation(
+                stop_evaluation_id=stop_evaluation_id,
+                stop_input_ref=input_ref,
+                continuation_decision="E6_REQUIRED",
+                assurance_level="BOUNDED",
+                release_readiness="QUALIFICATION_BLOCKED",
+                reason_codes=("E6_REQUIRED", "BOUNDED_ADDITIONAL_PLAN_APPROVED"),
+                blocking_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
+                remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
+            )
+
         # Complete satisfaction -> PASS
         release_readiness = (
             "READY_WITH_RESIDUAL_RISK"

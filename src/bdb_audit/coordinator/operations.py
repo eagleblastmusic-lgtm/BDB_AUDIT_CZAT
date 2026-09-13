@@ -10,7 +10,7 @@ import hashlib
 import json
 from pathlib import Path
 import time
-from typing import Any
+from typing import Any, Sequence
 from ..core.canonical_json import canonical_bytes, parse
 from ..core.errors import ValidationError
 from ..core.registry import ContractRegistry
@@ -27,6 +27,7 @@ from ..orchestration.templates import TemplateRegistry
 
 
 _BASELINE_STAGE_ORDER = ("E1", "E2", "E3", "E4", "E5")
+_ALL_STAGES = ("E1", "E2", "E3", "E4", "E5", "E6")
 _STAGE_ALIASES = {
     "F2_FOUNDATION": "E1",
     "E1_ENSEMBLE": "E1",
@@ -34,6 +35,9 @@ _STAGE_ALIASES = {
     "E3_BLIND_GAP": "E3",
     "E4_DEEPEN": "E4",
     "E5_ATTACK": "E5",
+    "E6": "E6",
+    "E6_REMEDIATION": "E6",
+    "E6_TARGETED_VERIFICATION": "E6",
 }
 
 
@@ -43,18 +47,18 @@ def _command_id(seed: str) -> str:
 
 
 def _canonical_stage_key(stage_id: str) -> str:
-    """Normalize public stage labels to the StageSpec key domain (E1..E5)."""
+    """Normalize public stage labels to the StageSpec key domain (E1..E6)."""
     normalized = stage_id.strip().upper()
-    if normalized in _BASELINE_STAGE_ORDER:
+    if normalized in _ALL_STAGES:
         return normalized
     if normalized in _STAGE_ALIASES:
         return _STAGE_ALIASES[normalized]
     prefix = normalized.split("_", 1)[0]
-    if prefix in _BASELINE_STAGE_ORDER:
+    if prefix in _ALL_STAGES:
         return prefix
     raise ValidationError(
         "INVALID_STAGE_ID",
-        f"Unknown stage: {stage_id}. Allowed canonical stages: E1..E5",
+        f"Unknown stage: {stage_id}. Allowed canonical stages: E1..E6",
     )
 
 
@@ -297,17 +301,26 @@ class AuditOperationApi:
         if stage_key in prepared_stages:
             raise ValidationError("STAGE_ALREADY_PREPARED", f"Stage {stage_key} is already prepared")
 
-        expected_stage = next((s for s in _BASELINE_STAGE_ORDER if s not in prepared_stages), None)
-        if expected_stage is not None and stage_key != expected_stage:
-            raise ValidationError(
-                "INVALID_STAGE_TRANSITION",
-                f"Expected next stage {expected_stage}, got {stage_key}",
+        predecessor_requirements: tuple[str, ...]
+        if stage_key == "E6":
+            if "E5" not in status["stages_completed"]:
+                raise ValidationError(
+                    "PREDECESSOR_STAGE_NOT_COMPLETED",
+                    "Stage E5 must be completed before preparing E6",
+                )
+            stage_ordinal = 6
+            predecessor_requirements = ("E5",)
+        else:
+            expected_stage = next((s for s in _BASELINE_STAGE_ORDER if s not in prepared_stages), None)
+            if expected_stage is not None and stage_key != expected_stage:
+                raise ValidationError(
+                    "INVALID_STAGE_TRANSITION",
+                    f"Expected next stage {expected_stage}, got {stage_key}",
+                )
+            stage_ordinal = _BASELINE_STAGE_ORDER.index(stage_key) + 1
+            predecessor_requirements = (
+                (_BASELINE_STAGE_ORDER[stage_ordinal - 2],) if stage_ordinal > 1 else ()
             )
-
-        stage_ordinal = _BASELINE_STAGE_ORDER.index(stage_key) + 1
-        predecessor_requirements = (
-            (_BASELINE_STAGE_ORDER[stage_ordinal - 2],) if stage_ordinal > 1 else ()
-        )
         spec = StageSpec(
             stage_key=stage_key,
             stage_spec_revision=stage_spec_revision,
@@ -535,6 +548,58 @@ class AuditOperationApi:
             "next_action": action,
             "head_seq": status["accepted_head_seq"],
         }
+
+    def qualify_stage(
+        self,
+        store_path: str | Path,
+        stage_id: str,
+        findings: Sequence[dict[str, Any]] = (),
+        unknown_blocked_summary: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Qualify completion predicate and record accepted StageCompletion."""
+        path = Path(store_path).resolve()
+        store = TransactionalHistoryStore(path, registry=self.registry)
+        from ..workflow.stage_service import StageService
+        svc = StageService(store)
+        return svc.qualify_and_complete_stage(
+            stage_id,
+            findings=findings,
+            unknown_blocked_summary=unknown_blocked_summary,
+        )
+
+    def evaluate_stop_gate(
+        self,
+        store_path: str | Path,
+        evaluation_context: str = "FINAL_POST_E5",
+        e6_plan_approved: bool = False,
+        unknown_blocked_summary: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Evaluate STOP gate on exact history cut and commit accepted StopEvaluation."""
+        path = Path(store_path).resolve()
+        store = TransactionalHistoryStore(path, registry=self.registry)
+        from ..assurance.finalization_service import FinalizationService
+        svc = FinalizationService(store)
+        return svc.evaluate_stop_gate(
+            evaluation_context=evaluation_context,
+            e6_plan_approved=e6_plan_approved,
+            unknown_blocked_summary=unknown_blocked_summary,
+        )
+
+    def conclude_campaign(
+        self,
+        store_path: str | Path,
+        termination_state: str | None = None,
+        bounded_statement: str = "Campaign concluded via post-E5 finalization",
+    ) -> dict[str, Any]:
+        """Conclude campaign, recording accepted CampaignConclusion, FinalAssuranceCase, and ReleaseQualification."""
+        path = Path(store_path).resolve()
+        store = TransactionalHistoryStore(path, registry=self.registry)
+        from ..assurance.finalization_service import FinalizationService
+        svc = FinalizationService(store)
+        return svc.conclude_campaign(
+            termination_state=termination_state,
+            bounded_statement=bounded_statement,
+        )
 
     def run_self_test(self, deep: bool = False) -> dict[str, Any]:
         """Run offline-critical controls; PASS means each reported control executed."""

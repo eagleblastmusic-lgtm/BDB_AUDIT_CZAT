@@ -8,7 +8,7 @@ from ..core.hashing import object_digest
 from ..history.objects import CanonicalObject
 
 
-_STAGES = {"E1", "E2", "E3", "E4", "E5"}
+_STAGES = {"E1", "E2", "E3", "E4", "E5", "E6"}
 _REVEAL_PHASES = {"NEVER", "CONTROLLED", "AFTER_CHECKPOINT", "ALWAYS"}
 
 

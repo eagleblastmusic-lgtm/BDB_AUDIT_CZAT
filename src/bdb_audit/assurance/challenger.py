@@ -59,7 +59,7 @@ class ChallengerAssignment:
             raise ValidationError("MISSING_HISTORY_CUT", "Assignment requires assignment_input_history_cut")
 
     def body(self) -> dict[str, Any]:
-        data = {
+        data: dict[str, Any] = {
             "challenge_assignment_id": self.challenge_assignment_id,
             "candidate_assurance_case_ref": dict(self.candidate_assurance_case_ref),
             "challenger_type": self.challenger_type,
