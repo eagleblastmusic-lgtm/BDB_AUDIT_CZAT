@@ -1,4 +1,4 @@
-"""Evidence-backed report projection builder for RU09 slice 1."""
+"""Evidence-backed report projection builder for RU09."""
 from __future__ import annotations
 
 from copy import deepcopy
@@ -10,8 +10,6 @@ from .models import ReportItem, ReportModel
 from .validation import validate_report_model, validate_report_references
 
 
-# Exact accepted kinds used by the first report slice.  The builder queries only
-# the canonical history store and does not use object-table presence as authority.
 REPORT_RECORD_KINDS: tuple[str, ...] = (
     "campaign_genesis",
     "successor_campaign_genesis",
@@ -34,6 +32,10 @@ REPORT_RECORD_KINDS: tuple[str, ...] = (
     "root_cause_revision",
     "contradiction_revision",
     "contradiction_resolution_decision",
+    "feature_inventory",
+    "feature_expectation",
+    "feature_testability",
+    "functional_verification_result",
     "stop_input",
     "stop_evaluation",
     "campaign_conclusion",
@@ -76,12 +78,7 @@ def extract_unknown_tokens(value: object) -> tuple[str, ...]:
 
 
 class ReportBuilder:
-    """Build a deterministic report projection from one verified current cut.
-
-    Slice 1 is intentionally conservative: it exports ``PARTIAL`` only.  Full
-    assurance export is forbidden until the later Q09 completeness gate validates
-    findings, unknowns, evidence closure, and remediation coverage.
-    """
+    """Build a deterministic report projection from one verified current cut."""
 
     def __init__(self, store: TransactionalHistoryStore):
         self.store = store
@@ -98,15 +95,15 @@ class ReportBuilder:
                 body = deepcopy(row["body"])
                 source_ref = deepcopy(row["ref"])
                 accepted_seq = int(row["accepted_seq"])
-                fact = ReportItem(
-                    classification="FACT",
-                    record_kind=kind,
-                    source_ref=source_ref,
-                    accepted_seq=accepted_seq,
-                    payload=body,
+                facts.append(
+                    ReportItem(
+                        classification="FACT",
+                        record_kind=kind,
+                        source_ref=source_ref,
+                        accepted_seq=accepted_seq,
+                        payload=body,
+                    )
                 )
-                facts.append(fact)
-
                 tokens = extract_unknown_tokens(body)
                 if tokens:
                     unknowns.append(
@@ -122,11 +119,20 @@ class ReportBuilder:
         facts.sort(key=lambda item: item.sort_key)
         unknowns.sort(key=lambda item: item.sort_key)
 
+        conclusions = [item for item in facts if item.record_kind == "campaign_conclusion"]
+        final_cases = [item for item in facts if item.record_kind == "final_assurance_case"]
+        if conclusions and final_cases and conclusions[-1].payload.get("termination_state") == "COMPLETED":
+            scope = "FULL"
+        elif conclusions:
+            scope = "BOUNDED"
+        else:
+            scope = "PARTIAL"
+
         model = ReportModel(
             campaign_id=campaign_id,
             input_history_cut=deepcopy(cut),
             source_identity=deepcopy(source),
-            report_scope="PARTIAL",
+            report_scope=scope,
             facts=tuple(facts),
             interpretations=(),
             proposals=(),
