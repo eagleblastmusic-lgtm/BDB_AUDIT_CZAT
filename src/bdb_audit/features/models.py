@@ -14,7 +14,7 @@ from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
 
 FEATURE_INTERFACES = {"CLI", "API", "BROWSER", "WORKER", "DATABASE", "DESKTOP", "MANUAL"}
-BEHAVIOR_KINDS = {"POSITIVE", "NEGATIVE", "RECOVERY"}
+BEHAVIOR_KINDS = {"HAPPY", "BOUNDARY", "NEGATIVE", "RECOVERY", "STATEFUL", "EXTERNAL_FAILURE"}
 ORACLE_STATUSES = {"QUALIFIED", "UNQUALIFIED", "BLOCKED"}
 ORACLE_INDEPENDENCE = {"INDEPENDENT", "SHARED_DEPENDENCY", "UNKNOWN"}
 FEATURE_STATUSES = {"PASS", "FAIL", "BLOCKED", "INSUFFICIENT", "UNSUPPORTED", "NOT_APPLICABLE", "NOT_RUN"}
@@ -89,6 +89,11 @@ class BehaviorCase:
     description: str = ""
 
     def __post_init__(self) -> None:
+        # POSITIVE was used by the first RU11 prototype. Accept it only as an
+        # input compatibility alias and canonicalize persisted/derived output to
+        # the B03 name HAPPY.
+        if self.behavior_kind == "POSITIVE":
+            object.__setattr__(self, "behavior_kind", "HAPPY")
         if not self.case_id or not self.feature_id or self.behavior_kind not in BEHAVIOR_KINDS:
             raise ValidationError("BEHAVIOR_CASE_INVALID")
         if any(type(item) is not str or not item or "\x00" in item for item in self.argv):
@@ -251,5 +256,5 @@ class BehaviorAssessment:
 
 __all__ = [
     "FeatureRevision", "BehaviorCase", "OracleAssessment", "TestabilityAssessment",
-    "VerificationPlan", "BehaviorAssessment", "FEATURE_STATUSES",
+    "VerificationPlan", "BehaviorAssessment", "FEATURE_STATUSES", "BEHAVIOR_KINDS",
 ]
