@@ -23,6 +23,13 @@ from .report import (
 )
 from .stop.operation import evaluate_stop_gate
 from .version import APP_VERSION, BUILD_ID
+from .workflow.assurance_projection import (
+    audit_blockers,
+    coverage_explain,
+    coverage_matrix,
+    inspect_evidence,
+    verify_evidence,
+)
 
 EXIT_SUCCESS = 0
 EXIT_DOMAIN_ERROR = 1
@@ -92,6 +99,9 @@ def create_parser() -> argparse.ArgumentParser:
     a_stat_p = audit_subs.add_parser("status", help="Get audit campaign status")
     a_stat_p.add_argument("--store", required=True)
     a_stat_p.add_argument("--json", action="store_true")
+    a_block_p = audit_subs.add_parser("blockers", help="Show verified current blockers and next action")
+    a_block_p.add_argument("--store", required=True)
+    a_block_p.add_argument("--json", action="store_true")
 
     campaign_p = subparsers.add_parser("campaign", help="Campaign lifecycle management")
     campaign_subs = campaign_p.add_subparsers(dest="subcommand", help="Campaign operations")
@@ -169,6 +179,29 @@ def create_parser() -> argparse.ArgumentParser:
     remediation_validate.add_argument("--plan", required=True)
     remediation_validate.add_argument("--json", action="store_true")
 
+    coverage_p = subparsers.add_parser("coverage", help="Verified coverage read models")
+    coverage_subs = coverage_p.add_subparsers(dest="subcommand", help="Coverage read operations")
+    coverage_matrix_p = coverage_subs.add_parser("matrix", help="Show exact-cut coverage matrix")
+    coverage_matrix_p.add_argument("--store", required=True)
+    coverage_matrix_p.add_argument("--json", action="store_true")
+    coverage_explain_p = coverage_subs.add_parser("explain", help="Explain one coverage obligation")
+    coverage_explain_p.add_argument("--store", required=True)
+    coverage_explain_p.add_argument("--obligation", required=True)
+    coverage_explain_p.add_argument("--json", action="store_true")
+
+    evidence_p = subparsers.add_parser("evidence", help="Verified accepted-evidence browser")
+    evidence_subs = evidence_p.add_subparsers(dest="subcommand", help="Evidence read operations")
+    evidence_inspect_p = evidence_subs.add_parser("inspect", help="Inspect an exact accepted evidence/object digest")
+    evidence_inspect_p.add_argument("--store", required=True)
+    evidence_inspect_p.add_argument("--digest", required=True)
+    evidence_inspect_p.add_argument("--kind")
+    evidence_inspect_p.add_argument("--json", action="store_true")
+    evidence_verify_p = evidence_subs.add_parser("verify", help="Verify accepted closure and freshness")
+    evidence_verify_p.add_argument("--store", required=True)
+    evidence_verify_p.add_argument("--digest", required=True)
+    evidence_verify_p.add_argument("--kind")
+    evidence_verify_p.add_argument("--json", action="store_true")
+
     st_p = subparsers.add_parser("self-test", help="Execute offline-critical self-test suite")
     st_p.add_argument("--deep", action="store_true")
     st_p.add_argument("--json", action="store_true")
@@ -207,6 +240,8 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
                 res = api.continue_campaign(args.store)
             elif args.subcommand == "status":
                 res = api.get_campaign_status(args.store)
+            elif args.subcommand == "blockers":
+                res = audit_blockers(TransactionalHistoryStore(args.store))
             else:
                 parser.parse_args(["audit", "--help"])
                 return EXIT_MALFORMED_ARGS
@@ -317,6 +352,30 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
                 res = {"status": "PASS", "plan_sha256": plan.plan_sha256, "state": plan.status}
             else:
                 parser.parse_args(["remediation", "--help"])
+                return EXIT_MALFORMED_ARGS
+            _emit_output(res, is_json)
+            return EXIT_SUCCESS
+
+        if args.command == "coverage":
+            store = TransactionalHistoryStore(args.store)
+            if args.subcommand == "matrix":
+                res = coverage_matrix(store)
+            elif args.subcommand == "explain":
+                res = coverage_explain(store, args.obligation)
+            else:
+                parser.parse_args(["coverage", "--help"])
+                return EXIT_MALFORMED_ARGS
+            _emit_output(res, is_json)
+            return EXIT_SUCCESS
+
+        if args.command == "evidence":
+            store = TransactionalHistoryStore(args.store)
+            if args.subcommand == "inspect":
+                res = inspect_evidence(store, args.digest, kind=args.kind)
+            elif args.subcommand == "verify":
+                res = verify_evidence(store, args.digest, kind=args.kind)
+            else:
+                parser.parse_args(["evidence", "--help"])
                 return EXIT_MALFORMED_ARGS
             _emit_output(res, is_json)
             return EXIT_SUCCESS
