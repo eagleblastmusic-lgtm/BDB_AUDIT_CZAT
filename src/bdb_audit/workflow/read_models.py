@@ -199,6 +199,19 @@ class VerifiedCampaignReadModel:
                 completed_by_stage[canonical_sk] = row["ref"]["revision_digest"]
                 completed_stages.append(canonical_sk)
 
+        # Preserve the accepted StageSpec ordering in the projection.  This keeps the
+        # read model deterministic without re-introducing a hard-coded global E1..E6
+        # authority: optional/scoped stages (for example E6) are ordered only when
+        # they are actually present in the accepted StageSpec set for this campaign.
+        stage_order = {stage_key: index for index, stage_key in enumerate(stages_prepared)}
+        try:
+            completed_stages.sort(key=stage_order.__getitem__)
+        except KeyError as exc:
+            raise ValidationError(
+                "STAGE_COMPLETION_PROJECTION_INVALID",
+                f"Completion references unprojected accepted stage {exc.args[0]}",
+            ) from exc
+
         # 4. Accepted StopEvaluations & CampaignConclusions
         stop_rows = self.store.accepted_records("stop_evaluation", cut)
         conclusion_rows = self.store.accepted_records("campaign_conclusion", cut)
