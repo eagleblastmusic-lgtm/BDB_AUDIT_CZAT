@@ -18,6 +18,7 @@ from .runner.permissions import validate_run_spec
 from .runner.specs import CapabilityProfile, ToolRunSpec
 from .runner.supervisor import ToolSupervisor
 from .runner.verification import verify_run_evidence
+from .vnext_commands import dispatch_vnext
 
 EXIT_SUCCESS = _legacy.EXIT_SUCCESS
 EXIT_DOMAIN_ERROR = _legacy.EXIT_DOMAIN_ERROR
@@ -96,17 +97,13 @@ def _tool_spec(args: argparse.Namespace) -> ToolRunSpec:
 def _tools_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="bdb_audit tools", description="Controlled tool-runner operations")
     subs = parser.add_subparsers(dest="subcommand")
-
     inspect_p = subs.add_parser("inspect", help="Inspect local runner capability and source identity")
     inspect_p.add_argument("--source", required=True)
     inspect_p.add_argument("--json", action="store_true")
-
     plan_p = subs.add_parser("plan", help="Validate and preview an exact-argv tool run")
     _add_run_arguments(plan_p)
-
     run_p = subs.add_parser("run", help="Execute an authorized exact-argv run in a disposable workspace")
     _add_run_arguments(run_p)
-
     results_p = subs.add_parser("results", help="Verify collected tool-run evidence and receipt binding")
     results_p.add_argument("--evidence", required=True)
     results_p.add_argument("--json", action="store_true")
@@ -233,6 +230,9 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
         return _run_tools(values[1:])
     if values and values[0] == "environment":
         return _run_environment(values[1:])
+    vnext = dispatch_vnext(values)
+    if vnext is not None:
+        return vnext
     return _legacy.run_cli(values)
 
 
