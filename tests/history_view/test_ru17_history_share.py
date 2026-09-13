@@ -65,3 +65,26 @@ def test_ru17_tampered_shared_file_fails_verification(tmp_path: Path) -> None:
     (bundle / "r.txt").write_text("tampered", encoding="utf-8")
     with pytest.raises(ValidationError, match="SHARE_FILE_IDENTITY_MISMATCH"):
         verify_share_bundle(bundle)
+
+
+def test_ru17_export_rejects_symlink_before_resolution(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    candidate = source / "link.txt"
+    candidate.write_text("target", encoding="utf-8")
+    original_is_symlink = Path.is_symlink
+
+    def fake_is_symlink(path: Path) -> bool:
+        if path == candidate:
+            return True
+        return original_is_symlink(path)
+
+    monkeypatch.setattr(Path, "is_symlink", fake_is_symlink)
+    with pytest.raises(ValidationError, match="SHARE_SYMLINK_UNSUPPORTED"):
+        export_share_bundle(
+            source,
+            tmp_path / "bundle",
+            include_paths=("link.txt",),
+            privacy_policy=PrivacyPolicy(mode="PUBLIC"),
+            source_identity={"sha": "a"},
+        )
