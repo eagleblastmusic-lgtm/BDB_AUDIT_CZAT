@@ -9,7 +9,7 @@ from typing import Any
 
 from ..core.errors import ValidationError
 from ..history.store import TransactionalHistoryStore
-from .read_models import campaign_status
+from .read_models import campaign_status, current_accepted_cut
 
 
 _STAGE_SEQUENCE = ("E1", "E2", "E3", "E4", "E5")
@@ -24,11 +24,11 @@ class ContinuationService:
         if head is None:
             raise ValidationError("EMPTY_STORE", "Store has no accepted commits")
 
-        cut = {
-            "campaign_id": head.campaign_id,
-            "commit_seq": head.commit_seq,
-            "commit_hash": head.commit_hash,
-        }
+        # Use the same verified, fully typed accepted-history cut as every other
+        # operational read model.  A shorthand {campaign_id, commit_seq, commit_hash}
+        # is not an authority-bearing HistoryCut and must never be passed to
+        # accepted_records/resolve_accepted.
+        cut = current_accepted_cut(store)
 
         # Query accepted records
         status = campaign_status(store, lambda s: s.upper() if isinstance(s, str) else str(s))
@@ -101,7 +101,7 @@ class ContinuationService:
                     return {
                         "campaign_id": head.campaign_id,
                         "current_stage": stage,
-                        "continuation_state": "PREPARED" if stage in prepared_stages else "NOT_PREPARED",
+                        "continuation_state": "NOT_PREPARED",
                         "next_action": f"PREPARE_STAGE_{stage}",
                         "stages_prepared": prepared_stages,
                         "stages_completed": completed_stages,
