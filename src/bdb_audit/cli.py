@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 import sys
 from typing import Sequence
 
@@ -25,6 +24,8 @@ EXIT_DOMAIN_ERROR = _legacy.EXIT_DOMAIN_ERROR
 EXIT_MALFORMED_ARGS = _legacy.EXIT_MALFORMED_ARGS
 EXIT_CAMPAIGN_NOT_FOUND = _legacy.EXIT_CAMPAIGN_NOT_FOUND
 EXIT_CONFLICT_ERROR = _legacy.EXIT_CONFLICT_ERROR
+APP_VERSION = _legacy.APP_VERSION
+BUILD_ID = _legacy.BUILD_ID
 SOURCE_CAPABILITIES = dict(_legacy.SOURCE_CAPABILITIES)
 SOURCE_CAPABILITIES["controlled_tool_runner"] = "SUPPORTED_LOCAL_PROFILE"
 create_parser = _legacy.create_parser
@@ -240,15 +241,9 @@ def main() -> None:
 
 
 __all__ = [
-    "run_cli",
-    "main",
-    "create_parser",
-    "SOURCE_CAPABILITIES",
-    "EXIT_SUCCESS",
-    "EXIT_DOMAIN_ERROR",
-    "EXIT_MALFORMED_ARGS",
-    "EXIT_CAMPAIGN_NOT_FOUND",
-    "EXIT_CONFLICT_ERROR",
+    "run_cli", "main", "create_parser", "SOURCE_CAPABILITIES", "APP_VERSION", "BUILD_ID",
+    "EXIT_SUCCESS", "EXIT_DOMAIN_ERROR", "EXIT_MALFORMED_ARGS",
+    "EXIT_CAMPAIGN_NOT_FOUND", "EXIT_CONFLICT_ERROR",
 ]
 
 
