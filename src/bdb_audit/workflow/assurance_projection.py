@@ -1,8 +1,9 @@
 """RU12-A verified assurance views derived only from accepted history.
 
-These projections are convenience/read models.  They never create workflow,
-coverage, evidence, or completion authority and can always be rebuilt from an
-exact accepted HistoryCut.
+The objects in this module are rebuildable read models. They never create
+workflow, coverage, evidence, or completion authority. Every status is bound
+to one exact accepted HistoryCut and exposes the accepted refs and reason tree
+that explain it.
 """
 from __future__ import annotations
 
@@ -12,14 +13,17 @@ from typing import Any, Mapping
 
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
+from ..core.ids import active_registry_document
 from ..history.store import TransactionalHistoryStore
 from .continuation_service import ContinuationService
 from .read_models import VerifiedCampaignReadModel, campaign_source_identity, current_accepted_cut
 
+_CONTENT_REF_CLASSES = {"CONTENT_OBJECT", "CONTENT_OR_PRIOR"}
+
 
 @dataclass(frozen=True)
 class AssuranceProjectionSnapshot:
-    """Immutable derived snapshot with a digest over its complete presentation body."""
+    """Derived snapshot with deterministic integrity over its complete body."""
 
     body: Mapping[str, Any]
 
@@ -49,6 +53,50 @@ def _dedupe_refs(refs: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [unique[key] for key in sorted(unique)]
 
 
+def _collect_typed_refs(value: Any) -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = []
+
+    def visit(node: Any) -> None:
+        if isinstance(node, dict):
+            if isinstance(node.get("kind"), str) and isinstance(node.get("revision_digest"), str):
+                found.append(dict(node))
+                return
+            for key in sorted(node):
+                visit(node[key])
+        elif isinstance(node, (list, tuple)):
+            for child in node:
+                visit(child)
+
+    visit(value)
+    return _dedupe_refs(found)
+
+
+def _partition_refs(
+    store: TransactionalHistoryStore,
+    cut: Mapping[str, Any],
+    value: Any,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Split body refs into verified accepted objects and explicit external pins.
+
+    A canonical content ref that is not in the accepted closure is a hard
+    integrity failure. Reference-target classes and non-content ref classes are
+    external authority/context references and are surfaced separately; they are
+    never misrepresented as accepted objects.
+    """
+    target_classes = set(active_registry_document().get("reference_target_classes", {}))
+    accepted: list[dict[str, Any]] = []
+    external: list[dict[str, Any]] = []
+    for ref in _collect_typed_refs(value):
+        ref_class = str(ref.get("ref_class", "CONTENT_OR_PRIOR"))
+        kind = str(ref.get("kind", ""))
+        if kind in target_classes or ref_class not in _CONTENT_REF_CLASSES:
+            external.append(ref)
+            continue
+        resolved = store.resolve_accepted(ref, dict(cut))
+        accepted.append(dict(resolved["ref"]))
+    return _dedupe_refs(accepted), _dedupe_refs(external)
+
+
 def _accepted_ref_by_digest(
     store: TransactionalHistoryStore,
     cut: Mapping[str, Any],
@@ -76,41 +124,25 @@ def _accepted_ref_by_digest(
     return next(iter(matches.values()))
 
 
-def _direct_refs(value: Any) -> list[dict[str, Any]]:
-    found: list[dict[str, Any]] = []
-
-    def visit(node: Any) -> None:
-        if isinstance(node, dict):
-            if isinstance(node.get("kind"), str) and isinstance(node.get("revision_digest"), str):
-                found.append(dict(node))
-                return
-            for key in sorted(node):
-                visit(node[key])
-        elif isinstance(node, (list, tuple)):
-            for child in node:
-                visit(child)
-
-    visit(value)
-    return _dedupe_refs(found)
-
-
 def _invalidation_index(
     store: TransactionalHistoryStore,
     cut: Mapping[str, Any],
-) -> tuple[dict[str, list[dict[str, Any]]], tuple[dict[str, Any], ...]]:
+) -> dict[str, list[dict[str, Any]]]:
     index: dict[str, list[dict[str, Any]]] = {}
-    rows = store.accepted_records("evidence_invalidation", dict(cut))
-    for row in rows:
+    for row in store.accepted_records("evidence_invalidation", dict(cut)):
         invalidation_ref = dict(row["ref"])
         for affected in row["body"].get("affected_evidence_or_qualification_refs", ()):
             if not isinstance(affected, dict):
-                continue
+                raise ValidationError("EVIDENCE_INVALIDATION_REF_INVALID")
             digest = affected.get("revision_digest")
-            if isinstance(digest, str):
-                index.setdefault(digest, []).append(invalidation_ref)
+            if not isinstance(digest, str):
+                raise ValidationError("EVIDENCE_INVALIDATION_REF_INVALID")
+            # Canonical affected refs must themselves be accepted at this cut.
+            store.resolve_accepted(affected, dict(cut))
+            index.setdefault(digest, []).append(invalidation_ref)
     for digest in index:
         index[digest] = _dedupe_refs(index[digest])
-    return index, rows
+    return index
 
 
 def _reason_node(code: str, source_ref: Mapping[str, Any] | None = None) -> dict[str, Any]:
@@ -125,13 +157,12 @@ def _project_evidence_index(
     cut: Mapping[str, Any],
     invalidations: Mapping[str, list[dict[str, Any]]],
 ) -> list[dict[str, Any]]:
-    rows = store.accepted_records("evidence_qualification_assessment", dict(cut))
     projected: list[dict[str, Any]] = []
-    for row in rows:
+    for row in store.accepted_records("evidence_qualification_assessment", dict(cut)):
         ref = dict(row["ref"])
         body = row["body"]
-        digest = ref["revision_digest"]
-        invalidating_refs = list(invalidations.get(digest, ()))
+        accepted_refs, external_refs = _partition_refs(store, cut, body)
+        invalidating_refs = _dedupe_refs(list(invalidations.get(ref["revision_digest"], ())))
         freshness = "STALE" if invalidating_refs else "ACTIVE"
         projected.append({
             "assessment_id": body.get("assessment_id"),
@@ -144,7 +175,9 @@ def _project_evidence_index(
             "observation_refs": _dedupe_refs([
                 dict(item) for item in body.get("observation_refs", ()) if isinstance(item, dict)
             ]),
-            "invalidation_refs": _dedupe_refs(invalidating_refs),
+            "direct_accepted_refs": accepted_refs,
+            "external_refs": external_refs,
+            "invalidation_refs": invalidating_refs,
             "current_applicable": freshness == "ACTIVE",
         })
     projected.sort(key=lambda item: _ref_identity(item["ref"]))
@@ -159,11 +192,15 @@ def _project_coverage_rows(
     obligations = store.accepted_records("coverage_obligation", dict(cut))
     qualifications = store.accepted_records("coverage_obligation_qualification", dict(cut))
     by_obligation_digest: dict[str, list[dict[str, Any]]] = {}
+
     for qualification in qualifications:
         obligation_ref = qualification["body"].get("obligation_revision_ref")
         if not isinstance(obligation_ref, dict):
             raise ValidationError("COVERAGE_QUALIFICATION_OBLIGATION_REF_MISSING")
-        digest = obligation_ref.get("revision_digest")
+        resolved = store.resolve_accepted(obligation_ref, dict(cut))
+        if resolved["ref"].get("kind") != "coverage_obligation":
+            raise ValidationError("COVERAGE_QUALIFICATION_OBLIGATION_KIND_INVALID")
+        digest = resolved["ref"].get("revision_digest")
         if not isinstance(digest, str):
             raise ValidationError("COVERAGE_QUALIFICATION_OBLIGATION_REF_MISSING")
         by_obligation_digest.setdefault(digest, []).append(qualification)
@@ -172,9 +209,8 @@ def _project_coverage_rows(
     for obligation in obligations:
         obligation_ref = dict(obligation["ref"])
         obligation_body = obligation["body"]
-        obligation_digest = obligation_ref["revision_digest"]
         qualification_rows = sorted(
-            by_obligation_digest.get(obligation_digest, ()),
+            by_obligation_digest.get(obligation_ref["revision_digest"], ()),
             key=lambda row: _ref_identity(row["ref"]),
         )
         reason_children: list[dict[str, Any]] = []
@@ -208,6 +244,8 @@ def _project_coverage_rows(
                     raise ValidationError("COVERAGE_EVIDENCE_REF_INVALID")
                 resolved = store.resolve_accepted(evidence_ref, dict(cut))
                 exact_ref = dict(resolved["ref"])
+                if exact_ref.get("kind") != "evidence_qualification_assessment":
+                    raise ValidationError("COVERAGE_EVIDENCE_KIND_INVALID")
                 evidence_refs.append(exact_ref)
                 direct_refs.append(exact_ref)
                 evidence_body = resolved["body"]
@@ -230,7 +268,9 @@ def _project_coverage_rows(
                 exact_ref = dict(applicability["ref"])
                 direct_refs.append(exact_ref)
                 is_not_applicable = applicability["body"].get("result") == "NOT_APPLICABLE"
-                reason_children.append(_reason_node("NOT_APPLICABLE" if is_not_applicable else "APPLICABILITY_DECISION", exact_ref))
+                reason_children.append(
+                    _reason_node("NOT_APPLICABLE" if is_not_applicable else "APPLICABILITY_DECISION", exact_ref)
+                )
 
             waiver_ref = qbody.get("waiver_decision_ref")
             if isinstance(waiver_ref, dict):
@@ -238,7 +278,9 @@ def _project_coverage_rows(
                 exact_ref = dict(waiver["ref"])
                 direct_refs.append(exact_ref)
                 is_waived = waiver["body"].get("decision") == "APPROVED"
-                reason_children.append(_reason_node("WAIVER_APPROVED" if is_waived else "WAIVER_NOT_APPROVED", exact_ref))
+                reason_children.append(
+                    _reason_node("WAIVER_APPROVED" if is_waived else "WAIVER_NOT_APPROVED", exact_ref)
+                )
 
         satisfies_completion = (
             effective_status == "QUALIFIED"
@@ -264,6 +306,7 @@ def _project_coverage_rows(
                 "children": reason_children,
             },
         })
+
     result.sort(key=lambda item: (
         str(item.get("policy_obligation_key", "")),
         str(item.get("obligation_id", "")),
@@ -285,43 +328,42 @@ def _coverage_summary(rows: list[dict[str, Any]]) -> dict[str, int]:
 
 
 def _coverage_blockers(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    blockers: list[dict[str, Any]] = []
-    for row in rows:
-        if row["satisfies_completion"]:
-            continue
-        blockers.append({
+    return [
+        {
             "blocker_type": f"COVERAGE_{row['effective_status']}",
             "obligation_id": row.get("obligation_id"),
             "reason_tree": row["reason_tree"],
             "direct_accepted_refs": row["direct_accepted_refs"],
-        })
-    return blockers
+        }
+        for row in rows
+        if not row["satisfies_completion"]
+    ]
 
 
 def build_verified_assurance_snapshot(
     store: TransactionalHistoryStore,
     cut: Mapping[str, Any] | None = None,
 ) -> AssuranceProjectionSnapshot:
-    """Rebuild the RU12-A read model from one verified accepted history cut."""
+    """Rebuild the RU12-A view from one verified accepted history cut."""
     current_cut = current_accepted_cut(store)
     selected_cut = dict(cut) if cut is not None else current_cut
-    model = VerifiedCampaignReadModel(store, cut=selected_cut)
-    campaign = model.project_status()
+    campaign = VerifiedCampaignReadModel(store, cut=selected_cut).project_status()
     campaign["accepted_head_seq"] = selected_cut["accepted_head_seq"]
     campaign["accepted_head_hash"] = selected_cut["accepted_head_hash"]
     source = campaign_source_identity(store, selected_cut)
-    invalidations, _ = _invalidation_index(store, selected_cut)
+    invalidations = _invalidation_index(store, selected_cut)
     coverage_rows = _project_coverage_rows(store, selected_cut, invalidations)
     evidence_index = _project_evidence_index(store, selected_cut, invalidations)
     freshness = "ACTIVE" if selected_cut == current_cut else "STALE"
-    if freshness == "ACTIVE":
-        workflow = ContinuationService.evaluate_continuation(store)
-    else:
-        workflow = {
+    workflow = (
+        ContinuationService.evaluate_continuation(store)
+        if freshness == "ACTIVE"
+        else {
             "continuation_state": "HISTORICAL_VIEW",
             "next_action": "NONE",
             "current_stage": campaign.get("current_stage"),
         }
+    )
     blockers = _coverage_blockers(coverage_rows)
     if workflow.get("continuation_state") == "BLOCKED":
         blockers.append({
@@ -329,7 +371,8 @@ def build_verified_assurance_snapshot(
             "reason_tree": {"code": "CONTINUATION_BLOCKED", "children": []},
             "direct_accepted_refs": [],
         })
-    body: dict[str, Any] = {
+
+    return AssuranceProjectionSnapshot({
         "schema_version": "RU12A-1",
         "projection_kind": "VERIFIED_ASSURANCE_PROJECTION",
         "authority": "DERIVED_ONLY",
@@ -342,15 +385,14 @@ def build_verified_assurance_snapshot(
         "coverage_rows": coverage_rows,
         "evidence_index": evidence_index,
         "blockers": blockers,
-    }
-    return AssuranceProjectionSnapshot(body)
+    })
 
 
 def verify_projection_snapshot(
     snapshot: Mapping[str, Any],
     store: TransactionalHistoryStore,
 ) -> dict[str, Any]:
-    """Verify snapshot self-integrity and report whether its exact cut is current."""
+    """Verify snapshot integrity/cut and report whether the exact cut is current."""
     supplied_digest = snapshot.get("projection_digest")
     body = dict(snapshot)
     body.pop("projection_digest", None)
@@ -416,11 +458,9 @@ def inspect_evidence(
     cut = current_accepted_cut(store)
     ref = _accepted_ref_by_digest(store, cut, digest, kind=kind)
     resolved = store.resolve_accepted(ref, cut)
-    invalidations, _ = _invalidation_index(store, cut)
+    invalidations = _invalidation_index(store, cut)
     invalidating_refs = _dedupe_refs(list(invalidations.get(digest, ())))
-    direct_refs = _direct_refs(resolved["body"])
-    for child_ref in direct_refs:
-        store.resolve_accepted(child_ref, cut)
+    direct_refs, external_refs = _partition_refs(store, cut, resolved["body"])
     return {
         "status": "SUCCESS",
         "history_cut": cut,
@@ -430,6 +470,7 @@ def inspect_evidence(
         "freshness": "STALE" if invalidating_refs else "ACTIVE",
         "current_applicable": not invalidating_refs,
         "direct_accepted_refs": direct_refs,
+        "external_refs": external_refs,
         "invalidation_refs": invalidating_refs,
         "reason_tree": {
             "code": "EVIDENCE_STALE" if invalidating_refs else "EVIDENCE_ACTIVE",
