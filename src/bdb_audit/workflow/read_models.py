@@ -199,9 +199,6 @@ class VerifiedCampaignReadModel:
                 completed_by_stage[canonical_sk] = row["ref"]["revision_digest"]
                 completed_stages.append(canonical_sk)
 
-        stage_order = {s: i for i, s in enumerate(("E1", "E2", "E3", "E4", "E5", "E6"))}
-        completed_stages.sort(key=lambda s: stage_order.get(s, 99))
-
         # 4. Accepted StopEvaluations & CampaignConclusions
         stop_rows = self.store.accepted_records("stop_evaluation", cut)
         conclusion_rows = self.store.accepted_records("campaign_conclusion", cut)
@@ -213,17 +210,14 @@ class VerifiedCampaignReadModel:
 
         # 5. Determine current_stage rigorously:
         # If there are prepared stages, current_stage is the first prepared stage that is NOT completed.
-        # If all prepared stages are completed and campaign is still OPEN, advance to next incomplete baseline stage.
+        # If all prepared stages are completed, current_stage is the last prepared stage (or GENESIS if none).
         current_stage = "GENESIS"
         for st in stages_prepared:
             if st not in completed_by_stage:
                 current_stage = st
                 break
         else:
-            if termination_state == "OPEN":
-                next_stage = next((s for s in ("E1", "E2", "E3", "E4", "E5") if s not in completed_by_stage), None)
-                current_stage = next_stage or (stages_prepared[-1] if stages_prepared else "GENESIS")
-            elif stages_prepared:
+            if stages_prepared:
                 current_stage = stages_prepared[-1]
 
         source = campaign_source_identity(self.store, cut)

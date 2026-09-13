@@ -18,6 +18,7 @@ from bdb_audit.cli import run_cli
 from bdb_audit.coordinator.operations import AuditOperationApi
 from bdb_audit.core.errors import ValidationError
 from bdb_audit.history.store import TransactionalHistoryStore
+from bdb_audit.workflow.continuation_service import ContinuationService
 from bdb_audit.workflow.orchestrator import FullAuditOrchestrator
 from bdb_audit.workflow.read_models import campaign_status
 from bdb_audit.workflow.settings import SettingsManager, UserSettings
@@ -143,7 +144,7 @@ def test_core_acceptance_3_early_blocked_completed_limited(workflow_env):
 
 
 def test_core_acceptance_4_restart_between_stages_preserves_accepted_truth(workflow_env):
-    """4. Process restart between stages preserves exact same accepted truth."""
+    """4. Process restart preserves accepted truth; next action remains a derived service view."""
     store_path = workflow_env["store_path"]
     api1 = AuditOperationApi()
 
@@ -157,12 +158,18 @@ def test_core_acceptance_4_restart_between_stages_preserves_accepted_truth(workf
     assert head1["stages_completed"] == ["E1", "E2"]
     commit_seq1 = head1["accepted_head_seq"]
 
-    # Completely new process / API instance reading from disk
+    # Completely new process / API instance reading from disk.
     api2 = AuditOperationApi()
     head2 = api2.get_campaign_status(store_path)
     assert head2["stages_completed"] == ["E1", "E2"]
     assert head2["accepted_head_seq"] == commit_seq1
-    assert head2["current_stage"] == "E3"  # First incomplete prepared/next stage
+    # current_stage remains accepted-history state, not a second next-stage authority.
+    assert head2["current_stage"] == "E2"
+
+    store2 = TransactionalHistoryStore(store_path)
+    continuation = ContinuationService.evaluate_continuation(store2)
+    assert continuation["current_stage"] == "E3"
+    assert continuation["next_action"] == "PREPARE_STAGE_E3"
 
 
 def test_core_acceptance_6_no_manual_pass_setter(workflow_env):

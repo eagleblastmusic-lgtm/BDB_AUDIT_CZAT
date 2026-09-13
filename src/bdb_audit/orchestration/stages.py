@@ -140,7 +140,8 @@ class StageSpecRegistry:
         return tuple(sorted(selected, key=lambda s: (s.stage_ordinal, s.stage_key)))
 
     def recognize_all_stage_keys(self):
-        return tuple(sorted(_STAGES))
+        """Return only stage keys actually registered in this immutable registry."""
+        return tuple(sorted({spec.stage_key for spec in self._by_digest.values()}))
 
 
 def initial_stage_specs():
