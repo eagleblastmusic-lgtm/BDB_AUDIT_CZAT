@@ -19,10 +19,13 @@ class CapabilityProfile:
     environment_sanitized: bool = True
     output_limit_enforced: bool = True
     network_isolation: str = "NOT_ENFORCED"
+    host_filesystem_isolation: str = "NOT_ENFORCED"
 
     def __post_init__(self) -> None:
         if self.network_isolation not in {"ENFORCED", "NOT_ENFORCED"}:
             raise ValidationError("RUNNER_NETWORK_ISOLATION_INVALID")
+        if self.host_filesystem_isolation not in {"ENFORCED", "NOT_ENFORCED"}:
+            raise ValidationError("RUNNER_FILESYSTEM_ISOLATION_INVALID")
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -33,6 +36,7 @@ class CapabilityProfile:
             "environment_sanitized": self.environment_sanitized,
             "output_limit_enforced": self.output_limit_enforced,
             "network_isolation": self.network_isolation,
+            "host_filesystem_isolation": self.host_filesystem_isolation,
         }
 
     @property
@@ -50,6 +54,7 @@ class ToolRunSpec:
     max_output_bytes: int = 4 * 1024 * 1024
     environment: Mapping[str, str] = field(default_factory=dict)
     require_network_isolation: bool = False
+    require_host_filesystem_isolation: bool = False
     working_subdir: str = "."
 
     def __post_init__(self) -> None:
@@ -77,6 +82,7 @@ class ToolRunSpec:
             "max_output_bytes": self.max_output_bytes,
             "environment": dict(sorted(self.environment.items())),
             "require_network_isolation": self.require_network_isolation,
+            "require_host_filesystem_isolation": self.require_host_filesystem_isolation,
             "working_subdir": self.working_subdir,
         }
 

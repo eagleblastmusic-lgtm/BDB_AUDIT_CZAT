@@ -104,6 +104,8 @@ class ToolSupervisor:
 
         if self.profile.network_isolation != "ENFORCED":
             limitations.append("NETWORK_EGRESS_NOT_ENFORCED")
+        if self.profile.host_filesystem_isolation != "ENFORCED":
+            limitations.append("HOST_FILESYSTEM_ISOLATION_NOT_ENFORCED")
 
         try:
             _safe_copy(source, worker)

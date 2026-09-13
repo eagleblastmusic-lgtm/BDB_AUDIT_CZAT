@@ -30,6 +30,8 @@ def validate_run_spec(spec: ToolRunSpec, profile: CapabilityProfile) -> tuple[Pa
         raise ValidationError("TOOL_RUN_EVIDENCE_INSIDE_TARGET")
     if spec.require_network_isolation and profile.network_isolation != "ENFORCED":
         raise ValidationError("NETWORK_ISOLATION_UNAVAILABLE")
+    if spec.require_host_filesystem_isolation and profile.host_filesystem_isolation != "ENFORCED":
+        raise ValidationError("HOST_FILESYSTEM_ISOLATION_UNAVAILABLE")
     if not all((profile.disposable_workspace, profile.shell_disabled, profile.process_tree_termination, profile.environment_sanitized, profile.output_limit_enforced)):
         raise ValidationError("RUNNER_REQUIRED_CONTROL_UNAVAILABLE")
     for root, dirs, files in os.walk(source):
