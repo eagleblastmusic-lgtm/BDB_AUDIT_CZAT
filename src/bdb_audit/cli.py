@@ -226,6 +226,15 @@ def _run_environment(argv: Sequence[str]) -> int:
 
 def run_cli(argv: Sequence[str] | None = None) -> int:
     values = list(sys.argv[1:] if argv is None else argv)
+    # Keep continuation routing here as well as in astra_cli so the embedded
+    # standalone distribution, whose bootstrap imports bdb_audit.cli directly,
+    # exposes exactly the same real workflow as the installed console script.
+    if values and values[0] == "ui":
+        from .astra_ui import run_ui
+        return run_ui()
+    if values and values[0] == "flow":
+        from .astra_flow_cli import run_flow_cli
+        return run_flow_cli(values[1:])
     if values and values[0] == "tools":
         return _run_tools(values[1:])
     if values and values[0] == "environment":
