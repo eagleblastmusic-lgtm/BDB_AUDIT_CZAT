@@ -4,7 +4,7 @@ Verifies requirements A through H:
 - A: Claim without evidence cannot be CONFIRMED/SUPPORTED.
 - B: Missing outcome remains INCONCLUSIVE / E2_INSUFFICIENT_EVIDENCE.
 - C: Same statement with different root-cause/evidence does not silently merge.
-- D: Different statement with same evidenced root cause relates only via evidence-backed reconciliation.
+- D: Different statement with same root-cause relation and explicit mechanism statement converges only after individual adjudication.
 - E: Multiple outcomes for the same claim candidate: explicit conflict/contradiction handling, no silent dictionary overwrite.
 - F: Mechanism evidence absent -> mechanism INCONCLUSIVE / E2_INSUFFICIENT_EVIDENCE.
 - G: Reachability evidence absent -> reachability INCONCLUSIVE / E2_INSUFFICIENT_EVIDENCE.
@@ -99,7 +99,7 @@ def test_d11_req_b_missing_outcome_remains_inconclusive():
     )
     dec = e2.adjudicated_decisions[0]
     assert dec.lifecycle_status == "OPEN"
-    # All axes must have method E2_INSUFFICIENT_EVIDENCE
+    # All axes must remain explicit objects even when evidence is insufficient.
     assert dec.mechanism_assessment_ref is not None
 
 
@@ -127,7 +127,7 @@ def test_d11_req_c_same_statement_different_provenance_no_silent_merge():
         {"tag": "CUT"},
         make_ref("policy_revision", "pol_c"),
     )
-    # Must produce 2 separate decisions, not 1 merged decision
+    # Must produce 2 separate decisions, not 1 merged decision.
     assert len(e2.adjudicated_decisions) == 2
 
 
@@ -135,15 +135,18 @@ def test_d11_req_d_different_statement_same_evidenced_root_cause_converges():
     """Requirement D: Different statements keep individual decisions and converge only in RootCauseRevision."""
     src_gen = make_ref("source_generation", "gen_req_d")
     shared_root = make_ref("root_cause_revision", "shared_root_cause_1")
+    mechanism = "Shared missing bounds validation in certificate parser"
     discoveries = {slot: [] for slot in E1_LANE_SLOTS}
     discoveries["E1-A"] = [{
         "statement": "Out-of-bounds read in ASN1 header decoder",
         "root_cause_ref": shared_root,
+        "root_cause_statement": mechanism,
         **_axis_refs("ev_d_a"),
     }]
     discoveries["E1-B"] = [{
         "statement": "Crash in X509 certificate parsing routine",
         "root_cause_ref": shared_root,
+        "root_cause_statement": mechanism,
         **_axis_refs("ev_d_b"),
     }]
     e1 = execute_e1_ensemble(src_gen, discoveries)
@@ -157,6 +160,7 @@ def test_d11_req_d_different_statement_same_evidenced_root_cause_converges():
     # Adjudication is per historical finding; normalization never erases a decision.
     assert len(e2.adjudicated_decisions) == 2
     assert len(e2.root_cause_revisions) == 1
+    assert e2.root_cause_revisions[0].mechanism_statement == mechanism
     assert len(e2.root_cause_revisions[0].membership_edges) == 2
 
 
@@ -235,7 +239,7 @@ def test_d11_req_f_mechanism_evidence_absent_mechanism_unknown():
         make_ref("policy_revision", "pol_f"),
     )
     dec = e2.adjudicated_decisions[0]
-    # Because MECHANISM has no explicit axis evidence, it cannot be confirmed
+    # Because MECHANISM has no explicit axis evidence, it cannot be confirmed.
     assert dec.lifecycle_status != "CONFIRMED_CURRENT"
     assert dec.lifecycle_status == "OPEN"
 
@@ -272,7 +276,7 @@ def test_d11_req_g_reachability_evidence_absent_reachability_unknown():
         make_ref("policy_revision", "pol_g"),
     )
     dec = e2.adjudicated_decisions[0]
-    # Because REACHABILITY has no explicit axis evidence, it cannot be confirmed
+    # Because REACHABILITY has no explicit axis evidence, it cannot be confirmed.
     assert dec.lifecycle_status != "CONFIRMED_CURRENT"
     assert dec.lifecycle_status == "OPEN"
 
