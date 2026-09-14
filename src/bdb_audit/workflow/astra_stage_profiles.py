@@ -3,16 +3,19 @@
 The continuation branch keeps user-facing lane order separate from canonical
 reference-set order.  StageRun reference arrays are canonicalized according to
 the pinned registry without changing the semantic/UI order of the lane batch.
+Post-E1 package compilation reuses the existing canonical stage templates;
+there is no unregistered/manual template bypass.
 """
 from __future__ import annotations
 
 import hashlib
-from typing import Any
+from typing import Any, Mapping
 
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
 from ..core.registry import canonical_reference_set
 from ..history.objects import CanonicalObject, CommandEnvelope, HistoryCut
+from ..orchestration.compiler import PromptPackageCompiler as CanonicalPromptPackageCompiler
 from . import stage_transport
 from .stage_transport import StageLaneDefinition
 
@@ -91,6 +94,70 @@ ASTRA_POST_E1_STAGE_LANES: dict[str, tuple[StageLaneDefinition, ...]] = {
         ),
     ),
 }
+
+
+class AstraPromptPackageCompiler(CanonicalPromptPackageCompiler):
+    """Map branch transport metadata onto the pinned canonical prompt templates."""
+
+    def compile(
+        self,
+        stage_spec_revision: str,
+        lane_spec_revision: str,
+        executor_revision: str,
+        delivery_revision: str,
+        projection_policy: Mapping[str, Any],
+        view_manifest: Mapping[str, Any],
+        history_cut: Mapping[str, Any],
+        prompt: Mapping[str, Any],
+    ):
+        normalized = dict(prompt)
+        if normalized.get("template") == "manual_stage":
+            stage = str(normalized.get("stage", "")).upper()
+            slot = str(normalized.get("slot", ""))
+            strategy = str(normalized.get("strategy", ""))
+            cut_digest = hashlib.sha256(canonical_bytes(dict(history_cut))).hexdigest()
+            if stage == "E2":
+                normalized = {
+                    "template": "e2_cross_review",
+                    "slot": slot,
+                    "predecessor_cut": cut_digest,
+                }
+            elif stage == "E3":
+                normalized = {
+                    "template": "e3_blind",
+                    "slot": slot,
+                    "holdout_id": f"{slot}:{cut_digest[:16]}",
+                }
+            elif stage == "E4":
+                normalized = {
+                    "template": "e4_deepen",
+                    "focus_area": slot,
+                    "depth_level": strategy or "DEEPEN",
+                }
+            elif stage == "E5":
+                normalized = {
+                    "template": "e5_attack",
+                    "candidate_id": f"PENDING_CANDIDATE:{cut_digest[:16]}",
+                    "challenger_profile": strategy or slot,
+                }
+            elif stage == "E6":
+                normalized = {
+                    "template": "e6_adaptive",
+                    "stop_evaluation_ref": f"PENDING_STOP:{cut_digest[:16]}",
+                    "budget": "POLICY_BOUND",
+                }
+            else:
+                raise ValidationError("POST_E1_STAGE_UNSUPPORTED", stage)
+        return super().compile(
+            stage_spec_revision=stage_spec_revision,
+            lane_spec_revision=lane_spec_revision,
+            executor_revision=executor_revision,
+            delivery_revision=delivery_revision,
+            projection_policy=projection_policy,
+            view_manifest=view_manifest,
+            history_cut=history_cut,
+            prompt=normalized,
+        )
 
 
 class AstraStageAssignmentService(stage_transport.StageAssignmentService):
@@ -188,13 +255,15 @@ class AstraStageAssignmentService(stage_transport.StageAssignmentService):
 
 
 def apply_astra_stage_profiles() -> None:
-    """Install branch-local lane and assignment profiles for future work."""
+    """Install branch-local lane, assignment, and compiler profiles."""
     stage_transport.POST_E1_STAGE_LANES.update(ASTRA_POST_E1_STAGE_LANES)
     stage_transport.StageAssignmentService = AstraStageAssignmentService
+    stage_transport.PromptPackageCompiler = AstraPromptPackageCompiler
 
 
 __all__ = [
     "ASTRA_POST_E1_STAGE_LANES",
+    "AstraPromptPackageCompiler",
     "AstraStageAssignmentService",
     "apply_astra_stage_profiles",
 ]
