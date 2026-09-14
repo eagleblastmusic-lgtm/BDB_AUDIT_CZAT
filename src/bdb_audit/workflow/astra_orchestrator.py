@@ -13,10 +13,11 @@ from typing import Any, Sequence
 from ..core.errors import ValidationError
 from ..history.store import TransactionalHistoryStore
 from .astra_stage_profiles import apply_astra_stage_profiles
+from .astra_transport import load_stage_batch, prepare_stage_batch
 from .inbox import ImportedResultSummary
 from .orchestrator import FullAuditOrchestrator
 from .post_e1_inbox import PostE1ResultInbox
-from .stage_transport import StageBatch, load_stage_batch, prepare_stage_batch, stage_slots
+from .stage_transport import StageBatch, stage_slots
 
 
 _BASELINE_STAGES = ("E1", "E2", "E3", "E4", "E5")
