@@ -40,6 +40,7 @@ def make_ref(kind: str, seed: str) -> dict:
 def _axis_refs(seed: str, outcome: str = "SUPPORTED") -> dict:
     ev = make_ref("evidence_qualification_assessment", seed)
     return {
+        "severity_value": "INFO",
         "axis_outcomes": {
             "MECHANISM": outcome,
             "REACHABILITY": outcome,
@@ -63,6 +64,7 @@ def test_d11_req_a_claim_without_evidence_cannot_be_confirmed():
         "finding_id": "f_no_ev",
         "statement": "Asserted vulnerability without evidence",
         "claim_outcome": "SUPPORTED",
+        "severity_value": "INFO",
     }]
     e1 = execute_e1_ensemble(src_gen, discoveries)
     e2 = execute_e2_convergence(
@@ -85,6 +87,7 @@ def test_d11_req_b_missing_outcome_remains_inconclusive():
     discoveries["E1-B"] = [{
         "finding_id": "f_missing_outcome",
         "statement": "Finding without explicit outcome fields",
+        "severity_value": "INFO",
     }]
     e1 = execute_e1_ensemble(src_gen, discoveries)
     e2 = execute_e2_convergence(
@@ -108,11 +111,13 @@ def test_d11_req_c_same_statement_different_provenance_no_silent_merge():
         "finding_id": "fa",
         "statement": "Buffer overflow in protocol parser",
         "affected_component": "parser_a.c",
+        "severity_value": "INFO",
     }]
     discoveries["E1-B"] = [{
         "finding_id": "fb",
         "statement": "Buffer overflow in protocol parser",
         "affected_component": "parser_b.c",
+        "severity_value": "INFO",
     }]
     e1 = execute_e1_ensemble(src_gen, discoveries)
     e2 = execute_e2_convergence(
@@ -165,12 +170,14 @@ def test_d11_req_e_multiple_outcomes_conflict_handling():
         "root_cause_ref": shared_root,
         "claim_outcome": "SUPPORTED",
         "evidence_ref": ev_sup,
+        "severity_value": "INFO",
     }]
     discoveries["E1-B"] = [{
         "statement": "Race condition in session validation",
         "root_cause_ref": shared_root,
         "claim_outcome": "REFUTED",
         "evidence_ref": ev_ref,
+        "severity_value": "INFO",
     }]
     e1 = execute_e1_ensemble(src_gen, discoveries)
     e2 = execute_e2_convergence(
@@ -195,6 +202,7 @@ def test_d11_req_f_mechanism_evidence_absent_mechanism_unknown():
         "finding_id": "f_no_mech_ev",
         "statement": "Finding without explicit mechanism evidence",
         "evidence_ref": ev,
+        "severity_value": "INFO",
         "axis_outcomes": {
             "MECHANISM": "SUPPORTED",
             "REACHABILITY": "SUPPORTED",
@@ -231,6 +239,7 @@ def test_d11_req_g_reachability_evidence_absent_reachability_unknown():
         "finding_id": "f_no_reach_ev",
         "statement": "Finding without explicit reachability evidence",
         "evidence_ref": ev,
+        "severity_value": "INFO",
         "axis_outcomes": {
             "MECHANISM": "SUPPORTED",
             "REACHABILITY": "SUPPORTED",
@@ -267,6 +276,7 @@ def test_d11_req_h_impact_severity_without_own_basis_no_synthetic_confirmation()
         "finding_id": "f_no_impact_ev",
         "statement": "Finding without explicit impact/severity evidence",
         "evidence_ref": ev,
+        "severity_value": "INFO",
         "axis_outcomes": {
             "MECHANISM": "SUPPORTED",
             "REACHABILITY": "SUPPORTED",
