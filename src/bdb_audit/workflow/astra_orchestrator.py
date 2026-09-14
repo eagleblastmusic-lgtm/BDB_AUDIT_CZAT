@@ -12,6 +12,7 @@ from typing import Any, Sequence
 
 from ..core.errors import ValidationError
 from ..history.store import TransactionalHistoryStore
+from .astra_stage_profiles import apply_astra_stage_profiles
 from .inbox import ImportedResultSummary
 from .orchestrator import FullAuditOrchestrator
 from .post_e1_inbox import PostE1ResultInbox
@@ -25,6 +26,7 @@ class AstraContinuationOrchestrator(FullAuditOrchestrator):
     """Real external E1->E5 continuation over durable packages/results."""
 
     def __init__(self, *args: Any, **kwargs: Any):
+        apply_astra_stage_profiles()
         super().__init__(*args, **kwargs)
         self.stage_batch: StageBatch | None = None
         self.stage_inbox: PostE1ResultInbox | None = None
