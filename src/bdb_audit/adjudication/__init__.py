@@ -49,9 +49,9 @@ class FindingAxisAssessment(_models.FindingAxisAssessment):
 
     Pre-R5.3.1 ``assessment_id`` is a name-only alias. Legacy free-text
     ``method`` is retained only as a limitation and is never promoted to a
-    typed method/evidence reference. The old epistemic SEVERITY form is
-    demoted to INFO/UNKNOWN with explicit reason codes because severity is now
-    characterization, not a truth vote.
+    typed method/evidence reference. Epistemic SEVERITY input is intentionally
+    not translated: Severity is characterization rather than a truth vote, so
+    the canonical model must reject such input fail-closed.
     """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -73,21 +73,6 @@ class FindingAxisAssessment(_models.FindingAxisAssessment):
             limitations = list(normalized.get("limitations", ()))
             limitations.append(f"LEGACY_UNTYPED_METHOD:{legacy_method}")
             normalized["limitations"] = limitations
-
-        axis = str(normalized.get("axis", "")).upper()
-        if axis == "SEVERITY" and "epistemic_outcome" in normalized:
-            normalized.pop("epistemic_outcome")
-            if "severity_value" not in normalized:
-                normalized["severity_value"] = "INFO"
-            reasons = list(normalized.get("reason_codes", ()))
-            reasons.extend(
-                [
-                    "LEGACY_SEVERITY_EPISTEMIC_OUTCOME_DEMOTED",
-                    "LEGACY_SEVERITY_VALUE_UNSPECIFIED",
-                ]
-            )
-            normalized["reason_codes"] = reasons
-            normalized.setdefault("confidence", "UNKNOWN")
 
         super().__init__(*args, **normalized)
         object.__setattr__(self, "_legacy_method", legacy_method)
