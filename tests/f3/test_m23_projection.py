@@ -55,6 +55,7 @@ def test_m23_derived_contribution_unique_support_leave_one_out():
         root_cause_id="rc_1",
         root_cause_revision=1,
         source_generation_ref=_mock_ref("source_generation", "sg1"),
+        mechanism_statement="Shared root-cause mechanism for f1 and f2",
         membership_edges=(
             {"finding_claim_revision_ref": f1, "relation_role": "PRIMARY", "scope": {"sub": "core"}},
             {"finding_claim_revision_ref": f2, "relation_role": "PRIMARY", "scope": {"sub": "core"}},
