@@ -44,6 +44,64 @@ class FindingClaimRevision(_models.FindingClaimRevision):
         return self.finding_claim_revision
 
 
+class FindingAxisAssessment(_models.FindingAxisAssessment):
+    """Current four-axis assessment with conservative legacy-call translation.
+
+    Pre-R5.3.1 ``assessment_id`` is a name-only alias. Legacy free-text
+    ``method`` is retained only as a limitation and is never promoted to a
+    typed method/evidence reference. The old epistemic SEVERITY form is
+    demoted to INFO/UNKNOWN with explicit reason codes because severity is now
+    characterization, not a truth vote.
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        normalized = dict(kwargs)
+        if "assessment_id" in normalized:
+            legacy_value = normalized.pop("assessment_id")
+            if (
+                "finding_axis_assessment_id" in normalized
+                and normalized["finding_axis_assessment_id"] != legacy_value
+            ):
+                raise TypeError(
+                    "Conflicting constructor values for 'assessment_id' and "
+                    "'finding_axis_assessment_id'"
+                )
+            normalized["finding_axis_assessment_id"] = legacy_value
+
+        legacy_method = normalized.pop("method", None)
+        if legacy_method is not None:
+            limitations = list(normalized.get("limitations", ()))
+            limitations.append(f"LEGACY_UNTYPED_METHOD:{legacy_method}")
+            normalized["limitations"] = limitations
+
+        axis = str(normalized.get("axis", "")).upper()
+        if axis == "SEVERITY" and "epistemic_outcome" in normalized:
+            normalized.pop("epistemic_outcome")
+            if "severity_value" not in normalized:
+                normalized["severity_value"] = "INFO"
+            reasons = list(normalized.get("reason_codes", ()))
+            reasons.extend(
+                [
+                    "LEGACY_SEVERITY_EPISTEMIC_OUTCOME_DEMOTED",
+                    "LEGACY_SEVERITY_VALUE_UNSPECIFIED",
+                ]
+            )
+            normalized["reason_codes"] = reasons
+            normalized.setdefault("confidence", "UNKNOWN")
+
+        super().__init__(*args, **normalized)
+        object.__setattr__(self, "_legacy_method", legacy_method)
+
+    @property
+    def assessment_id(self) -> str | None:
+        return self.finding_axis_assessment_id
+
+    @property
+    def method(self) -> str | None:
+        value = getattr(self, "_legacy_method", None)
+        return None if value is None else str(value)
+
+
 class FindingAdjudicationDecision(_models.FindingAdjudicationDecision):
     """Current decision with the pre-R5.3.1 lifecycle-status call alias."""
 
@@ -68,12 +126,12 @@ class FindingAdjudicationDecision(_models.FindingAdjudicationDecision):
 
 
 # Direct imports from ``bdb_audit.adjudication.models`` occur throughout the
-# implementation. Install name-only compatibility subclasses before importing
-# engine modules so every later direct import receives the same classes.
+# implementation. Install compatibility subclasses before importing engine
+# modules so every later direct import receives the same classes.
 setattr(_models, "FindingClaimRevision", FindingClaimRevision)
+setattr(_models, "FindingAxisAssessment", FindingAxisAssessment)
 setattr(_models, "FindingAdjudicationDecision", FindingAdjudicationDecision)
 
-FindingAxisAssessment = _models.FindingAxisAssessment
 RootCauseRevision = _models.RootCauseRevision
 ContradictionRevision = _models.ContradictionRevision
 ContradictionResolutionDecision = _models.ContradictionResolutionDecision
