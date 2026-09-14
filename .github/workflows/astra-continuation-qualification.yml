@@ -63,7 +63,21 @@ jobs:
 
       - name: Full pytest suite
         shell: pwsh
-        run: python -m pytest -q
+        run: |
+          python -m pytest -q --tb=short --maxfail=50 --junitxml=pytest-results.xml 2>&1 | Tee-Object -FilePath pytest-output.txt
+          $code = $LASTEXITCODE
+          exit $code
+
+      - name: Upload pytest diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: astra-pytest-diagnostics-${{ github.sha }}
+          path: |
+            pytest-output.txt
+            pytest-results.xml
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Ruff
         shell: pwsh
