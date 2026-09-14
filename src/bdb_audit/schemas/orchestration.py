@@ -14,11 +14,22 @@ OPTIONAL = {
     "attempt": ("retry_of_attempt_ref", "retry_reason_ref"),
     "bdb_audit_lane_result": (
         "findings_count", "notes", "evidence_files", "assignment_ref", "attempt_ref",
-        "raw_result_digest", "raw_result_byte_length",
+        "raw_result_digest", "raw_result_byte_length", "challenge_status",
     ),
 }
 ARRAYS = set("predecessor_requirements required_lane_slots optional_lane_slots allowed_corpus_roles forbidden_corpus_roles required_stage_completion_outputs scope_selectors allowed_view_classes forbidden_knowledge_classes required_outputs executor_capability_requirements predecessor_stage_completion_refs required_lane_slot_contract_refs required_result_slots result_slot_contracts findings evidence_files".split())
 ARRAYS.update("enforcement_receipt_refs filesystem_boundary_evidence_refs network_boundary_evidence_refs tool_boundary_evidence_refs session_boundary_evidence_refs contamination_assessment_refs limitations reason_codes".split())
+
+# vNext/Astra keeps a closed stage/lane domain.  Supporting post-E1 result
+# transport must not degrade the old E1-only schema into arbitrary strings.
+LANE_RESULT_STAGE_SLOTS = {
+    "E1": ("E1-A", "E1-B", "E1-C", "E1-D", "E1-E"),
+    "E2": ("E2-CONVERGENCE", "E2-ADJUDICATION"),
+    "E3": ("E3-X", "E3-Y", "E3-Z"),
+    "E4": ("E4-DEEPEN",),
+    "E5": ("E5-CANDIDATE", "E5-SKEPTIC", "E5-HUNTER"),
+    "E6": ("E6-VERIFY",),
+}
 
 
 def orchestration_schema(kind):
@@ -47,12 +58,25 @@ def orchestration_schema(kind):
     if kind == "isolation_qualification":
         properties["result"] = {"enum": ["ENFORCED", "DECLARED", "UNKNOWN"]}
         properties["required_isolation_assurance"] = {"enum": ["ENFORCED", "DECLARED", "UNKNOWN"]}
+
+    schema = {"type": "object", "required": fields, "properties": properties, "additionalProperties": False}
     if kind == "bdb_audit_lane_result":
+        all_slots = [slot for stage_slots in LANE_RESULT_STAGE_SLOTS.values() for slot in stage_slots]
         properties["findings"] = {"type": "array"}
         properties["history_cut"] = {"type": "object"}
-        properties["lane_slot"] = {"enum": ["E1-A", "E1-B", "E1-C", "E1-D", "E1-E"]}
-        properties["stage_id"] = {"const": "E1"}
+        properties["lane_slot"] = {"enum": all_slots}
+        properties["stage_id"] = {"enum": list(LANE_RESULT_STAGE_SLOTS)}
         properties["kind"] = {"const": "bdb_audit_lane_result"}
         properties["version"] = {"const": "1"}
         properties["raw_result_digest"] = {"type": "string", "format": "bdb-sha256"}
-    return {"type": "object", "required": fields, "properties": properties, "additionalProperties": False}
+        schema["oneOf"] = [
+            {
+                "properties": {
+                    "stage_id": {"const": stage_id},
+                    "lane_slot": {"enum": list(stage_slots)},
+                },
+                "required": ["stage_id", "lane_slot"],
+            }
+            for stage_id, stage_slots in LANE_RESULT_STAGE_SLOTS.items()
+        ]
+    return schema
