@@ -132,7 +132,7 @@ def test_d11_req_c_same_statement_different_provenance_no_silent_merge():
 
 
 def test_d11_req_d_different_statement_same_evidenced_root_cause_converges():
-    """Requirement D: Different statements converge only when explicit typed root_cause_ref is supplied."""
+    """Requirement D: Different statements keep individual decisions and converge only in RootCauseRevision."""
     src_gen = make_ref("source_generation", "gen_req_d")
     shared_root = make_ref("root_cause_revision", "shared_root_cause_1")
     discoveries = {slot: [] for slot in E1_LANE_SLOTS}
@@ -154,11 +154,14 @@ def test_d11_req_d_different_statement_same_evidenced_root_cause_converges():
         {"tag": "CUT"},
         make_ref("policy_revision", "pol_d"),
     )
-    assert len(e2.adjudicated_decisions) == 1
+    # Adjudication is per historical finding; normalization never erases a decision.
+    assert len(e2.adjudicated_decisions) == 2
+    assert len(e2.root_cause_revisions) == 1
+    assert len(e2.root_cause_revisions[0].membership_edges) == 2
 
 
 def test_d11_req_e_multiple_outcomes_conflict_handling():
-    """Requirement E: Conflicting outcomes (SUPPORTED vs REFUTED) for same claim create open contradiction, no overwrite."""
+    """Requirement E: Conflicting outcomes create an open scoped contradiction, no overwrite."""
     src_gen = make_ref("source_generation", "gen_req_e")
     shared_root = make_ref("root_cause_revision", "contested_claim_root")
     ev_sup = make_ref("evidence_qualification_assessment", "ev_sup_e")
@@ -187,10 +190,17 @@ def test_d11_req_e_multiple_outcomes_conflict_handling():
         {"tag": "CUT"},
         make_ref("policy_revision", "pol_e"),
     )
+    assert len(e2.adjudicated_decisions) == 2
     assert len(e2.contradiction_revisions) == 1
     contra = e2.contradiction_revisions[0]
     assert contra.status == "OPEN"
-    assert len(contra.contradicting_evidence_refs) == 2
+    assert len(contra.claim_revision_refs) == 2
+    assert len(contra.supporting_evidence_qualification_refs) == 1
+    assert len(contra.opposing_evidence_qualification_refs) == 1
+    assert {
+        contra.supporting_evidence_qualification_refs[0]["revision_digest"],
+        contra.opposing_evidence_qualification_refs[0]["revision_digest"],
+    } == {ev_sup["revision_digest"], ev_ref["revision_digest"]}
 
 
 def test_d11_req_f_mechanism_evidence_absent_mechanism_unknown():
