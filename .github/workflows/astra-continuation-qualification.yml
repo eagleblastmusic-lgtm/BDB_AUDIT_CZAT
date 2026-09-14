@@ -1,0 +1,88 @@
+name: Astra Continuation Qualification
+
+on:
+  push:
+    branches:
+      - kontynuacja_planu_astry
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUTF8: '1'
+  PYTHON_VERSION: '3.14.7'
+  PIP_VERSION: '26.2.1'
+  PYTEST_VERSION: '9.1.1'
+  RUFF_VERSION: '0.16.7'
+  MYPY_VERSION: '2.3.1'
+  ARTIFACT_PATH: dist/BDB_AUDIT_ASSISTANT_v2.0.3.py
+
+concurrency:
+  group: astra-continuation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualify:
+    name: Astra continuation / Windows CPython 3.14.7
+    runs-on: windows-2025
+    timeout-minutes: 40
+    steps:
+      - name: Checkout exact branch head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Prove source identity
+        shell: pwsh
+        run: |
+          $actual = (git rev-parse HEAD).Trim()
+          $declared = "${{ github.sha }}"
+          Write-Host "DECLARED_SHA=$declared"
+          Write-Host "TESTED_SHA=$actual"
+          if ($actual -ne $declared) { throw "Checked-out HEAD differs from workflow SHA" }
+
+      - name: Set up exact Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install exact runtime and qualification tools
+        shell: pwsh
+        run: |
+          python -m pip install pip==${{ env.PIP_VERSION }}
+          python -m pip install --no-deps -r requirements-f2.lock
+          python -m pip install pytest==${{ env.PYTEST_VERSION }} ruff==${{ env.RUFF_VERSION }} mypy==${{ env.MYPY_VERSION }}
+          python -m pip install --no-deps -e .
+
+      - name: Full pytest suite
+        shell: pwsh
+        run: python -m pytest -q
+
+      - name: Ruff
+        shell: pwsh
+        run: python -m ruff check src build
+
+      - name: Mypy
+        shell: pwsh
+        run: python -m mypy --config-file pyproject.toml
+
+      - name: Deterministic standalone build
+        shell: pwsh
+        run: |
+          python build/normalize_runtime_metadata.py
+          python build/build_single_file.py
+
+      - name: Release validator
+        shell: pwsh
+        run: python -m bdb_audit.release_validator_cli "${{ env.ARTIFACT_PATH }}" --output dist/ASTRA_RELEASE_VALIDATOR.json
+
+      - name: Standalone verification
+        shell: pwsh
+        run: |
+          python -I "${{ env.ARTIFACT_PATH }}" --version
+          python -I "${{ env.ARTIFACT_PATH }}" --verify-payload
+          python -I "${{ env.ARTIFACT_PATH }}" self-test
+          python -I "${{ env.ARTIFACT_PATH }}" self-test --deep
+          python -I "${{ env.ARTIFACT_PATH }}" capabilities
