@@ -85,12 +85,36 @@ class AstraPostE1ResultInbox(PostE1ResultInbox):
         if set(proposals_by_slot) != {"E2-CONVERGENCE", "E2-ADJUDICATION"}:
             raise ValidationError("E2_REQUIRED_LANE_SET_INVALID")
 
-        result = materialize_e2(
+        convergence_records = proposals_by_slot["E2-CONVERGENCE"]["body"].get("e2_records")
+        adjudication_records = proposals_by_slot["E2-ADJUDICATION"]["body"].get("e2_records")
+
+        # First pass: prove that every scope/evidence/predecessor reference and
+        # every semantic lane assertion was already legal at the frozen E2
+        # assignment cut.  This preserves the no-forward-knowledge boundary.
+        frozen_result = materialize_e2(
             self.store,
             frozen_cut=self.batch.frozen_history_cut,
-            convergence_records=proposals_by_slot["E2-CONVERGENCE"]["body"].get("e2_records"),
-            adjudication_records=proposals_by_slot["E2-ADJUDICATION"]["body"].get("e2_records"),
+            convergence_records=convergence_records,
+            adjudication_records=adjudication_records,
         )
+
+        # Second pass: the authoritative M21/M22 objects are local deterministic
+        # derivations created only after both durable lane results have been
+        # accepted.  Their *_input_history_cut fields therefore must bind the
+        # exact current parent head of this atomic materialization commit.  The
+        # first pass above prevents this rebinding from admitting any reference
+        # that was not already legal at assignment time.
+        result = materialize_e2(
+            self.store,
+            frozen_cut=cut,
+            convergence_records=convergence_records,
+            adjudication_records=adjudication_records,
+        )
+        frozen_claim_digests = tuple(sorted(claim.digest for claim in frozen_result.finding_claim_revisions))
+        current_claim_digests = tuple(sorted(claim.digest for claim in result.finding_claim_revisions))
+        if current_claim_digests != frozen_claim_digests:
+            raise ValidationError("E2_MATERIALIZATION_VIEW_DRIFT")
+
         semantic = semantic_objects(result)
         semantic_refs = [obj.as_ref(ref_class="CONTENT_OR_PRIOR").as_dict() for obj in semantic]
 
