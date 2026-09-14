@@ -9,7 +9,7 @@ there is no unregistered/manual template bypass.
 from __future__ import annotations
 
 import hashlib
-from typing import Any, Mapping
+from typing import Any
 
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
@@ -101,21 +101,22 @@ class AstraPromptPackageCompiler(CanonicalPromptPackageCompiler):
 
     def compile(
         self,
-        stage_spec_revision: str,
-        lane_spec_revision: str,
-        executor_revision: str,
-        delivery_revision: str,
-        projection_policy: Mapping[str, Any],
-        view_manifest: Mapping[str, Any],
-        history_cut: Mapping[str, Any],
-        prompt: Mapping[str, Any],
-    ):
-        normalized = dict(prompt)
-        if normalized.get("template") == "manual_stage":
+        *,
+        stage_spec_revision: Any,
+        lane_spec_revision: Any,
+        executor_revision: Any,
+        delivery_revision: Any,
+        projection_policy: Any,
+        view_manifest: Any,
+        history_cut: Any,
+        prompt: Any = None,
+    ) -> Any:
+        normalized = dict(prompt) if isinstance(prompt, dict) else prompt
+        if isinstance(normalized, dict) and normalized.get("template") == "manual_stage":
             stage = str(normalized.get("stage", "")).upper()
             slot = str(normalized.get("slot", ""))
             strategy = str(normalized.get("strategy", ""))
-            cut_digest = hashlib.sha256(canonical_bytes(dict(history_cut))).hexdigest()
+            cut_digest = hashlib.sha256(canonical_bytes(history_cut)).hexdigest()
             if stage == "E2":
                 normalized = {
                     "template": "e2_cross_review",
@@ -257,8 +258,8 @@ class AstraStageAssignmentService(stage_transport.StageAssignmentService):
 def apply_astra_stage_profiles() -> None:
     """Install branch-local lane, assignment, and compiler profiles."""
     stage_transport.POST_E1_STAGE_LANES.update(ASTRA_POST_E1_STAGE_LANES)
-    stage_transport.StageAssignmentService = AstraStageAssignmentService
-    stage_transport.PromptPackageCompiler = AstraPromptPackageCompiler
+    setattr(stage_transport, "StageAssignmentService", AstraStageAssignmentService)
+    setattr(stage_transport, "PromptPackageCompiler", AstraPromptPackageCompiler)
 
 
 __all__ = [
