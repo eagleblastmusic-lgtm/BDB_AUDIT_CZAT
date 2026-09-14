@@ -18,6 +18,7 @@ _COMMANDS = {
     "regression": ("bdb_audit.incremental.cli", "run_regression_cli"),
     "history": ("bdb_audit.history_view.cli", "run_history_cli"),
     "share": ("bdb_audit.history_view.cli", "run_share_cli"),
+    "flow": ("bdb_audit.astra_flow_cli", "run_flow_cli"),
 }
 
 
