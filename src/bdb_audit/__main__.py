@@ -1,6 +1,6 @@
 """CLI entry point for bdb_audit module."""
 import sys
-from .cli import run_cli
+from .astra_cli import run_cli
 
 
 def main(argv=None):
