@@ -226,11 +226,11 @@ def test_full_domain_integration_lifecycle():
     # 4. NATIVE E1 DISCOVERY ENSEMBLE (WP-F4-09)
     # -------------------------------------------------------------
     e1_discoveries = {
-        "E1-A": [{"statement": "Missing length check in parse_packet header"}],
-        "E1-B": [{"statement": "Unauthenticated access to internal parse buffer"}],
-        "E1-C": [{"statement": "Memory corruption on 64KB packet"}],
-        "E1-D": [{"statement": "Malformed packet header triggers heap overflow", "claim_outcome": "SUPPORTED"}],
-        "E1-E": [{"statement": "Deadlock during packet reassembly"}],
+        "E1-A": [{"statement": "Missing length check in parse_packet header", "severity_value": "INFO"}],
+        "E1-B": [{"statement": "Unauthenticated access to internal parse buffer", "severity_value": "INFO"}],
+        "E1-C": [{"statement": "Memory corruption on 64KB packet", "severity_value": "INFO"}],
+        "E1-D": [{"statement": "Malformed packet header triggers heap overflow", "claim_outcome": "SUPPORTED", "severity_value": "INFO"}],
+        "E1-E": [{"statement": "Deadlock during packet reassembly", "severity_value": "INFO"}],
     }
     e1_result = execute_e1_ensemble(src_gen, e1_discoveries)
     assert e1_result.stage_key == "E1"
@@ -416,7 +416,7 @@ def test_full_domain_integration_lifecycle():
         assessment_input_history_cut=cut,
         assessment_policy_ref=policy_ref,
         axis="SEVERITY",
-        epistemic_outcome="SUPPORTED",
+        severity_value="CRITICAL",
         method="CVSS_9_8",
     )
     adjudication = adjudicate_finding(
@@ -432,6 +432,7 @@ def test_full_domain_integration_lifecycle():
 
     rc = cluster_findings_into_root_cause(
         source_generation_ref=src_gen,
+        mechanism_statement="Crafted length controls permit an out-of-bounds packet-parser write",
         membership_edges=[{
             "finding_claim_revision_ref": claim.as_object().as_ref(),
             "relation_role": "PRIMARY",
@@ -472,34 +473,45 @@ def test_full_domain_integration_lifecycle():
     # -------------------------------------------------------------
     # 11. CONTRADICTION RESOLUTION AUTHORITY (WP-F4-08)
     # -------------------------------------------------------------
+    counter_claim = FindingClaimRevision(
+        statement="Crafted length header does not produce a reachable heap overflow",
+        source_generation_ref=src_gen,
+    )
+    support_ref = ref("evidence_qualification_assessment", "ev_supports")
+    oppose_ref = ref("evidence_qualification_assessment", "ev_refutes")
     contra = ContradictionRevision(
-        claim_revision_ref=claim.as_object().as_ref(),
-        contradicting_evidence_refs=[
-            ref("evidence_qualification_assessment", "ev_supports"),
-            ref("evidence_qualification_assessment", "ev_refutes"),
+        claim_revision_refs=[claim.as_object().as_ref(), counter_claim.as_object().as_ref()],
+        scope={"subsystem": "packet_parser"},
+        positions=[
+            {"claim_revision_ref": claim.as_object().as_ref().as_dict(), "position": "SUPPORTED"},
+            {"claim_revision_ref": counter_claim.as_object().as_ref().as_dict(), "position": "REFUTED"},
         ],
-        input_history_cut=cut,
+        supporting_evidence_qualification_refs=[support_ref],
+        opposing_evidence_qualification_refs=[oppose_ref],
+        required_falsifier={"requirement": "Independent reproduction on the pinned parser baseline"},
         status="OPEN",
     )
     # Fail closed: majority vote forbidden
     with pytest.raises(ValidationError, match="MAJORITY_VOTE_FORBIDDEN"):
         resolve_contradiction(
             contradiction=contra,
-            adjudicator_ref=adjudicator,
-            resolution_status="RESOLVED_FULL",
-            rationale="2 vs 1 vote",
+            resolution_kind="REFUTED",
+            resolved_scope={"subsystem": "packet_parser"},
+            basis_refs=[support_ref],
             input_history_cut=cut,
+            resulting_status="RESOLVED_FULL",
             resolved_by_majority_vote=True,
         )
-    # Resolved by proper authority
+    # Resolved by proper prior-bound authority
     contra_res = resolve_contradiction(
         contradiction=contra,
-        adjudicator_ref=adjudicator,
-        resolution_status="RESOLVED_FULL",
-        rationale="Controlled isolated reproduction proved reachability under all valid network profiles",
+        resolution_kind="REFUTED",
+        resolved_scope={"subsystem": "packet_parser"},
+        basis_refs=[support_ref],
         input_history_cut=cut,
+        resulting_status="RESOLVED_FULL",
     )
-    assert contra_res.resolution_status == "RESOLVED_FULL"
+    assert contra_res.resulting_status == "RESOLVED_FULL"
 
     # -------------------------------------------------------------
     # 12. REPLAY CAPSULE & SUCCESSOR CAMPAIGN (WP-F4-10)
