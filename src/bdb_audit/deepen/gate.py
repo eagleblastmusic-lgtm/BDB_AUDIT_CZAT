@@ -139,6 +139,7 @@ class E4SyntheticBenchmark:
         # 1. Root Cause Family (F4 authority model)
         rc = RootCauseRevision(
             source_generation_ref={"generation_id": "gen_bench"},
+            mechanism_statement="Synthetic benchmark root-cause anchor",
             membership_edges=(),
         )
         summary["root_cause_id"] = rc.root_cause_id
