@@ -14,10 +14,10 @@ OPTIONAL = {
     "attempt": ("retry_of_attempt_ref", "retry_reason_ref"),
     "bdb_audit_lane_result": (
         "findings_count", "notes", "evidence_files", "assignment_ref", "attempt_ref",
-        "raw_result_digest", "raw_result_byte_length", "challenge_status",
+        "raw_result_digest", "raw_result_byte_length", "challenge_status", "e2_records",
     ),
 }
-ARRAYS = set("predecessor_requirements required_lane_slots optional_lane_slots allowed_corpus_roles forbidden_corpus_roles required_stage_completion_outputs scope_selectors allowed_view_classes forbidden_knowledge_classes required_outputs executor_capability_requirements predecessor_stage_completion_refs required_lane_slot_contract_refs required_result_slots result_slot_contracts findings evidence_files".split())
+ARRAYS = set("predecessor_requirements required_lane_slots optional_lane_slots allowed_corpus_roles forbidden_corpus_roles required_stage_completion_outputs scope_selectors allowed_view_classes forbidden_knowledge_classes required_outputs executor_capability_requirements predecessor_stage_completion_refs required_lane_slot_contract_refs required_result_slots result_slot_contracts findings evidence_files e2_records".split())
 ARRAYS.update("enforcement_receipt_refs filesystem_boundary_evidence_refs network_boundary_evidence_refs tool_boundary_evidence_refs session_boundary_evidence_refs contamination_assessment_refs limitations reason_codes".split())
 
 # vNext/Astra keeps a closed stage/lane domain.  Supporting post-E1 result
@@ -69,6 +69,9 @@ def orchestration_schema(kind):
         properties["kind"] = {"const": "bdb_audit_lane_result"}
         properties["version"] = {"const": "1"}
         properties["raw_result_digest"] = {"type": "string", "format": "bdb-sha256"}
+        # ``e2_records`` is a transport field only for E2.  The generic schema
+        # admits the array structurally so the Astra E2 inbox can apply the
+        # stronger R5.3 semantic checks; every other stage remains fail-closed.
         schema["oneOf"] = [
             {
                 "properties": {
@@ -76,6 +79,7 @@ def orchestration_schema(kind):
                     "lane_slot": {"enum": list(stage_slots)},
                 },
                 "required": ["stage_id", "lane_slot"],
+                **({} if stage_id == "E2" else {"not": {"required": ["e2_records"]}}),
             }
             for stage_id, stage_slots in LANE_RESULT_STAGE_SLOTS.items()
         ]
