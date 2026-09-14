@@ -277,7 +277,9 @@ def _resolve_prior_ref(
     ref: Mapping[str, Any],
     *,
     expected_kind: str | None = None,
+    ref_class: str = "CONTENT_OR_PRIOR",
 ) -> dict[str, Any]:
+    """Prove prior acceptance while preserving the owning field's wire ref class."""
     if expected_kind is not None and ref.get("kind") != expected_kind:
         raise ValidationError("E2_REFERENCE_KIND_INVALID", str(ref.get("kind")))
     try:
@@ -287,7 +289,7 @@ def _resolve_prior_ref(
             "E2_REFERENCE_NOT_ACCEPTED_AT_ASSIGNED_CUT",
             f"{ref.get('kind')}:{ref.get('revision_digest')}",
         ) from exc
-    return _ref_with_class(row["ref"], "PRIOR_ACCEPTED_ONLY")
+    return _ref_with_class(row["ref"], ref_class)
 
 
 def _prior_refs(
@@ -296,10 +298,11 @@ def _prior_refs(
     value: Any,
     *,
     expected_kind: str | None = None,
+    ref_class: str = "CONTENT_OR_PRIOR",
 ) -> list[dict[str, Any]]:
     refs = _validate_ref_list(value, "E2_REFERENCE_LIST_INVALID")
     resolved = [
-        _resolve_prior_ref(store, cut, ref, expected_kind=expected_kind)
+        _resolve_prior_ref(store, cut, ref, expected_kind=expected_kind, ref_class=ref_class)
         for ref in refs
     ]
     by_key = {_ref_key(ref): ref for ref in resolved}
@@ -367,7 +370,7 @@ def materialize_e2(
     sources = tuple(store.accepted_records("source_generation", dict(frozen_cut)))
     if len(sources) != 1:
         raise ValidationError("E2_SOURCE_GENERATION_AMBIGUOUS", str(len(sources)))
-    source_ref = _ref_with_class(sources[0]["ref"], "PRIOR_ACCEPTED_ONLY")
+    source_ref = _ref_with_class(sources[0]["ref"], "CONTENT_OR_PRIOR")
 
     governing = frozen_cut.get("governing_policy_ref")
     policy_ref = (
@@ -375,7 +378,9 @@ def materialize_e2(
         if isinstance(governing, Mapping) and _REF_FIELDS.issubset(governing)
         else _external_ref("policy_revision", str(governing or "E2_ASSIGNED_POLICY"))
     )
-    adjudicator_ref = _external_ref("actor_or_authority_ref", "BDB_E2_DETERMINISTIC_ADJUDICATOR")
+    adjudicator_ref = _external_ref(
+        "actor_or_authority_ref", "BDB_E2_DETERMINISTIC_ADJUDICATOR", "CONTENT_OR_PRIOR"
+    )
 
     claims: list[FindingClaimRevision] = []
     axes: list[FindingAxisAssessment] = []
@@ -450,7 +455,13 @@ def materialize_e2(
         predecessor_refs = []
         for record in records:
             predecessor_refs.extend(
-                _prior_refs(store, frozen_cut, record.get("predecessor_root_cause_refs", []), expected_kind="root_cause_revision")
+                _prior_refs(
+                    store,
+                    frozen_cut,
+                    record.get("predecessor_root_cause_refs", []),
+                    expected_kind="root_cause_revision",
+                    ref_class="PRIOR_ACCEPTED_ONLY",
+                )
             )
         predecessor_unique = {_ref_key(ref): ref for ref in predecessor_refs}
         edges = [
