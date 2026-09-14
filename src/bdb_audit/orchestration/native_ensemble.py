@@ -426,7 +426,11 @@ def _required_falsifier(items: Sequence[Mapping[str, Any]]) -> Any:
 
 
 def _deterministic_object_id(kind: str, *parts: Any) -> str:
-    return deterministic_id(kind, canonical_bytes(list(parts)))
+    normalized_parts = [
+        {"__bdb_bytes_hex__": part.hex()} if isinstance(part, bytes) else part
+        for part in parts
+    ]
+    return deterministic_id(kind, canonical_bytes(normalized_parts))
 
 
 @dataclass(frozen=True)
