@@ -77,7 +77,10 @@ def run_flow_cli(argv: Sequence[str]) -> int:
     try:
         args = parser.parse_args(list(argv))
     except SystemExit as exc:
-        return int(exc.code or 2)
+        # argparse uses SystemExit(0) for a successful --help request and
+        # SystemExit(2) for parse failures. Preserve that distinction exactly;
+        # ``exc.code or 2`` incorrectly turns the legal help exit into failure.
+        return exc.code if isinstance(exc.code, int) else 2
     if not args.action:
         parser.print_help()
         return 2
