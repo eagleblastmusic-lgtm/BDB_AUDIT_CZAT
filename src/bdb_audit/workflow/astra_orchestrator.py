@@ -198,14 +198,6 @@ class AstraContinuationOrchestrator(FullAuditOrchestrator):
                 "next_action": "EVALUATE_STOP_GATE",
             }
 
-        if next_stage == "E3" and self.settings.execution_mode == "ChatGPT / GitHub":
-            return {
-                "status": "BLOCKED",
-                "current_stage": "E3",
-                "reason": "E3 requires ENFORCED isolation; ChatGPT / GitHub manual transport provides DECLARED only",
-                "next_action": "CONFIGURE_ENFORCED_E3_EXECUTOR",
-            }
-
         batch = self.prepare_post_e1_stage(next_stage)
         return {
             "status": "STAGE_READY",
@@ -214,6 +206,11 @@ class AstraContinuationOrchestrator(FullAuditOrchestrator):
             "lane_slots": list(batch.lane_slots),
             "frozen_history_cut": dict(batch.frozen_history_cut),
             "package_paths": {slot: str(job.package_zip_path) for slot, job in batch.jobs.items()},
+            "assurance_profile": (
+                "BOUNDED_MANUAL_DECLARED"
+                if next_stage == "E3" and self.settings.execution_mode == "ChatGPT / GitHub"
+                else "NORMATIVE"
+            ),
         }
 
     def get_dashboard_summary(self) -> dict[str, Any]:
