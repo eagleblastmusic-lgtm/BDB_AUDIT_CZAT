@@ -44,13 +44,36 @@ class FindingClaimRevision(_models.FindingClaimRevision):
         return self.finding_claim_revision
 
 
+class FindingAdjudicationDecision(_models.FindingAdjudicationDecision):
+    """Current decision with the pre-R5.3.1 lifecycle-status call alias."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        normalized = dict(kwargs)
+        if "lifecycle_status" in normalized:
+            legacy_value = normalized.pop("lifecycle_status")
+            if (
+                "finding_lifecycle_status" in normalized
+                and normalized["finding_lifecycle_status"] != legacy_value
+            ):
+                raise TypeError(
+                    "Conflicting constructor values for 'lifecycle_status' and "
+                    "'finding_lifecycle_status'"
+                )
+            normalized["finding_lifecycle_status"] = legacy_value
+        super().__init__(*args, **normalized)
+
+    @property
+    def lifecycle_status(self) -> str:
+        return self.finding_lifecycle_status
+
+
 # Direct imports from ``bdb_audit.adjudication.models`` occur throughout the
-# implementation. Install the compatibility subclass before importing engine
-# modules so every later direct import receives the same class.
+# implementation. Install name-only compatibility subclasses before importing
+# engine modules so every later direct import receives the same classes.
 setattr(_models, "FindingClaimRevision", FindingClaimRevision)
+setattr(_models, "FindingAdjudicationDecision", FindingAdjudicationDecision)
 
 FindingAxisAssessment = _models.FindingAxisAssessment
-FindingAdjudicationDecision = _models.FindingAdjudicationDecision
 RootCauseRevision = _models.RootCauseRevision
 ContradictionRevision = _models.ContradictionRevision
 ContradictionResolutionDecision = _models.ContradictionResolutionDecision
