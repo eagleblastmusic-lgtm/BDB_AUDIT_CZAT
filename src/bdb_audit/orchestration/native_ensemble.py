@@ -1,23 +1,26 @@
-"""Native E1 Discovery Ensemble and E2 Convergence/Adjudication Orchestration (WP-F4-09)."""
-from dataclasses import dataclass, field
-from typing import Any, Mapping, Sequence
+"""Native E1 Discovery Ensemble and R5.3 E2 Convergence/Adjudication orchestration."""
+from __future__ import annotations
+
+from dataclasses import dataclass, replace
 import hashlib
+from typing import Any, Mapping, Sequence
 
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
-from ..core.hashing import object_digest
-from ..core.ids import new_id
-from ..history.objects import CanonicalObject, ObjectRef
+from ..core.ids import deterministic_id
 from .stages import StageSpec
-from .runs import LaneSpec, Attempt
+from .runs import LaneSpec
 from ..adjudication.models import (
+    FINDING_CATEGORIES,
+    SEVERITY_VALUES,
     FindingClaimRevision,
     FindingAxisAssessment,
     FindingAdjudicationDecision,
+    RootCauseRevision,
     ContradictionRevision,
     _ref_dict,
 )
-from ..adjudication.engine import adjudicate_finding
+from ..adjudication.engine import adjudicate_finding, cluster_findings_into_root_cause
 
 # 5 Mandatory E1 Discovery Lanes (R5.3 §27)
 E1_LANE_SLOTS = ("E1-A", "E1-B", "E1-C", "E1-D", "E1-E")
@@ -65,23 +68,32 @@ def build_e1_lane_specs(stage_spec_revision: str = "1", lane_revision: str = "1"
 
 
 def build_e2_stage_spec(revision: str = "1") -> StageSpec:
-    """Construct normative E2 StageSpec (R5.3 §28)."""
+    """Construct normative E2 StageSpec (R5.3 §71)."""
     return StageSpec(
         stage_key="E2",
         stage_spec_revision=revision,
         stage_role="CONVERGENCE_AND_ADJUDICATION",
         stage_ordinal=2,
-        purpose="Quarantine claim deduplication, 4-axis finding adjudication, and contradiction obligations",
+        purpose=(
+            "Claim quarantine, individual four-axis adjudication, then root-cause normalization "
+            "and contradiction obligations"
+        ),
         predecessor_requirements=("E1",),
         required_lane_slots=("E2-CONVERGENCE", "E2-ADJUDICATION"),
         blind_reveal_phase_model="CONTROLLED",
-        required_stage_completion_outputs=("adjudication_decisions", "contradiction_obligations"),
+        required_stage_completion_outputs=(
+            "finding_claim_revisions",
+            "finding_axis_assessments",
+            "adjudication_decisions",
+            "root_cause_revisions",
+            "contradiction_obligations",
+        ),
         stop_e6_relationship="CONTINUE_REQUIRED",
     )
 
 
 class EnsembleQuarantineBroker:
-    """Enforces knowledge isolation and prevents cross-lane contamination in E1 discovery."""
+    """Enforce knowledge isolation and prevent cross-lane contamination in E1."""
 
     def __init__(self):
         self._sealed_findings: dict[str, list[dict]] = {slot: [] for slot in E1_LANE_SLOTS}
@@ -95,13 +107,11 @@ class EnsembleQuarantineBroker:
         self._sealed_findings[lane_slot].append(dict(discovery))
 
     def get_lane_view(self, requesting_lane: str) -> list[dict]:
-        """A lane can ONLY see its own findings prior to checkpoint release."""
         if requesting_lane not in E1_LANE_SLOTS:
             raise ValidationError("UNKNOWN_LANE_SLOT", requesting_lane)
         return list(self._sealed_findings[requesting_lane])
 
     def query_cross_lane_findings(self, requesting_lane: str, target_lane: str) -> list[dict]:
-        """Adversarial check: requesting another lane's unreleased findings must fail closed."""
         if not self._is_checkpoint_released and requesting_lane != target_lane:
             raise ValidationError(
                 "CROSS_LANE_KNOWLEDGE_LEAKAGE",
@@ -110,7 +120,6 @@ class EnsembleQuarantineBroker:
         return list(self._sealed_findings[target_lane])
 
     def release_checkpoint_for_e2(self) -> dict[str, list[dict]]:
-        """Seal E1 discoveries and release them to E2 convergence."""
         self._is_checkpoint_released = True
         return {slot: list(findings) for slot, findings in self._sealed_findings.items()}
 
@@ -141,13 +150,8 @@ def execute_e1_ensemble(
     lane_discoveries: Mapping[str, Sequence[dict]],
     stage_spec: StageSpec | None = None,
 ) -> E1CompletionResult:
-    """Execute E1 discovery ensemble and produce validated E1CompletionResult.
-
-    Fails closed if any of the 5 mandatory lanes (E1-A..E1-E) is missing.
-    """
+    """Execute E1 and bind the exact quarantined discovery content."""
     spec = stage_spec or build_e1_stage_spec()
-
-    # Check all mandatory lanes are reported
     reported_lanes = set(lane_discoveries.keys())
     missing = set(spec.required_lane_slots) - reported_lanes
     if missing:
@@ -159,41 +163,31 @@ def execute_e1_ensemble(
     broker = EnsembleQuarantineBroker()
     all_quarantined_claims: list[dict] = []
     total_count = 0
-
     for slot in sorted(spec.required_lane_slots):
-        disc_list = lane_discoveries.get(slot, [])
-        for d in disc_list:
-            broker.record_lane_discovery(slot, d)
-            claim_data = dict(d)
+        for discovery in lane_discoveries.get(slot, []):
+            broker.record_lane_discovery(slot, discovery)
+            claim_data = dict(discovery)
             claim_data["originating_lane"] = slot
             all_quarantined_claims.append(claim_data)
             total_count += 1
 
     released = broker.release_checkpoint_for_e2()
-
-    # Bind the exact quarantined content, not merely its count.  This makes the
-    # library-level checkpoint change when the evidence-bearing discovery set
-    # changes even if lane/count summaries remain constant.
     completion_body = {
         "stage_key": "E1",
         "stage_spec_digest": spec.revision_digest,
         "completed_lanes": sorted(spec.required_lane_slots),
         "source_generation_ref": _ref_dict(source_generation_ref),
         "total_discoveries": total_count,
-        "quarantined_claims": sorted(
-            all_quarantined_claims,
-            key=lambda item: canonical_bytes(item),
-        ),
+        "quarantined_claims": sorted(all_quarantined_claims, key=canonical_bytes),
     }
-    comp_digest = hashlib.sha256(canonical_bytes(completion_body)).hexdigest()
-
+    completion_digest = hashlib.sha256(canonical_bytes(completion_body)).hexdigest()
     return E1CompletionResult(
         stage_key="E1",
         stage_spec_digest=spec.revision_digest,
         completed_lanes=tuple(sorted(spec.required_lane_slots)),
         total_discoveries=total_count,
         discoveries_by_lane=released,
-        completion_digest=comp_digest,
+        completion_digest=completion_digest,
         quarantined_claims=tuple(all_quarantined_claims),
     )
 
@@ -202,7 +196,10 @@ def execute_e1_ensemble(
 class E2CompletionResult:
     stage_key: str
     e1_completion_digest: str
+    finding_claim_revisions: tuple[FindingClaimRevision, ...]
+    axis_assessments: tuple[FindingAxisAssessment, ...]
     adjudicated_decisions: tuple[FindingAdjudicationDecision, ...]
+    root_cause_revisions: tuple[RootCauseRevision, ...]
     contradiction_revisions: tuple[ContradictionRevision, ...]
     completion_digest: str
 
@@ -210,7 +207,10 @@ class E2CompletionResult:
         return {
             "stage_key": self.stage_key,
             "e1_completion_digest": self.e1_completion_digest,
+            "finding_claim_revisions_count": len(self.finding_claim_revisions),
+            "axis_assessments_count": len(self.axis_assessments),
             "adjudicated_decisions_count": len(self.adjudicated_decisions),
+            "root_cause_revisions_count": len(self.root_cause_revisions),
             "contradictions_count": len(self.contradiction_revisions),
             "completion_digest": self.completion_digest,
         }
@@ -220,7 +220,6 @@ def validate_stage_transition(
     predecessor_completion: E1CompletionResult | dict,
     target_stage_spec: StageSpec,
 ) -> None:
-    """Validate stage transition gating from predecessor to target stage."""
     pred_stage = (
         predecessor_completion.stage_key
         if isinstance(predecessor_completion, E1CompletionResult)
@@ -233,211 +232,501 @@ def validate_stage_transition(
         )
 
 
-def _typed_evidence_refs(value: Any) -> list[dict]:
-    """Return only complete typed evidence refs; incomplete labels are not evidence."""
+def _typed_refs(value: Any, *, expected_kind: str | None = None) -> list[dict[str, Any]]:
     if value is None:
         return []
     values = value if isinstance(value, (list, tuple)) else [value]
-    refs: list[dict] = []
-    required = {"kind", "revision_digest", "digest_profile", "schema_revision_ref"}
+    required = {"kind", "revision_digest", "digest_profile", "schema_revision_ref", "ref_class"}
+    refs: dict[bytes, dict[str, Any]] = {}
     for item in values:
-        if isinstance(item, dict) and required.issubset(item):
-            refs.append(dict(item))
-    return refs
+        if not isinstance(item, Mapping) or not required.issubset(item):
+            continue
+        ref = dict(item)
+        if expected_kind is not None and ref.get("kind") != expected_kind:
+            continue
+        refs[canonical_bytes(ref)] = ref
+    return [refs[key] for key in sorted(refs)]
 
 
-def _generic_evidence(item: Mapping[str, Any]) -> list[dict]:
-    refs = _typed_evidence_refs(item.get("evidence_ref"))
-    refs.extend(_typed_evidence_refs(item.get("evidence_refs")))
-    by_digest = {ref["revision_digest"]: ref for ref in refs}
-    return [by_digest[key] for key in sorted(by_digest)]
+def _generic_evidence(item: Mapping[str, Any]) -> list[dict[str, Any]]:
+    refs = _typed_refs(item.get("evidence_ref"), expected_kind="evidence_qualification_assessment")
+    refs.extend(_typed_refs(item.get("evidence_refs"), expected_kind="evidence_qualification_assessment"))
+    return _unique_refs(refs)
 
 
-def _axis_evidence(item: Mapping[str, Any], axis: str) -> list[dict]:
+def _axis_evidence(item: Mapping[str, Any], axis: str) -> list[dict[str, Any]]:
     raw = item.get("axis_evidence_refs")
-    refs = []
+    if not isinstance(raw, Mapping):
+        return []
+    return _typed_refs(raw.get(axis), expected_kind="evidence_qualification_assessment")
+
+
+def _axis_method_refs(item: Mapping[str, Any], axis: str) -> list[dict[str, Any]]:
+    raw = item.get("axis_method_refs") or item.get("method_or_characterization_refs")
     if isinstance(raw, Mapping):
-        refs.extend(_typed_evidence_refs(raw.get(axis)))
-    by_digest = {ref["revision_digest"]: ref for ref in refs}
-    return [by_digest[key] for key in sorted(by_digest)]
+        return _typed_refs(raw.get(axis))
+    return _typed_refs(raw)
 
 
-def _stable_convergence_key(item: Mapping[str, Any]) -> bytes:
-    """Build a conservative dedup key that never relies on statement text alone.
+def _unique_refs(values: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    refs = {canonical_bytes(dict(value)): dict(value) for value in values}
+    return [refs[key] for key in sorted(refs)]
 
-    A pre-existing typed root-cause reference is strongest.  Otherwise a claim
-    can converge only when invariant + component + source location are all
-    explicitly supplied.  Without either, the discovery remains a distinct
-    claim candidate, keyed by its lane/finding identity or exact content.
-    """
+
+def _unique_values(values: Sequence[Any]) -> list[Any]:
+    keyed = {canonical_bytes(value): value for value in values}
+    return [keyed[key] for key in sorted(keyed)]
+
+
+def _string_list(value: Any) -> list[str]:
+    if value is None:
+        return []
+    values = value if isinstance(value, (list, tuple)) else [value]
+    return sorted({str(item) for item in values if str(item)}, key=lambda text: text.encode("utf-8"))
+
+
+def _claim_statement(item: Mapping[str, Any]) -> str:
+    statement = str(item.get("claim_statement") or item.get("statement") or "").strip()
+    if not statement:
+        raise ValidationError("E2_FINDING_CLAIM_STATEMENT_REQUIRED")
+    return statement
+
+
+def _claim_category(item: Mapping[str, Any]) -> str:
+    raw = item.get("category")
+    if raw is None:
+        return "OTHER"
+    category = str(raw).upper()
+    if category not in FINDING_CATEGORIES:
+        raise ValidationError("INVALID_FINDING_CATEGORY", category)
+    return category
+
+
+def _finding_scope(item: Mapping[str, Any]) -> dict[str, Any]:
+    raw = item.get("finding_scope")
+    if raw is None:
+        raw = item.get("scope")
+    return dict(raw) if isinstance(raw, Mapping) else {}
+
+
+def _axis_scope(item: Mapping[str, Any], axis: str) -> dict[str, Any]:
+    raw = item.get("axis_scopes")
+    if isinstance(raw, Mapping) and isinstance(raw.get(axis), Mapping):
+        return dict(raw[axis])
+    return _finding_scope(item)
+
+
+def _axis_confidence(item: Mapping[str, Any], axis: str) -> str:
+    raw = item.get("axis_confidence")
+    value = raw.get(axis) if isinstance(raw, Mapping) else None
+    if value is None and axis == "SEVERITY":
+        value = item.get("severity_confidence")
+    return str(value or "UNKNOWN").upper()
+
+
+def _axis_reason_codes(item: Mapping[str, Any], axis: str) -> list[str]:
+    raw = item.get("axis_reason_codes")
+    values = raw.get(axis) if isinstance(raw, Mapping) else None
+    return _string_list(values)
+
+
+def _operational_axis_outcome(
+    item: Mapping[str, Any],
+    axis: str,
+) -> tuple[str, list[dict[str, Any]], list[str]]:
+    raw = item.get("axis_outcomes")
+    outcome = raw.get(axis) if isinstance(raw, Mapping) else None
+    outcome = str(outcome).upper() if outcome is not None else None
+    evidence = _axis_evidence(item, axis)
+    reasons = _axis_reason_codes(item, axis)
+    valid = {"SUPPORTED", "REFUTED", "INCONCLUSIVE", "BLOCKED", "NOT_APPLICABLE"}
+    if outcome not in valid:
+        return "INCONCLUSIVE", evidence, _string_list([*reasons, "E2_AXIS_UNASSESSED"])
+    if outcome in {"SUPPORTED", "REFUTED"} and not evidence:
+        return "INCONCLUSIVE", evidence, _string_list([*reasons, "E2_AXIS_EVIDENCE_REQUIRED"])
+    return outcome, evidence, reasons
+
+
+def _severity_value(item: Mapping[str, Any]) -> str:
+    raw = item.get("severity_value") or item.get("severity")
+    if raw is None:
+        axis_values = item.get("axis_values")
+        if isinstance(axis_values, Mapping):
+            raw = axis_values.get("SEVERITY")
+    severity = str(raw or "").upper()
+    if severity not in SEVERITY_VALUES:
+        raise ValidationError(
+            "E2_SEVERITY_ASSESSMENT_REQUIRED",
+            "Each quarantined finding requires an explicit CRITICAL/HIGH/MEDIUM/LOW/INFO severity assessment",
+        )
+    return severity
+
+
+def _normalization_key(item: Mapping[str, Any]) -> bytes | None:
+    """Return only an explicit/stable relation key; statement text is never a merge key."""
     root = item.get("root_cause_ref")
-    if isinstance(root, dict) and {"kind", "revision_digest"}.issubset(root):
-        return canonical_bytes({"root_cause_ref": root})
+    if _typed_refs(root, expected_kind="root_cause_revision"):
+        return canonical_bytes({"root_cause_ref": _typed_refs(root, expected_kind="root_cause_revision")[0]})
 
-    invariant = item.get("invariant_ref") or item.get("violated_invariant_ref")
+    invariant_refs = _typed_refs(item.get("invariant_ref") or item.get("violated_invariant_ref"))
     component = item.get("affected_component")
     location = item.get("source_location") or item.get("location")
-    if isinstance(invariant, dict) and component and location:
-        return canonical_bytes({
-            "invariant_ref": invariant,
-            "affected_component": component,
-            "source_location": location,
-        })
-
-    finding_id = item.get("finding_id") or item.get("id")
-    if finding_id:
-        return canonical_bytes({
-            "originating_lane": item.get("originating_lane"),
-            "finding_id": str(finding_id),
-        })
-    return canonical_bytes({
-        "originating_lane": item.get("originating_lane"),
-        "exact_discovery": dict(item),
-    })
+    if invariant_refs and component and location:
+        return canonical_bytes(
+            {
+                "invariant_ref": invariant_refs[0],
+                "affected_component": str(component),
+                "source_location": location,
+            }
+        )
+    return None
 
 
-def _claim_outcome_with_evidence(item: Mapping[str, Any]) -> str:
-    outcome = item.get("claim_outcome")
-    if outcome not in {"SUPPORTED", "REFUTED"}:
-        return "INCONCLUSIVE"
-    if not _generic_evidence(item):
-        return "INCONCLUSIVE"
-    return str(outcome)
+def _claim_outcome_with_evidence(item: Mapping[str, Any]) -> tuple[str, list[dict[str, Any]]]:
+    outcome = str(item.get("claim_outcome") or "").upper()
+    evidence = _generic_evidence(item)
+    if outcome not in {"SUPPORTED", "REFUTED"} or not evidence:
+        return "INCONCLUSIVE", evidence
+    return outcome, evidence
 
 
-def _axis_outcome(items: Sequence[Mapping[str, Any]], axis: str) -> tuple[str, list[dict]]:
-    observed: list[str] = []
-    evidence: list[dict] = []
-    for item in items:
-        raw = item.get("axis_outcomes")
-        outcome = raw.get(axis) if isinstance(raw, Mapping) else None
-        refs = _axis_evidence(item, axis)
-        if outcome in {"SUPPORTED", "REFUTED", "INCONCLUSIVE", "BLOCKED", "NOT_APPLICABLE"} and refs:
-            observed.append(str(outcome))
-            evidence.extend(refs)
-    unique = set(observed)
-    if not unique:
-        result = "INCONCLUSIVE"
-    elif "SUPPORTED" in unique and "REFUTED" in unique:
-        result = "INCONCLUSIVE"
-    elif len(unique) == 1:
-        result = next(iter(unique))
-    else:
-        # Mixed epistemic states are not promoted to positive evidence.
-        result = "INCONCLUSIVE"
-    by_digest = {ref["revision_digest"]: ref for ref in evidence}
-    return result, [by_digest[key] for key in sorted(by_digest)]
+def _common_mapping(items: Sequence[Mapping[str, Any]], field_name: str) -> dict[str, Any]:
+    candidates = [dict(item[field_name]) for item in items if isinstance(item.get(field_name), Mapping)]
+    if not candidates:
+        return {}
+    first = canonical_bytes(candidates[0])
+    if any(canonical_bytes(candidate) != first for candidate in candidates[1:]):
+        raise ValidationError("E2_NORMALIZATION_SCOPE_CONFLICT", field_name)
+    return candidates[0]
+
+
+def _root_cause_statement(items: Sequence[Mapping[str, Any]]) -> str | None:
+    statements = sorted(
+        {str(item.get("root_cause_statement") or "").strip() for item in items if str(item.get("root_cause_statement") or "").strip()},
+        key=lambda text: text.encode("utf-8"),
+    )
+    if not statements:
+        return None
+    if len(statements) != 1:
+        raise ValidationError("E2_ROOT_CAUSE_MECHANISM_CONFLICT")
+    return statements[0]
+
+
+def _required_falsifier(items: Sequence[Mapping[str, Any]]) -> Any:
+    values = [item.get("required_falsifier") for item in items if item.get("required_falsifier") is not None]
+    unique = _unique_values(values)
+    if len(unique) > 1:
+        raise ValidationError("E2_CONTRADICTION_FALSIFIER_CONFLICT")
+    if unique:
+        return unique[0]
+    return {
+        "requirement": "QUALIFIED_FALSIFIER_FOR_EXACT_CONTRADICTORY_CLAIM_REVISIONS",
+        "generated_by": "E2_CONTRADICTION_ENGINE",
+    }
+
+
+def _deterministic_object_id(kind: str, *parts: Any) -> str:
+    return deterministic_id(kind, canonical_bytes(list(parts)))
+
+
+@dataclass(frozen=True)
+class _AdjudicatedCandidate:
+    raw: dict[str, Any]
+    claim: FindingClaimRevision
+    axes: tuple[FindingAxisAssessment, FindingAxisAssessment, FindingAxisAssessment, FindingAxisAssessment]
+    decision: FindingAdjudicationDecision
+    normalization_key: bytes | None
+
+
+def _adjudicate_candidate(
+    raw_claim: Mapping[str, Any],
+    *,
+    source_generation_ref: Any,
+    adjudicator_ref: Any,
+    input_history_cut: Mapping[str, Any],
+    policy_ref: Any,
+    e1_completion_digest: str,
+) -> _AdjudicatedCandidate:
+    item = dict(raw_claim)
+    seed = {
+        "e1_completion_digest": e1_completion_digest,
+        "source_generation_ref": _ref_dict(source_generation_ref),
+        "raw_discovery": item,
+    }
+    finding_id = _deterministic_object_id("finding_claim_revision", seed)
+    claim = FindingClaimRevision(
+        finding_id=finding_id,
+        finding_claim_revision=str(item.get("finding_claim_revision") or "1"),
+        claim_statement=_claim_statement(item),
+        source_generation_ref=_ref_dict(source_generation_ref),
+        category=_claim_category(item),
+        scope_refs=_typed_refs(item.get("scope_ref") or item.get("scope_refs")),
+        violated_invariant_refs=_typed_refs(
+            item.get("invariant_ref") or item.get("violated_invariant_ref") or item.get("violated_invariant_refs")
+        ),
+        discovery_relation_refs=_typed_refs(item.get("discovery_relation_ref") or item.get("discovery_relation_refs")),
+        limitations=_string_list(item.get("limitations")),
+    )
+    claim_ref = claim.as_object().as_ref().as_dict()
+
+    axes: dict[str, FindingAxisAssessment] = {}
+    all_evidence: list[dict[str, Any]] = []
+    for axis in ("MECHANISM", "REACHABILITY", "IMPACT"):
+        outcome, evidence, reasons = _operational_axis_outcome(item, axis)
+        all_evidence.extend(evidence)
+        axes[axis] = FindingAxisAssessment(
+            finding_axis_assessment_id=_deterministic_object_id(
+                "finding_axis_assessment", claim.digest, axis, input_history_cut, policy_ref
+            ),
+            claim_revision_ref=claim_ref,
+            assessment_input_history_cut=dict(input_history_cut),
+            assessment_policy_ref=_ref_dict(policy_ref),
+            axis=axis,
+            scope=_axis_scope(item, axis),
+            evidence_qualification_refs=evidence,
+            epistemic_outcome=outcome,
+            method_or_characterization_refs=_axis_method_refs(item, axis),
+            confidence=_axis_confidence(item, axis),
+            limitations=_string_list(item.get("axis_limitations", {}).get(axis) if isinstance(item.get("axis_limitations"), Mapping) else None),
+            reason_codes=reasons,
+        )
+
+    severity_evidence = _axis_evidence(item, "SEVERITY")
+    all_evidence.extend(severity_evidence)
+    axes["SEVERITY"] = FindingAxisAssessment(
+        finding_axis_assessment_id=_deterministic_object_id(
+            "finding_axis_assessment", claim.digest, "SEVERITY", input_history_cut, policy_ref
+        ),
+        claim_revision_ref=claim_ref,
+        assessment_input_history_cut=dict(input_history_cut),
+        assessment_policy_ref=_ref_dict(policy_ref),
+        axis="SEVERITY",
+        scope=_axis_scope(item, "SEVERITY"),
+        evidence_qualification_refs=severity_evidence,
+        method_or_characterization_refs=_axis_method_refs(item, "SEVERITY"),
+        severity_value=_severity_value(item),
+        confidence=_axis_confidence(item, "SEVERITY"),
+        limitations=_string_list(item.get("axis_limitations", {}).get("SEVERITY") if isinstance(item.get("axis_limitations"), Mapping) else None),
+        reason_codes=_axis_reason_codes(item, "SEVERITY"),
+    )
+
+    decision = adjudicate_finding(
+        claim=claim,
+        mechanism=axes["MECHANISM"],
+        reachability=axes["REACHABILITY"],
+        impact=axes["IMPACT"],
+        severity=axes["SEVERITY"],
+        adjudicator_ref=_ref_dict(adjudicator_ref),
+        input_history_cut=dict(input_history_cut),
+        evidence_refs=_unique_refs(all_evidence),
+        scope=_finding_scope(item),
+        reason_codes=(
+            ("E2_INDIVIDUAL_ADJUDICATION_INCOMPLETE",)
+            if any(axes[name].epistemic_outcome not in {"SUPPORTED", "REFUTED"} for name in ("MECHANISM", "REACHABILITY", "IMPACT"))
+            else ()
+        ),
+    )
+    decision = replace(
+        decision,
+        decision_id=_deterministic_object_id(
+            "finding_adjudication_decision",
+            claim.digest,
+            axes["MECHANISM"].digest,
+            axes["REACHABILITY"].digest,
+            axes["IMPACT"].digest,
+            axes["SEVERITY"].digest,
+            input_history_cut,
+            adjudicator_ref,
+        ),
+    )
+    return _AdjudicatedCandidate(
+        raw=item,
+        claim=claim,
+        axes=(axes["MECHANISM"], axes["REACHABILITY"], axes["IMPACT"], axes["SEVERITY"]),
+        decision=decision,
+        normalization_key=_normalization_key(item),
+    )
+
+
+def _normalize_root_causes(
+    groups: Mapping[bytes, Sequence[_AdjudicatedCandidate]],
+    *,
+    source_generation_ref: Any,
+) -> list[RootCauseRevision]:
+    revisions: list[RootCauseRevision] = []
+    for group_key in sorted(groups):
+        candidates = list(groups[group_key])
+        mechanism_statement = _root_cause_statement([candidate.raw for candidate in candidates])
+        if mechanism_statement is None:
+            continue
+        membership_edges = []
+        predecessor_refs: list[dict[str, Any]] = []
+        for candidate in candidates:
+            membership_edges.append(
+                {
+                    "finding_claim_revision_ref": candidate.claim.as_object().as_ref().as_dict(),
+                    "relation_role": str(candidate.raw.get("root_cause_relation_role") or "CONTRIBUTING"),
+                    "scope": (
+                        dict(candidate.raw["root_cause_membership_scope"])
+                        if isinstance(candidate.raw.get("root_cause_membership_scope"), Mapping)
+                        else _finding_scope(candidate.raw)
+                    ),
+                }
+            )
+            predecessor_refs.extend(
+                _typed_refs(candidate.raw.get("root_cause_ref"), expected_kind="root_cause_revision")
+            )
+        revision = cluster_findings_into_root_cause(
+            source_generation_ref=_ref_dict(source_generation_ref),
+            mechanism_statement=mechanism_statement,
+            membership_edges=membership_edges,
+            predecessor_root_cause_refs=_unique_refs(predecessor_refs),
+            scope=_common_mapping([candidate.raw for candidate in candidates], "root_cause_scope"),
+            multi_causal_condition=(
+                candidates[0].raw.get("multi_causal_condition")
+                if all(
+                    canonical_bytes(candidate.raw.get("multi_causal_condition"))
+                    == canonical_bytes(candidates[0].raw.get("multi_causal_condition"))
+                    for candidate in candidates
+                )
+                else None
+            ),
+        )
+        revision = replace(
+            revision,
+            root_cause_id=_deterministic_object_id(
+                "root_cause_revision",
+                group_key,
+                [candidate.claim.digest for candidate in candidates],
+                mechanism_statement,
+            ),
+        )
+        revisions.append(revision)
+    return revisions
+
+
+def _build_contradictions(
+    groups: Mapping[bytes, Sequence[_AdjudicatedCandidate]],
+) -> list[ContradictionRevision]:
+    contradictions: list[ContradictionRevision] = []
+    for group_key in sorted(groups):
+        candidates = list(groups[group_key])
+        supported: list[tuple[_AdjudicatedCandidate, list[dict[str, Any]]]] = []
+        refuted: list[tuple[_AdjudicatedCandidate, list[dict[str, Any]]]] = []
+        for candidate in candidates:
+            outcome, evidence = _claim_outcome_with_evidence(candidate.raw)
+            if outcome == "SUPPORTED":
+                supported.append((candidate, evidence))
+            elif outcome == "REFUTED":
+                refuted.append((candidate, evidence))
+        if not supported or not refuted:
+            continue
+
+        contradictory = [*supported, *refuted]
+        claim_refs = [candidate.claim.as_object().as_ref().as_dict() for candidate, _ in contradictory]
+        positions = [
+            {
+                "claim_revision_ref": candidate.claim.as_object().as_ref().as_dict(),
+                "position": "SUPPORTED" if (candidate, evidence) in supported else "REFUTED",
+            }
+            for candidate, evidence in contradictory
+        ]
+        supporting_evidence = _unique_refs([ref for _, refs in supported for ref in refs])
+        opposing_evidence = _unique_refs([ref for _, refs in refuted for ref in refs])
+        raw_items = [candidate.raw for candidate, _ in contradictory]
+        failure_differences = _unique_values(
+            [
+                value
+                for item in raw_items
+                for value in (item.get("failure_assumption_differences") or [])
+            ]
+        )
+        environment_differences = _unique_values(
+            [
+                value
+                for item in raw_items
+                for value in (item.get("environment_input_model_differences") or [])
+            ]
+        )
+        contradiction = ContradictionRevision(
+            contradiction_id=_deterministic_object_id(
+                "contradiction_revision",
+                group_key,
+                [ref["revision_digest"] for ref in claim_refs],
+            ),
+            contradiction_revision="1",
+            claim_revision_refs=claim_refs,
+            scope=_common_mapping(raw_items, "contradiction_scope"),
+            positions=positions,
+            supporting_evidence_qualification_refs=supporting_evidence,
+            opposing_evidence_qualification_refs=opposing_evidence,
+            failure_assumption_differences=failure_differences,
+            environment_input_model_differences=environment_differences,
+            required_falsifier=_required_falsifier(raw_items),
+            status="OPEN",
+        )
+        contradictions.append(contradiction)
+    return contradictions
 
 
 def execute_e2_convergence(
     e1_completion: E1CompletionResult,
     source_generation_ref: Any,
     adjudicator_ref: Any,
-    input_history_cut: dict,
+    input_history_cut: Mapping[str, Any],
     policy_ref: Any,
 ) -> E2CompletionResult:
-    """Execute fail-closed E2 convergence and four-axis adjudication.
+    """Run R5.3 E2 in the required order: individual adjudication, then normalization.
 
-    Discovery text is never sufficient proof.  Missing evidence/outcomes remain
-    INCONCLUSIVE, statement similarity alone cannot merge findings, and each
-    axis is promoted only from explicitly supplied axis evidence.
+    Every quarantined E1 discovery becomes its own evidence-free claim revision
+    and four exact axis assessments. Statement similarity is never a merge key.
+    Only after those individual decisions exist may E2 derive Root Cause or
+    Contradiction relations from explicit stable relation inputs.
     """
     e2_spec = build_e2_stage_spec()
     validate_stage_transition(e1_completion, e2_spec)
 
-    grouped: dict[bytes, list[dict]] = {}
-    for raw_claim in e1_completion.quarantined_claims:
-        claim_data = dict(raw_claim)
-        grouped.setdefault(_stable_convergence_key(claim_data), []).append(claim_data)
-
-    adjudicated_decisions: list[FindingAdjudicationDecision] = []
-    contradictions: list[ContradictionRevision] = []
-    decision_digests: list[str] = []
-    contradiction_digests: list[str] = []
-
-    for group_key in sorted(grouped):
-        items = grouped[group_key]
-        statements = sorted({str(item.get("statement", "")).strip() for item in items if str(item.get("statement", "")).strip()})
-        statement = statements[0] if len(statements) == 1 else " | ".join(statements)
-        if not statement:
-            statement = "UNSPECIFIED_CLAIM"
-
-        invariant_refs: list[dict] = []
-        scope_refs: list[dict] = []
-        for item in items:
-            invariant_refs.extend(_typed_evidence_refs(item.get("invariant_ref") or item.get("violated_invariant_ref")))
-            scope_refs.extend(_typed_evidence_refs(item.get("scope_ref") or item.get("scope_refs")))
-        inv_by_digest = {ref["revision_digest"]: ref for ref in invariant_refs}
-        scope_by_digest = {ref["revision_digest"]: ref for ref in scope_refs}
-
-        claim = FindingClaimRevision(
-            statement=statement,
-            source_generation_ref=_ref_dict(source_generation_ref),
-            scope_refs=[scope_by_digest[key] for key in sorted(scope_by_digest)],
-            violated_invariant_refs=[inv_by_digest[key] for key in sorted(inv_by_digest)],
-        )
-
-        # Contradiction requires both an explicit supported/refuted outcome and
-        # typed evidence on both sides. Missing evidence is merely inconclusive.
-        evidence_by_outcome: dict[str, list[dict]] = {"SUPPORTED": [], "REFUTED": []}
-        for item in items:
-            outcome = _claim_outcome_with_evidence(item)
-            if outcome in evidence_by_outcome:
-                evidence_by_outcome[outcome].extend(_generic_evidence(item))
-        if evidence_by_outcome["SUPPORTED"] and evidence_by_outcome["REFUTED"]:
-            refs = evidence_by_outcome["SUPPORTED"] + evidence_by_outcome["REFUTED"]
-            unique_refs = {ref["revision_digest"]: ref for ref in refs}
-            contra = ContradictionRevision(
-                claim_revision_ref=claim.as_object().as_ref().as_dict(),
-                contradicting_evidence_refs=[unique_refs[key] for key in sorted(unique_refs)],
-                input_history_cut=input_history_cut,
-                status="OPEN",
-            )
-            contradictions.append(contra)
-            contradiction_digests.append(contra.digest)
-
-        axis_assessments: dict[str, FindingAxisAssessment] = {}
-        all_axis_evidence: dict[str, dict] = {}
-        for axis in ("MECHANISM", "REACHABILITY", "IMPACT", "SEVERITY"):
-            outcome, evidence_refs = _axis_outcome(items, axis)
-            for ref in evidence_refs:
-                all_axis_evidence[ref["revision_digest"]] = ref
-            axis_assessments[axis] = FindingAxisAssessment(
-                claim_revision_ref=claim.as_object().as_ref().as_dict(),
-                assessment_input_history_cut=input_history_cut,
-                assessment_policy_ref=_ref_dict(policy_ref),
-                axis=axis,
-                epistemic_outcome=outcome,
-                method="E2_EXPLICIT_AXIS_EVIDENCE" if evidence_refs else "E2_INSUFFICIENT_EVIDENCE",
-                evidence_qualification_refs=evidence_refs,
-            )
-
-        dec = adjudicate_finding(
-            claim=claim,
-            mechanism=axis_assessments["MECHANISM"],
-            reachability=axis_assessments["REACHABILITY"],
-            impact=axis_assessments["IMPACT"],
-            severity=axis_assessments["SEVERITY"],
-            adjudicator_ref=_ref_dict(adjudicator_ref),
+    candidates = [
+        _adjudicate_candidate(
+            raw_claim,
+            source_generation_ref=source_generation_ref,
+            adjudicator_ref=adjudicator_ref,
             input_history_cut=input_history_cut,
-            evidence_refs=[all_axis_evidence[key] for key in sorted(all_axis_evidence)],
+            policy_ref=policy_ref,
+            e1_completion_digest=e1_completion.completion_digest,
         )
-        adjudicated_decisions.append(dec)
-        decision_digests.append(dec.digest)
+        for raw_claim in sorted(e1_completion.quarantined_claims, key=canonical_bytes)
+    ]
 
-    # Bind exact decision/contradiction identities, not only cardinalities.
+    normalization_groups: dict[bytes, list[_AdjudicatedCandidate]] = {}
+    for candidate in candidates:
+        if candidate.normalization_key is not None:
+            normalization_groups.setdefault(candidate.normalization_key, []).append(candidate)
+
+    root_causes = _normalize_root_causes(normalization_groups, source_generation_ref=source_generation_ref)
+    contradictions = _build_contradictions(normalization_groups)
+
+    claims = [candidate.claim for candidate in candidates]
+    axes = [axis for candidate in candidates for axis in candidate.axes]
+    decisions = [candidate.decision for candidate in candidates]
     e2_body = {
         "stage_key": "E2",
+        "stage_spec_digest": e2_spec.revision_digest,
         "e1_completion_digest": e1_completion.completion_digest,
-        "adjudication_decision_digests": sorted(decision_digests),
-        "contradiction_digests": sorted(contradiction_digests),
+        "finding_claim_revision_digests": sorted(claim.digest for claim in claims),
+        "axis_assessment_digests": sorted(axis.digest for axis in axes),
+        "adjudication_decision_digests": sorted(decision.digest for decision in decisions),
+        "root_cause_revision_digests": sorted(revision.digest for revision in root_causes),
+        "contradiction_digests": sorted(contradiction.digest for contradiction in contradictions),
     }
     e2_digest = hashlib.sha256(canonical_bytes(e2_body)).hexdigest()
-
     return E2CompletionResult(
         stage_key="E2",
         e1_completion_digest=e1_completion.completion_digest,
-        adjudicated_decisions=tuple(adjudicated_decisions),
+        finding_claim_revisions=tuple(claims),
+        axis_assessments=tuple(axes),
+        adjudicated_decisions=tuple(decisions),
+        root_cause_revisions=tuple(root_causes),
         contradiction_revisions=tuple(contradictions),
         completion_digest=e2_digest,
     )
