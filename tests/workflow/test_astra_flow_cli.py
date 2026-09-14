@@ -36,7 +36,7 @@ def _orchestrator(tmp_path: Path) -> AstraContinuationOrchestrator:
     orch.resolved_source = ResolvedSource(
         target_type="github",
         location="https://github.com/example/cli-target",
-        display_name="example/cli-target",
+        display_name="example/target",
         ref="main",
         exact_commit_sha=COMMIT,
         exact_tree_sha=TREE,
@@ -66,6 +66,21 @@ def _e1_result(path: Path, job) -> Path:
     with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         zf.writestr("MANIFEST.json", canonical_bytes(manifest))
     return out
+
+
+def test_flow_cli_help_is_success(capsys) -> None:
+    rc = run_flow_cli(["--help"])
+    captured = capsys.readouterr()
+    assert rc == 0
+    assert "Durable real external audit workflow" in captured.out
+    assert "{status,advance,packages,import}" in captured.out
+
+
+def test_flow_cli_parse_error_remains_nonzero(capsys) -> None:
+    rc = run_flow_cli(["status"])
+    captured = capsys.readouterr()
+    assert rc == 2
+    assert "required: --store" in captured.err
 
 
 def test_flow_cli_resumes_same_store_and_prepares_real_e2_packages(tmp_path: Path, capsys) -> None:
