@@ -37,6 +37,7 @@ files = [
     "src/bdb_audit/coordinator/operations.py",
     "src/bdb_audit/cli.py",
     "src/bdb_audit/astra_cli.py",
+    "src/bdb_audit/astra_flow_cli.py",
     "src/bdb_audit/astra_ui.py",
     "src/bdb_audit/ui.py",
     "src/bdb_audit/orchestration/templates.py",
