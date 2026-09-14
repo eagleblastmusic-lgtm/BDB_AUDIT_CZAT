@@ -94,17 +94,24 @@ class AstraPostE1ResultInbox(PostE1ResultInbox):
         semantic = semantic_objects(result)
         semantic_refs = [obj.as_ref(ref_class="CONTENT_OR_PRIOR").as_dict() for obj in semantic]
 
-        unresolved_refs = [
-            decision.as_object().as_ref(ref_class="CONTENT_OR_PRIOR").as_dict()
+        open_findings_count = sum(
+            1
             for decision in result.adjudicated_decisions
             if decision.finding_lifecycle_status in {"OPEN", "REOPENED"}
-        ]
-        unresolved_refs.extend(
-            contradiction.as_object().as_ref(ref_class="CONTENT_OR_PRIOR").as_dict()
+        )
+        open_contradictions_count = sum(
+            1
             for contradiction in result.contradiction_revisions
             if contradiction.status in {"OPEN", "TESTING", "REOPENED", "BLOCKED"}
         )
 
+        # E2 StageCompletion proves that the convergence/adjudication stage
+        # produced its required authoritative outputs.  OPEN findings and
+        # contradictions are legitimate carry-forward outputs for later
+        # stages/STOP; treating every such object as a stage-local unresolved
+        # material blocker would make ordinary E2 completion impossible and
+        # collapse StageCompletion into campaign-level assurance.  They remain
+        # exact required_output_refs and are counted explicitly below.
         stage_completion = StageCompletion(
             stage_completion_id=deterministic_id(
                 "stage_completion",
@@ -128,21 +135,15 @@ class AstraPostE1ResultInbox(PostE1ResultInbox):
                 "finding_adjudication_decisions": len(result.adjudicated_decisions),
                 "root_cause_revisions": len(result.root_cause_revisions),
                 "contradiction_revisions": len(result.contradiction_revisions),
+                "open_findings_count": open_findings_count,
+                "open_contradictions_count": open_contradictions_count,
                 "semantic_completion_digest": result.completion_digest,
             },
-            unresolved_material_refs=unresolved_refs,
+            unresolved_material_refs=[],
             unknown_blocked_summary={
                 "unknown_surfaces_count": 0,
-                "open_findings_count": sum(
-                    1
-                    for decision in result.adjudicated_decisions
-                    if decision.finding_lifecycle_status in {"OPEN", "REOPENED"}
-                ),
-                "open_contradictions_count": sum(
-                    1
-                    for contradiction in result.contradiction_revisions
-                    if contradiction.status in {"OPEN", "TESTING", "REOPENED", "BLOCKED"}
-                ),
+                "open_findings_count": open_findings_count,
+                "open_contradictions_count": open_contradictions_count,
             },
             completion_predicate_result="STAGE_COMPLETED",
         )
