@@ -372,11 +372,15 @@ def materialize_e2(
         raise ValidationError("E2_SOURCE_GENERATION_AMBIGUOUS", str(len(sources)))
     source_ref = _ref_with_class(sources[0]["ref"], "CONTENT_OR_PRIOR")
 
-    governing = frozen_cut.get("governing_policy_ref")
-    policy_ref = (
-        dict(governing)
-        if isinstance(governing, Mapping) and _REF_FIELDS.issubset(governing)
-        else _external_ref("policy_revision", str(governing or "E2_ASSIGNED_POLICY"))
+    policy_binding_seed = canonical_bytes({
+        "stage": "E2",
+        "profile": "R5.3_FOUR_AXIS_ASSESSMENT",
+        "governing_policy_ref": frozen_cut.get("governing_policy_ref"),
+    })
+    policy_ref = _external_ref(
+        "external_profile_ref",
+        "E2_R5_3_FOUR_AXIS_" + hashlib.sha256(policy_binding_seed).hexdigest(),
+        "HISTORY_CONTEXT_BINDING",
     )
     adjudicator_ref = _external_ref(
         "actor_or_authority_ref", "BDB_E2_DETERMINISTIC_ADJUDICATOR", "CONTENT_OR_PRIOR"
