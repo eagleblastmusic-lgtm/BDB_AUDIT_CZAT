@@ -12,11 +12,11 @@ from typing import Any, Sequence
 
 from ..core.errors import ValidationError
 from ..history.store import TransactionalHistoryStore
+from .astra_post_e1_inbox import AstraPostE1ResultInbox
 from .astra_stage_profiles import apply_astra_stage_profiles
 from .astra_transport import load_stage_batch, prepare_stage_batch
 from .inbox import ImportedResultSummary
 from .orchestrator import FullAuditOrchestrator
-from .post_e1_inbox import PostE1ResultInbox
 from .stage_transport import StageBatch, stage_slots
 
 
@@ -30,7 +30,7 @@ class AstraContinuationOrchestrator(FullAuditOrchestrator):
         apply_astra_stage_profiles()
         super().__init__(*args, **kwargs)
         self.stage_batch: StageBatch | None = None
-        self.stage_inbox: PostE1ResultInbox | None = None
+        self.stage_inbox: AstraPostE1ResultInbox | None = None
 
     def _status(self) -> dict[str, Any]:
         if not self.active_store_path:
@@ -85,7 +85,7 @@ class AstraContinuationOrchestrator(FullAuditOrchestrator):
             slots=stage_slots(stage),
         )
         self.stage_batch = batch
-        self.stage_inbox = PostE1ResultInbox(store, batch)
+        self.stage_inbox = AstraPostE1ResultInbox(store, batch)
         return batch
 
     def deliver_post_e1_lane(self, slot: str) -> dict[str, Any]:
@@ -128,7 +128,7 @@ class AstraContinuationOrchestrator(FullAuditOrchestrator):
             raise
         self.resolved_source = source
         self.stage_batch = batch
-        self.stage_inbox = PostE1ResultInbox(store, batch)
+        self.stage_inbox = AstraPostE1ResultInbox(store, batch)
         return True
 
     def resume_campaign(self, store_path: Path | str) -> dict[str, Any]:
@@ -199,9 +199,6 @@ class AstraContinuationOrchestrator(FullAuditOrchestrator):
             }
 
         if next_stage == "E3" and self.settings.execution_mode == "ChatGPT / GitHub":
-            # Manual chat transport is DECLARED.  R5.3 blind E3 lanes require
-            # ENFORCED isolation, so do not manufacture packages that could
-            # never qualify their LaneCompletion.
             return {
                 "status": "BLOCKED",
                 "current_stage": "E3",
