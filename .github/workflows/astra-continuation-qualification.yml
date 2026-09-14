@@ -56,6 +56,11 @@ jobs:
           python -m pip install pytest==${{ env.PYTEST_VERSION }} ruff==${{ env.RUFF_VERSION }} mypy==${{ env.MYPY_VERSION }}
           python -m pip install --no-deps -e .
 
+      - name: Real Astra continuation tests
+        shell: pwsh
+        timeout-minutes: 8
+        run: python -m pytest -q tests/workflow/test_astra_post_e1_continuation.py tests/workflow/test_astra_flow_cli.py
+
       - name: Full pytest suite
         shell: pwsh
         run: python -m pytest -q
@@ -86,3 +91,4 @@ jobs:
           python -I "${{ env.ARTIFACT_PATH }}" self-test
           python -I "${{ env.ARTIFACT_PATH }}" self-test --deep
           python -I "${{ env.ARTIFACT_PATH }}" capabilities
+          python -I "${{ env.ARTIFACT_PATH }}" flow --help
