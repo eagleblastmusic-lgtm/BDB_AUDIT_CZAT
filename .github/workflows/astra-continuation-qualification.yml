@@ -58,8 +58,8 @@ jobs:
 
       - name: Real Astra continuation tests
         shell: pwsh
-        timeout-minutes: 8
-        run: python -m pytest -q tests/workflow/test_astra_post_e1_continuation.py tests/workflow/test_astra_flow_cli.py
+        timeout-minutes: 10
+        run: python -m pytest -q tests/workflow/test_astra_post_e1_continuation.py tests/workflow/test_astra_flow_cli.py tests/workflow/test_astra_context_transport.py
 
       - name: Full pytest suite
         shell: pwsh
