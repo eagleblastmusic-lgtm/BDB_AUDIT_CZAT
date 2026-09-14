@@ -6,6 +6,13 @@ from typing import Any
 from . import models as _models
 
 
+_LEGACY_INTERNAL_SEVERITY_METHODS = {
+    "DEFAULT_CRASH_SEVERITY": "INFO",
+    "DIFFERENTIAL_SEVERITY_ESTIMATE": "INFO",
+    "METAMORPHIC_SEVERITY_ESTIMATE": "INFO",
+}
+
+
 class FindingClaimRevision(_models.FindingClaimRevision):
     """Canonical finding claim with source-compatible pre-R5.3.1 constructor aliases.
 
@@ -49,9 +56,14 @@ class FindingAxisAssessment(_models.FindingAxisAssessment):
 
     Pre-R5.3.1 ``assessment_id`` is a name-only alias. Legacy free-text
     ``method`` is retained only as a limitation and is never promoted to a
-    typed method/evidence reference. Epistemic SEVERITY input is intentionally
-    not translated: Severity is characterization rather than a truth vote, so
-    the canonical model must reject such input fail-closed.
+    typed method/evidence reference.
+
+    Three known internal F5 adapters historically expressed Severity as an
+    epistemic ``SUPPORTED`` vote because the pre-R5.3 model had no independent
+    severity value. For those exact internal method markers only, the wrapper
+    migrates the legacy call to conservative ``INFO`` characterization and
+    records an explicit limitation/reason code. All other epistemic Severity
+    input remains forbidden and is rejected by the canonical model.
     """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -69,6 +81,23 @@ class FindingAxisAssessment(_models.FindingAxisAssessment):
             normalized["finding_axis_assessment_id"] = legacy_value
 
         legacy_method = normalized.pop("method", None)
+        legacy_internal_severity_migrated = False
+        if (
+            normalized.get("axis") == "SEVERITY"
+            and "severity_value" not in normalized
+            and "epistemic_outcome" in normalized
+            and legacy_method in _LEGACY_INTERNAL_SEVERITY_METHODS
+        ):
+            normalized.pop("epistemic_outcome")
+            normalized["severity_value"] = _LEGACY_INTERNAL_SEVERITY_METHODS[str(legacy_method)]
+            limitations = list(normalized.get("limitations", ()))
+            limitations.append(f"LEGACY_INTERNAL_SEVERITY_MIGRATED:{legacy_method}")
+            normalized["limitations"] = limitations
+            reason_codes = list(normalized.get("reason_codes", ()))
+            reason_codes.append("LEGACY_INTERNAL_SEVERITY_MIGRATED_TO_INFO")
+            normalized["reason_codes"] = reason_codes
+            legacy_internal_severity_migrated = True
+
         if legacy_method is not None:
             limitations = list(normalized.get("limitations", ()))
             limitations.append(f"LEGACY_UNTYPED_METHOD:{legacy_method}")
@@ -76,6 +105,7 @@ class FindingAxisAssessment(_models.FindingAxisAssessment):
 
         super().__init__(*args, **normalized)
         object.__setattr__(self, "_legacy_method", legacy_method)
+        object.__setattr__(self, "_legacy_internal_severity_migrated", legacy_internal_severity_migrated)
 
     @property
     def assessment_id(self) -> str | None:
