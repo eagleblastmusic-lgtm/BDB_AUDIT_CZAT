@@ -416,7 +416,7 @@ def materialize_e2(
             axis: _axis_from_record(store, frozen_cut, claim, policy_ref, key, axis, adj["axes"][axis])
             for axis in _ALL_AXES
         }
-        evidence = []
+        evidence: list[dict[str, Any]] = []
         for axis in _ALL_AXES:
             evidence.extend(axis_map[axis].evidence_qualification_refs)
         unique_evidence = {_ref_key(ref): ref for ref in evidence}
@@ -505,8 +505,8 @@ def materialize_e2(
             raise ValidationError("E2_CONTRADICTION_REQUIRES_MULTIPLE_CLAIMS", group)
         records = [adjudication_by_key[key] for key in keys]
         positions = []
-        supporting = []
-        opposing = []
+        supporting: list[dict[str, Any]] = []
+        opposing: list[dict[str, Any]] = []
         for key, record in zip(keys, records):
             position = str(record.get("claim_position") or "INCONCLUSIVE").upper()
             if position not in {"SUPPORTED", "REFUTED"}:
