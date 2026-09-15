@@ -451,7 +451,91 @@ class TransactionalHistoryStore:
                     if row[0] != ref.kind or row[1] != ref.schema_revision_ref:
                         raise ValidationError("TYPED_REF_TARGET_MISMATCH")
 
-    def _validate_material_ref_contracts(self, obj):
+    @staticmethod
+    def _prior_accepted_error_code(consumer_kind):
+        specific_temporal_consumers = {
+            "challenger_assignment",
+            "challenger_result",
+            "campaign_conclusion",
+            "final_assurance_case",
+            "release_qualification",
+        }
+        return (
+            "PRIOR_ACCEPTED_REFERENCE_REQUIRED"
+            if consumer_kind in specific_temporal_consumers
+            else "BACKWARD_REF_NOT_PRIOR_ACCEPTED"
+        )
+
+    def _validate_prior_accepted_membership(self, ref, *, consumer_kind, current, con):
+        """Prove canonical PRIOR_ACCEPTED_ONLY membership at the parent head.
+
+        Typed external target-class locators remain governed by their dedicated
+        authority/profile validators. A typed ref whose kind is a registered
+        canonical contract kind, however, must occur in the canonical commit
+        chain before this command. Presence in ``immutable_objects`` alone is
+        deliberately insufficient.
+        """
+        registered_kinds = {
+            row["kind"] for row in self.registry.document.get("contracts", ())
+            if isinstance(row, dict) and isinstance(row.get("kind"), str)
+        }
+        kind = ref.get("kind")
+        if kind not in registered_kinds:
+            return
+
+        error_code = self._prior_accepted_error_code(consumer_kind)
+        if current is None:
+            raise ValidationError(error_code, kind or "")
+
+        previous = EMPTY_HISTORY
+        found = False
+        for stored_seq, digest, raw in con.execute(
+                "SELECT seq,commit_hash,body FROM commits WHERE seq<=? ORDER BY seq",
+                (current.commit_seq,)):
+            body = json.loads(raw)
+            commit = _commit_from_body(body)
+            if commit.digest != digest or body["commit_seq"] != stored_seq or body["prev_history_ref"] != previous:
+                raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
+            if body["campaign_id"] != current.campaign_id:
+                raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
+            previous = {
+                "tag": ACCEPTED_HEAD_REF,
+                "campaign_id": current.campaign_id,
+                "commit_seq": stored_seq,
+                "commit_hash": digest,
+            }
+            if any(
+                candidate.get("revision_digest") == ref.get("revision_digest")
+                and candidate.get("kind") == kind
+                and candidate.get("schema_revision_ref") == ref.get("schema_revision_ref")
+                and candidate.get("logical_id") == ref.get("logical_id")
+                and candidate.get("digest_profile") == ref.get("digest_profile")
+                for candidate in body.get("immutable_object_refs", ())
+            ):
+                found = True
+
+        expected_head = {"tag": ACCEPTED_HEAD_REF, **current.as_dict()}
+        if previous != expected_head:
+            raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
+        if not found:
+            raise ValidationError(error_code, ref.get("revision_digest", ""))
+
+        row = con.execute(
+            "SELECT kind,version,schema_ref,logical_id,body FROM immutable_objects WHERE digest=?",
+            (ref.get("revision_digest"),),
+        ).fetchone()
+        if row is None:
+            raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
+        obj = CanonicalObject(row[0], json.loads(row[4]), row[2], row[3], row[1])
+        if (
+            obj.digest != ref.get("revision_digest")
+            or obj.kind != kind
+            or obj.schema_revision_ref != ref.get("schema_revision_ref")
+            or obj.logical_id != ref.get("logical_id")
+        ):
+            raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
+
+    def _validate_material_ref_contracts(self, obj, *, current, con):
         """Check exact field/class/allowed-kind/cardinality for inline refs.
 
         Structural executable schemas intentionally stay small; this layer is
@@ -509,6 +593,13 @@ class TransactionalHistoryStore:
                     raise ValidationError("TYPED_REF_TARGET_MISMATCH", field)
                 if value_item.get("ref_class") not in semantics:
                     raise ValidationError("UNREGISTERED_REFERENCE_CLASS")
+                if value_item.get("ref_class") == "PRIOR_ACCEPTED_ONLY":
+                    self._validate_prior_accepted_membership(
+                        value_item,
+                        consumer_kind=obj.kind,
+                        current=current,
+                        con=con,
+                    )
 
     def _validate_stop_snapshot_binding(self, obj, objects, con):
         snap_ref = obj.body.get("stop_input_snapshot_ref")
@@ -647,7 +738,7 @@ class TransactionalHistoryStore:
                 raise ValidationError("CAMPAIGN_ID_REQUIRED")
             self._validate_content_refs(objects, con)
             for obj in objects:
-                self._validate_material_ref_contracts(obj)
+                self._validate_material_ref_contracts(obj, current=current, con=con)
                 if obj.kind == "stop_input":
                     self._validate_stop_snapshot_binding(obj, objects, con)
             from ..orchestration.fsm import project_states
