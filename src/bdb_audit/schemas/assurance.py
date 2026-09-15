@@ -4,8 +4,7 @@ from __future__ import annotations
 FIELDS = {
     "residual_risk": (
         "risk_id risk_revision scope description materiality uncertainty_class reason_unresolved "
-        "disposition blocking_effect history_cut related_obligation_refs related_hypothesis_refs "
-        "evidence_refs status"
+        "disposition blocking_effect related_obligation_refs related_hypothesis_refs evidence_refs"
     ),
     "candidate_assurance_case": (
         "candidate_assurance_case_id campaign_ref source_generation_ref candidate_input_history_cut "
@@ -50,7 +49,7 @@ FIELDS = {
 }
 
 OPTIONAL = {
-    "residual_risk": ("owner_approval_ref", "waiver_ref"),
+    "residual_risk": ("owner_approval_ref",),
     "candidate_assurance_case": ("coverage_obligation_summary_ref",),
     "challenger_assignment": ("forbidden_prior_result_refs",),
     "campaign_conclusion": ("candidate_assurance_case_ref", "limited_conclusion_basis_refs"),
@@ -71,7 +70,6 @@ ARRAYS = {
 }
 
 OBJECTS = {
-    "history_cut",
     "candidate_input_history_cut", "assignment_input_history_cut", "result_input_history_cut",
     "conclusion_command_input_history_cut", "final_case_input_history_cut",
     "release_assessment_basis_cut", "qualification_command_input_history_cut",
@@ -108,7 +106,6 @@ def assurance_schema(kind: str):
             "enum": ["OPEN", "BOUNDED", "ACCEPTED_RESIDUAL_RISK", "BLOCKED", "UNKNOWN", "SUPERSEDED"]
         }
         properties["blocking_effect"] = {"type": "boolean"}
-        properties["status"] = {"enum": ["VALID", "INVALIDATED", "CONTRADICTED", "STALE"]}
     elif kind == "challenger_assignment":
         properties["challenger_type"] = {
             "enum": ["FALSE_POSITIVE_SKEPTIC", "FALSE_NEGATIVE_HUNTER", "OTHER_POLICY_DEFINED"]
