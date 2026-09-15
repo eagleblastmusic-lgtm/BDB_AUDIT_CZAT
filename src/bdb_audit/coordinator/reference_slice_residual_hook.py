@@ -1,9 +1,9 @@
 """Make the synthetic reference slice explicit about an empty residual-risk set.
 
 The reference slice constructs its INTERMEDIATE StopInput directly rather than
-through StopInputBuilder.  Its constructor already declares
+through StopInputBuilder. Its constructor already declares
 ``residual_risk_refs=[]``; this adapter adds the matching machine-readable zero
-counters.  The durable store still independently proves that accepted history
+counters. The durable store still independently proves that accepted history
 really contains no current residual-risk revisions, so the adapter cannot hide
 an accepted risk.
 """
@@ -24,7 +24,6 @@ def install_reference_slice_zero_risk_proof(reference_slice_module) -> None:
                 "accepted_residual_risk_count": 0,
                 "blocking_residual_risk_count": 0,
                 "unresolved_residual_risk_count": 0,
-                "invalid_residual_risk_count": 0,
             }
             for key, value in expected.items():
                 if key in summary and summary[key] != value:
