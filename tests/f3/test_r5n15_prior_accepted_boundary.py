@@ -86,7 +86,7 @@ def _discovery_with_knowledge_ref(ctx, discovery_record, knowledge_ref, discover
     body["discovery_id"] = discovery_id
     body["discovery_input_history_cut"] = ctx["head_cut"]
     body["knowledge_state_ref"] = knowledge_ref
-    return CanonicalObject("discovery_record", body, logical_id=discovery_id)
+    return CanonicalObject("discovery_record", body)
 
 
 def test_fabricated_canonical_prior_ref_is_rejected(tmp_path: Path) -> None:
@@ -116,9 +116,8 @@ def test_orphan_object_row_is_not_prior_acceptance_evidence(tmp_path: Path) -> N
         tmp_path, "r5n15_orphan.sqlite"
     )
     orphan_body = dict(knowledge["body"])
-    orphan_id = "kstate_r5n15_orphan"
-    orphan_body["knowledge_state_id"] = orphan_id
-    orphan = CanonicalObject("knowledge_state", orphan_body, logical_id=orphan_id)
+    orphan_body["knowledge_state_id"] = "kstate_r5n15_orphan"
+    orphan = CanonicalObject("knowledge_state", orphan_body)
 
     con = store._connect()
     try:
