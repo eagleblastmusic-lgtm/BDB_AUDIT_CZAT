@@ -85,6 +85,72 @@ def _validate_overlay_prior_accepted(self, ref, *, consumer_kind, current, con) 
         raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
 
 
+def _prior_approval_body(ref, con) -> dict:
+    row = con.execute(
+        "SELECT kind,body FROM immutable_objects WHERE digest=?",
+        (ref.get("revision_digest"),),
+    ).fetchone()
+    if row is None or row[0] != "approval_decision":
+        raise ValidationError("RESIDUAL_RISK_APPROVAL_NOT_ACCEPTED")
+    return json.loads(row[1])
+
+
+def _validate_residual_risk_authority(obj, *, con) -> None:
+    """Approval refs are authority only when the prior decision is APPROVED."""
+    body = obj.body
+    owner_ref = body.get("owner_approval_ref")
+    waiver_ref = body.get("waiver_ref")
+
+    if body.get("disposition") == "ACCEPTED_RESIDUAL_RISK":
+        if not isinstance(owner_ref, dict):
+            raise ValidationError("RESIDUAL_RISK_REQUIRES_APPROVAL")
+        if body.get("status") != "VALID":
+            raise ValidationError("ACCEPTED_RESIDUAL_RISK_MUST_BE_VALID")
+
+    if isinstance(owner_ref, dict):
+        if _prior_approval_body(owner_ref, con).get("decision") != "APPROVED":
+            raise ValidationError("RESIDUAL_RISK_APPROVAL_NOT_APPROVED")
+    if isinstance(waiver_ref, dict):
+        if _prior_approval_body(waiver_ref, con).get("decision") != "APPROVED":
+            raise ValidationError("RESIDUAL_RISK_WAIVER_NOT_APPROVED")
+
+
+def _validate_stop_residual_risk_projection(obj, *, current, con) -> None:
+    """Equality-check StopInput's residual-risk set against accepted history."""
+    if current is None:
+        raise ValidationError("STOP_INPUT_REQUIRES_ACCEPTED_PARENT")
+
+    from ..stop.authority import _accepted_index, _digest_set, _latest_by, _records
+    from ..stop.residual_risk_projection import _risk_summary
+
+    index = _accepted_index(current, con)
+    current_risks = _latest_by(
+        _records("residual_risk", index, con),
+        lambda row: str(row["body"].get("risk_id") or row["ref"]["revision_digest"]),
+    )
+    active_rows = tuple(
+        current_risks[key]
+        for key in sorted(current_risks)
+        if current_risks[key]["body"].get("disposition") != "SUPERSEDED"
+    )
+    expected_refs = [row["ref"] for row in active_rows]
+    actual_refs = obj.body.get("residual_risk_refs", ())
+    if _digest_set(actual_refs) != _digest_set(expected_refs):
+        raise ValidationError("STOP_CURRENT_PROJECTION_MISMATCH", "residual_risk_refs")
+
+    expected_summary = _risk_summary(active_rows)
+    actual_summary = obj.body.get("unknown_blocked_summary")
+    if not isinstance(actual_summary, dict):
+        raise ValidationError("STOP_DERIVED_SUMMARY_MISMATCH", "unknown_blocked_summary")
+    for key, expected in expected_summary.items():
+        actual = actual_summary.get(key)
+        if isinstance(expected, bool):
+            if actual is not expected:
+                raise ValidationError("STOP_DERIVED_SUMMARY_MISMATCH", key)
+        elif type(actual) is not int or actual != expected:
+            raise ValidationError("STOP_DERIVED_SUMMARY_MISMATCH", key)
+
+
 def install_domain_authority_hooks(store_cls) -> None:
     """Install fail-closed domain authority checks exactly once."""
     original_material = store_cls._validate_material_ref_contracts
@@ -111,6 +177,10 @@ def install_domain_authority_hooks(store_cls) -> None:
             from ..stop.e6 import validate_adaptive_e6_stage_spec_authority
 
             validate_adaptive_e6_stage_spec_authority(obj, current=current, con=con)
+        elif obj.kind == "residual_risk":
+            _validate_residual_risk_authority(obj, con=con)
+        elif obj.kind == "stop_input":
+            _validate_stop_residual_risk_projection(obj, current=current, con=con)
 
     validate_prior_accepted_membership._bdb_overlay_prior_authority = True
     validate_material_ref_contracts._bdb_domain_authority_hooks = True
