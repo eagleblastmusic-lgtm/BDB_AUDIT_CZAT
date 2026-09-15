@@ -1,4 +1,4 @@
-"""Targeted tests for Residual Risk Register (PR-E5-07 / M42)."""
+"""Targeted tests for Residual Risk Register / Projection (PR-E5-07 / M42)."""
 import pytest
 from bdb_audit.assurance.residual_risk import ResidualRiskRecord, ResidualRiskRegister
 from bdb_audit.core.errors import ValidationError
@@ -35,12 +35,7 @@ def approval_ref():
     return _ref("approval_decision", "a" * 64, "PRIOR_ACCEPTED_ONLY")
 
 
-@pytest.fixture
-def waiver_ref():
-    return _ref("approval_decision", "b" * 64, "PRIOR_ACCEPTED_ONLY")
-
-
-def test_valid_accepted_residual_risk(history_cut, approval_ref):
+def test_valid_accepted_residual_risk_has_exact_section_79_body(history_cut, approval_ref):
     rec = ResidualRiskRecord(
         risk_id="risk_001",
         risk_revision="rev_1",
@@ -51,18 +46,25 @@ def test_valid_accepted_residual_risk(history_cut, approval_ref):
         reason_unresolved="Acceptable operational edge case",
         disposition="ACCEPTED_RESIDUAL_RISK",
         blocking_effect=False,
-        history_cut=history_cut,
         owner_approval_ref=approval_ref,
     )
     assert rec.disposition == "ACCEPTED_RESIDUAL_RISK"
-    assert rec.status == "VALID"
+    assert set(rec.body()) == {
+        "risk_id", "risk_revision", "scope", "description", "materiality",
+        "uncertainty_class", "reason_unresolved", "disposition", "blocking_effect",
+        "related_obligation_refs", "related_hypothesis_refs", "evidence_refs",
+        "owner_approval_ref",
+    }
+    assert "history_cut" not in rec.body()
+    assert "status" not in rec.body()
+    assert "waiver_ref" not in rec.body()
 
     reg = ResidualRiskRegister(history_cut)
     reg.add_record(rec)
     assert len(reg.records) == 1
 
 
-def test_unapproved_residual_risk_fail_closed(history_cut):
+def test_unapproved_residual_risk_fail_closed():
     with pytest.raises(ValidationError, match="RESIDUAL_RISK_REQUIRES_APPROVAL"):
         ResidualRiskRecord(
             risk_id="risk_unapproved",
@@ -74,12 +76,11 @@ def test_unapproved_residual_risk_fail_closed(history_cut):
             reason_unresolved="Unfixed",
             disposition="ACCEPTED_RESIDUAL_RISK",
             blocking_effect=True,
-            history_cut=history_cut,
             owner_approval_ref=None,
         )
 
 
-def test_unknown_scope_cannot_be_implicit_residual_risk(history_cut):
+def test_unknown_scope_cannot_be_implicit_accepted_residual_risk():
     with pytest.raises(ValidationError, match="RESIDUAL_RISK_REQUIRES_APPROVAL"):
         ResidualRiskRecord(
             risk_id="risk_unknown",
@@ -91,15 +92,13 @@ def test_unknown_scope_cannot_be_implicit_residual_risk(history_cut):
             reason_unresolved="Never analyzed",
             disposition="ACCEPTED_RESIDUAL_RISK",
             blocking_effect=True,
-            history_cut=history_cut,
             owner_approval_ref=None,
         )
 
 
-def test_stale_evidence_and_history_cut(history_cut, approval_ref):
+def test_register_staleness_is_projection_metadata_not_risk_body(history_cut, approval_ref):
     reg = ResidualRiskRegister(history_cut)
-    stale_cut = _cut(8, "8" * 64)
-    stale_rec = ResidualRiskRecord(
+    rec = ResidualRiskRecord(
         risk_id="risk_stale",
         risk_revision="rev_1",
         scope="crypto.rng",
@@ -109,45 +108,41 @@ def test_stale_evidence_and_history_cut(history_cut, approval_ref):
         reason_unresolved="Acceptable",
         disposition="ACCEPTED_RESIDUAL_RISK",
         blocking_effect=False,
-        history_cut=stale_cut,
         owner_approval_ref=approval_ref,
     )
-    with pytest.raises(ValidationError, match="STALE_RESIDUAL_RISK_INPUT"):
-        reg.add_record(stale_rec)
-
+    reg.add_record(rec)
     newer_cut = _cut(11, "d" * 64)
     assert reg.check_stale(newer_cut) is True
     assert reg.check_stale(history_cut) is False
+    assert "history_cut" not in rec.body()
 
 
-def test_invalidated_waiver_and_evidence(history_cut, approval_ref, waiver_ref):
+def test_invalidated_supporting_evidence_blocks_derived_register_view(history_cut, approval_ref):
     reg = ResidualRiskRegister(history_cut)
     rec = ResidualRiskRecord(
-        risk_id="risk_with_waiver",
+        risk_id="risk_evidence",
         risk_revision="rev_1",
         scope="storage.wal",
         description="WAL sync frequency",
         materiality="MEDIUM",
         uncertainty_class="PERFORMANCE_TRADEOFF",
-        reason_unresolved="Waived by security team",
+        reason_unresolved="Accepted operational tradeoff",
         disposition="ACCEPTED_RESIDUAL_RISK",
         blocking_effect=False,
-        history_cut=history_cut,
         evidence_refs=(_ref("registered_immutable_object", "c" * 64),),
         owner_approval_ref=approval_ref,
-        waiver_ref=waiver_ref,
     )
     reg.add_record(rec)
 
-    affected = reg.apply_invalidations({"b" * 64})
+    affected = reg.apply_invalidations({"c" * 64})
     assert affected == 1
-    updated = reg.records["risk_with_waiver"]
-    assert updated.status == "INVALIDATED"
+    updated = reg.records["risk_evidence"]
     assert updated.disposition == "BLOCKED"
     assert updated.blocking_effect is True
+    assert "status" not in updated.body()
 
 
-def test_open_contradiction(history_cut, approval_ref):
+def test_open_contradiction_blocks_derived_register_view(history_cut, approval_ref):
     reg = ResidualRiskRegister(history_cut)
     rec = ResidualRiskRecord(
         risk_id="risk_contra",
@@ -159,14 +154,12 @@ def test_open_contradiction(history_cut, approval_ref):
         reason_unresolved="Accepted",
         disposition="ACCEPTED_RESIDUAL_RISK",
         blocking_effect=False,
-        history_cut=history_cut,
         owner_approval_ref=approval_ref,
     )
     reg.add_record(rec)
 
     reg.apply_contradiction("risk_contra", {"reason": "Contradicted by DDoS benchmark"})
     updated = reg.records["risk_contra"]
-    assert updated.status == "CONTRADICTED"
     assert updated.disposition == "BLOCKED"
     assert updated.blocking_effect is True
 
@@ -183,7 +176,6 @@ def test_deterministic_rebuild(history_cut, approval_ref):
         reason_unresolved="Resolved",
         disposition="ACCEPTED_RESIDUAL_RISK",
         blocking_effect=False,
-        history_cut=history_cut,
         owner_approval_ref=approval_ref,
     )
     reg.add_record(rec)
