@@ -68,15 +68,22 @@ def _prior_accepted_refs(value):
 def typed_dependencies(nodes):
     """Return dependency edges (dependency, consumer) from complete refs.
 
-    R5.3 gives the post-STOP finalization chain a hard prior-accepted temporal
-    boundary. Other PRIOR_ACCEPTED_ONLY uses remain governed by their own
-    explicit contract validators and are intentionally not generalized here.
+    R5.3 gives both the E5 challenger chain and the post-STOP finalization
+    chain hard prior-accepted temporal boundaries. Other PRIOR_ACCEPTED_ONLY
+    uses remain governed by their own explicit contract validators and are
+    intentionally not generalized here.
     """
     prepared = [_node(n) for n in nodes]
     by_ref = {(n.kind, n.revision_digest): n.node_id for n in prepared if n.revision_digest}
     by_id = {n.node_id: n for n in prepared}
     edges = set()
-    finalization_kinds = {"campaign_conclusion", "final_assurance_case", "release_qualification"}
+    strict_temporal_consumers = {
+        "challenger_assignment",
+        "challenger_result",
+        "campaign_conclusion",
+        "final_assurance_case",
+        "release_qualification",
+    }
     for n in prepared:
         for dep in n.depends_on:
             if dep not in by_id:
@@ -96,7 +103,7 @@ def typed_dependencies(nodes):
                 raise ValidationError("SELF_CONTENT_REF")
             edges.add((target, n.node_id))
 
-        if n.kind not in finalization_kinds:
+        if n.kind not in strict_temporal_consumers:
             continue
         body = n.value.body if isinstance(n.value, CanonicalObject) else None
         if body is None:
