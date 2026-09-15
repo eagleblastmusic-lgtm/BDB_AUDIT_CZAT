@@ -15,6 +15,12 @@ from .packaging import E1LaneJob, E1Batch, prepare_e1_batch
 from .inbox import E1ResultInbox, ImportedResultSummary, LaneInboxStatus
 from .history_projection import CampaignProjection, CampaignHistoryService
 from .orchestrator import FullAuditOrchestrator, PreflightCheckResult, PreflightReport
+from .e6_runtime_hook import install_recursive_e6_runtime_support
+
+# POST_E6 may request another immutable E6 revision.  Install the read-model and
+# completion projection rules before application services begin making stage
+# decisions from accepted history.
+install_recursive_e6_runtime_support()
 
 __all__ = [
     "UserSettings",
