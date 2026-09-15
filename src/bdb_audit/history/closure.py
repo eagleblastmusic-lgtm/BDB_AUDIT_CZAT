@@ -106,7 +106,7 @@ def typed_dependencies(nodes):
             if target is None:
                 continue
             raise ValidationError(
-                "FINALIZATION_TEMPORAL_BINDING_CONFLICT",
+                "PRIOR_ACCEPTED_REFERENCE_REQUIRED",
                 f"{n.kind} consumes same-commit {ref.kind} through PRIOR_ACCEPTED_ONLY",
             )
     return prepared, edges
