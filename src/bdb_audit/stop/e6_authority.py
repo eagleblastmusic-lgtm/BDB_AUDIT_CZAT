@@ -2,8 +2,8 @@
 
 A stage whose ``stage_key`` is E6 is legal only when it is a deterministic
 continuation of a prior accepted STOP result with ``E6_REQUIRED``.  The check
-runs inside the history-store write transaction and therefore cannot be
-satisfied by an in-memory model, an object-table orphan, or a same-commit STOP.
+runs at the trusted Coordinator boundary against the durable accepted history
+and cannot be satisfied by an in-memory model or object-table orphan.
 """
 from __future__ import annotations
 
@@ -108,10 +108,20 @@ def validate_e6_stage_spec_accepted_authority(
     stop_record = _resolve(stop_ref, index, con)
     stop_evaluation = StopEvaluation(**stop_record["body"])
 
-    stop_input_ref = stop_evaluation.stop_input_ref
-    stop_input_record = _resolve(dict(stop_input_ref), index, con)
-    if stop_input_record["ref"].get("kind") != "stop_input":
+    # Embedded StopInput refs created by the existing STOP contract may omit
+    # optional logical_id.  Membership is therefore established by exact
+    # accepted kind/digest/schema, then the accepted ref itself is used to
+    # verify durable object bytes.
+    stop_input_ref = dict(stop_evaluation.stop_input_ref)
+    stop_input_digest = stop_input_ref.get("revision_digest")
+    membership = index.get(("stop_input", stop_input_digest))
+    if (
+        membership is None
+        or stop_input_ref.get("kind") != "stop_input"
+        or membership["ref"].get("schema_revision_ref") != stop_input_ref.get("schema_revision_ref")
+    ):
         raise ValidationError("E6_STOP_INPUT_REQUIRED")
+    stop_input_record = _resolve(dict(membership["ref"]), index, con)
     stop_input = StopInput(**stop_input_record["body"])
     _assert_stop_semantics(stop_evaluation, stop_input)
 
