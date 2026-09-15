@@ -1,7 +1,12 @@
-"""Executable field contracts and schemas for Assurance & Finalization (F7 / M43, M43B, M44, M45A)."""
+"""Executable field contracts and schemas for Assurance & Finalization (F7 / M42-M45A)."""
 from __future__ import annotations
 
 FIELDS = {
+    "residual_risk": (
+        "risk_id risk_revision scope description materiality uncertainty_class reason_unresolved "
+        "disposition blocking_effect history_cut related_obligation_refs related_hypothesis_refs "
+        "evidence_refs status"
+    ),
     "candidate_assurance_case": (
         "candidate_assurance_case_id campaign_ref source_generation_ref candidate_input_history_cut "
         "scope_inventory_ref coverage_obligation_refs coverage_obligation_qualification_refs "
@@ -45,6 +50,7 @@ FIELDS = {
 }
 
 OPTIONAL = {
+    "residual_risk": ("owner_approval_ref", "waiver_ref"),
     "candidate_assurance_case": ("coverage_obligation_summary_ref",),
     "challenger_assignment": ("forbidden_prior_result_refs",),
     "campaign_conclusion": ("candidate_assurance_case_ref", "limited_conclusion_basis_refs"),
@@ -53,6 +59,7 @@ OPTIONAL = {
 }
 
 ARRAYS = {
+    "related_obligation_refs", "related_hypothesis_refs", "evidence_refs",
     "coverage_obligation_refs", "coverage_obligation_qualification_refs",
     "finding_claim_revision_refs", "finding_adjudication_refs", "contradiction_refs",
     "evidence_qualification_refs", "residual_risk_refs", "forbidden_prior_result_refs",
@@ -64,6 +71,7 @@ ARRAYS = {
 }
 
 OBJECTS = {
+    "history_cut",
     "candidate_input_history_cut", "assignment_input_history_cut", "result_input_history_cut",
     "conclusion_command_input_history_cut", "final_case_input_history_cut",
     "release_assessment_basis_cut", "qualification_command_input_history_cut",
@@ -89,7 +97,19 @@ def assurance_schema(kind: str):
         else:
             properties[name] = {"type": ["string", "number", "object"]}
 
-    if kind == "challenger_assignment":
+    if kind == "residual_risk":
+        for name in (
+            "risk_id", "risk_revision", "scope", "description", "uncertainty_class",
+            "reason_unresolved",
+        ):
+            properties[name] = {"type": "string", "minLength": 1}
+        properties["materiality"] = {"enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]}
+        properties["disposition"] = {
+            "enum": ["OPEN", "BOUNDED", "ACCEPTED_RESIDUAL_RISK", "BLOCKED", "UNKNOWN", "SUPERSEDED"]
+        }
+        properties["blocking_effect"] = {"type": "boolean"}
+        properties["status"] = {"enum": ["VALID", "INVALIDATED", "CONTRADICTED", "STALE"]}
+    elif kind == "challenger_assignment":
         properties["challenger_type"] = {
             "enum": ["FALSE_POSITIVE_SKEPTIC", "FALSE_NEGATIVE_HUNTER", "OTHER_POLICY_DEFINED"]
         }
