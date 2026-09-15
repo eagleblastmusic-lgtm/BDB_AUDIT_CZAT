@@ -130,69 +130,38 @@ def canonical_order(nodes, *, command_kind=None, commit_seq=None,
         order_edges = registry.order_only_edges(
             prepared, command_kind=command_kind, commit_seq=commit_seq,
             expected_parent=expected_parent, profile_name=profile_name)
-        if profile is None:
-            return set()
-        by_kind = {}
-        for node in nodes:
-            kind = node.get("kind") if isinstance(node, dict) else getattr(node, "kind", None)
-            by_kind.setdefault(kind, []).append(node)
-        groups = profile["ordered_kind_groups"]
-        # A group may be absent. Pair every present group with every later
-        # present group, preserving the exact profile relation without
-        # inferring edges from prose or kind-name conventions.
-        edges = set()
-        def node_id(node):
-            return node.get("id") if isinstance(node, dict) else getattr(node, "node_id")
-        for i, group in enumerate(groups):
-            left_nodes = [n for kind in group for n in by_kind.get(kind, ())]
-            if not left_nodes:
-                continue
-            for later_group in groups[i + 1:]:
-                right_nodes = [n for kind in later_group for n in by_kind.get(kind, ())]
-                edges.update(
-                    (node_id(left), node_id(right))
-                    for left in left_nodes for right in right_nodes
-                    if node_id(left) != node_id(right)
-                )
-        return edges
+        edges.update(order_edges)
+    adjacency = {n.node_id: set() for n in prepared}
+    indegree = {n.node_id: 0 for n in prepared}
+    for dep, consumer in edges:
+        if dep not in by_id or consumer not in by_id:
+            raise ValidationError("DANGLING_CONTENT_REF")
+        if consumer not in adjacency[dep]:
+            adjacency[dep].add(consumer)
+            indegree[consumer] += 1
 
-    def validate_definition(self, candidate):
-        seen = set()
-        for row in candidate.get("contracts", []):
-            kind, version = row.get("kind"), row.get("version")
-            expected = self.contract(kind, version)
-            if (kind, version) in seen:
-                raise ValidationError("DUPLICATE_CONTRACT_KIND")
-            seen.add((kind, version))
-            self.role(row.get("canonical_role"))
-            if kind in self._doc["foundation_inline_reference_contract_kinds"]:
-                if row.get("reference_contract_mode") != "EXPLICIT_COMPLETE":
-                    raise ValidationError("EXPLICIT_COMPLETE_REFERENCE_CONTRACT_MISMATCH")
-            for ref in row.get("material_refs", []):
-                if ref.get("ref_class") not in self._doc["reference_class_semantics"]:
-                    raise ValidationError("UNREGISTERED_REFERENCE_CLASS")
-                for target in ref.get("allowed", []):
-                    self.target(target)
-            self.reference_parity(kind, row.get("material_refs"), version)
-            if row.get("ordering_rules") != expected["ordering_rules"]:
-                raise ValidationError("ORDERING_RULE_DEFECT")
-            if row != expected:
-                raise ValidationError("REGISTRY_CONTRACT_SEMANTICS_MISMATCH")
-        if seen != set(self._contracts):
-            raise ValidationError("REGISTRY_INCOMPLETE")
-        for key, value in self._doc.items():
-            if key not in candidate:
-                raise ValidationError("REGISTRY_INCOMPLETE", key)
-            if key != "contracts" and candidate[key] != value:
-                raise ValidationError("REGISTRY_CONTRACT_SEMANTICS_MISMATCH", key)
+    def key(node_id):
+        n = by_id[node_id]
+        is_cmd = 0 if n.kind == "command_envelope" else 1
+        return (is_cmd, n.kind, n.logical_id or "", n.revision_digest or "", node_id)
 
-
-def canonical_reference_set(refs):
-    """Canonical deterministic set ordering for typed immutable refs."""
-    def key(ref):
-        return (ref.get("kind", ""), ref.get("logical_id", ""),
-                ref.get("revision_digest", ""), ref.get("schema_revision_ref", ""))
-    ordered = sorted(refs, key=key)
-    if len({(r.get("kind"), r.get("revision_digest")) for r in ordered}) != len(ordered):
-        raise ValidationError("DUPLICATE_CONTENT_REFERENCE")
+    heap = [(key(n.node_id), n.node_id) for n in prepared if indegree[n.node_id] == 0]
+    heapq.heapify(heap)
+    ordered = []
+    while heap:
+        _, node_id = heapq.heappop(heap)
+        ordered.append(node_id)
+        for child in sorted(adjacency[node_id], key=key):
+            indegree[child] -= 1
+            if indegree[child] == 0:
+                heapq.heappush(heap, (key(child), child))
+    if len(ordered) != len(prepared):
+        raise ValidationError("CONTENT_REFERENCE_CYCLE")
+    if expected is not None and list(expected) != ordered:
+        raise ValidationError("FUTURE_CONTENT_REF_OR_NON_TOPOLOGICAL_CLOSURE")
     return ordered
+
+
+def order_nodes(nodes, **kwargs):
+    by_id = {_node(n).node_id: _node(n) for n in nodes}
+    return [by_id[node_id] for node_id in canonical_order(nodes, **kwargs)]
