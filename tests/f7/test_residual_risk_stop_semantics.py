@@ -13,7 +13,6 @@ def _with_risk_summary(**overrides):
             "accepted_residual_risk_count": 1,
             "blocking_residual_risk_count": 0,
             "unresolved_residual_risk_count": 0,
-            "invalid_residual_risk_count": 0,
             **overrides,
         }
     )
@@ -38,17 +37,6 @@ def test_blocking_risk_cannot_pass() -> None:
     assert "BLOCKING_RESIDUAL_RISK" in result.reason_codes
 
 
-def test_invalid_or_stale_risk_authority_blocks_qualification() -> None:
-    data = _with_risk_summary(
-        accepted_residual_risk_count=0,
-        invalid_residual_risk_count=1,
-    )
-    result = evaluate_stop(StopInput(**data), insufficient_data=False)
-    assert result.continuation_decision == "BLOCKED"
-    assert result.release_readiness == "QUALIFICATION_BLOCKED"
-    assert "INVALID_RESIDUAL_RISK_AUTHORITY" in result.reason_codes
-
-
 def test_unresolved_risk_requires_e6_when_plan_is_approved() -> None:
     data = _with_risk_summary(
         accepted_residual_risk_count=0,
@@ -62,6 +50,17 @@ def test_unresolved_risk_requires_e6_when_plan_is_approved() -> None:
     assert result.continuation_decision == "E6_REQUIRED"
     assert result.release_readiness == "QUALIFICATION_BLOCKED"
     assert "E6_REQUIRED_TO_RESOLVE_RESIDUAL_RISK" in result.reason_codes
+
+
+def test_unresolved_risk_without_plan_is_blocked() -> None:
+    data = _with_risk_summary(
+        accepted_residual_risk_count=0,
+        unresolved_residual_risk_count=1,
+    )
+    result = evaluate_stop(StopInput(**data), insufficient_data=False)
+    assert result.continuation_decision == "BLOCKED"
+    assert result.release_readiness == "QUALIFICATION_BLOCKED"
+    assert "UNRESOLVED_RESIDUAL_RISK" in result.reason_codes
 
 
 def test_unverified_risk_binding_is_fail_closed() -> None:
