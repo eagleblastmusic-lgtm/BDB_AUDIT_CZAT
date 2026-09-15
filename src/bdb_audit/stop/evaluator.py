@@ -9,6 +9,8 @@ Normative invariants:
 - UNKNOWN/BLOCKED/insufficient/invalidated/contradicted state cannot silently become PASS.
 - Qualification cardinality is not obligation coverage proof for authoritative inputs.
 - Challenger cardinality is not exact-current-candidate binding proof for authoritative inputs.
+- A decisive VIOLATION_CONFIRMED can still be a valid qualification outcome; defect/release
+  disposition is a separate authority axis and is not inferred from coverage qualification alone.
 - Pure/non-authoritative preview inputs remain backward-compatible when proof fields are absent;
   accepted StopInput objects are independently equality-checked by the history authority.
 - Campaign termination is a separate CampaignConclusion decision.
@@ -171,7 +173,6 @@ def evaluate_stop(
 
         blocked_quals = _count(ub_summary, "blocked_qualification_count")
         stale_quals = _count(ub_summary, "stale_qualification_count")
-        violation_quals = _count(ub_summary, "violation_confirmed_count")
         in_progress_quals = _count(ub_summary, "in_progress_qualification_count")
         inconclusive_quals = _count(ub_summary, "inconclusive_qualification_count")
 
@@ -180,9 +181,6 @@ def evaluate_stop(
             is_hard_blocked = True
         if stale_quals:
             failure_reasons.append("STALE_MANDATORY_QUALIFICATION")
-            is_hard_blocked = True
-        if violation_quals:
-            failure_reasons.append("MANDATORY_OBLIGATION_VIOLATION_CONFIRMED")
             is_hard_blocked = True
         if in_progress_quals:
             failure_reasons.append("MANDATORY_QUALIFICATION_INCOMPLETE")
