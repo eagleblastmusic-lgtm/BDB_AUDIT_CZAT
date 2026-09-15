@@ -1,7 +1,7 @@
 """R5.3 finalization temporal-boundary regressions.
 
 These tests close R5N-51: a PRIOR_ACCEPTED_ONLY decision may never be
-manufactured and consumed in the same commit.  The public finalization service
+manufactured and consumed in the same commit. The public finalization service
 must materialize Conclusion -> FinalAssuranceCase -> ReleaseQualification as
 three accepted-history boundaries and resume safely after partial completion.
 """
@@ -88,6 +88,9 @@ class _FakeAcceptedStore:
             commit_seq=self.seq,
             commit_hash=self.hash,
         )
+
+    def accept(self, *args, **kwargs):
+        raise AssertionError("Coordinator.accept is not expected in this service-unit fake")
 
     def accepted_records(self, kind: str, cut: dict) -> list[dict]:
         max_seq = int(cut["accepted_head_seq"])
