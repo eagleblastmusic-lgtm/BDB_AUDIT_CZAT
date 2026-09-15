@@ -273,10 +273,18 @@ def test_real_e1_to_e2_packages_partial_import_restart_and_completion(tmp_path: 
     assert isinstance(e2_stage_completions, list)
 
     next_transition = resumed.advance_to_next_stage()
-    assert next_transition["status"] == "BLOCKED"
+    assert next_transition["status"] == "STAGE_READY"
     assert next_transition["current_stage"] == "E3"
-    assert next_transition["next_action"] == "CONFIGURE_ENFORCED_E3_EXECUTOR"
-    assert "ENFORCED" in next_transition["reason"]
+    assert next_transition["next_action"] == "DELIVER_STAGE_PACKAGES"
+    assert next_transition["lane_slots"] == ["E3-X", "E3-Y", "E3-Z"]
+    assert next_transition["assurance_profile"] == "BOUNDED_MANUAL_DECLARED"
+
+    e3_batch = resumed.stage_batch
+    assert e3_batch is not None
+    assert tuple(e3_batch.jobs) == ("E3-X", "E3-Y", "E3-Z")
+    for job in e3_batch.jobs.values():
+        assert job.required_isolation == "ENFORCED"
+        assert job.actual_isolation == "DECLARED"
 
 
 def test_post_e1_rejects_wrong_package_digest_without_stage_completion(tmp_path: Path) -> None:
