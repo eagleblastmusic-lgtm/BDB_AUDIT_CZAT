@@ -71,10 +71,32 @@ def test_e5_service_materializes_candidate_assignments_results_and_completion_in
     store = TransactionalHistoryStore(store_path)
     cut = current_accepted_cut(store)
 
-    candidate = store.accepted_records("candidate_assurance_case", cut)[-1]
-    assignments = store.accepted_records("challenger_assignment", cut)[-2:]
-    results = store.accepted_records("challenger_result", cut)[-2:]
-    completion = store.accepted_records("stage_completion", cut)[-1]
+    candidate = max(
+        store.accepted_records("candidate_assurance_case", cut),
+        key=lambda record: int(record["accepted_seq"]),
+    )
+    candidate_digest = candidate["ref"]["revision_digest"]
+
+    assignments = [
+        record
+        for record in store.accepted_records("challenger_assignment", cut)
+        if record["body"]["candidate_assurance_case_ref"]["revision_digest"]
+        == candidate_digest
+    ]
+    assignment_digests = {record["ref"]["revision_digest"] for record in assignments}
+    results = [
+        record
+        for record in store.accepted_records("challenger_result", cut)
+        if record["body"]["challenge_assignment_ref"]["revision_digest"]
+        in assignment_digests
+    ]
+    completion = max(
+        store.accepted_records("stage_completion", cut),
+        key=lambda record: int(record["accepted_seq"]),
+    )
+
+    assert len(assignments) == 2
+    assert len(results) == 2
 
     candidate_seq = int(candidate["accepted_seq"])
     assignment_seqs = {int(record["accepted_seq"]) for record in assignments}
@@ -91,16 +113,15 @@ def test_e5_service_materializes_candidate_assignments_results_and_completion_in
     for assignment in assignments:
         body = assignment["body"]
         assert body["assignment_input_history_cut"]["accepted_head_seq"] == candidate_seq
-        assert body["candidate_assurance_case_ref"]["revision_digest"] == candidate["ref"]["revision_digest"]
+        assert body["candidate_assurance_case_ref"]["revision_digest"] == candidate_digest
         assert body["candidate_assurance_case_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
 
-    assignment_digests = {record["ref"]["revision_digest"] for record in assignments}
     for challenger_result in results:
         body = challenger_result["body"]
         assert body["result_input_history_cut"]["accepted_head_seq"] == assignment_seq
         assert body["challenge_assignment_ref"]["revision_digest"] in assignment_digests
         assert body["challenge_assignment_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
-        assert body["candidate_assurance_case_ref"]["revision_digest"] == candidate["ref"]["revision_digest"]
+        assert body["candidate_assurance_case_ref"]["revision_digest"] == candidate_digest
         assert body["candidate_assurance_case_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
 
     assert completion["body"]["input_history_cut"]["accepted_head_seq"] == result_seq
