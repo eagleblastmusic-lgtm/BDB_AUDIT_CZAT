@@ -1,13 +1,13 @@
 """Adaptive E6 Generator (WP-E5-11 / M45 / §104 / Data Contracts §78).
 
-The canonical authority for adaptive E6 is an immutable ``StageSpec`` revision.
-Planner metadata remains available on ``AdaptiveE6Spec`` for orchestration, but
-``body()`` / ``as_object()`` expose only the exact StageSpec wire contract.
+Adaptive E6 authority is an immutable canonical ``StageSpec`` revision.
+The source STOP must be the current prior accepted head.  Trust is inherited
+from accepted ``CampaignGenesis`` and the isolation requirement is derived from
+the completed baseline StageRun -> LaneRun -> LaneSpec lineage.  Caller input is
+never allowed to create either authority after observing a failure.
 
-Authoritative acceptance proves that ``stop_e6_relationship`` points to the
-latest prior accepted ``StopEvaluation=E6_REQUIRED`` and its exact accepted
-``StopInput``.  Repeated POST_E6 rounds inherit the latest accepted E6 StageSpec,
-so earlier strengthening cannot disappear in a later adaptive round.
+POST_E6 may request another E6 round.  A later round therefore inherits the
+latest accepted E6 StageSpec and cumulatively preserves every prior strengthening.
 """
 from __future__ import annotations
 
@@ -25,6 +25,7 @@ from .models import StopInput, StopEvaluation
 
 _RELATIONSHIP_TYPE = "ADAPTIVE_E6_FROM_ACCEPTED_STOP_V1"
 _POST_E6_OUTPUT = "POST_E6_STOP_REEVALUATION"
+_ISOLATION_RANK = {"UNKNOWN": 0, "DECLARED": 1, "ENFORCED": 2}
 _RELATIONSHIP_KEYS = {
     "relationship_type",
     "source_stop_evaluation_ref",
@@ -36,7 +37,7 @@ _RELATIONSHIP_KEYS = {
     "governing_policy_pin",
     "governing_spec_pins",
     "trust_profile_ref",
-    "isolation_profile_ref",
+    "required_isolation_assurance",
     "inherited_unresolved_obligations",
     "unknown_blocked_summary",
     "unresolved_contradictions",
@@ -93,12 +94,83 @@ def _parse_relationship(value: Any) -> dict[str, Any]:
         raise ValidationError("E6_STOP_RELATIONSHIP_NONCANONICAL")
     if payload.get("relationship_type") != _RELATIONSHIP_TYPE:
         raise ValidationError("E6_STOP_RELATIONSHIP_INVALID")
+    if payload.get("required_isolation_assurance") not in _ISOLATION_RANK:
+        raise ValidationError("E6_ISOLATION_ASSURANCE_INVALID")
     return payload
+
+
+def _profile_isolation_assurance(value: Mapping[str, Any] | None) -> str:
+    """Compatibility adapter for the pure planner API; never history authority."""
+    if value is None:
+        return "UNKNOWN"
+    explicit = value.get("required_isolation_assurance")
+    if explicit in _ISOLATION_RANK:
+        return str(explicit)
+    level = str(value.get("isolation_level", "UNKNOWN")).upper()
+    if level in {"STRICT", "ENFORCED"}:
+        return "ENFORCED"
+    if level in {"RELAXED", "DECLARED"}:
+        return "DECLARED"
+    return "UNKNOWN"
+
+
+def _strongest_isolation(values: Sequence[str]) -> str:
+    valid = [value for value in values if value in _ISOLATION_RANK]
+    if not valid:
+        raise ValidationError("E6_BASELINE_ISOLATION_AUTHORITY_REQUIRED")
+    return max(valid, key=lambda value: _ISOLATION_RANK[value])
+
+
+def _baseline_from_rows(rows: Sequence[dict[str, Any]], evaluation_context: str) -> dict[str, Any]:
+    e6_rows = [row for row in rows if row["body"].get("stage_key") == "E6"]
+    e5_rows = [row for row in rows if row["body"].get("stage_key") == "E5"]
+    if e6_rows:
+        baseline = max(e6_rows, key=lambda row: int(row.get("accepted_seq", 0)))
+    elif e5_rows:
+        baseline = max(e5_rows, key=lambda row: int(row.get("accepted_seq", 0)))
+    else:
+        raise ValidationError("E6_BASELINE_STAGE_SPEC_REQUIRED")
+    if evaluation_context == "POST_E6" and baseline["body"].get("stage_key") != "E6":
+        raise ValidationError("E6_PRIOR_ROUND_BASELINE_REQUIRED")
+    return baseline
+
+
+def _baseline_isolation_from_store(store, cut: dict[str, Any], baseline_row: dict[str, Any]) -> str:
+    baseline_digest = baseline_row["ref"]["revision_digest"]
+    completions = [
+        row
+        for row in store.accepted_records("stage_completion", cut)
+        if row["body"].get("completion_predicate_result") == "STAGE_COMPLETED"
+        and row["body"].get("stage_spec_ref", {}).get("revision_digest") == baseline_digest
+    ]
+    if not completions:
+        raise ValidationError("E6_BASELINE_STAGE_NOT_COMPLETED")
+    completion = max(completions, key=lambda row: int(row.get("accepted_seq", 0)))
+    stage_run_digest = completion["body"].get("stage_run_ref", {}).get("revision_digest")
+    if not isinstance(stage_run_digest, str):
+        raise ValidationError("E6_BASELINE_STAGE_RUN_REQUIRED")
+
+    lane_runs = [
+        row
+        for row in store.accepted_records("lane_run", cut)
+        if row["body"].get("stage_run_ref", {}).get("revision_digest") == stage_run_digest
+    ]
+    lane_specs = {
+        row["ref"]["revision_digest"]: row
+        for row in store.accepted_records("lane_spec", cut)
+    }
+    assurances: list[str] = []
+    for lane_run in lane_runs:
+        lane_spec_digest = lane_run["body"].get("lane_spec_ref", {}).get("revision_digest")
+        lane_spec = lane_specs.get(lane_spec_digest)
+        if lane_spec is not None:
+            assurances.append(str(lane_spec["body"].get("required_isolation_assurance")))
+    return _strongest_isolation(assurances)
 
 
 @dataclass(frozen=True)
 class AdaptiveE6Spec:
-    """Planner view whose canonical authority is ``stage_spec`` only."""
+    """Planner view whose only canonical authority is ``stage_spec``."""
 
     stage_spec: StageSpec
     source_stop_evaluation_ref: dict[str, Any]
@@ -118,7 +190,6 @@ class AdaptiveE6Spec:
         return self.stage_spec.stage_spec_revision
 
     def body(self) -> dict[str, Any]:
-        """Return the exact canonical ``StageSpec`` body, never planner metadata."""
         return self.stage_spec.body()
 
     def as_object(self) -> CanonicalObject:
@@ -177,10 +248,9 @@ class AdaptiveE6Generator:
     ) -> AdaptiveE6Spec:
         """Build one immutable E6 plan.
 
-        This pure builder validates semantic preservation but cannot by itself
-        prove accepted-history membership.  Use ``generate_e6_spec_from_store``
-        for an authoritative-ready plan; the history store repeats the proof at
-        acceptance time.
+        The pure API is useful for deterministic planning/tests, but caller
+        trust/isolation values are assertions only.  History authority is added
+        by ``generate_e6_spec_from_store`` and re-proved at acceptance time.
         """
         if stop_evaluation.continuation_decision != "E6_REQUIRED":
             raise ValidationError(
@@ -214,13 +284,13 @@ class AdaptiveE6Generator:
                 "E6 cannot drop unresolved mandatory obligations to manipulate the denominator",
             )
 
+        required_isolation = _profile_isolation_assurance(isolation_profile_ref)
         if proposed_isolation_profile_ref is not None:
-            baseline_level = isolation_profile_ref.get("isolation_level", "STRICT")
-            proposed_level = proposed_isolation_profile_ref.get("isolation_level", "STRICT")
-            if baseline_level == "STRICT" and proposed_level != "STRICT":
+            proposed = _profile_isolation_assurance(proposed_isolation_profile_ref)
+            if _ISOLATION_RANK[proposed] < _ISOLATION_RANK[required_isolation]:
                 raise ValidationError(
                     "ISOLATION_REWRITE_FORBIDDEN",
-                    "E6 cannot weaken baseline isolation profile after failure observation",
+                    "E6 cannot weaken baseline isolation assurance after failure observation",
                 )
 
         stop_cut = AdaptiveE6Generator._accepted_cut(dict(stop_input.input_history_cut), "stop_input_cut")
@@ -249,7 +319,8 @@ class AdaptiveE6Generator:
                 raise ValidationError("E6_GOVERNING_SPEC_MISMATCH")
             if prior_relation.get("trust_profile_ref") != trust_profile_ref:
                 raise ValidationError("E6_TRUST_PROFILE_WEAKENING_FORBIDDEN")
-            if prior_relation.get("isolation_profile_ref") != isolation_profile_ref:
+            prior_isolation = str(prior_relation.get("required_isolation_assurance"))
+            if _ISOLATION_RANK[required_isolation] < _ISOLATION_RANK[prior_isolation]:
                 raise ValidationError("E6_ISOLATION_REWRITE_FORBIDDEN")
             prior_added_surfaces = prior_relation.get("added_surfaces", ())
             prior_added_invariants = prior_relation.get("added_invariants", ())
@@ -272,7 +343,7 @@ class AdaptiveE6Generator:
             "governing_policy_pin": hcut.get("governing_policy_ref"),
             "governing_spec_pins": list(hcut.get("governing_spec_refs", ())),
             "trust_profile_ref": dict(trust_profile_ref),
-            "isolation_profile_ref": dict(isolation_profile_ref),
+            "required_isolation_assurance": required_isolation,
             "inherited_unresolved_obligations": list(inherited_unresolved),
             "unknown_blocked_summary": dict(stop_input.unknown_blocked_summary),
             "unresolved_contradictions": list(unresolved_contradictions),
@@ -341,15 +412,15 @@ class AdaptiveE6Generator:
         *,
         spec_id: str,
         stop_evaluation_ref: Mapping[str, Any],
-        trust_profile_ref: dict[str, Any],
-        isolation_profile_ref: dict[str, Any],
+        trust_profile_ref: dict[str, Any] | None = None,
+        isolation_profile_ref: dict[str, Any] | None = None,
         proposed_isolation_profile_ref: dict[str, Any] | None = None,
         added_surfaces: Sequence[dict[str, Any]] = (),
         added_invariants: Sequence[dict[str, Any]] = (),
         added_obligations: Sequence[dict[str, Any]] = (),
         attempted_dropped_obligation_digests: Set[str] | None = None,
     ) -> AdaptiveE6Spec:
-        """Build E6 from the latest exact accepted STOP result at current head."""
+        """Build E6 solely from the current accepted STOP and inherited authority."""
         from ..workflow.read_models import current_accepted_cut
 
         cut = current_accepted_cut(store)
@@ -359,6 +430,8 @@ class AdaptiveE6Generator:
         latest_stop = max(stop_rows, key=lambda row: int(row.get("accepted_seq", 0)))
         requested_digest = stop_evaluation_ref.get("revision_digest")
         if requested_digest != latest_stop["ref"].get("revision_digest"):
+            raise ValidationError("E6_STOP_EVALUATION_STALE")
+        if int(latest_stop.get("accepted_seq", 0)) != int(cut["accepted_head_seq"]):
             raise ValidationError("E6_STOP_EVALUATION_STALE")
 
         stop_evaluation = StopEvaluation(**latest_stop["body"])
@@ -375,29 +448,32 @@ class AdaptiveE6Generator:
         stop_input_row = stop_input_rows[0]
         stop_input = StopInput(**stop_input_row["body"])
 
-        all_stage_rows = store.accepted_records("stage_spec", cut)
-        e6_rows = [row for row in all_stage_rows if row["body"].get("stage_key") == "E6"]
-        e5_rows = [row for row in all_stage_rows if row["body"].get("stage_key") == "E5"]
-        if e6_rows:
-            baseline_row = max(e6_rows, key=lambda row: int(row.get("accepted_seq", 0)))
-        elif e5_rows:
-            baseline_row = max(e5_rows, key=lambda row: int(row.get("accepted_seq", 0)))
-        else:
-            raise ValidationError("E6_BASELINE_STAGE_SPEC_REQUIRED")
-        if stop_input.evaluation_context == "POST_E6" and baseline_row["body"].get("stage_key") != "E6":
-            raise ValidationError("E6_PRIOR_ROUND_BASELINE_REQUIRED")
+        baseline_row = _baseline_from_rows(
+            store.accepted_records("stage_spec", cut), stop_input.evaluation_context
+        )
         baseline_stage_spec = StageSpec(**baseline_row["body"])
+        required_isolation = _baseline_isolation_from_store(store, cut, baseline_row)
 
-        if trust_profile_ref.get("kind") != "trust_profile":
+        genesis_rows = store.accepted_records("campaign_genesis", cut)
+        if len(genesis_rows) != 1:
+            raise ValidationError("E6_CAMPAIGN_GENESIS_REQUIRED")
+        inherited_trust = genesis_rows[0]["body"].get("trust_profile_ref")
+        if not isinstance(inherited_trust, dict):
             raise ValidationError("E6_TRUST_PROFILE_REQUIRED")
-        store.resolve_accepted(dict(trust_profile_ref), cut)
+        if trust_profile_ref is not None and trust_profile_ref != inherited_trust:
+            raise ValidationError("E6_TRUST_PROFILE_WEAKENING_FORBIDDEN")
+        if isolation_profile_ref is not None:
+            asserted_isolation = _profile_isolation_assurance(isolation_profile_ref)
+            if asserted_isolation != required_isolation:
+                raise ValidationError("E6_ISOLATION_REWRITE_FORBIDDEN")
 
+        derived_isolation = {"required_isolation_assurance": required_isolation}
         return AdaptiveE6Generator.generate_e6_spec(
             spec_id=spec_id,
             stop_evaluation=stop_evaluation,
             stop_input=stop_input,
-            trust_profile_ref=trust_profile_ref,
-            isolation_profile_ref=isolation_profile_ref,
+            trust_profile_ref=inherited_trust,
+            isolation_profile_ref=derived_isolation,
             proposed_isolation_profile_ref=proposed_isolation_profile_ref,
             added_surfaces=added_surfaces,
             added_invariants=added_invariants,
@@ -413,7 +489,6 @@ class AdaptiveE6Generator:
     def verify_post_e6_return_to_stop(new_head_cut: dict[str, Any], previous_cut: dict[str, Any]) -> None:
         previous = AdaptiveE6Generator._accepted_cut(previous_cut, "previous_cut")
         new = AdaptiveE6Generator._accepted_cut(new_head_cut, "new_head_cut")
-
         if new.campaign_id != previous.campaign_id:
             raise ValidationError(
                 "POST_E6_CAMPAIGN_MISMATCH",
@@ -429,13 +504,50 @@ class AdaptiveE6Generator:
             )
 
 
+def _baseline_isolation_from_index(
+    baseline_row: dict[str, Any],
+    *,
+    index,
+    con,
+    records,
+) -> str:
+    baseline_digest = baseline_row["ref"]["revision_digest"]
+    completions = [
+        row
+        for row in records("stage_completion", index, con)
+        if row["body"].get("completion_predicate_result") == "STAGE_COMPLETED"
+        and row["body"].get("stage_spec_ref", {}).get("revision_digest") == baseline_digest
+    ]
+    if not completions:
+        raise ValidationError("E6_BASELINE_STAGE_NOT_COMPLETED")
+    completion = max(completions, key=lambda row: int(row["accepted_seq"]))
+    stage_run_digest = completion["body"].get("stage_run_ref", {}).get("revision_digest")
+    if not isinstance(stage_run_digest, str):
+        raise ValidationError("E6_BASELINE_STAGE_RUN_REQUIRED")
+    lane_runs = [
+        row
+        for row in records("lane_run", index, con)
+        if row["body"].get("stage_run_ref", {}).get("revision_digest") == stage_run_digest
+    ]
+    lane_specs = {
+        row["ref"]["revision_digest"]: row for row in records("lane_spec", index, con)
+    }
+    assurances: list[str] = []
+    for lane_run in lane_runs:
+        lane_spec_digest = lane_run["body"].get("lane_spec_ref", {}).get("revision_digest")
+        lane_spec = lane_specs.get(lane_spec_digest)
+        if lane_spec is not None:
+            assurances.append(str(lane_spec["body"].get("required_isolation_assurance")))
+    return _strongest_isolation(assurances)
+
+
 def validate_adaptive_e6_stage_spec_authority(
     stage_obj: CanonicalObject,
     *,
     current: AcceptedHead | None,
     con,
 ) -> None:
-    """Prove an E6 StageSpec is derived from current prior accepted STOP authority."""
+    """Prove an E6 StageSpec is derived from current prior accepted authority."""
     if stage_obj.kind != "stage_spec" or stage_obj.body.get("stage_key") != "E6":
         return
     if current is None:
@@ -466,7 +578,11 @@ def validate_adaptive_e6_stage_spec_authority(
         raise ValidationError("E6_ACCEPTED_STOP_REQUIRED")
     stop_eval_row = _resolve(stop_eval_ref, index, con)
     latest_stop = _latest(_records("stop_evaluation", index, con))
-    if latest_stop is None or latest_stop["ref"].get("revision_digest") != stop_eval_ref.get("revision_digest"):
+    if (
+        latest_stop is None
+        or latest_stop["ref"].get("revision_digest") != stop_eval_ref.get("revision_digest")
+        or int(stop_eval_row["accepted_seq"]) != current.commit_seq
+    ):
         raise ValidationError("E6_STOP_EVALUATION_STALE")
 
     stop_eval_body = stop_eval_row["body"]
@@ -485,26 +601,29 @@ def validate_adaptive_e6_stage_spec_authority(
         raise ValidationError("E6_STOP_INPUT_BINDING_MISMATCH")
     stop_input_row = _resolve(stop_input_ref, index, con)
     stop_input_body = stop_input_row["body"]
-    if stop_input_body.get("evaluation_context") not in {"FINAL_POST_E5", "POST_E6"}:
+    evaluation_context = str(stop_input_body.get("evaluation_context"))
+    if evaluation_context not in {"FINAL_POST_E5", "POST_E6"}:
         raise ValidationError("E6_FINAL_STOP_CONTEXT_REQUIRED")
 
     stage_rows = _records("stage_spec", index, con)
-    prior_e6_rows = [row for row in stage_rows if row["body"].get("stage_key") == "E6"]
-    e5_rows = [row for row in stage_rows if row["body"].get("stage_key") == "E5"]
-    if prior_e6_rows:
-        baseline_row = max(prior_e6_rows, key=lambda row: int(row["accepted_seq"]))
-    elif e5_rows:
-        baseline_row = max(e5_rows, key=lambda row: int(row["accepted_seq"]))
-    else:
-        raise ValidationError("E6_BASELINE_STAGE_SPEC_REQUIRED")
-    if stop_input_body.get("evaluation_context") == "POST_E6" and baseline_row["body"].get("stage_key") != "E6":
-        raise ValidationError("E6_PRIOR_ROUND_BASELINE_REQUIRED")
-
+    baseline_row = _baseline_from_rows(stage_rows, evaluation_context)
     baseline_ref = payload.get("baseline_stage_spec_ref")
     if not isinstance(baseline_ref, dict) or not _same_digest(baseline_ref, baseline_row["ref"]):
         raise ValidationError("E6_BASELINE_STAGE_SPEC_MISMATCH")
     _resolve(baseline_ref, index, con)
     baseline_body = baseline_row["body"]
+    required_isolation = _baseline_isolation_from_index(
+        baseline_row, index=index, con=con, records=_records
+    )
+    if payload.get("required_isolation_assurance") != required_isolation:
+        raise ValidationError("E6_ISOLATION_REWRITE_FORBIDDEN")
+
+    genesis_rows = _records("campaign_genesis", index, con)
+    if len(genesis_rows) != 1:
+        raise ValidationError("E6_CAMPAIGN_GENESIS_REQUIRED")
+    genesis_trust = genesis_rows[0]["body"].get("trust_profile_ref")
+    if payload.get("trust_profile_ref") != genesis_trust:
+        raise ValidationError("E6_TRUST_PROFILE_WEAKENING_FORBIDDEN")
 
     if payload.get("source_generation_ref") != stop_input_body.get("source_generation_ref"):
         raise ValidationError("E6_SOURCE_GENERATION_MISMATCH")
@@ -537,13 +656,6 @@ def validate_adaptive_e6_stage_spec_authority(
     if payload.get("source_stop_reason_codes") != stop_eval_body.get("reason_codes"):
         raise ValidationError("E6_STOP_REASON_SET_MISMATCH")
 
-    trust_ref = payload.get("trust_profile_ref")
-    if not isinstance(trust_ref, dict) or trust_ref.get("kind") != "trust_profile":
-        raise ValidationError("E6_TRUST_PROFILE_REQUIRED")
-    _resolve(trust_ref, index, con)
-    if not isinstance(payload.get("isolation_profile_ref"), dict):
-        raise ValidationError("E6_ISOLATION_PROFILE_REQUIRED")
-
     for field_name in ("added_surfaces", "added_invariants", "added_obligations"):
         values = payload.get(field_name)
         if not isinstance(values, list):
@@ -553,9 +665,10 @@ def validate_adaptive_e6_stage_spec_authority(
 
     if baseline_body.get("stage_key") == "E6":
         prior_relation = _parse_relationship(baseline_body.get("stop_e6_relationship"))
-        if prior_relation.get("trust_profile_ref") != trust_ref:
+        if prior_relation.get("trust_profile_ref") != genesis_trust:
             raise ValidationError("E6_TRUST_PROFILE_WEAKENING_FORBIDDEN")
-        if prior_relation.get("isolation_profile_ref") != payload.get("isolation_profile_ref"):
+        prior_isolation = str(prior_relation.get("required_isolation_assurance"))
+        if _ISOLATION_RANK[required_isolation] < _ISOLATION_RANK[prior_isolation]:
             raise ValidationError("E6_ISOLATION_REWRITE_FORBIDDEN")
         if not _same_digest(prior_relation.get("source_generation_ref"), payload.get("source_generation_ref")):
             raise ValidationError("E6_SOURCE_GENERATION_MISMATCH")
