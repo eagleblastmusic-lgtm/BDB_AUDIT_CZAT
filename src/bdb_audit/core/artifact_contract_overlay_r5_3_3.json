@@ -4,7 +4,7 @@
   "base_registry_id": "BDB-AUDIT-V2-ARTIFACT-CONTRACT-REGISTRY-R5-3-2",
   "contracts": [
     {
-      "authoritative_for": "canonical residual-risk assessment revision used by STOP, conclusion, final assurance and release qualification",
+      "authoritative_for": "versioned residual-risk assessment bound to exact obligations, hypotheses, evidence and optional prior owner acceptance",
       "canonical_role": "ASSESSMENT",
       "consumer_roles": [
         "COORDINATOR",
@@ -14,14 +14,6 @@
       "kind": "residual_risk",
       "lifecycle": "IMMUTABLE",
       "material_refs": [
-        {
-          "allowed": [
-            "history_cut"
-          ],
-          "cardinality": "1",
-          "field": "history_cut",
-          "ref_class": "HISTORY_INPUT"
-        },
         {
           "allowed": [
             "coverage_obligation"
@@ -53,18 +45,10 @@
           "cardinality": "0..1",
           "field": "owner_approval_ref",
           "ref_class": "PRIOR_ACCEPTED_ONLY"
-        },
-        {
-          "allowed": [
-            "approval_decision"
-          ],
-          "cardinality": "0..1",
-          "field": "waiver_ref",
-          "ref_class": "PRIOR_ACCEPTED_ONLY"
         }
       ],
       "ordering_rules": {
-        "temporal_boundary": "owner_approval_ref and waiver_ref, when present, must be prior accepted and visible on history_cut; risk revision acceptance may not self-authorize residual-risk acceptance."
+        "acceptance_authority": "ACCEPTED_RESIDUAL_RISK requires owner_approval_ref to a prior accepted APPROVED approval_decision; assessment acceptance may not self-authorize."
       },
       "producer_authority": "TRUSTED_COORDINATOR_ACCEPTANCE",
       "reference_contract_mode": "EXPLICIT_COMPLETE",
@@ -72,7 +56,6 @@
         "L3",
         "L4",
         "L5",
-        "L6",
         "L7"
       ],
       "schema_ref": "BDB_SCHEMA_REGISTRY::residual_risk/1",
