@@ -51,12 +51,34 @@ def _node(value):
     raise ValidationError("CLOSURE_NODE_INVALID")
 
 
+def _prior_accepted_refs(value):
+    """Yield typed PRIOR_ACCEPTED_ONLY refs embedded in a prepared body.
+
+    A PRIOR_ACCEPTED_ONLY edge is deliberately excluded from the ordinary
+    content dependency graph: it must already exist in the parent accepted
+    history and therefore can never be satisfied by another object prepared in
+    the same closure.  Walking it separately lets the closure gate reject the
+    temporal self-certification pattern before persistence.
+    """
+    if isinstance(value, dict):
+        if {"kind", "revision_digest", "digest_profile", "schema_revision_ref"}.issubset(value):
+            if value.get("ref_class") == "PRIOR_ACCEPTED_ONLY":
+                yield ObjectRef.from_dict(value)
+            return
+        for child in value.values():
+            yield from _prior_accepted_refs(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from _prior_accepted_refs(child)
+
+
 def typed_dependencies(nodes):
     """Return dependency edges (dependency, consumer) from complete refs."""
     prepared = [_node(n) for n in nodes]
     by_ref = {(n.kind, n.revision_digest): n.node_id for n in prepared if n.revision_digest}
     by_id = {n.node_id: n for n in prepared}
     edges = set()
+    finalization_kinds = {"campaign_conclusion", "final_assurance_case", "release_qualification"}
     for n in prepared:
         for dep in n.depends_on:
             if dep not in by_id:
@@ -75,6 +97,22 @@ def typed_dependencies(nodes):
             if target == n.node_id:
                 raise ValidationError("SELF_CONTENT_REF")
             edges.add((target, n.node_id))
+
+        body = n.value.body if isinstance(n.value, CanonicalObject) else None
+        if body is not None:
+            for ref in _prior_accepted_refs(body):
+                target = by_ref.get((ref.kind, ref.revision_digest))
+                if target is None:
+                    continue
+                if n.kind in finalization_kinds or ref.kind in finalization_kinds | {"stop_evaluation"}:
+                    raise ValidationError(
+                        "FINALIZATION_TEMPORAL_BINDING_CONFLICT",
+                        f"{n.kind} consumes same-commit {ref.kind} through PRIOR_ACCEPTED_ONLY",
+                    )
+                raise ValidationError(
+                    "HISTORY_INPUT_SAME_COMMIT_FORBIDDEN",
+                    f"{n.kind} consumes same-commit {ref.kind} through PRIOR_ACCEPTED_ONLY",
+                )
     return prepared, edges
 
 
