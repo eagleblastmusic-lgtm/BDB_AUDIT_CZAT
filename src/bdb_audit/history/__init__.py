@@ -7,6 +7,7 @@ from .objects import (
 )
 from .closure import ClosureNode, canonical_order, order_nodes, typed_dependencies
 from .store import TransactionalHistoryStore, AcceptanceResult, InjectedCrash
+from .authority_hooks import install_domain_authority_hooks
 from .replay import (
     ReplayCapsule,
     IndependentReplayRecord,
@@ -19,6 +20,10 @@ from .successor import (
     create_successor_campaign,
     select_successor_campaign,
 )
+
+# Domain-specific accepted-authority checks extend the generic durable adapter
+# at its existing pre-durability material-reference validation boundary.
+install_domain_authority_hooks(TransactionalHistoryStore)
 
 __all__ = [
     "EMPTY_HISTORY", "ACCEPTED_HEAD_REF", "HistoryCut", "AcceptedHead",
