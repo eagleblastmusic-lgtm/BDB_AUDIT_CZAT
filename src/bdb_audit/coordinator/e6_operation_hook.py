@@ -14,7 +14,6 @@ from ..core.errors import ValidationError
 from ..history.objects import CommandEnvelope
 from ..history.store import TransactionalHistoryStore
 from ..stop.e6 import AdaptiveE6Generator
-from ..workflow.read_models import current_accepted_cut
 
 
 def install_adaptive_e6_prepare_stage() -> None:
@@ -31,6 +30,8 @@ def install_adaptive_e6_prepare_stage() -> None:
         stage_key = operations_module._canonical_stage_key(stage_id)
         if stage_key != "E6":
             return original_prepare_stage(self, store_path, stage_id, stage_spec_revision)
+
+        from ..workflow.read_models import current_accepted_cut
 
         path = Path(store_path).resolve()
         status = self.get_campaign_status(path)
