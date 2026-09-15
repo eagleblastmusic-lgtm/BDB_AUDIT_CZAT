@@ -34,13 +34,17 @@ def _risk_summary(rows: tuple[dict[str, Any], ...]) -> dict[str, Any]:
         body = row["body"]
         disposition = body.get("disposition")
         status = body.get("status")
-        blocking = bool(body.get("blocking_effect", False))
+        blocking = bool(body.get("blocking_effect", False)) or disposition == "BLOCKED"
         approved = isinstance(body.get("owner_approval_ref"), dict)
 
         if status in invalid_statuses:
             summary["invalid_residual_risk_count"] += 1
-        if blocking or disposition == "BLOCKED" or status in invalid_statuses:
+        if blocking:
             summary["blocking_residual_risk_count"] += 1
+        elif status in invalid_statuses:
+            # Invalid/stale authority is a qualification blocker, not evidence
+            # that the underlying condition is itself a known technical defect.
+            continue
         elif (
             disposition == "ACCEPTED_RESIDUAL_RISK"
             and status == "VALID"
