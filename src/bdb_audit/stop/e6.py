@@ -4,9 +4,10 @@ The canonical authority for adaptive E6 is an immutable ``StageSpec`` revision.
 Planner metadata remains available on ``AdaptiveE6Spec`` for orchestration, but
 ``body()`` / ``as_object()`` expose only the exact StageSpec wire contract.
 
-Authoritative acceptance additionally proves that ``stop_e6_relationship``
-points to the latest prior accepted ``StopEvaluation=E6_REQUIRED`` and its exact
-accepted ``StopInput``.  A same-commit or fabricated STOP result is never enough.
+Authoritative acceptance proves that ``stop_e6_relationship`` points to the
+latest prior accepted ``StopEvaluation=E6_REQUIRED`` and its exact accepted
+``StopInput``.  Repeated POST_E6 rounds inherit the latest accepted E6 StageSpec,
+so earlier strengthening cannot disappear in a later adaptive round.
 """
 from __future__ import annotations
 
@@ -46,12 +47,17 @@ _RELATIONSHIP_KEYS = {
 }
 
 
-def _ref_dict(value: Mapping[str, Any] | dict[str, Any]) -> dict[str, Any]:
-    return dict(value)
-
-
 def _canonical_refs(values: Sequence[Mapping[str, Any]]) -> tuple[dict[str, Any], ...]:
     return tuple(canonical_reference_set([dict(value) for value in values]))
+
+
+def _merge_canonical_refs(*groups: Sequence[Mapping[str, Any]]) -> tuple[dict[str, Any], ...]:
+    unique: dict[bytes, dict[str, Any]] = {}
+    for group in groups:
+        for value in group:
+            ref = dict(value)
+            unique[canonical_bytes(ref)] = ref
+    return tuple(canonical_reference_set(list(unique.values())))
 
 
 def _digest_set(values: Sequence[Mapping[str, Any]]) -> set[str]:
@@ -60,6 +66,14 @@ def _digest_set(values: Sequence[Mapping[str, Any]]) -> set[str]:
         for value in values
         if isinstance(value, Mapping) and isinstance(value.get("revision_digest"), str)
     }
+
+
+def _same_digest(left: Any, right: Any) -> bool:
+    return (
+        isinstance(left, Mapping)
+        and isinstance(right, Mapping)
+        and left.get("revision_digest") == right.get("revision_digest")
+    )
 
 
 def _canonical_relationship(payload: dict[str, Any]) -> str:
@@ -158,6 +172,8 @@ class AdaptiveE6Generator:
         attempted_dropped_obligation_digests: Set[str] | None = None,
         e6_input_history_cut: dict[str, Any] | None = None,
         baseline_stage_spec: StageSpec | None = None,
+        source_stop_evaluation_ref: Mapping[str, Any] | None = None,
+        source_stop_input_ref: Mapping[str, Any] | None = None,
     ) -> AdaptiveE6Spec:
         """Build one immutable E6 plan.
 
@@ -176,6 +192,13 @@ class AdaptiveE6Generator:
         if stop_evaluation.release_readiness in {"READY", "READY_WITH_RESIDUAL_RISK"}:
             raise ValidationError("E6_READY_AXIS_CONFLICT")
         if stop_evaluation.stop_input_ref.get("revision_digest") != stop_input.ref.get("revision_digest"):
+            raise ValidationError("E6_STOP_INPUT_BINDING_MISMATCH")
+
+        exact_stop_eval_ref = dict(source_stop_evaluation_ref or stop_evaluation.ref)
+        exact_stop_input_ref = dict(source_stop_input_ref or stop_input.ref)
+        if exact_stop_eval_ref.get("revision_digest") != stop_evaluation.ref.get("revision_digest"):
+            raise ValidationError("E6_STOP_EVALUATION_BINDING_MISMATCH")
+        if exact_stop_input_ref.get("revision_digest") != stop_input.ref.get("revision_digest"):
             raise ValidationError("E6_STOP_INPUT_BINDING_MISMATCH")
 
         mandatory_digests = _digest_set(stop_input.mandatory_obligation_refs)
@@ -213,16 +236,35 @@ class AdaptiveE6Generator:
         ):
             raise ValidationError("E6_INPUT_CUT_CONFLICT")
 
-        added_surfaces_c = _canonical_refs(added_surfaces)
-        added_invariants_c = _canonical_refs(added_invariants)
-        added_obligations_c = _canonical_refs(added_obligations)
+        prior_added_surfaces: Sequence[Mapping[str, Any]] = ()
+        prior_added_invariants: Sequence[Mapping[str, Any]] = ()
+        prior_added_obligations: Sequence[Mapping[str, Any]] = ()
+        if baseline_stage_spec is not None and baseline_stage_spec.stage_key == "E6":
+            prior_relation = _parse_relationship(baseline_stage_spec.stop_e6_relationship)
+            if not _same_digest(prior_relation.get("source_generation_ref"), stop_input.source_generation_ref):
+                raise ValidationError("E6_SOURCE_GENERATION_MISMATCH")
+            if prior_relation.get("governing_policy_pin") != hcut.get("governing_policy_ref"):
+                raise ValidationError("E6_GOVERNING_POLICY_MISMATCH")
+            if prior_relation.get("governing_spec_pins") != list(hcut.get("governing_spec_refs", ())):
+                raise ValidationError("E6_GOVERNING_SPEC_MISMATCH")
+            if prior_relation.get("trust_profile_ref") != trust_profile_ref:
+                raise ValidationError("E6_TRUST_PROFILE_WEAKENING_FORBIDDEN")
+            if prior_relation.get("isolation_profile_ref") != isolation_profile_ref:
+                raise ValidationError("E6_ISOLATION_REWRITE_FORBIDDEN")
+            prior_added_surfaces = prior_relation.get("added_surfaces", ())
+            prior_added_invariants = prior_relation.get("added_invariants", ())
+            prior_added_obligations = prior_relation.get("added_obligations", ())
+
+        added_surfaces_c = _merge_canonical_refs(prior_added_surfaces, added_surfaces)
+        added_invariants_c = _merge_canonical_refs(prior_added_invariants, added_invariants)
+        added_obligations_c = _merge_canonical_refs(prior_added_obligations, added_obligations)
         unresolved_contradictions = _canonical_refs(stop_input.contradiction_refs)
 
         baseline_ref = dict(baseline_stage_spec.ref) if baseline_stage_spec is not None else None
         payload = {
             "relationship_type": _RELATIONSHIP_TYPE,
-            "source_stop_evaluation_ref": dict(stop_evaluation.ref),
-            "source_stop_input_ref": dict(stop_input.ref),
+            "source_stop_evaluation_ref": exact_stop_eval_ref,
+            "source_stop_input_ref": exact_stop_input_ref,
             "baseline_stage_spec_ref": baseline_ref,
             "e6_input_history_cut": hcut,
             "source_generation_ref": dict(stop_input.source_generation_ref),
@@ -280,7 +322,7 @@ class AdaptiveE6Generator:
 
         return AdaptiveE6Spec(
             stage_spec=stage_spec,
-            source_stop_evaluation_ref=dict(stop_evaluation.ref),
+            source_stop_evaluation_ref=exact_stop_eval_ref,
             source_generation_ref=dict(stop_input.source_generation_ref),
             governing_policy_ref=dict(stop_input.governing_policy_ref),
             trust_profile_ref=dict(trust_profile_ref),
@@ -319,28 +361,36 @@ class AdaptiveE6Generator:
         if requested_digest != latest_stop["ref"].get("revision_digest"):
             raise ValidationError("E6_STOP_EVALUATION_STALE")
 
-        stop_row = store.resolve_accepted(dict(stop_evaluation_ref), cut)
-        stop_evaluation = StopEvaluation(**stop_row["body"])
-        stop_input_ref = stop_row["body"].get("stop_input_ref")
-        if not isinstance(stop_input_ref, dict):
+        stop_evaluation = StopEvaluation(**latest_stop["body"])
+        declared_stop_input_ref = latest_stop["body"].get("stop_input_ref")
+        if not isinstance(declared_stop_input_ref, dict):
             raise ValidationError("E6_STOP_INPUT_BINDING_MISMATCH")
-        stop_input_row = store.resolve_accepted(stop_input_ref, cut)
+        stop_input_rows = [
+            row
+            for row in store.accepted_records("stop_input", cut)
+            if row["ref"].get("revision_digest") == declared_stop_input_ref.get("revision_digest")
+        ]
+        if len(stop_input_rows) != 1:
+            raise ValidationError("E6_STOP_INPUT_BINDING_MISMATCH")
+        stop_input_row = stop_input_rows[0]
         stop_input = StopInput(**stop_input_row["body"])
 
-        stage_rows = [
-            row
-            for row in store.accepted_records("stage_spec", cut)
-            if row["body"].get("stage_key") == "E5"
-        ]
-        if not stage_rows:
+        all_stage_rows = store.accepted_records("stage_spec", cut)
+        e6_rows = [row for row in all_stage_rows if row["body"].get("stage_key") == "E6"]
+        e5_rows = [row for row in all_stage_rows if row["body"].get("stage_key") == "E5"]
+        if e6_rows:
+            baseline_row = max(e6_rows, key=lambda row: int(row.get("accepted_seq", 0)))
+        elif e5_rows:
+            baseline_row = max(e5_rows, key=lambda row: int(row.get("accepted_seq", 0)))
+        else:
             raise ValidationError("E6_BASELINE_STAGE_SPEC_REQUIRED")
-        latest_e5 = max(stage_rows, key=lambda row: int(row.get("accepted_seq", 0)))
-        baseline_stage_spec = StageSpec(**latest_e5["body"])
+        if stop_input.evaluation_context == "POST_E6" and baseline_row["body"].get("stage_key") != "E6":
+            raise ValidationError("E6_PRIOR_ROUND_BASELINE_REQUIRED")
+        baseline_stage_spec = StageSpec(**baseline_row["body"])
 
-        # Trust profile is a canonical contract family and therefore must be
-        # accepted at the creation cut before it can constrain adaptive E6.
-        if trust_profile_ref.get("kind") == "trust_profile":
-            store.resolve_accepted(dict(trust_profile_ref), cut)
+        if trust_profile_ref.get("kind") != "trust_profile":
+            raise ValidationError("E6_TRUST_PROFILE_REQUIRED")
+        store.resolve_accepted(dict(trust_profile_ref), cut)
 
         return AdaptiveE6Generator.generate_e6_spec(
             spec_id=spec_id,
@@ -355,6 +405,8 @@ class AdaptiveE6Generator:
             attempted_dropped_obligation_digests=attempted_dropped_obligation_digests,
             e6_input_history_cut=cut,
             baseline_stage_spec=baseline_stage_spec,
+            source_stop_evaluation_ref=latest_stop["ref"],
+            source_stop_input_ref=stop_input_row["ref"],
         )
 
     @staticmethod
@@ -429,32 +481,30 @@ def validate_adaptive_e6_stage_spec_authority(
     if not isinstance(stop_input_ref, dict):
         raise ValidationError("E6_STOP_INPUT_BINDING_MISMATCH")
     accepted_stop_input_ref = stop_eval_body.get("stop_input_ref")
-    if (
-        not isinstance(accepted_stop_input_ref, dict)
-        or stop_input_ref.get("revision_digest") != accepted_stop_input_ref.get("revision_digest")
-    ):
+    if not _same_digest(stop_input_ref, accepted_stop_input_ref):
         raise ValidationError("E6_STOP_INPUT_BINDING_MISMATCH")
     stop_input_row = _resolve(stop_input_ref, index, con)
     stop_input_body = stop_input_row["body"]
     if stop_input_body.get("evaluation_context") not in {"FINAL_POST_E5", "POST_E6"}:
         raise ValidationError("E6_FINAL_STOP_CONTEXT_REQUIRED")
 
-    latest_e5_rows = [
-        row
-        for row in _records("stage_spec", index, con)
-        if row["body"].get("stage_key") == "E5"
-    ]
-    if not latest_e5_rows:
+    stage_rows = _records("stage_spec", index, con)
+    prior_e6_rows = [row for row in stage_rows if row["body"].get("stage_key") == "E6"]
+    e5_rows = [row for row in stage_rows if row["body"].get("stage_key") == "E5"]
+    if prior_e6_rows:
+        baseline_row = max(prior_e6_rows, key=lambda row: int(row["accepted_seq"]))
+    elif e5_rows:
+        baseline_row = max(e5_rows, key=lambda row: int(row["accepted_seq"]))
+    else:
         raise ValidationError("E6_BASELINE_STAGE_SPEC_REQUIRED")
-    latest_e5 = max(latest_e5_rows, key=lambda row: int(row["accepted_seq"]))
+    if stop_input_body.get("evaluation_context") == "POST_E6" and baseline_row["body"].get("stage_key") != "E6":
+        raise ValidationError("E6_PRIOR_ROUND_BASELINE_REQUIRED")
+
     baseline_ref = payload.get("baseline_stage_spec_ref")
-    if (
-        not isinstance(baseline_ref, dict)
-        or baseline_ref.get("revision_digest") != latest_e5["ref"].get("revision_digest")
-    ):
+    if not isinstance(baseline_ref, dict) or not _same_digest(baseline_ref, baseline_row["ref"]):
         raise ValidationError("E6_BASELINE_STAGE_SPEC_MISMATCH")
     _resolve(baseline_ref, index, con)
-    baseline_body = latest_e5["body"]
+    baseline_body = baseline_row["body"]
 
     if payload.get("source_generation_ref") != stop_input_body.get("source_generation_ref"):
         raise ValidationError("E6_SOURCE_GENERATION_MISMATCH")
@@ -500,6 +550,20 @@ def validate_adaptive_e6_stage_spec_authority(
             raise ValidationError("E6_ADDED_SCOPE_INVALID", field_name)
         if canonical_bytes(values) != canonical_bytes(canonical_reference_set(values)):
             raise ValidationError("E6_ADDED_SCOPE_NONCANONICAL", field_name)
+
+    if baseline_body.get("stage_key") == "E6":
+        prior_relation = _parse_relationship(baseline_body.get("stop_e6_relationship"))
+        if prior_relation.get("trust_profile_ref") != trust_ref:
+            raise ValidationError("E6_TRUST_PROFILE_WEAKENING_FORBIDDEN")
+        if prior_relation.get("isolation_profile_ref") != payload.get("isolation_profile_ref"):
+            raise ValidationError("E6_ISOLATION_REWRITE_FORBIDDEN")
+        if not _same_digest(prior_relation.get("source_generation_ref"), payload.get("source_generation_ref")):
+            raise ValidationError("E6_SOURCE_GENERATION_MISMATCH")
+        for field_name in ("added_surfaces", "added_invariants", "added_obligations"):
+            prior_digests = _digest_set(prior_relation.get(field_name, ()))
+            current_digests = _digest_set(payload.get(field_name, ()))
+            if not prior_digests.issubset(current_digests):
+                raise ValidationError("E6_PRIOR_STRENGTHENING_DROPPED", field_name)
 
     expected_outputs = tuple(
         dict.fromkeys((*baseline_body.get("required_stage_completion_outputs", ()), _POST_E6_OUTPUT))
