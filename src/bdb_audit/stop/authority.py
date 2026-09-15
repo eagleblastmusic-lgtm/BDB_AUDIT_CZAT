@@ -1,7 +1,8 @@
 """Trusted STOP-input equality checks against canonical accepted history.
 
-Every canonical ref used to justify authoritative STOP must occur in the parent
-accepted commit chain.  Durable object-table presence alone is never authority.
+Every accepted-content ref used to justify authoritative STOP must occur in the
+parent accepted commit chain. HISTORY_CONTEXT_BINDING refs remain governed by
+their pinned semantic context contract and are not misclassified as content.
 """
 from __future__ import annotations
 
@@ -12,7 +13,7 @@ from ..core.errors import ValidationError
 from ..history.objects import ACCEPTED_HEAD_REF, EMPTY_HISTORY, AcceptedHead, CanonicalObject
 
 
-_CANONICAL_FIELDS = (
+_ACCEPTED_CONTENT_FIELDS = (
     "source_generation_ref",
     "inventory_revision_ref",
     "mandatory_obligation_refs",
@@ -22,8 +23,6 @@ _CANONICAL_FIELDS = (
     "candidate_assurance_case_ref",
     "challenger_refs",
     "completed_stage_refs",
-    "required_stage_spec_refs",
-    "pending_required_stage_refs",
 )
 
 
@@ -39,8 +38,7 @@ def _accepted_index(current: AcceptedHead, con) -> dict[tuple[str, str], dict[st
     previous: Any = EMPTY_HISTORY
     index: dict[tuple[str, str], dict[str, Any]] = {}
     for stored_seq, digest, raw in con.execute(
-        "SELECT seq,commit_hash,body FROM commits WHERE seq<=? ORDER BY seq",
-        (current.commit_seq,),
+        "SELECT seq,commit_hash,body FROM commits WHERE seq<=? ORDER BY seq", (current.commit_seq,)
     ):
         body = json.loads(raw)
         from ..history.store import _commit_from_body
@@ -49,12 +47,8 @@ def _accepted_index(current: AcceptedHead, con) -> dict[tuple[str, str], dict[st
             raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
         if body["campaign_id"] != current.campaign_id:
             raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
-        previous = {
-            "tag": ACCEPTED_HEAD_REF,
-            "campaign_id": current.campaign_id,
-            "commit_seq": stored_seq,
-            "commit_hash": digest,
-        }
+        previous = {"tag": ACCEPTED_HEAD_REF, "campaign_id": current.campaign_id,
+                    "commit_seq": stored_seq, "commit_hash": digest}
         for ref in body.get("immutable_object_refs", ()):
             kind = ref.get("kind")
             revision_digest = ref.get("revision_digest")
@@ -81,12 +75,9 @@ def _resolve(ref: dict[str, Any], index: dict[tuple[str, str], dict[str, Any]], 
     if row is None:
         raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
     obj = CanonicalObject(row[0], json.loads(row[4]), row[2], row[3], row[1])
-    if (
-        obj.digest != ref["revision_digest"]
-        or obj.kind != ref["kind"]
-        or obj.schema_revision_ref != ref["schema_revision_ref"]
-        or obj.logical_id != ref.get("logical_id")
-    ):
+    if (obj.digest != ref["revision_digest"] or obj.kind != ref["kind"]
+            or obj.schema_revision_ref != ref["schema_revision_ref"]
+            or obj.logical_id != ref.get("logical_id")):
         raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
     return {"body": obj.body, "accepted_seq": membership["accepted_seq"], "ref": accepted_ref}
 
@@ -104,20 +95,16 @@ def validate_stop_input_accepted_authority(stop_obj: CanonicalObject, *, current
         return
     if current is None:
         raise ValidationError("STOP_INPUT_REQUIRES_ACCEPTED_PARENT")
-
     body = stop_obj.body
     cut = body.get("input_history_cut", {})
-    if (
-        cut.get("variant") != "ACCEPTED_HISTORY_CUT"
-        or cut.get("campaign_id") != current.campaign_id
-        or cut.get("accepted_head_seq") != current.commit_seq
-        or cut.get("accepted_head_hash") != current.commit_hash
-    ):
+    if (cut.get("variant") != "ACCEPTED_HISTORY_CUT" or cut.get("campaign_id") != current.campaign_id
+            or cut.get("accepted_head_seq") != current.commit_seq
+            or cut.get("accepted_head_hash") != current.commit_hash):
         raise ValidationError("STOP_INPUT_CUT_MISMATCH")
 
     index = _accepted_index(current, con)
     resolved: dict[tuple[str, str], dict[str, Any]] = {}
-    for field in _CANONICAL_FIELDS:
+    for field in _ACCEPTED_CONTENT_FIELDS:
         value = body.get(field)
         if value is None:
             continue
@@ -130,9 +117,6 @@ def validate_stop_input_accepted_authority(stop_obj: CanonicalObject, *, current
     if not isinstance(invalidation_state, dict) or invalidation_state.get("invalidated_count") != len(invalidation_refs):
         raise ValidationError("STOP_DERIVED_SUMMARY_MISMATCH", "evidence_invalidation_state")
 
-    # Intermediate STOP is never release authority. Exact accepted references
-    # are still enforced, but final-candidate/challenger qualification proof is
-    # intentionally deferred until FINAL_POST_E5 / POST_E6.
     if body.get("evaluation_context") == "INTERMEDIATE":
         return
 
@@ -181,11 +165,8 @@ def validate_stop_input_accepted_authority(stop_obj: CanonicalObject, *, current
     candidate_digest = candidate_ref.get("revision_digest") if isinstance(candidate_ref, dict) else None
     challenger_refs = [ref for ref in body.get("challenger_refs", ()) if isinstance(ref, dict)]
     roles: set[str] = set()
-    challenger_counts = {
-        "challenger_blocked_count": 0,
-        "challenger_inconclusive_count": 0,
-        "challenger_material_counterevidence_count": 0,
-    }
+    challenger_counts = {"challenger_blocked_count": 0, "challenger_inconclusive_count": 0,
+                         "challenger_material_counterevidence_count": 0}
     for ref in challenger_refs:
         result_row = resolved[(ref["kind"], ref["revision_digest"])]
         result_body = result_row["body"]
