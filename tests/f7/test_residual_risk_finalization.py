@@ -42,6 +42,7 @@ def _install_fake_accept(monkeypatch, store: _FakeAcceptedStore, service: Finali
 
 def _add_risk(store: _FakeAcceptedStore, token: str, *, seq: int, risk_id: str = "risk-1") -> dict:
     risk_ref = _ref("residual_risk", token)
+    approval_ref = dict(_ref("approval_decision", f"approval-{token}"), ref_class="PRIOR_ACCEPTED_ONLY")
     store.records.setdefault("residual_risk", []).append(
         {
             "accepted_seq": seq,
@@ -49,10 +50,17 @@ def _add_risk(store: _FakeAcceptedStore, token: str, *, seq: int, risk_id: str =
             "body": {
                 "risk_id": risk_id,
                 "risk_revision": token,
+                "scope": "release.fixture",
+                "description": "Accepted bounded release fixture risk",
+                "materiality": "MEDIUM",
+                "uncertainty_class": "BOUNDED",
+                "reason_unresolved": "Known bounded condition",
                 "disposition": "ACCEPTED_RESIDUAL_RISK",
-                "status": "VALID",
                 "blocking_effect": False,
-                "owner_approval_ref": _ref("approval_decision", f"approval-{token}"),
+                "related_obligation_refs": [],
+                "related_hypothesis_refs": [],
+                "evidence_refs": [],
+                "owner_approval_ref": approval_ref,
             },
         }
     )
