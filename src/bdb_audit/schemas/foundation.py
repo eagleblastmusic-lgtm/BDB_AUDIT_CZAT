@@ -84,8 +84,13 @@ M28_KINDS = (
 
 F6_KINDS = (*F3_KINDS, *M28_KINDS)
 
+M42_KINDS = (
+    "residual_risk",
+)
+
 F7_KINDS = (
     *F6_KINDS,
+    *M42_KINDS,
     "candidate_assurance_case",
     "challenger_assignment",
     "challenger_result",
