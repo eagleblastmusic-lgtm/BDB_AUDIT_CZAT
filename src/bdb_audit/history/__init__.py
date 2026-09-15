@@ -7,7 +7,9 @@ from .objects import (
 )
 from .closure import ClosureNode, canonical_order, order_nodes, typed_dependencies
 from .store import TransactionalHistoryStore, AcceptanceResult, InjectedCrash
+from . import authority_hooks as _authority_hooks_module
 from .authority_hooks import install_domain_authority_hooks
+from .residual_risk_release_authority import install_residual_risk_release_authority
 from .replay import (
     ReplayCapsule,
     IndependentReplayRecord,
@@ -24,6 +26,9 @@ from .successor import (
 # Domain-specific accepted-authority checks extend the generic durable adapter
 # at its existing pre-durability material-reference validation boundary.
 install_domain_authority_hooks(TransactionalHistoryStore)
+# Refine only STOP_AXIS release consistency: COMPLETED copies the STOP release
+# axis exactly; COMPLETED_LIMITED remains non-READY without widening M42 policy.
+install_residual_risk_release_authority(_authority_hooks_module)
 
 __all__ = [
     "EMPTY_HISTORY", "ACCEPTED_HEAD_REF", "HistoryCut", "AcceptedHead",
