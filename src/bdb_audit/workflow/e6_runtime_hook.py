@@ -54,7 +54,6 @@ def install_recursive_e6_runtime_support() -> None:
                         raise ValidationError("STAGE_SPEC_REVISION_REBIND", revision)
                     e6_revision_digests[revision] = current_digest
 
-                # E6 intentionally overwrites with the newest accepted revision.
                 selected_by_stage[canonical_key] = row
 
             stage_records: list[tuple[int, str, dict[str, Any]]] = []
@@ -75,9 +74,6 @@ def install_recursive_e6_runtime_support() -> None:
                     raise ValidationError("LANE_SPEC_PROJECTION_INVALID", "lane_spec missing lane_key")
                 lanes_prepared.append(str(lane_key))
             lanes_prepared.sort()
-            # Recursive E6 may legitimately reuse an operational lane key in a
-            # new immutable lane-spec revision.  Baseline duplicate keys remain
-            # invalid; collapse only E6 lane keys by their accepted revisions.
             non_e6_keys = [key for key in lanes_prepared if not key.lower().startswith("lane_e6")]
             if len(non_e6_keys) != len(set(non_e6_keys)):
                 raise ValidationError("LANE_SPEC_PROJECTION_INVALID", "Duplicate accepted lane key")
@@ -185,8 +181,8 @@ def install_recursive_e6_runtime_support() -> None:
                 "source_generation_id": source.get("source_generation_id"),
             }
 
-        model_cls.project_status = project_status
-        model_cls._bdb_recursive_e6_projection_installed = True
+        setattr(model_cls, "project_status", project_status)
+        setattr(model_cls, "_bdb_recursive_e6_projection_installed", True)
 
     service_cls = ss.StageService
     if getattr(service_cls, "_bdb_recursive_e6_completion_installed", False):
@@ -222,13 +218,13 @@ def install_recursive_e6_runtime_support() -> None:
             lane_kwargs["stage_spec_revision"] = latest_revision
             return original_lane_spec(*lane_args, **lane_kwargs)
 
-        self.store.accepted_records = chronological_records
-        ss.LaneSpec = e6_lane_spec
+        setattr(self.store, "accepted_records", chronological_records)
+        setattr(ss, "LaneSpec", e6_lane_spec)
         try:
             return original_qualify(self, "E6", *args, **kwargs)
         finally:
-            self.store.accepted_records = original_records
-            ss.LaneSpec = original_lane_spec
+            setattr(self.store, "accepted_records", original_records)
+            setattr(ss, "LaneSpec", original_lane_spec)
 
-    service_cls.qualify_and_complete_stage = qualify_and_complete_stage
-    service_cls._bdb_recursive_e6_completion_installed = True
+    setattr(service_cls, "qualify_and_complete_stage", qualify_and_complete_stage)
+    setattr(service_cls, "_bdb_recursive_e6_completion_installed", True)
