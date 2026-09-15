@@ -327,7 +327,7 @@ def run_foundation_reference_slice(store_path: str | Path, *, stop_at_seq: int =
     head_cut = make_cut(head, commit_4.commit)
 
     # -------------------------------------------------------------------------
-    # 5. SEQ=5: Controlled Discovery & Checkpoint & Reveal (F2 / M12)
+    # 5. SEQ=5: Knowledge checkpoint accepted before discovery (F2 / M12)
     # -------------------------------------------------------------------------
     knowledge_checkpoint = CanonicalObject("knowledge_state", {
         "knowledge_state_id": "kstate_checkpoint_fixture",
@@ -339,6 +339,16 @@ def run_foundation_reference_slice(store_path: str | Path, *, stop_at_seq: int =
         "potential_exposure_refs": [],
     })
 
+    commit_5 = coordinator.accept(
+        next_cmd(head_ref), immutable_objects=(knowledge_checkpoint,), expected_head=head
+    )
+    head = commit_5.head
+    head_ref = {"tag": "ACCEPTED_HEAD_REF", **head.as_dict()}
+    head_cut = make_cut(head, commit_5.commit)
+
+    # -------------------------------------------------------------------------
+    # 6. SEQ=6: Discovery + Hypothesis + Preregistered Experiment (M12/M17/M19)
+    # -------------------------------------------------------------------------
     discovery = CanonicalObject("discovery_record", {
         "discovery_id": "disc_e3_fixture",
         "lane_run_ref": _ref_for("discovery_record", "lane_run_ref", lane_run),
@@ -352,18 +362,6 @@ def run_foundation_reference_slice(store_path: str | Path, *, stop_at_seq: int =
         "own_observation_refs": [],
     })
 
-    seq5_objects = (
-        knowledge_checkpoint,
-        discovery,
-    )
-    commit_5 = coordinator.accept(next_cmd(head_ref), immutable_objects=seq5_objects, expected_head=head)
-    head = commit_5.head
-    head_ref = {"tag": "ACCEPTED_HEAD_REF", **head.as_dict()}
-    head_cut = make_cut(head, commit_5.commit)
-
-    # -------------------------------------------------------------------------
-    # 6. SEQ=6: Hypothesis (M17/M18) + Preregistered Experiment (M19)
-    # -------------------------------------------------------------------------
     hypothesis = HypothesisRevision(
         hypothesis_id=det_id("hypothesis_revision"),
         hypothesis_revision="1",
@@ -427,6 +425,7 @@ def run_foundation_reference_slice(store_path: str | Path, *, stop_at_seq: int =
     )
 
     seq6_objects = (
+        discovery,
         hypothesis.as_object(),
         exp_spec.as_object(),
         exec_desc.as_object(),
