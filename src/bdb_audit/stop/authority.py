@@ -1,9 +1,7 @@
 """Trusted STOP-input equality checks against canonical accepted history.
 
-This module is deliberately persistence-facing.  It never accepts object-table
-presence as authority: every canonical ref used to justify a final STOP result
-must occur in the parent accepted commit chain and its durable bytes must match
-the referenced digest/schema identity.
+Every canonical ref used to justify authoritative STOP must occur in the parent
+accepted commit chain.  Durable object-table presence alone is never authority.
 """
 from __future__ import annotations
 
@@ -46,7 +44,6 @@ def _accepted_index(current: AcceptedHead, con) -> dict[tuple[str, str], dict[st
     ):
         body = json.loads(raw)
         from ..history.store import _commit_from_body
-
         commit = _commit_from_body(body)
         if commit.digest != digest or body["commit_seq"] != stored_seq or body["prev_history_ref"] != previous:
             raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
@@ -63,7 +60,6 @@ def _accepted_index(current: AcceptedHead, con) -> dict[tuple[str, str], dict[st
             revision_digest = ref.get("revision_digest")
             if isinstance(kind, str) and isinstance(revision_digest, str):
                 index[(kind, revision_digest)] = {"ref": ref, "accepted_seq": stored_seq}
-
     if previous != {"tag": ACCEPTED_HEAD_REF, **current.as_dict()}:
         raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
     return index
@@ -129,11 +125,20 @@ def validate_stop_input_accepted_authority(stop_obj: CanonicalObject, *, current
             key = (ref["kind"], ref["revision_digest"])
             resolved[key] = _resolve(ref, index, con)
 
+    invalidation_refs = [ref for ref in body.get("evidence_invalidation_refs", ()) if isinstance(ref, dict)]
+    invalidation_state = body.get("evidence_invalidation_state")
+    if not isinstance(invalidation_state, dict) or invalidation_state.get("invalidated_count") != len(invalidation_refs):
+        raise ValidationError("STOP_DERIVED_SUMMARY_MISMATCH", "evidence_invalidation_state")
+
+    # Intermediate STOP is never release authority. Exact accepted references
+    # are still enforced, but final-candidate/challenger qualification proof is
+    # intentionally deferred until FINAL_POST_E5 / POST_E6.
+    if body.get("evaluation_context") == "INTERMEDIATE":
+        return
+
     mandatory_refs = [ref for ref in body.get("mandatory_obligation_refs", ()) if isinstance(ref, dict)]
     mandatory_digests = {ref.get("revision_digest") for ref in mandatory_refs}
-    qualification_refs = [
-        ref for ref in body.get("current_obligation_qualification_refs", ()) if isinstance(ref, dict)
-    ]
+    qualification_refs = [ref for ref in body.get("current_obligation_qualification_refs", ()) if isinstance(ref, dict)]
     qualification_by_obligation: dict[str, dict[str, Any]] = {}
     for ref in qualification_refs:
         row = resolved[(ref["kind"], ref["revision_digest"])]
@@ -145,7 +150,7 @@ def validate_stop_input_accepted_authority(stop_obj: CanonicalObject, *, current
             raise ValidationError("STOP_QUALIFICATION_BINDING_AMBIGUOUS")
         qualification_by_obligation[target_digest] = row
 
-    expected = {
+    expected: dict[str, Any] = {
         "qualification_binding_verified": set(qualification_by_obligation) == mandatory_digests,
         "unqualified_mandatory_obligations_count": len(mandatory_digests - set(qualification_by_obligation)),
         "blocked_qualification_count": 0,
@@ -204,10 +209,7 @@ def validate_stop_input_accepted_authority(stop_obj: CanonicalObject, *, current
             challenger_counts["challenger_inconclusive_count"] += 1
         elif status == "MATERIAL_COUNTEREVIDENCE_FOUND":
             challenger_counts["challenger_material_counterevidence_count"] += 1
-    expected["challenger_binding_verified"] = roles == {
-        "FALSE_POSITIVE_SKEPTIC",
-        "FALSE_NEGATIVE_HUNTER",
-    }
+    expected["challenger_binding_verified"] = roles == {"FALSE_POSITIVE_SKEPTIC", "FALSE_NEGATIVE_HUNTER"}
     expected.update(challenger_counts)
 
     summary = body.get("unknown_blocked_summary")
@@ -219,8 +221,3 @@ def validate_stop_input_accepted_authority(stop_obj: CanonicalObject, *, current
                 raise ValidationError("STOP_DERIVED_SUMMARY_MISMATCH", key)
         elif _summary_int(summary, key) != value:
             raise ValidationError("STOP_DERIVED_SUMMARY_MISMATCH", key)
-
-    invalidation_refs = [ref for ref in body.get("evidence_invalidation_refs", ()) if isinstance(ref, dict)]
-    invalidation_state = body.get("evidence_invalidation_state")
-    if not isinstance(invalidation_state, dict) or invalidation_state.get("invalidated_count") != len(invalidation_refs):
-        raise ValidationError("STOP_DERIVED_SUMMARY_MISMATCH", "evidence_invalidation_state")
