@@ -274,14 +274,24 @@ class StopInputBuilder:
             **qualification_summary,
             **challenger_summary,
         }
-        # Caller input may only make STOP more conservative, never erase a blocker.
+
+        # Caller input may only add conservative scope/data blockers. Derived
+        # qualification/challenger/stage proof is immutable and cannot be
+        # overwritten by the request that asks for STOP evaluation.
         if unknown_blocked_summary:
+            conservative_bool_fields = {"is_blocked", "insufficient_data", "has_unknown_scope"}
+            conservative_count_fields = {"unknown_surfaces_count"}
             for key, value in unknown_blocked_summary.items():
-                if isinstance(value, bool):
-                    derived_summary[key] = bool(derived_summary.get(key, False) or value)
-                elif isinstance(value, int) and not isinstance(value, bool):
+                if key in conservative_bool_fields:
+                    derived_summary[key] = bool(derived_summary.get(key, False) or bool(value))
+                elif key in conservative_count_fields:
+                    if type(value) is not int or value < 0:
+                        raise ValidationError("STOP_UNKNOWN_SUMMARY_INVALID", key)
                     derived_summary[key] = max(int(derived_summary.get(key, 0)), value)
-                elif key not in derived_summary:
+                elif key in derived_summary:
+                    if value != derived_summary[key]:
+                        raise ValidationError("STOP_DERIVED_SUMMARY_OVERRIDE_FORBIDDEN", key)
+                else:
                     derived_summary[key] = value
 
         policy_token = str(cut["governing_policy_ref"])
