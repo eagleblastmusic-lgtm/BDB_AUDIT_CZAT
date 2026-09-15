@@ -11,6 +11,7 @@ from typing import Any, Iterable, Sequence
 
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
+from ..core.registry import canonical_reference_set
 from ..history.store import TransactionalHistoryStore
 from .models import StopInput
 
@@ -111,7 +112,9 @@ class StopInputBuilder:
         # Missing required stage specs are STOP state, not a builder exception.
         # The final evaluator treats this count as required work still pending;
         # no fabricated StageSpec digest is introduced to fill the gap.
-        required_stage_spec_refs = [dict(row["ref"], ref_class="HISTORY_CONTEXT_BINDING") for row in required_specs]
+        required_stage_spec_refs = canonical_reference_set([
+            dict(row["ref"], ref_class="HISTORY_CONTEXT_BINDING") for row in required_specs
+        ])
         spec_key_by_digest = {row["ref"]["revision_digest"]: row["body"]["stage_key"] for row in required_specs}
 
         current_completions: dict[str, dict[str, Any]] = {}
@@ -126,12 +129,14 @@ class StopInputBuilder:
             prior = current_completions.get(stage_key)
             if prior is None or int(row["accepted_seq"]) > int(prior["accepted_seq"]):
                 current_completions[stage_key] = row
-        completed_stage_refs = [current_completions[key]["ref"] for key in sorted(current_completions)]
-        pending_required_stage_refs = [
+        completed_stage_refs = canonical_reference_set([
+            current_completions[key]["ref"] for key in sorted(current_completions)
+        ])
+        pending_required_stage_refs = canonical_reference_set([
             dict(row["ref"], ref_class="HISTORY_CONTEXT_BINDING")
             for row in required_specs
             if row["body"]["stage_key"] not in current_completions
-        ]
+        ])
 
         inv_record = _latest(store.accepted_records("inventory_revision", cut))
         if inv_record is None:
