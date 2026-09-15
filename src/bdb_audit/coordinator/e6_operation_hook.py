@@ -1,9 +1,10 @@
-"""Install the M45-aware E6 preparation path on the public operation facade.
+"""Install the M45-aware E6 preparation and continuation paths.
 
 The pre-M45 facade constructed E6 like an ordinary baseline StageSpec, which
 produced ``stop_e6_relationship='NONE'`` and was correctly rejected by the M45
 history authority validator.  This adapter keeps E1-E5 behavior untouched while
-routing E6 through ``AdaptiveE6Generator.generate_e6_spec_from_store``.
+routing E6 through ``AdaptiveE6Generator.generate_e6_spec_from_store`` and
+ensuring a prepared E6 revision must complete before control returns to STOP.
 """
 from __future__ import annotations
 
@@ -25,6 +26,7 @@ def install_adaptive_e6_prepare_stage() -> None:
         return
 
     original_prepare_stage = api_cls.prepare_stage
+    original_continue_campaign = api_cls.continue_campaign
 
     def prepare_stage(self, store_path, stage_id, stage_spec_revision="1"):
         stage_key = operations_module._canonical_stage_key(stage_id)
@@ -125,5 +127,25 @@ def install_adaptive_e6_prepare_stage() -> None:
             "commit_hash": result.head.commit_hash,
         }
 
+    def continue_campaign(self, store_path):
+        status = self.get_campaign_status(store_path)
+        if (
+            status.get("termination_state", "OPEN") == "OPEN"
+            and "E6" in status.get("stages_prepared", ())
+            and "E6" not in status.get("stages_completed", ())
+        ):
+            return {
+                "status": "SUCCESS",
+                "campaign_id": status["campaign_id"],
+                "current_stage": "E6",
+                "continuation_state": "AWAITING_STAGE_COMPLETION",
+                "next_action": "AWAITING_STAGE_COMPLETION",
+                "head_seq": status["accepted_head_seq"],
+            }
+        # Once the latest E6 revision is complete, the baseline continuation
+        # logic sees E1-E5 complete and correctly returns EVALUATE_STOP_GATE.
+        return original_continue_campaign(self, store_path)
+
     setattr(api_cls, "prepare_stage", prepare_stage)
+    setattr(api_cls, "continue_campaign", continue_campaign)
     setattr(api_cls, "_bdb_m45_prepare_stage_installed", True)
