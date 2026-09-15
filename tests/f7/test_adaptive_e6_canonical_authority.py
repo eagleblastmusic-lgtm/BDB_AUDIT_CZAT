@@ -15,9 +15,9 @@ from bdb_audit.history.objects import (
     CanonicalObject,
     CommandEnvelope,
     CommitBody,
-    HistoryCut,
 )
 from bdb_audit.history.store import TransactionalHistoryStore
+from bdb_audit.orchestration.runs import LaneSpec
 from bdb_audit.orchestration.stages import StageSpec
 from bdb_audit.schemas.foundation import executable_schema
 from bdb_audit.stop.e6 import AdaptiveE6Generator
@@ -126,6 +126,56 @@ def _accept_command(store: TransactionalHistoryStore, index: int) -> CommandEnve
     )
 
 
+def _stage_execution_objects(
+    stage_spec: StageSpec,
+    *,
+    source_generation_ref: dict,
+    label: str,
+    required_isolation_assurance: str,
+    include_stage_spec: bool,
+) -> list[CanonicalObject]:
+    stage_spec_obj = stage_spec.as_object()
+    stage_run = CanonicalObject(
+        "stage_run",
+        {
+            "stage_run_id": f"stage-run-{label}",
+            "stage_spec_ref": stage_spec.ref,
+            "source_generation_ref": source_generation_ref,
+        },
+    )
+    lane_spec = LaneSpec(
+        lane_key=f"lane-{label}",
+        lane_spec_revision="1",
+        stage_spec_revision=stage_spec.stage_spec_revision,
+        purpose=f"lane for {label}",
+        primary_strategy="DIRECT_ANALYSIS",
+        required_isolation_assurance=required_isolation_assurance,
+    )
+    lane_spec_obj = lane_spec.as_object()
+    lane_run = CanonicalObject(
+        "lane_run",
+        {
+            "lane_run_id": f"lane-run-{label}",
+            "stage_run_ref": stage_run.as_ref().as_dict(),
+            "lane_spec_ref": lane_spec_obj.as_ref(ref_class="HISTORY_CONTEXT_BINDING").as_dict(),
+            "source_generation_ref": source_generation_ref,
+        },
+    )
+    completion = CanonicalObject(
+        "stage_completion",
+        {
+            "stage_completion_id": f"stage-completion-{label}",
+            "stage_run_ref": stage_run.as_ref().as_dict(),
+            "stage_spec_ref": stage_spec.ref,
+            "completion_predicate_result": "STAGE_COMPLETED",
+        },
+    )
+    objects = [stage_run, lane_spec_obj, lane_run, completion]
+    if include_stage_spec:
+        objects.insert(0, stage_spec_obj)
+    return objects
+
+
 def _stop_pair(
     *,
     cut: dict,
@@ -182,7 +232,7 @@ def _stop_pair(
 
 def _seed_authority_store(tmp_path):
     store = TransactionalHistoryStore(tmp_path / "m45.sqlite")
-    profile, bootstrap_cmd, genesis_objects, _ = bootstrap_fixture()
+    profile, bootstrap_cmd, genesis_objects, bootstrap = bootstrap_fixture()
     Coordinator(store).accept(
         bootstrap_cmd,
         immutable_objects=genesis_objects,
@@ -193,7 +243,7 @@ def _seed_authority_store(tmp_path):
 
     baseline_e5 = StageSpec(
         stage_key="E5",
-        stage_spec_revision="1",
+        stage_spec_revision="e5-baseline-1",
         stage_role="E5",
         stage_ordinal=5,
         purpose="M45 E5 baseline",
@@ -206,38 +256,39 @@ def _seed_authority_store(tmp_path):
         required_stage_completion_outputs=("E5_ASSURANCE",),
         transition_policy_ref=cut1["governing_spec_refs"][0],
     )
-    trust_obj = CanonicalObject("trust_profile", {"profile": "m45-trust"})
+    _append_raw_commit(
+        store,
+        _stage_execution_objects(
+            baseline_e5,
+            source_generation_ref=source_generation_ref,
+            label="e5",
+            required_isolation_assurance="DECLARED",
+            include_stage_spec=True,
+        ),
+        index=2,
+    )
+
+    cut2 = current_accepted_cut(store)
     obligation_ref = _ref("coverage_obligation", "m45-open-obligation")
     stop_input, stop_evaluation = _stop_pair(
-        cut=cut1,
+        cut=cut2,
         source_generation_ref=source_generation_ref,
         evaluation_context="FINAL_POST_E5",
-        suffix="2",
+        suffix="3",
         remaining_obligation_ref=obligation_ref,
     )
     stop_input_obj = stop_input.as_object()
     stop_evaluation_obj = stop_evaluation.as_object()
-    _append_raw_commit(
-        store,
-        [baseline_e5.as_object(), trust_obj, stop_input_obj, stop_evaluation_obj],
-        index=2,
-    )
-    cut2 = current_accepted_cut(store)
+    _append_raw_commit(store, [stop_input_obj, stop_evaluation_obj], index=3)
+
+    cut3 = current_accepted_cut(store)
     exact_stop_eval_ref = next(
         row["ref"]
-        for row in store.accepted_records("stop_evaluation", cut2)
+        for row in store.accepted_records("stop_evaluation", cut3)
         if row["ref"]["revision_digest"] == stop_evaluation_obj.digest
     )
-    trust_ref = trust_obj.as_ref(ref_class="HISTORY_CONTEXT_BINDING").as_dict()
-    isolation_ref = {
-        "kind": "isolation_profile",
-        "revision_digest": _hex("m45-isolation"),
-        "digest_profile": "BDB-OBJECT-DIGEST-1",
-        "schema_revision_ref": "BDB_TARGET/isolation_profile",
-        "ref_class": "HISTORY_CONTEXT_BINDING",
-        "isolation_level": "STRICT",
-    }
-    return store, exact_stop_eval_ref, trust_ref, isolation_ref, obligation_ref
+    genesis_trust_ref = bootstrap["genesis"].body["trust_profile_ref"]
+    return store, exact_stop_eval_ref, genesis_trust_ref, obligation_ref
 
 
 def test_pure_e6_materializes_exact_canonical_stage_spec_shape() -> None:
@@ -261,8 +312,8 @@ def test_pure_e6_materializes_exact_canonical_stage_spec_shape() -> None:
         "e6-pure-1",
         stop_evaluation,
         stop_input,
-        _ref("trust_profile", "pure-trust", "HISTORY_CONTEXT_BINDING"),
-        {"kind": "isolation_profile", "revision_digest": _hex("pure-iso"), "isolation_level": "STRICT"},
+        _ref("trust_profile", "pure-trust", "PINNED_INSTALLATION_REF"),
+        {"required_isolation_assurance": "DECLARED"},
     )
 
     body = e6.body()
@@ -274,37 +325,53 @@ def test_pure_e6_materializes_exact_canonical_stage_spec_shape() -> None:
     relationship = e6.relationship_payload
     assert relationship["source_stop_evaluation_ref"]["revision_digest"] == stop_evaluation.ref["revision_digest"]
     assert relationship["source_stop_input_ref"]["revision_digest"] == stop_input.ref["revision_digest"]
+    assert relationship["required_isolation_assurance"] == "DECLARED"
     assert "POST_E6_STOP_REEVALUATION" in body["required_stage_completion_outputs"]
 
 
-def test_store_aware_e6_uses_full_accepted_refs_and_accepts_at_authority_boundary(tmp_path) -> None:
-    store, stop_eval_ref, trust_ref, isolation_ref, _ = _seed_authority_store(tmp_path)
+def test_store_aware_e6_derives_genesis_trust_and_baseline_isolation(tmp_path) -> None:
+    store, stop_eval_ref, genesis_trust_ref, _ = _seed_authority_store(tmp_path)
     e6 = AdaptiveE6Generator.generate_e6_spec_from_store(
         store,
         spec_id="e6-round-1",
         stop_evaluation_ref=stop_eval_ref,
-        trust_profile_ref=trust_ref,
-        isolation_profile_ref=isolation_ref,
         added_surfaces=[_ref("surface_record", "round-1-surface")],
     )
     relation = e6.relationship_payload
     assert relation["source_stop_evaluation_ref"].get("logical_id") is not None
     assert relation["source_stop_input_ref"].get("logical_id") is not None
+    assert relation["trust_profile_ref"] == genesis_trust_ref
+    assert relation["required_isolation_assurance"] == "DECLARED"
 
-    cmd = _accept_command(store, 3)
-    result = store.accept(cmd, immutable_objects=[e6.as_object()])
-    assert result.head.commit_seq == 3
+    result = store.accept(_accept_command(store, 4), immutable_objects=[e6.as_object()])
+    assert result.head.commit_seq == 4
     assert store.object_record(e6.as_object().digest) is not None
 
 
+def test_caller_cannot_rewrite_trust_or_isolation_after_failure(tmp_path) -> None:
+    store, stop_eval_ref, _, _ = _seed_authority_store(tmp_path)
+    with pytest.raises(ValidationError, match="E6_TRUST_PROFILE_WEAKENING_FORBIDDEN"):
+        AdaptiveE6Generator.generate_e6_spec_from_store(
+            store,
+            spec_id="e6-bad-trust",
+            stop_evaluation_ref=stop_eval_ref,
+            trust_profile_ref=_ref("trust_profile", "caller-trust", "PINNED_INSTALLATION_REF"),
+        )
+    with pytest.raises(ValidationError, match="E6_ISOLATION_REWRITE_FORBIDDEN"):
+        AdaptiveE6Generator.generate_e6_spec_from_store(
+            store,
+            spec_id="e6-bad-isolation",
+            stop_evaluation_ref=stop_eval_ref,
+            isolation_profile_ref={"required_isolation_assurance": "UNKNOWN"},
+        )
+
+
 def test_forged_unaccepted_stop_ref_is_rejected_before_object_durability(tmp_path) -> None:
-    store, stop_eval_ref, trust_ref, isolation_ref, _ = _seed_authority_store(tmp_path)
+    store, stop_eval_ref, _, _ = _seed_authority_store(tmp_path)
     e6 = AdaptiveE6Generator.generate_e6_spec_from_store(
         store,
         spec_id="e6-forged",
         stop_evaluation_ref=stop_eval_ref,
-        trust_profile_ref=trust_ref,
-        isolation_profile_ref=isolation_ref,
     )
     body = e6.body()
     relationship = json.loads(body["stop_e6_relationship"])
@@ -313,41 +380,61 @@ def test_forged_unaccepted_stop_ref_is_rejected_before_object_durability(tmp_pat
     body["stop_e6_relationship"] = canonical_bytes(relationship).decode("utf-8")
     forged = CanonicalObject("stage_spec", body)
 
-    cmd = _accept_command(store, 3)
+    cmd = _accept_command(store, 4)
     with pytest.raises(ValidationError):
         store.accept(cmd, immutable_objects=[forged])
     assert store.object_record(forged.digest) is None
-    assert store.head().commit_seq == 2
+    assert store.head().commit_seq == 3
+
+
+def test_material_commit_after_stop_makes_e6_source_stale(tmp_path) -> None:
+    store, stop_eval_ref, _, _ = _seed_authority_store(tmp_path)
+    _append_raw_commit(store, [CanonicalObject("finding_claim_revision", {"finding_id": "drift"})], index=4)
+    with pytest.raises(ValidationError, match="E6_STOP_EVALUATION_STALE"):
+        AdaptiveE6Generator.generate_e6_spec_from_store(
+            store,
+            spec_id="e6-stale-stop",
+            stop_evaluation_ref=stop_eval_ref,
+        )
 
 
 def test_second_post_e6_round_preserves_prior_strengthening(tmp_path) -> None:
-    store, stop_eval_ref, trust_ref, isolation_ref, obligation_ref = _seed_authority_store(tmp_path)
+    store, stop_eval_ref, genesis_trust_ref, obligation_ref = _seed_authority_store(tmp_path)
     first_added = _ref("surface_record", "round-1-surface")
     first = AdaptiveE6Generator.generate_e6_spec_from_store(
         store,
         spec_id="e6-round-1",
         stop_evaluation_ref=stop_eval_ref,
-        trust_profile_ref=trust_ref,
-        isolation_profile_ref=isolation_ref,
         added_surfaces=[first_added],
     )
-    store.accept(_accept_command(store, 3), immutable_objects=[first.as_object()])
+    store.accept(_accept_command(store, 4), immutable_objects=[first.as_object()])
 
-    cut3 = current_accepted_cut(store)
+    _append_raw_commit(
+        store,
+        _stage_execution_objects(
+            first.stage_spec,
+            source_generation_ref=first.source_generation_ref,
+            label="e6-round-1",
+            required_isolation_assurance="DECLARED",
+            include_stage_spec=False,
+        ),
+        index=5,
+    )
+    cut5 = current_accepted_cut(store)
     stop_input2, stop_evaluation2 = _stop_pair(
-        cut=cut3,
+        cut=cut5,
         source_generation_ref=first.source_generation_ref,
         evaluation_context="POST_E6",
-        suffix="4",
+        suffix="6",
         remaining_obligation_ref=obligation_ref,
     )
     stop_input2_obj = stop_input2.as_object()
     stop_evaluation2_obj = stop_evaluation2.as_object()
-    _append_raw_commit(store, [stop_input2_obj, stop_evaluation2_obj], index=4)
-    cut4 = current_accepted_cut(store)
+    _append_raw_commit(store, [stop_input2_obj, stop_evaluation2_obj], index=6)
+    cut6 = current_accepted_cut(store)
     exact_second_stop_ref = next(
         row["ref"]
-        for row in store.accepted_records("stop_evaluation", cut4)
+        for row in store.accepted_records("stop_evaluation", cut6)
         if row["ref"]["revision_digest"] == stop_evaluation2_obj.digest
     )
 
@@ -356,8 +443,6 @@ def test_second_post_e6_round_preserves_prior_strengthening(tmp_path) -> None:
         store,
         spec_id="e6-round-2",
         stop_evaluation_ref=exact_second_stop_ref,
-        trust_profile_ref=trust_ref,
-        isolation_profile_ref=isolation_ref,
         added_surfaces=[second_added],
     )
     relationship = second.relationship_payload
@@ -365,6 +450,8 @@ def test_second_post_e6_round_preserves_prior_strengthening(tmp_path) -> None:
     assert first_added["revision_digest"] in surface_digests
     assert second_added["revision_digest"] in surface_digests
     assert relationship["baseline_stage_spec_ref"]["revision_digest"] == first.as_object().digest
+    assert relationship["trust_profile_ref"] == genesis_trust_ref
+    assert relationship["required_isolation_assurance"] == "DECLARED"
 
-    result = store.accept(_accept_command(store, 5), immutable_objects=[second.as_object()])
-    assert result.head.commit_seq == 5
+    result = store.accept(_accept_command(store, 7), immutable_objects=[second.as_object()])
+    assert result.head.commit_seq == 7
