@@ -104,11 +104,22 @@ def test_core_acceptance_2_material_e6_fresh_challenger(workflow_env):
     assert stop_res["continuation_decision"] == "E6_REQUIRED"
     assert stop_res["assurance_level"] == "BOUNDED"
 
-    # Now execute E6
+    # Prepare E6 from the exact accepted STOP authority.  Continuation must not
+    # skip an active E6 revision and jump directly back to STOP.
     api.prepare_stage(store_path, "E6")
+    awaiting_e6 = api.continue_campaign(store_path)
+    assert awaiting_e6["current_stage"] == "E6"
+    assert awaiting_e6["continuation_state"] == "AWAITING_STAGE_COMPLETION"
+    assert awaiting_e6["next_action"] == "AWAITING_STAGE_COMPLETION"
+
     e6_res = api.qualify_stage(store_path, "E6")
     assert e6_res["status"] == "SUCCESS"
     assert e6_res["stage"] == "E6"
+
+    # A completed E6 revision returns control to the global STOP gate.
+    after_e6 = api.continue_campaign(store_path)
+    assert after_e6["continuation_state"] == "READY_FOR_STOP_EVALUATION"
+    assert after_e6["next_action"] == "EVALUATE_STOP_GATE"
 
     # Post-E6 STOP evaluation
     post_e6_stop = api.evaluate_stop_gate(store_path, evaluation_context="POST_E6")
