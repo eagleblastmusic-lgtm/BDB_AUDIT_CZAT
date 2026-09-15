@@ -16,11 +16,18 @@ from .e6 import (
     AdaptiveE6Generator,
 )
 from .planner_compat import install_adaptive_e6_planner_compat
+from .input_builder import StopInputBuilder
+from .residual_risk_projection import install_residual_risk_stop_projection
 
 # Compatibility is deliberately limited to pure-planner construction.  The
 # authoritative history-store boundary still re-proves canonical current STOP
 # provenance before any E6 StageSpec can become accepted state.
 install_adaptive_e6_planner_compat(AdaptiveE6Spec, AdaptiveE6Generator)
+
+# Residual-risk projection is authoritative input preparation, not caller
+# supplied readiness. The history-store equality validator independently
+# re-proves the exact risk set before an accepted StopInput can be durable.
+install_residual_risk_stop_projection(StopInputBuilder)
 
 __all__ = [
     "LaneCompletion",
