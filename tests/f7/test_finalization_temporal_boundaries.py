@@ -40,7 +40,7 @@ def test_r5n51_same_commit_prior_accepted_finalization_is_rejected() -> None:
     with pytest.raises(ValidationError) as exc:
         canonical_order([conclusion, final_case])
 
-    assert exc.value.code == "FINALIZATION_TEMPORAL_BINDING_CONFLICT"
+    assert exc.value.code == "PRIOR_ACCEPTED_REFERENCE_REQUIRED"
 
 
 class _FakeAcceptedStore:
