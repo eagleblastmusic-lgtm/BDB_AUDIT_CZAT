@@ -1,37 +1,43 @@
 """Targeted tests for Residual Risk Register (PR-E5-07 / M42)."""
 import pytest
-from bdb_audit.assurance.residual_risk import (
-    ResidualRiskRecord,
-    ResidualRiskRegister,
-)
+from bdb_audit.assurance.residual_risk import ResidualRiskRecord, ResidualRiskRegister
 from bdb_audit.core.errors import ValidationError
+
+
+def _cut(seq=10, digest="a" * 64):
+    return {
+        "variant": "ACCEPTED_HISTORY_CUT",
+        "campaign_id": "CAMP-001",
+        "accepted_head_seq": seq,
+        "accepted_head_hash": digest,
+        "governing_policy_ref": "pin:policy",
+        "governing_spec_refs": ["pin:spec"],
+    }
+
+
+def _ref(kind, digest, ref_class="CONTENT_OR_PRIOR"):
+    return {
+        "kind": kind,
+        "revision_digest": digest,
+        "digest_profile": "BDB-OBJECT-DIGEST-1",
+        "schema_revision_ref": f"BDB_SCHEMA_REGISTRY::{kind}/1",
+        "ref_class": ref_class,
+    }
 
 
 @pytest.fixture
 def history_cut():
-    return {
-        "campaign_id": "CAMP-001",
-        "commit_seq": 10,
-        "commit_hash": "a" * 64,
-    }
+    return _cut()
 
 
 @pytest.fixture
 def approval_ref():
-    return {
-        "kind": "approval_decision",
-        "revision_digest": "appr" * 16,
-        "ref_class": "CONTENT_OR_PRIOR",
-    }
+    return _ref("approval_decision", "a" * 64, "PRIOR_ACCEPTED_ONLY")
 
 
 @pytest.fixture
 def waiver_ref():
-    return {
-        "kind": "waiver_decision",
-        "revision_digest": "waiv" * 16,
-        "ref_class": "CONTENT_OR_PRIOR",
-    }
+    return _ref("approval_decision", "b" * 64, "PRIOR_ACCEPTED_ONLY")
 
 
 def test_valid_accepted_residual_risk(history_cut, approval_ref):
@@ -57,7 +63,6 @@ def test_valid_accepted_residual_risk(history_cut, approval_ref):
 
 
 def test_unapproved_residual_risk_fail_closed(history_cut):
-    """ACCEPTED_RESIDUAL_RISK without explicit owner approval must fail closed."""
     with pytest.raises(ValidationError, match="RESIDUAL_RISK_REQUIRES_APPROVAL"):
         ResidualRiskRecord(
             risk_id="risk_unapproved",
@@ -70,12 +75,11 @@ def test_unapproved_residual_risk_fail_closed(history_cut):
             disposition="ACCEPTED_RESIDUAL_RISK",
             blocking_effect=True,
             history_cut=history_cut,
-            owner_approval_ref=None,  # Missing!
+            owner_approval_ref=None,
         )
 
 
 def test_unknown_scope_cannot_be_implicit_residual_risk(history_cut):
-    """UNKNOWN_SCOPE cannot be accepted without explicit authority/approval."""
     with pytest.raises(ValidationError, match="RESIDUAL_RISK_REQUIRES_APPROVAL"):
         ResidualRiskRecord(
             risk_id="risk_unknown",
@@ -94,12 +98,7 @@ def test_unknown_scope_cannot_be_implicit_residual_risk(history_cut):
 
 def test_stale_evidence_and_history_cut(history_cut, approval_ref):
     reg = ResidualRiskRegister(history_cut)
-
-    stale_cut = {
-        "campaign_id": "CAMP-001",
-        "commit_seq": 8,
-        "commit_hash": "stale" * 12 + "0000",
-    }
+    stale_cut = _cut(8, "8" * 64)
     stale_rec = ResidualRiskRecord(
         risk_id="risk_stale",
         risk_revision="rev_1",
@@ -116,8 +115,7 @@ def test_stale_evidence_and_history_cut(history_cut, approval_ref):
     with pytest.raises(ValidationError, match="STALE_RESIDUAL_RISK_INPUT"):
         reg.add_record(stale_rec)
 
-    # Stale register check
-    newer_cut = {"campaign_id": "CAMP-001", "commit_seq": 11, "commit_hash": "new" * 16}
+    newer_cut = _cut(11, "d" * 64)
     assert reg.check_stale(newer_cut) is True
     assert reg.check_stale(history_cut) is False
 
@@ -135,14 +133,13 @@ def test_invalidated_waiver_and_evidence(history_cut, approval_ref, waiver_ref):
         disposition="ACCEPTED_RESIDUAL_RISK",
         blocking_effect=False,
         history_cut=history_cut,
-        evidence_refs=({"kind": "observation", "revision_digest": "obs_wal"},),
+        evidence_refs=(_ref("registered_immutable_object", "c" * 64),),
         owner_approval_ref=approval_ref,
         waiver_ref=waiver_ref,
     )
     reg.add_record(rec)
 
-    # Invalidate the waiver!
-    affected = reg.apply_invalidations({"waiv" * 16})
+    affected = reg.apply_invalidations({"b" * 64})
     assert affected == 1
     updated = reg.records["risk_with_waiver"]
     assert updated.status == "INVALIDATED"
@@ -193,7 +190,6 @@ def test_deterministic_rebuild(history_cut, approval_ref):
 
     canonical = reg.export_canonical()
     d1 = reg.digest()
-
     rebuilt = ResidualRiskRegister.rebuild(canonical)
     d2 = rebuilt.digest()
 
