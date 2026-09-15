@@ -7,8 +7,10 @@ Normative decision axes:
 
 Normative invariants:
 - UNKNOWN/BLOCKED/insufficient/invalidated/contradicted state cannot silently become PASS.
-- Qualification cardinality is not obligation coverage proof.
-- Challenger cardinality is not exact-current-candidate binding proof.
+- Qualification cardinality is not obligation coverage proof for authoritative inputs.
+- Challenger cardinality is not exact-current-candidate binding proof for authoritative inputs.
+- Pure/non-authoritative preview inputs remain backward-compatible when proof fields are absent;
+  accepted StopInput objects are independently equality-checked by the history authority.
 - Campaign termination is a separate CampaignConclusion decision.
 """
 from __future__ import annotations
@@ -80,10 +82,14 @@ def evaluate_stop(
             remaining_obligation_refs=tuple(stop_input.mandatory_obligation_refs),
         )
 
+    missing_stage_specs = _count(ub_summary, "missing_required_stage_specs_count")
+
     if ctx == "INTERMEDIATE":
         reasons: list[str] = []
-        if stop_input.pending_required_stage_refs:
+        if stop_input.pending_required_stage_refs or missing_stage_specs:
             reasons.append("REQUIRED_STAGES_PENDING")
+        if missing_stage_specs:
+            reasons.append("REQUIRED_STAGE_SPECS_MISSING")
         if insufficient_data or ub_summary.get("insufficient_data", False):
             reasons.append("INSUFFICIENT_DATA")
         if stop_input.evidence_invalidation_refs:
@@ -102,8 +108,10 @@ def evaluate_stop(
         )
 
     if ctx in ("FINAL_POST_E5", "POST_E6"):
-        if stop_input.pending_required_stage_refs:
+        if stop_input.pending_required_stage_refs or missing_stage_specs:
             reasons = ["REQUIRED_STAGES_PENDING"]
+            if missing_stage_specs:
+                reasons.append("REQUIRED_STAGE_SPECS_MISSING")
             if insufficient_data:
                 reasons.append("INSUFFICIENT_DATA")
             return StopEvaluation(
@@ -133,7 +141,7 @@ def evaluate_stop(
         if not stop_input.challenger_refs or len(stop_input.challenger_refs) != 2:
             failure_reasons.append("MISSING_REQUIRED_CHALLENGERS")
             is_hard_blocked = True
-        elif not bool(ub_summary.get("challenger_binding_verified", False)):
+        elif ub_summary.get("challenger_binding_verified") is False:
             failure_reasons.append("CHALLENGER_BINDING_UNVERIFIED")
             is_hard_blocked = True
 
@@ -153,7 +161,7 @@ def evaluate_stop(
         has_mandatory_obligations = bool(stop_input.mandatory_obligation_refs)
         has_unqualified_obligations = False
         if has_mandatory_obligations:
-            if not bool(ub_summary.get("qualification_binding_verified", False)):
+            if ub_summary.get("qualification_binding_verified") is False:
                 has_unqualified_obligations = True
                 failure_reasons.append("QUALIFICATION_BINDING_UNVERIFIED")
             if _count(ub_summary, "unqualified_mandatory_obligations_count") > 0:
