@@ -285,10 +285,21 @@ class AdaptiveE6Generator:
             raise ValidationError("E6_STOP_EVALUATION_REQUIRED")
         stop_evaluation = StopEvaluation(**stop_record["body"])
 
-        stop_input_ref = stop_evaluation.stop_input_ref
-        stop_input_record = store.resolve_accepted(stop_input_ref, cut)
-        if stop_input_record["ref"].get("kind") != "stop_input":
+        # StopEvaluation's canonical contract historically did not require the
+        # optional logical_id member on its embedded stop_input_ref.  Prove the
+        # referenced digest/schema through accepted membership, then consume the
+        # exact accepted record rather than object-table presence.
+        stop_input_ref = dict(stop_evaluation.stop_input_ref)
+        if stop_input_ref.get("kind") != "stop_input" or not stop_input_ref.get("revision_digest"):
             raise ValidationError("E6_STOP_INPUT_REQUIRED")
+        matches = [
+            row for row in store.accepted_records("stop_input", cut)
+            if row["ref"].get("revision_digest") == stop_input_ref.get("revision_digest")
+            and row["ref"].get("schema_revision_ref") == stop_input_ref.get("schema_revision_ref")
+        ]
+        if len(matches) != 1:
+            raise ValidationError("E6_STOP_INPUT_REQUIRED")
+        stop_input_record = matches[0]
         stop_input = StopInput(**stop_input_record["body"])
 
         genesis_records = store.accepted_records("campaign_genesis", cut)
