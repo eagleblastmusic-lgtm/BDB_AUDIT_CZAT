@@ -18,6 +18,7 @@ from typing import Any, Mapping, Sequence, Set
 
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
+from ..history.objects import HistoryCut
 from .models import StopInput, StopEvaluation
 
 
@@ -132,12 +133,48 @@ class AdaptiveE6Generator:
         )
 
     @staticmethod
+    def _accepted_cut(value: dict[str, Any], label: str) -> HistoryCut:
+        """Parse one canonical accepted-history cut without legacy aliases."""
+        if not isinstance(value, dict) or value.get("variant") != "ACCEPTED_HISTORY_CUT":
+            raise ValidationError(
+                "ACCEPTED_HISTORY_CUT_REQUIRED",
+                f"{label} must be a canonical ACCEPTED_HISTORY_CUT",
+            )
+        cut = HistoryCut(
+            variant=value.get("variant"),
+            history_namespace_ref=value.get("history_namespace_ref"),
+            campaign_id=value.get("campaign_id"),
+            accepted_head_seq=value.get("accepted_head_seq"),
+            accepted_head_hash=value.get("accepted_head_hash"),
+            governing_policy_ref=value.get("governing_policy_ref"),
+            governing_spec_refs=tuple(value.get("governing_spec_refs", ())),
+        )
+        cut.require_accepted()
+        return cut
+
+    @staticmethod
     def verify_post_e6_return_to_stop(new_head_cut: dict[str, Any], previous_cut: dict[str, Any]) -> None:
-        """Verify that after E6 completion, control flow returns to global STOP on the new accepted head."""
-        new_seq = new_head_cut.get("commit_seq", 0)
-        prev_seq = previous_cut.get("commit_seq", 0)
-        if new_seq <= prev_seq:
+        """Prove POST_E6 returns to global STOP on a newer canonical accepted head.
+
+        Legacy ``commit_seq`` / ``commit_hash`` dictionaries are intentionally
+        rejected.  E6 operates on the same canonical history-cut wire contract
+        used by the authority store, so a caller cannot manufacture progress by
+        supplying an ad-hoc sequence number detached from accepted history.
+        """
+        previous = AdaptiveE6Generator._accepted_cut(previous_cut, "previous_cut")
+        new = AdaptiveE6Generator._accepted_cut(new_head_cut, "new_head_cut")
+
+        if new.campaign_id != previous.campaign_id:
+            raise ValidationError(
+                "POST_E6_CAMPAIGN_MISMATCH",
+                "Post-E6 STOP must remain in the same campaign",
+            )
+
+        if (
+            new.accepted_head_seq <= previous.accepted_head_seq
+            or new.accepted_head_hash == previous.accepted_head_hash
+        ):
             raise ValidationError(
                 "POST_E6_MUST_ADVANCE_HEAD",
-                f"Post-E6 evaluation requires advanced head cut (new {new_seq} <= prev {prev_seq})",
+                "Post-E6 evaluation requires a strictly newer accepted head",
             )
