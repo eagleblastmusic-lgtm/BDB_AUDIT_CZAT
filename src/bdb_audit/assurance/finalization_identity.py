@@ -1,16 +1,15 @@
 """Full typed-identity resolver for residual-risk finalization.
 
 StopEvaluation carries a digest-bearing StopInput ref, while accepted history
-may additionally carry the StopInput logical_id.  Finalization must recover the
-full accepted ref from the canonical commit chain instead of treating a
-shortened model ref as sufficient acceptance evidence.
+may additionally carry the StopInput logical_id. Finalization recovers the full
+accepted ref from the canonical commit chain instead of treating a shortened
+model ref as sufficient acceptance evidence.
 """
 from __future__ import annotations
 
 from functools import wraps
 
 from ..core.errors import ValidationError
-from ..workflow.read_models import current_accepted_cut
 from ..stop.residual_risk_projection import _current_risk_rows
 
 
@@ -29,13 +28,13 @@ def install_full_identity_stop_lookup(finalization_module) -> None:
 
     @wraps(original)
     def stop_and_risks(service, termination_state):
-        cut = current_accepted_cut(service.store)
+        cut = finalization_module.current_accepted_cut(service.store)
         stop_eval_record = service._latest(service.store.accepted_records("stop_evaluation", cut))
         if stop_eval_record is None:
             if termination_state == "COMPLETED":
                 raise ValidationError("STOP_EVALUATION_REQUIRED")
             service.evaluate_stop_gate(evaluation_context="FINAL_POST_E5")
-            cut = current_accepted_cut(service.store)
+            cut = finalization_module.current_accepted_cut(service.store)
             stop_eval_record = service._latest(service.store.accepted_records("stop_evaluation", cut))
             if stop_eval_record is None:
                 raise ValidationError("STOP_EVALUATION_REQUIRED")
