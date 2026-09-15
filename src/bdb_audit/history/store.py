@@ -58,9 +58,6 @@ class TransactionalHistoryStore:
     def __init__(self, path, *, schema_bindings=None, registry=None, crash_hook=None):
         self.path = str(path)
         self.registry = registry or ContractRegistry()
-        # Bind every foundation kind up front.  This is still a prerequisite
-        # substrate (M10 qualification is separate), but no accepted closure
-        # can reach an unbound registered dependency.
         self.schemas = schema_bindings or foundation_schema_bindings(kinds=tuple(ALL_EXECUTABLE_KINDS))
         self.crash_hook = crash_hook
         if crash_hook is not None and not callable(crash_hook):
@@ -142,12 +139,7 @@ class TransactionalHistoryStore:
             con.close()
 
     def resolve_accepted(self, ref, cut, *, require_current=False):
-        """Resolve exact closure membership on a verified accepted cut.
-
-        Object-table presence alone is never acceptance evidence. Validate the
-        commit chain, cut context and complete typed identity before returning.
-        This read creates no grant or other authority.
-        """
+        """Resolve exact closure membership on a verified accepted cut."""
         from .objects import ObjectRef
         ref = ref.as_dict() if isinstance(ref, ObjectRef) else ref
         typed = ObjectRef.from_dict(ref)
@@ -207,7 +199,6 @@ class TransactionalHistoryStore:
             for ref in commit["immutable_object_refs"]:
                 if ref["kind"] == kind:
                     refs[ref["revision_digest"]] = ref
-        # Validate the cut even when this particular kind has no members.
         commits = self.commits()
         if not commits:
             raise ValidationError("ACCEPTED_HISTORY_CUT_NOT_FOUND")
@@ -232,7 +223,6 @@ class TransactionalHistoryStore:
         return current.commit_seq + 1, canonical_current
 
     def _check_schema_bindings(self, objects, command):
-        # This check is intentionally before any persistence boundary.
         kinds = {"command_envelope", "commit_body", "command_receipt", *M5_KINDS}
         kinds.update(o.kind for o in objects)
         for kind in kinds:
@@ -245,42 +235,18 @@ class TransactionalHistoryStore:
 
     @staticmethod
     def _ref_tokens(value):
-        """Return identity spellings that can be used by an authority pin.
-
-        History context fields are intentionally scalar pins in the current
-        foundation contracts, while prepared objects use typed reference
-        dictionaries.  Keeping the comparison at this boundary avoids
-        treating a same-commit object as effective merely because its digest
-        appears somewhere in a command body.
-        """
         if isinstance(value, str):
             return {value}
         if isinstance(value, dict):
-            return {v for v in (value.get("revision_digest"), value.get("logical_id"))
-                    if isinstance(v, str)}
+            return {v for v in (value.get("revision_digest"), value.get("logical_id")) if isinstance(v, str)}
         return set()
 
     def _validate_semantic_authority(self, objects, command, profile, current, con):
-        """Enforce input-cut authority and prohibit semantic self-upgrades.
-
-        Policy/spec/actor/source authority are context bindings.  They may be
-        pinned by the installation profile for the EMPTY_HISTORY bootstrap,
-        or must match the already accepted parent commit for a normal command.
-        A prepared object in the accepting closure can therefore never make
-        itself effective by naming its own digest/logical id in one of these
-        fields.  This check is deliberately independent from the content DAG:
-        an order-only edge cannot satisfy authority or provenance.
-        """
         same_commit_tokens = set()
         for obj in objects:
-            same_commit_tokens.update({obj.digest})
+            same_commit_tokens.add(obj.digest)
             if obj.logical_id:
                 same_commit_tokens.add(obj.logical_id)
-
-        # Explicit semantic self-authorization markers are rejected for every
-        # acceptance path, including bootstrap.  These fields are diagnostic
-        # witnesses used by the pinned negative vectors; they cannot turn a
-        # prepared object into an authority source.
         for obj in objects:
             body = obj.body
             if body.get("source_authority_created_in_same_commit"):
@@ -289,63 +255,35 @@ class TransactionalHistoryStore:
                 raise ValidationError("ACTOR_AUTHORITY_NOT_PREESTABLISHED")
             if body.get("owner_operator_authority_same_commit"):
                 raise ValidationError("GENESIS_CONTEXT_SELF_AUTHORIZATION")
-
-        command_context = {
-            command.governing_policy_ref,
-            *command.governing_spec_refs,
-        }
+        command_context = {command.governing_policy_ref, *command.governing_spec_refs}
         if command_context & same_commit_tokens:
             raise ValidationError("SEMANTIC_CONTEXT_NOT_EFFECTIVE_AT_INPUT_HISTORY")
         if command.actor_ref in same_commit_tokens:
             raise ValidationError("ACTOR_AUTHORITY_NOT_EFFECTIVE_AT_INPUT_HISTORY")
-
         if current is None:
-            # EMPTY_HISTORY has no accepted commit to consult.  The exact
-            # installation profile is the only context authority allowed.
             if profile is None:
                 raise ValidationError("BOOTSTRAP_PROFILE_REQUIRED")
             if command.governing_policy_ref != profile.pins["initial_governing_policy_ref"]:
                 raise ValidationError("SEMANTIC_CONTEXT_NOT_EFFECTIVE_AT_INPUT_HISTORY")
             if tuple(command.governing_spec_refs) != (profile.pins["initial_transition_profile_ref"],):
                 raise ValidationError("SEMANTIC_CONTEXT_NOT_EFFECTIVE_AT_INPUT_HISTORY")
-            # The installation owner/trust root is represented by an external
-            # scalar pin in the bootstrap profile; arbitrary same-commit actor
-            # objects were already rejected above.  Keep the boundary explicit
-            # without inventing a new actor object kind.
             if command.actor_ref.startswith("workspace/"):
                 raise ValidationError("ACTOR_AUTHORITY_NOT_PREESTABLISHED")
             return
-
         row = con.execute("SELECT body FROM commits WHERE commit_hash=?", (current.commit_hash,)).fetchone()
         if row is None:
             raise ValidationError("ACCEPTED_HEAD_COMMIT_MISSING")
         prior = json.loads(row[0])
-        if command.governing_policy_ref != prior.get("governing_policy_ref") or \
-                tuple(command.governing_spec_refs) != tuple(prior.get("governing_spec_refs", ())):
+        if command.governing_policy_ref != prior.get("governing_policy_ref") or tuple(command.governing_spec_refs) != tuple(prior.get("governing_spec_refs", ())):
             raise ValidationError("SEMANTIC_CONTEXT_NOT_EFFECTIVE_AT_INPUT_HISTORY")
-        prior_actor = prior.get("actor_ref")
-        if command.actor_ref != prior_actor:
-            # This minimal foundation has no separate accepted actor-grant
-            # family yet.  Until one is introduced by a later contract, only
-            # an actor already recorded by the accepted parent is effective.
+        if command.actor_ref != prior.get("actor_ref"):
             raise ValidationError("ACTOR_AUTHORITY_NOT_EFFECTIVE_AT_INPUT_HISTORY")
 
     def _validate_history_cuts(self, objects, *, seq, current, profile, con):
-        """Validate tagged history cuts without erasing durable assignment context.
-
-        Normal command-input cuts bind the exact prior accepted head.  A durable
-        external lane result is different: its root ``history_cut`` records the
-        already-accepted cut assigned before delivery and therefore may be older
-        than the current head after sibling work is accepted.  That exception is
-        narrow and still fail-closed: the historical cut must reconstruct exactly
-        from this campaign's canonical accepted commit chain.
-        """
         expected_empty = profile.empty_cut().as_dict() if profile is not None else None
         expected_accepted = None
         if current is not None:
-            commit_row = con.execute(
-                "SELECT body FROM commits WHERE commit_hash=?", (current.commit_hash,)
-            ).fetchone()
+            commit_row = con.execute("SELECT body FROM commits WHERE commit_hash=?", (current.commit_hash,)).fetchone()
             if commit_row is None:
                 raise ValidationError("ACCEPTED_HEAD_COMMIT_MISSING")
             prior = json.loads(commit_row[0])
@@ -366,11 +304,9 @@ class TransactionalHistoryStore:
                 raise ValidationError("ACCEPTED_HISTORY_CUT_NOT_FOUND")
             if value.get("campaign_id") != current.campaign_id:
                 raise ValidationError("HISTORY_CUT_INPUT_MISMATCH")
-
             previous = EMPTY_HISTORY
             found = False
-            for stored_seq, digest, raw in con.execute(
-                    "SELECT seq,commit_hash,body FROM commits WHERE seq<=? ORDER BY seq", (cut_seq,)):
+            for stored_seq, digest, raw in con.execute("SELECT seq,commit_hash,body FROM commits WHERE seq<=? ORDER BY seq", (cut_seq,)):
                 body = json.loads(raw)
                 commit = _commit_from_body(body)
                 if commit.digest != digest or body["commit_seq"] != stored_seq or body["prev_history_ref"] != previous:
@@ -380,10 +316,8 @@ class TransactionalHistoryStore:
                 previous = {"tag": ACCEPTED_HEAD_REF, "campaign_id": current.campaign_id,
                             "commit_seq": stored_seq, "commit_hash": digest}
                 if stored_seq == cut_seq:
-                    expected = HistoryCut.accepted(
-                        AcceptedHead(current.campaign_id, cut_seq, digest),
-                        body["governing_policy_ref"], body["governing_spec_refs"],
-                    ).as_dict()
+                    expected = HistoryCut.accepted(AcceptedHead(current.campaign_id, cut_seq, digest),
+                                                  body["governing_policy_ref"], body["governing_spec_refs"]).as_dict()
                     if value != expected:
                         raise ValidationError("HISTORY_CUT_INPUT_MISMATCH")
                     found = True
@@ -412,18 +346,10 @@ class TransactionalHistoryStore:
             elif isinstance(value, list):
                 for child in value:
                     walk(child, field_name, object_kind=object_kind, depth=depth + 1)
-
         for obj in objects:
             walk(obj.body, object_kind=obj.kind)
 
     def _validate_content_refs(self, objects, con):
-        """Validate typed refs independently of order-only precedence.
-
-        A CONTENT_OBJECT target must be in this closure. A CONTENT_OR_PRIOR
-        target may be in the closure or an immutable object already persisted.
-        History/context/sidecar refs are deliberately excluded from the content
-        dependency graph and are validated by their owning object contract.
-        """
         by_digest = {obj.digest: obj for obj in objects}
         if len(by_digest) != len(objects):
             raise ValidationError("DUPLICATE_CONTENT_REFERENCE")
@@ -438,14 +364,8 @@ class TransactionalHistoryStore:
                     raise ValidationError("DANGLING_CONTENT_REF", ref.revision_digest)
                 if target is None:
                     if ref.kind in self.registry.document.get("reference_target_classes", {}):
-                        # Registry target classes (for example a pinned
-                        # application-generation identity) may be external
-                        # immutable locators rather than object rows.
                         continue
-                    row = con.execute(
-                        "SELECT kind,schema_ref FROM immutable_objects WHERE digest=?",
-                        (ref.revision_digest,),
-                    ).fetchone()
+                    row = con.execute("SELECT kind,schema_ref FROM immutable_objects WHERE digest=?", (ref.revision_digest,)).fetchone()
                     if row is None:
                         raise ValidationError("DANGLING_CONTENT_REF", ref.revision_digest)
                     if row[0] != ref.kind or row[1] != ref.schema_revision_ref:
@@ -453,28 +373,10 @@ class TransactionalHistoryStore:
 
     @staticmethod
     def _prior_accepted_error_code(consumer_kind):
-        specific_temporal_consumers = {
-            "challenger_assignment",
-            "challenger_result",
-            "campaign_conclusion",
-            "final_assurance_case",
-            "release_qualification",
-        }
-        return (
-            "PRIOR_ACCEPTED_REFERENCE_REQUIRED"
-            if consumer_kind in specific_temporal_consumers
-            else "BACKWARD_REF_NOT_PRIOR_ACCEPTED"
-        )
+        specific = {"challenger_assignment", "challenger_result", "campaign_conclusion", "final_assurance_case", "release_qualification"}
+        return "PRIOR_ACCEPTED_REFERENCE_REQUIRED" if consumer_kind in specific else "BACKWARD_REF_NOT_PRIOR_ACCEPTED"
 
     def _validate_prior_accepted_membership(self, ref, *, consumer_kind, current, con):
-        """Prove canonical PRIOR_ACCEPTED_ONLY membership at the parent head.
-
-        Typed external target-class locators remain governed by their dedicated
-        authority/profile validators. A typed ref whose kind is a registered
-        canonical contract kind, however, must occur in the canonical commit
-        chain before this command. Presence in ``immutable_objects`` alone is
-        deliberately insufficient.
-        """
         registered_kinds = {
             row["kind"] for row in self.registry.document.get("contracts", ())
             if isinstance(row, dict) and isinstance(row.get("kind"), str)
@@ -482,65 +384,39 @@ class TransactionalHistoryStore:
         kind = ref.get("kind")
         if kind not in registered_kinds:
             return
-
         error_code = self._prior_accepted_error_code(consumer_kind)
         if current is None:
             raise ValidationError(error_code, kind or "")
-
         previous = EMPTY_HISTORY
         found = False
-        for stored_seq, digest, raw in con.execute(
-                "SELECT seq,commit_hash,body FROM commits WHERE seq<=? ORDER BY seq",
-                (current.commit_seq,)):
+        for stored_seq, digest, raw in con.execute("SELECT seq,commit_hash,body FROM commits WHERE seq<=? ORDER BY seq", (current.commit_seq,)):
             body = json.loads(raw)
             commit = _commit_from_body(body)
             if commit.digest != digest or body["commit_seq"] != stored_seq or body["prev_history_ref"] != previous:
                 raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
             if body["campaign_id"] != current.campaign_id:
                 raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
-            previous = {
-                "tag": ACCEPTED_HEAD_REF,
-                "campaign_id": current.campaign_id,
-                "commit_seq": stored_seq,
-                "commit_hash": digest,
-            }
-            if any(
-                candidate.get("revision_digest") == ref.get("revision_digest")
-                and candidate.get("kind") == kind
-                and candidate.get("schema_revision_ref") == ref.get("schema_revision_ref")
-                and candidate.get("logical_id") == ref.get("logical_id")
-                and candidate.get("digest_profile") == ref.get("digest_profile")
-                for candidate in body.get("immutable_object_refs", ())
-            ):
+            previous = {"tag": ACCEPTED_HEAD_REF, "campaign_id": current.campaign_id,
+                        "commit_seq": stored_seq, "commit_hash": digest}
+            if any(candidate.get("revision_digest") == ref.get("revision_digest")
+                   and candidate.get("kind") == kind
+                   and candidate.get("schema_revision_ref") == ref.get("schema_revision_ref")
+                   and candidate.get("logical_id") == ref.get("logical_id")
+                   and candidate.get("digest_profile") == ref.get("digest_profile")
+                   for candidate in body.get("immutable_object_refs", ())):
                 found = True
-
-        expected_head = {"tag": ACCEPTED_HEAD_REF, **current.as_dict()}
-        if previous != expected_head:
+        if previous != {"tag": ACCEPTED_HEAD_REF, **current.as_dict()}:
             raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
         if not found:
             raise ValidationError(error_code, ref.get("revision_digest", ""))
-
-        row = con.execute(
-            "SELECT kind,version,schema_ref,logical_id,body FROM immutable_objects WHERE digest=?",
-            (ref.get("revision_digest"),),
-        ).fetchone()
+        row = con.execute("SELECT kind,version,schema_ref,logical_id,body FROM immutable_objects WHERE digest=?", (ref.get("revision_digest"),)).fetchone()
         if row is None:
             raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
         obj = CanonicalObject(row[0], json.loads(row[4]), row[2], row[3], row[1])
-        if (
-            obj.digest != ref.get("revision_digest")
-            or obj.kind != kind
-            or obj.schema_revision_ref != ref.get("schema_revision_ref")
-            or obj.logical_id != ref.get("logical_id")
-        ):
+        if obj.digest != ref.get("revision_digest") or obj.kind != kind or obj.schema_revision_ref != ref.get("schema_revision_ref") or obj.logical_id != ref.get("logical_id"):
             raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
 
     def _validate_material_ref_contracts(self, obj, *, current, con):
-        """Check exact field/class/allowed-kind/cardinality for inline refs.
-
-        Structural executable schemas intentionally stay small; this layer is
-        where the pinned Registry's explicit reference contract is enforced.
-        """
         row = self.registry.contract(obj.kind, obj.version)
         body = obj.body
         semantics = self.registry.document["reference_class_semantics"]
@@ -548,39 +424,27 @@ class TransactionalHistoryStore:
             field = spec["field"]
             value = body.get(field)
             if value is None:
-                count = 0
-                values = []
+                count, values = 0, []
             elif isinstance(value, list):
-                count = len(value)
-                values = value
+                count, values = len(value), value
             else:
-                count = 1
-                values = [value]
+                count, values = 1, [value]
             card = spec.get("cardinality", "")
             required = card == "1" or card.startswith("1;") or card.startswith("1 for") or card.startswith("1..")
             if required and count < 1:
                 raise ValidationError("REFERENCE_CARDINALITY_MISMATCH", field)
             if card.startswith("0..1") and count > 1:
                 raise ValidationError("REFERENCE_CARDINALITY_MISMATCH", field)
-            if isinstance(value, list) and value and all(
-                    isinstance(item, dict) and {"kind", "revision_digest", "digest_profile", "schema_revision_ref"}.issubset(item)
-                    for item in value):
+            if isinstance(value, list) and value and all(isinstance(item, dict) and {"kind", "revision_digest", "digest_profile", "schema_revision_ref"}.issubset(item) for item in value):
                 ordering = row.get("ordering_rules", {})
-                has_override = field == "immutable_object_refs" or any(
-                    "CANONICAL_TOPOLOGICAL" in str(rule) for rule in ordering.values()
-                )
+                has_override = field == "immutable_object_refs" or any("CANONICAL_TOPOLOGICAL" in str(rule) for rule in ordering.values())
                 if not has_override and value != canonical_reference_set(value):
                     raise ValidationError("ORDERING_RULE_DEFECT", field)
             for value_item in values:
                 if not isinstance(value_item, dict) or not {"kind", "revision_digest", "digest_profile", "schema_revision_ref"}.issubset(value_item):
-                    # Scalar refs (policy/actor/history strings) are allowed
-                    # only where the exact reference class is a scalar wire
-                    # binding. Content and profile refs must be typed objects.
-                    if isinstance(value_item, str) and spec["ref_class"] in {
-                            "AUTHORIZED_ACTOR_REF", "HISTORY_CONTEXT_BINDING",
-                            "PINNED_INSTALLATION_REF", "PRIOR_ACCEPTED_ONLY"}:
+                    if isinstance(value_item, str) and spec["ref_class"] in {"AUTHORIZED_ACTOR_REF", "HISTORY_CONTEXT_BINDING", "PINNED_INSTALLATION_REF", "PRIOR_ACCEPTED_ONLY"}:
                         continue
-                    if field in {"expected_parent_head", "prev_history_ref", "accepted_head"} or "variant" in value_item:
+                    if field in {"expected_parent_head", "prev_history_ref", "accepted_head"} or (isinstance(value_item, dict) and "variant" in value_item):
                         continue
                     raise ValidationError("TYPED_REF_INCOMPLETE", field)
                 if value_item.get("ref_class") != spec["ref_class"]:
@@ -594,12 +458,7 @@ class TransactionalHistoryStore:
                 if value_item.get("ref_class") not in semantics:
                     raise ValidationError("UNREGISTERED_REFERENCE_CLASS")
                 if value_item.get("ref_class") == "PRIOR_ACCEPTED_ONLY":
-                    self._validate_prior_accepted_membership(
-                        value_item,
-                        consumer_kind=obj.kind,
-                        current=current,
-                        con=con,
-                    )
+                    self._validate_prior_accepted_membership(value_item, consumer_kind=obj.kind, current=current, con=con)
 
     def _validate_stop_snapshot_binding(self, obj, objects, con):
         snap_ref = obj.body.get("stop_input_snapshot_ref")
@@ -617,14 +476,8 @@ class TransactionalHistoryStore:
         from ..stop.evaluator import validate_stop_snapshot_binding
         validate_stop_snapshot_binding(obj.body, snap_body)
 
-
     def _validate_bootstrap_closure(self, objects, profile):
-        required = {
-            "command_envelope", "source_generation", "legacy_raw_ref",
-            "legacy_mechanical_validation_assessment", "source_reconciliation_assessment",
-            "lineage_admission_assessment", "trusted_predecessor_selection_decision",
-            "bootstrap_admission_decision", "campaign_genesis",
-        }
+        required = {"command_envelope", "source_generation", "legacy_raw_ref", "legacy_mechanical_validation_assessment", "source_reconciliation_assessment", "lineage_admission_assessment", "trusted_predecessor_selection_decision", "bootstrap_admission_decision", "campaign_genesis"}
         kinds = {o.kind for o in objects}
         missing = required - kinds
         if missing:
@@ -637,8 +490,6 @@ class TransactionalHistoryStore:
         admission_ref = genesis.body.get("bootstrap_admission_decision_ref")
         if not isinstance(admission_ref, dict) or admission_ref.get("revision_digest") != admission.digest:
             raise ValidationError("GENESIS_ADMISSION_BINDING_MISMATCH")
-        # Order-only edges do not satisfy refs, authority, or provenance. Check
-        # required refs independently through each object's typed body graph.
         if any(o.body.get("source_authority_created_in_same_commit") for o in objects):
             raise ValidationError("SOURCE_AUTHORITY_NOT_PREESTABLISHED")
         if any(o.body.get("owner_operator_authority_same_commit") for o in objects):
@@ -647,29 +498,15 @@ class TransactionalHistoryStore:
             pin = obj.body.get("predecessor_pin_ref", "")
             if isinstance(pin, str) and pin.startswith("workspace/"):
                 raise ValidationError("UNTRUSTED_PREDECESSOR_PIN")
-        # The exact bootstrap profile is an external trust root. Object body
-        # fields must bind to its pins; same-commit replacements are not a
-        # semantic upgrade.
-        genesis = by_kind["campaign_genesis"]
         trust_ref = genesis.body.get("trust_profile_ref", {})
         trust_pin = profile.pins.get("initial_trust_profile_ref")
-        if isinstance(trust_ref, dict) and isinstance(trust_pin, str):
-            # A profile may pin an exact digest or an installation locator.
-            # Compare the digest when the pin is digest-shaped; otherwise the
-            # external installation locator remains the authority boundary.
-            if len(trust_pin) == 64 and trust_ref.get("revision_digest") != trust_pin:
-                raise ValidationError("GENESIS_TRUST_PROFILE_PIN_MISMATCH")
-        if genesis.body.get("owner_operator_authority_same_commit"):
-            raise ValidationError("GENESIS_CONTEXT_SELF_AUTHORIZATION")
+        if isinstance(trust_ref, dict) and isinstance(trust_pin, str) and len(trust_pin) == 64 and trust_ref.get("revision_digest") != trust_pin:
+            raise ValidationError("GENESIS_TRUST_PROFILE_PIN_MISMATCH")
         if genesis.body.get("input_history_cut", {}).get("variant") != "EMPTY_HISTORY_CUT":
             raise ValidationError("NORMAL_GENESIS_REQUIRES_EMPTY_HISTORY")
         selection = by_kind["trusted_predecessor_selection_decision"]
         predecessor_pin = selection.body.get("predecessor_pin_ref")
-        allowed_pin_strings = {
-            profile.pins.get("initial_trust_profile_ref"),
-            profile.pins.get("allowed_history_namespace_ref"),
-            "INSTALLATION_BOOTSTRAP_PROFILE_V1",
-        }
+        allowed_pin_strings = {profile.pins.get("initial_trust_profile_ref"), profile.pins.get("allowed_history_namespace_ref"), "INSTALLATION_BOOTSTRAP_PROFILE_V1"}
         if isinstance(predecessor_pin, dict):
             if predecessor_pin.get("ref_class") != "PINNED_INSTALLATION_REF":
                 raise ValidationError("UNTRUSTED_PREDECESSOR_PIN")
@@ -681,12 +518,10 @@ class TransactionalHistoryStore:
         for obj in objects:
             if not isinstance(obj, CanonicalObject):
                 raise ValidationError("OBJECT_REQUIRED")
-            rows.append((obj.digest, obj.kind, obj.version, obj.schema_revision_ref,
-                         obj.logical_id, canonical_bytes(obj.body)))
+            rows.append((obj.digest, obj.kind, obj.version, obj.schema_revision_ref, obj.logical_id, canonical_bytes(obj.body)))
         return rows
 
-    def accept(self, command: CommandEnvelope, expected_head=None, *, immutable_objects=(),
-               ordered_events=(), bootstrap_profile=None, expected_closure=None):
+    def accept(self, command: CommandEnvelope, expected_head=None, *, immutable_objects=(), ordered_events=(), bootstrap_profile=None, expected_closure=None):
         if not isinstance(command, CommandEnvelope):
             raise ValidationError("COMMAND_REQUIRED")
         objects = list(immutable_objects)
@@ -731,8 +566,7 @@ class TransactionalHistoryStore:
                 raise ValidationError("COMMAND_BINDING_CONFLICT")
             if current is not None and command.campaign_ref != current.campaign_id:
                 raise ValidationError("CAMPAIGN_NOT_PRIOR_ACCEPTED")
-            self._validate_history_cuts(objects, seq=seq, current=current,
-                                        profile=bootstrap_profile, con=con)
+            self._validate_history_cuts(objects, seq=seq, current=current, profile=bootstrap_profile, con=con)
             campaign_id = command.proposed_campaign_id if seq == 1 else command.campaign_ref
             if not campaign_id:
                 raise ValidationError("CAMPAIGN_ID_REQUIRED")
@@ -741,36 +575,31 @@ class TransactionalHistoryStore:
                 self._validate_material_ref_contracts(obj, current=current, con=con)
                 if obj.kind == "stop_input":
                     self._validate_stop_snapshot_binding(obj, objects, con)
+                    from ..stop.authority import validate_stop_input_accepted_authority
+                    validate_stop_input_accepted_authority(obj, current=current, con=con)
             from ..orchestration.fsm import project_states
-            prior_events = [event for (raw,) in con.execute("SELECT body FROM commits ORDER BY seq")
-                            for event in json.loads(raw)["ordered_event_bodies"]]
-            transition_events = [event for event in prior_events + list(ordered_events)
-                                 if isinstance(event, dict) and any(key in event for key in ("aggregate", "from_state", "to_state"))]
+            prior_events = [event for (raw,) in con.execute("SELECT body FROM commits ORDER BY seq") for event in json.loads(raw)["ordered_event_bodies"]]
+            transition_events = [event for event in prior_events + list(ordered_events) if isinstance(event, dict) and any(key in event for key in ("aggregate", "from_state", "to_state"))]
             project_states(transition_events)
             closure_nodes = [ClosureNode.from_object(o, node_id=o.digest) for o in objects]
-            ordered_ids = canonical_order(
-                closure_nodes, command_kind=command.command_kind, commit_seq=seq,
-                expected_parent="EMPTY_HISTORY" if parent == EMPTY_HISTORY else ACCEPTED_HEAD_REF,
-                expected=expected_closure, registry=self.registry)
+            ordered_ids = canonical_order(closure_nodes, command_kind=command.command_kind, commit_seq=seq, expected_parent="EMPTY_HISTORY" if parent == EMPTY_HISTORY else ACCEPTED_HEAD_REF, expected=expected_closure, registry=self.registry)
             ordered_refs = tuple(next(o.as_ref(ref_class="CONTENT_OBJECT") for o in objects if o.digest == d) for d in ordered_ids)
             if command_obj.digest not in ordered_ids:
                 raise ValidationError("COMMAND_NOT_IN_CLOSURE")
             if seq == 1 and ordered_ids.index(command_obj.digest) != 0:
                 raise ValidationError("COMMAND_MUST_PRECEDE_DOMAIN_OBJECTS")
-            commit = CommitBody(
-                campaign_id=campaign_id, commit_seq=seq,
-                prev_history_ref=parent, command_ref=command_obj.as_ref(ref_class="CONTENT_OBJECT"),
-                command_digest=command.digest, actor_ref=command.actor_ref,
-                expected_parent_head=parent,
-                governing_policy_ref=command.governing_policy_ref,
-                governing_spec_refs=tuple(command.governing_spec_refs),
-                ordered_event_bodies=tuple(ordered_events), immutable_object_refs=ordered_refs)
+            commit = CommitBody(campaign_id=campaign_id, commit_seq=seq, prev_history_ref=parent,
+                                command_ref=command_obj.as_ref(ref_class="CONTENT_OBJECT"), command_digest=command.digest,
+                                actor_ref=command.actor_ref, expected_parent_head=parent,
+                                governing_policy_ref=command.governing_policy_ref,
+                                governing_spec_refs=tuple(command.governing_spec_refs),
+                                ordered_event_bodies=tuple(ordered_events), immutable_object_refs=ordered_refs)
             commit_digest = commit.digest
             head = AcceptedHead(campaign_id, seq, commit_digest)
             receipt = CommandReceipt(command.command_id, command_obj.as_ref(ref_class="CONTENT_OBJECT"), ordered_refs,
                                      {"kind": "commit_body", "revision_digest": commit_digest,
                                       "digest_profile": "BDB-OBJECT-DIGEST-1",
-                                     "schema_revision_ref": self.registry.contract("commit_body")["schema_ref"],
+                                      "schema_revision_ref": self.registry.contract("commit_body")["schema_ref"],
                                       "ref_class": "POST_ACCEPTANCE_SIDECAR"}, head)
             self.schemas.validate_schema("commit_body", canonical_bytes(commit.body()))
             self.schemas.validate_schema("command_receipt", canonical_bytes(receipt.body()))
@@ -779,25 +608,17 @@ class TransactionalHistoryStore:
                 con.execute("INSERT OR IGNORE INTO immutable_objects(digest,kind,version,schema_ref,logical_id,body) VALUES(?,?,?,?,?,?)", row)
             self._hook("after_object_durability")
             self._hook("before_commit_durability")
-            con.execute("INSERT INTO commits(seq,commit_hash,campaign_id,body) VALUES(?,?,?,?)",
-                        (seq, commit_digest, campaign_id, canonical_bytes(commit.body())))
+            con.execute("INSERT INTO commits(seq,commit_hash,campaign_id,body) VALUES(?,?,?,?)", (seq, commit_digest, campaign_id, canonical_bytes(commit.body())))
             self._hook("after_commit_before_receipt")
             receipt_digest = receipt.digest
-            con.execute("INSERT INTO receipts(command_id,command_digest,receipt_digest,body) VALUES(?,?,?,?)",
-                        (command.command_id, command.digest, receipt_digest, canonical_bytes(receipt.body())))
-            con.execute("INSERT INTO command_index(command_id,command_digest,receipt_digest) VALUES(?,?,?)",
-                        (command.command_id, command.digest, receipt_digest))
+            con.execute("INSERT INTO receipts(command_id,command_digest,receipt_digest,body) VALUES(?,?,?,?)", (command.command_id, command.digest, receipt_digest, canonical_bytes(receipt.body())))
+            con.execute("INSERT INTO command_index(command_id,command_digest,receipt_digest) VALUES(?,?,?)", (command.command_id, command.digest, receipt_digest))
             self._hook("after_receipt_before_head")
             if current is None:
-                con.execute("INSERT INTO accepted_head(singleton,campaign_id,seq,commit_hash) VALUES(1,?,?,?)",
-                            (campaign_id, seq, commit_digest))
+                con.execute("INSERT INTO accepted_head(singleton,campaign_id,seq,commit_hash) VALUES(1,?,?,?)", (campaign_id, seq, commit_digest))
             else:
-                updated = con.execute(
-                    "UPDATE accepted_head SET campaign_id=?,seq=?,commit_hash=? "
-                    "WHERE singleton=1 AND campaign_id=? AND seq=? AND commit_hash=?",
-                    (campaign_id, seq, commit_digest, current.campaign_id,
-                     current.commit_seq, current.commit_hash),
-                ).rowcount
+                updated = con.execute("UPDATE accepted_head SET campaign_id=?,seq=?,commit_hash=? WHERE singleton=1 AND campaign_id=? AND seq=? AND commit_hash=?",
+                                      (campaign_id, seq, commit_digest, current.campaign_id, current.commit_seq, current.commit_hash)).rowcount
                 if updated != 1:
                     raise ValidationError("EXPECTED_HEAD_CONFLICT")
             self._hook("after_head_durability")
@@ -811,7 +632,6 @@ class TransactionalHistoryStore:
             con.close()
 
     def rebuild_projection(self):
-        """Rebuild a derived sequence solely from canonical commits."""
         result = {"campaign_id": None, "state": "CREATED", "events": []}
         for body in self.commits():
             if result["campaign_id"] is None:
