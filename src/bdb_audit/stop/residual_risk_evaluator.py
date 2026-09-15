@@ -66,7 +66,7 @@ def _validate_snapshot_with_residual_risk(stop_input: Any, snapshot: Any) -> Non
 
 
 def install_residual_risk_evaluator(evaluator_module) -> None:
-    """Patch the pure evaluator with canonical residual-risk decision semantics."""
+    """Patch the pure evaluator with §79 residual-risk decision semantics."""
     original = evaluator_module.evaluate_stop
     if getattr(original, "_bdb_residual_risk_evaluator", False):
         return
@@ -89,7 +89,6 @@ def install_residual_risk_evaluator(evaluator_module) -> None:
                 )
 
             blocking = _count(summary, "blocking_residual_risk_count")
-            invalid = _count(summary, "invalid_residual_risk_count")
             unresolved = _count(summary, "unresolved_residual_risk_count")
             accepted = _count(summary, "accepted_residual_risk_count")
 
@@ -101,15 +100,6 @@ def install_residual_risk_evaluator(evaluator_module) -> None:
                     assurance_level="INSUFFICIENT",
                     release_readiness="TECHNICALLY_NOT_READY",
                     reason_codes=("BLOCKING_RESIDUAL_RISK",),
-                )
-            if invalid:
-                return StopEvaluation(
-                    stop_evaluation_id=stop_id,
-                    stop_input_ref=stop_input.ref,
-                    continuation_decision="BLOCKED",
-                    assurance_level="INSUFFICIENT",
-                    release_readiness="QUALIFICATION_BLOCKED",
-                    reason_codes=("INVALID_RESIDUAL_RISK_AUTHORITY",),
                 )
             if unresolved:
                 if kwargs.get("e6_plan_approved", False):
