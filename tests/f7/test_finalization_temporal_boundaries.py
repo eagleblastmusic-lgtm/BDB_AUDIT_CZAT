@@ -13,6 +13,7 @@ from types import SimpleNamespace
 import pytest
 
 import bdb_audit.assurance.finalization_service as finalization_module
+import bdb_audit.assurance.residual_risk_finalization as risk_finalization_module
 from bdb_audit.assurance.finalization_service import FinalizationService
 from bdb_audit.core.errors import ValidationError
 from bdb_audit.history.closure import canonical_order
@@ -50,18 +51,28 @@ class _FakeAcceptedStore:
         self.campaign_id = "campaign_temporal-boundary-test"
         self.seq = 10
         self.hash = "a" * 64
+        stop_input_ref = _ref("stop_input", "stop-input")
         self.records: dict[str, list[dict]] = {
+            "stop_input": [
+                {
+                    "accepted_seq": 10,
+                    "ref": stop_input_ref,
+                    "body": {"residual_risk_refs": []},
+                }
+            ],
             "stop_evaluation": [
                 {
                     "accepted_seq": 10,
                     "ref": _ref("stop_evaluation", "stop"),
                     "body": {
+                        "stop_input_ref": stop_input_ref,
                         "continuation_decision": "PASS",
                         "assurance_level": "ADEQUATE_FOR_DECLARED_SCOPE",
                         "release_readiness": "READY",
                     },
                 }
             ],
+            "residual_risk": [],
             "source_generation": [
                 {
                     "accepted_seq": 2,
@@ -100,6 +111,12 @@ class _FakeAcceptedStore:
             if int(record["accepted_seq"]) <= max_seq
         ]
 
+    def resolve_accepted(self, ref: dict, cut: dict):
+        for record in self.accepted_records(ref["kind"], cut):
+            if record["ref"]["revision_digest"] == ref["revision_digest"]:
+                return record
+        raise ValidationError("OBJECT_NOT_ACCEPTED_AT_CUT")
+
 
 def test_finalization_service_uses_three_prior_accepted_boundaries_and_resumes(monkeypatch) -> None:
     store = _FakeAcceptedStore()
@@ -125,6 +142,7 @@ def test_finalization_service_uses_three_prior_accepted_boundaries_and_resumes(m
         return SimpleNamespace(head=store.head())
 
     monkeypatch.setattr(finalization_module, "current_accepted_cut", fake_cut)
+    monkeypatch.setattr(risk_finalization_module, "current_accepted_cut", fake_cut)
     monkeypatch.setattr(service, "_accept_one", fake_accept_one)
 
     result = service.conclude_campaign(
@@ -151,8 +169,6 @@ def test_finalization_service_uses_three_prior_accepted_boundaries_and_resumes(m
     assert qualification["final_assurance_case_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
     assert qualification["stop_evaluation_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
 
-    # A retry after all three boundaries were accepted must resume/reuse them,
-    # not append a second finalization chain.
     retry = service.conclude_campaign(
         termination_state="COMPLETED",
         bounded_statement="Temporal boundary regression",
