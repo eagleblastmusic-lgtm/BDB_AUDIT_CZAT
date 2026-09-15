@@ -18,9 +18,20 @@ def _ref(kind: str, digest_suffix: str, ref_class: str = "CONTENT_OR_PRIOR") -> 
     }
 
 
+def _accepted_cut(seq: int, hash_char: str, campaign_id: str = "CAMP-001") -> dict:
+    return {
+        "variant": "ACCEPTED_HISTORY_CUT",
+        "campaign_id": campaign_id,
+        "accepted_head_seq": seq,
+        "accepted_head_hash": hash_char * 64,
+        "governing_policy_ref": "pin:initial_governing_policy_ref",
+        "governing_spec_refs": ["pin:initial_transition_profile_ref"],
+    }
+
+
 @pytest.fixture
 def base_stop_artifacts():
-    hcut = {"campaign_id": "CAMP-001", "commit_seq": 25, "commit_hash": "a" * 64}
+    hcut = _accepted_cut(25, "a")
     si = StopInput(
         campaign_id="CAMP-001",
         source_generation_ref=_ref("source_generation", "sg"),
@@ -94,6 +105,7 @@ def test_valid_e6_generator_and_obligation_preservation(base_stop_artifacts):
     )
 
     assert e6_spec.e6_stage_spec_id == "e6_spec_01"
+    assert e6_spec.e6_input_history_cut == ctx["hcut"]
     # Preserves all unresolved obligations
     assert len(e6_spec.inherited_unresolved_obligations) == 2
     digests = [r["revision_digest"] for r in e6_spec.inherited_unresolved_obligations]
@@ -109,7 +121,7 @@ def test_e6_rejects_generation_from_non_e6_stop(base_stop_artifacts):
     with pytest.raises(ValidationError, match="E6_ONLY_FROM_E6_REQUIRED"):
         AdaptiveE6Generator.generate_e6_spec(
             spec_id="e6_bad",
-            stop_evaluation=ctx["ev_pass"],  # PASS, not E6_REQUIRED!
+            stop_evaluation=ctx["ev_pass"],
             stop_input=ctx["stop_input"],
             trust_profile_ref=ctx["trust_ref"],
             isolation_profile_ref=ctx["iso_ref"],
@@ -172,11 +184,29 @@ def test_isolation_rewrite_rejected(base_stop_artifacts):
         )
 
 
-def test_post_e6_return_to_stop_advances_head(base_stop_artifacts):
-    prev_cut = {"commit_seq": 25}
-    new_head_cut = {"commit_seq": 28}
+def test_post_e6_return_to_stop_advances_canonical_accepted_head(base_stop_artifacts):
+    prev_cut = _accepted_cut(25, "a")
+    new_head_cut = _accepted_cut(28, "b")
     AdaptiveE6Generator.verify_post_e6_return_to_stop(new_head_cut, prev_cut)
 
-    # Regressing or same head cut fails closed
     with pytest.raises(ValidationError, match="POST_E6_MUST_ADVANCE_HEAD"):
-        AdaptiveE6Generator.verify_post_e6_return_to_stop({"commit_seq": 25}, prev_cut)
+        AdaptiveE6Generator.verify_post_e6_return_to_stop(_accepted_cut(25, "a"), prev_cut)
+
+    with pytest.raises(ValidationError, match="POST_E6_MUST_ADVANCE_HEAD"):
+        AdaptiveE6Generator.verify_post_e6_return_to_stop(_accepted_cut(28, "a"), prev_cut)
+
+
+def test_post_e6_return_rejects_legacy_noncanonical_cut() -> None:
+    legacy_prev = {"campaign_id": "CAMP-001", "commit_seq": 25, "commit_hash": "a" * 64}
+    canonical_new = _accepted_cut(28, "b")
+
+    with pytest.raises(ValidationError, match="ACCEPTED_HISTORY_CUT_REQUIRED"):
+        AdaptiveE6Generator.verify_post_e6_return_to_stop(canonical_new, legacy_prev)
+
+
+def test_post_e6_return_rejects_cross_campaign_transition() -> None:
+    prev_cut = _accepted_cut(25, "a", campaign_id="CAMP-001")
+    other_campaign = _accepted_cut(28, "b", campaign_id="CAMP-002")
+
+    with pytest.raises(ValidationError, match="POST_E6_CAMPAIGN_MISMATCH"):
+        AdaptiveE6Generator.verify_post_e6_return_to_stop(other_campaign, prev_cut)
