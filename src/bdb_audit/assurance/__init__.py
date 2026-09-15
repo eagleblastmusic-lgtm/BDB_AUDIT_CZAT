@@ -2,6 +2,7 @@
 from .residual_risk import (
     ResidualRiskRecord,
     ResidualRiskRegister,
+    ResidualRiskService,
     RISK_DISPOSITIONS,
     RISK_MATERIALITIES,
 )
@@ -29,3 +30,10 @@ from .release import (
     RELEASE_BASES,
     RELEASE_RESULTS,
 )
+from .finalization_service import FinalizationService
+from .residual_risk_finalization import install_residual_risk_finalization
+
+# Finalization must carry the exact accepted residual-risk set that STOP saw.
+# Zero-risk finalization remains the existing implementation; the installed
+# adapter only handles the residual-risk path and post-STOP risk drift.
+install_residual_risk_finalization(FinalizationService)
