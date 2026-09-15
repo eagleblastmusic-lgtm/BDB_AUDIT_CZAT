@@ -1,9 +1,9 @@
-"""Residual Risk Register and canonical accepted-history producer (M42 / §101).
+"""Residual Risk Register / Projection and canonical producer (M42 / §79 / §101).
 
-Residual risk is a versioned canonical assessment, not a narrative ledger.
-Material owner acceptance/waiver authority must pre-exist the risk revision;
-release readiness is derived later by STOP/release policy and is never granted by
-constructing this model alone.
+The canonical ``residual_risk`` body follows Data & Artifact Contracts §79
+exactly.  History freshness, invalidation and contradiction are properties of
+the accepted-history projection and separate canonical facts; they are not
+invented duplicate fields inside the residual-risk assessment.
 """
 from __future__ import annotations
 
@@ -24,15 +24,14 @@ RISK_DISPOSITIONS = {
     "UNKNOWN",
     "SUPERSEDED",
 }
-
 RISK_MATERIALITIES = {"CRITICAL", "HIGH", "MEDIUM", "LOW"}
-RECORD_STATUSES = {"VALID", "INVALIDATED", "CONTRADICTED", "STALE"}
 _REQUIRED_REF_FIELDS = {
     "kind", "revision_digest", "digest_profile", "schema_revision_ref", "ref_class"
 }
 
 
 def _accepted_cut(value: dict[str, Any]) -> dict[str, Any]:
+    """Validate a register/service input cut; this is not part of §79 body."""
     if not isinstance(value, dict) or value.get("variant") != "ACCEPTED_HISTORY_CUT":
         raise ValidationError("ACCEPTED_HISTORY_CUT_REQUIRED")
     if not isinstance(value.get("campaign_id"), str) or not value["campaign_id"]:
@@ -78,6 +77,8 @@ def _typed_refs(values, field: str) -> tuple[dict[str, Any], ...]:
 
 @dataclass(frozen=True)
 class ResidualRiskRecord:
+    """Canonical §79 residual-risk assessment revision."""
+
     risk_id: str
     risk_revision: str
     scope: str
@@ -87,13 +88,10 @@ class ResidualRiskRecord:
     reason_unresolved: str
     disposition: str
     blocking_effect: bool
-    history_cut: dict[str, Any]
     related_obligation_refs: tuple[dict[str, Any], ...] = ()
     related_hypothesis_refs: tuple[dict[str, Any], ...] = ()
     evidence_refs: tuple[dict[str, Any], ...] = ()
     owner_approval_ref: dict[str, Any] | None = None
-    waiver_ref: dict[str, Any] | None = None
-    status: str = "VALID"
 
     def __post_init__(self):
         for field_name in (
@@ -113,12 +111,9 @@ class ResidualRiskRecord:
                 "INVALID_RISK_MATERIALITY",
                 f"materiality {self.materiality} must be one of {sorted(RISK_MATERIALITIES)}",
             )
-        if self.status not in RECORD_STATUSES:
-            raise ValidationError("INVALID_RECORD_STATUS", f"status {self.status} invalid")
         if type(self.blocking_effect) is not bool:
             raise ValidationError("INVALID_BLOCKING_EFFECT")
 
-        object.__setattr__(self, "history_cut", _accepted_cut(self.history_cut))
         object.__setattr__(
             self,
             "related_obligation_refs",
@@ -142,22 +137,10 @@ class ResidualRiskRecord:
                     ref_class="PRIOR_ACCEPTED_ONLY",
                 ),
             )
-        if self.waiver_ref is not None:
-            object.__setattr__(
-                self,
-                "waiver_ref",
-                _typed_ref(
-                    self.waiver_ref,
-                    "waiver_ref",
-                    kind="approval_decision",
-                    ref_class="PRIOR_ACCEPTED_ONLY",
-                ),
-            )
-
         if self.disposition == "ACCEPTED_RESIDUAL_RISK" and not self.owner_approval_ref:
             raise ValidationError(
                 "RESIDUAL_RISK_REQUIRES_APPROVAL",
-                f"Risk {self.risk_id} cannot have disposition ACCEPTED_RESIDUAL_RISK without explicit owner_approval_ref",
+                f"Risk {self.risk_id} cannot be ACCEPTED_RESIDUAL_RISK without owner_approval_ref",
             )
 
     def body(self) -> dict[str, Any]:
@@ -171,16 +154,12 @@ class ResidualRiskRecord:
             "reason_unresolved": self.reason_unresolved,
             "disposition": self.disposition,
             "blocking_effect": self.blocking_effect,
-            "history_cut": dict(self.history_cut),
             "related_obligation_refs": [dict(r) for r in self.related_obligation_refs],
             "related_hypothesis_refs": [dict(r) for r in self.related_hypothesis_refs],
             "evidence_refs": [dict(r) for r in self.evidence_refs],
-            "status": self.status,
         }
         if self.owner_approval_ref is not None:
             data["owner_approval_ref"] = dict(self.owner_approval_ref)
-        if self.waiver_ref is not None:
-            data["waiver_ref"] = dict(self.waiver_ref)
         return data
 
     def as_object(self) -> CanonicalObject:
@@ -195,7 +174,7 @@ class ResidualRiskRecord:
 
 
 class ResidualRiskRegister:
-    """Deterministic current-revision projector for residual-risk assessments."""
+    """Derived register/export over assessment revisions on one input cut."""
 
     def __init__(self, history_cut: dict[str, Any]):
         self.history_cut = _accepted_cut(history_cut)
@@ -206,11 +185,6 @@ class ResidualRiskRegister:
         return self._records
 
     def add_record(self, record: ResidualRiskRecord) -> None:
-        if record.history_cut != self.history_cut:
-            raise ValidationError(
-                "STALE_RESIDUAL_RISK_INPUT",
-                f"Record {record.risk_id} history cut does not match register history cut",
-            )
         self._records[record.risk_id] = record
 
     def check_stale(self, current_cut: dict[str, Any]) -> bool:
@@ -222,7 +196,7 @@ class ResidualRiskRegister:
         )
 
     def apply_invalidations(self, invalidated_ref_ids: Set[str]) -> int:
-        """Invalidate risks whose supporting evidence or waiver authority was invalidated."""
+        """Derived view: supporting-evidence invalidation makes risk blocking."""
         affected = 0
         new_records: dict[str, ResidualRiskRecord] = {}
         for rid, rec in self._records.items():
@@ -231,14 +205,7 @@ class ResidualRiskRegister:
                 or r.get("id") in invalidated_ref_ids
                 for r in rec.evidence_refs
             )
-            waiver_invalid = (
-                rec.waiver_ref is not None
-                and (
-                    rec.waiver_ref.get("revision_digest") in invalidated_ref_ids
-                    or rec.waiver_ref.get("id") in invalidated_ref_ids
-                )
-            )
-            if (evidence_invalid or waiver_invalid) and rec.status != "INVALIDATED":
+            if evidence_invalid:
                 new_records[rid] = ResidualRiskRecord(
                     risk_id=rec.risk_id,
                     risk_revision=rec.risk_revision,
@@ -246,16 +213,13 @@ class ResidualRiskRegister:
                     description=rec.description,
                     materiality=rec.materiality,
                     uncertainty_class=rec.uncertainty_class,
-                    reason_unresolved=f"{rec.reason_unresolved}; Evidence or waiver was invalidated",
+                    reason_unresolved=f"{rec.reason_unresolved}; supporting evidence invalidated",
                     disposition="BLOCKED",
                     blocking_effect=True,
-                    history_cut=rec.history_cut,
                     related_obligation_refs=rec.related_obligation_refs,
                     related_hypothesis_refs=rec.related_hypothesis_refs,
                     evidence_refs=rec.evidence_refs,
                     owner_approval_ref=None,
-                    waiver_ref=None,
-                    status="INVALIDATED",
                 )
                 affected += 1
             else:
@@ -264,7 +228,7 @@ class ResidualRiskRegister:
         return affected
 
     def apply_contradiction(self, risk_id: str, contradiction_ref: dict[str, Any]) -> None:
-        """Mark a projected risk as contradicted and blocking."""
+        """Derived view: an open contradiction makes the risk blocking."""
         if risk_id not in self._records:
             raise ValidationError("UNKNOWN_RISK", f"Risk {risk_id} not found in register")
         rec = self._records[risk_id]
@@ -275,19 +239,19 @@ class ResidualRiskRegister:
             description=rec.description,
             materiality=rec.materiality,
             uncertainty_class=rec.uncertainty_class,
-            reason_unresolved=f"{rec.reason_unresolved}; Open contradiction encountered: {contradiction_ref.get('reason', '')}",
+            reason_unresolved=(
+                f"{rec.reason_unresolved}; open contradiction: {contradiction_ref.get('reason', '')}"
+            ),
             disposition="BLOCKED",
             blocking_effect=True,
-            history_cut=rec.history_cut,
             related_obligation_refs=rec.related_obligation_refs,
             related_hypothesis_refs=rec.related_hypothesis_refs,
             evidence_refs=rec.evidence_refs,
             owner_approval_ref=None,
-            waiver_ref=rec.waiver_ref,
-            status="CONTRADICTED",
         )
 
     def export_canonical(self) -> dict[str, Any]:
+        # The register/export carries its projection cut; individual §79 records do not.
         return {
             "history_cut": dict(self.history_cut),
             "records": [self._records[k].body() for k in sorted(self._records.keys())],
@@ -302,33 +266,36 @@ class ResidualRiskRegister:
     def rebuild(cls, canonical_data: dict[str, Any]) -> "ResidualRiskRegister":
         reg = cls(history_cut=canonical_data["history_cut"])
         for rb in canonical_data.get("records", []):
-            rec = ResidualRiskRecord(
-                risk_id=rb["risk_id"],
-                risk_revision=rb["risk_revision"],
-                scope=rb["scope"],
-                description=rb["description"],
-                materiality=rb["materiality"],
-                uncertainty_class=rb["uncertainty_class"],
-                reason_unresolved=rb["reason_unresolved"],
-                disposition=rb["disposition"],
-                blocking_effect=rb["blocking_effect"],
-                history_cut=rb["history_cut"],
-                related_obligation_refs=tuple(rb.get("related_obligation_refs", ())),
-                related_hypothesis_refs=tuple(rb.get("related_hypothesis_refs", ())),
-                evidence_refs=tuple(rb.get("evidence_refs", ())),
-                owner_approval_ref=rb.get("owner_approval_ref"),
-                waiver_ref=rb.get("waiver_ref"),
-                status=rb.get("status", "VALID"),
+            reg.add_record(
+                ResidualRiskRecord(
+                    risk_id=rb["risk_id"],
+                    risk_revision=rb["risk_revision"],
+                    scope=rb["scope"],
+                    description=rb["description"],
+                    materiality=rb["materiality"],
+                    uncertainty_class=rb["uncertainty_class"],
+                    reason_unresolved=rb["reason_unresolved"],
+                    disposition=rb["disposition"],
+                    blocking_effect=rb["blocking_effect"],
+                    related_obligation_refs=tuple(rb.get("related_obligation_refs", ())),
+                    related_hypothesis_refs=tuple(rb.get("related_hypothesis_refs", ())),
+                    evidence_refs=tuple(rb.get("evidence_refs", ())),
+                    owner_approval_ref=rb.get("owner_approval_ref"),
+                )
             )
-            reg.add_record(rec)
         return reg
 
 
 class ResidualRiskService:
-    """Accept residual-risk revisions through the Coordinator authority boundary."""
+    """Accept §79 risk revisions through the sole Coordinator authority boundary."""
 
     @staticmethod
-    def accept_record(store, record: ResidualRiskRecord) -> dict[str, Any]:
+    def accept_record(
+        store,
+        record: ResidualRiskRecord,
+        *,
+        expected_input_history_cut: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         from ..coordinator import Coordinator
         from ..history.objects import ACCEPTED_HEAD_REF, CommandEnvelope
         from ..workflow.read_models import current_accepted_cut
@@ -337,8 +304,10 @@ class ResidualRiskService:
         if head is None:
             raise ValidationError("EMPTY_STORE", "Residual risk requires an accepted campaign")
         cut = current_accepted_cut(store)
-        obj = record.as_object()
+        if expected_input_history_cut is not None and _accepted_cut(expected_input_history_cut) != cut:
+            raise ValidationError("STALE_RESIDUAL_RISK_INPUT")
 
+        obj = record.as_object()
         for row in store.accepted_records("residual_risk", cut):
             if row["ref"]["revision_digest"] == obj.digest:
                 return {
@@ -346,9 +315,6 @@ class ResidualRiskService:
                     "residual_risk_digest": obj.digest,
                     "commit_seq": row["accepted_seq"],
                 }
-
-        if record.history_cut != cut:
-            raise ValidationError("STALE_RESIDUAL_RISK_INPUT")
 
         prior = store.commits()[-1]
         seed = hashlib.sha256(
@@ -384,5 +350,4 @@ __all__ = [
     "ResidualRiskService",
     "RISK_DISPOSITIONS",
     "RISK_MATERIALITIES",
-    "RECORD_STATUSES",
 ]
