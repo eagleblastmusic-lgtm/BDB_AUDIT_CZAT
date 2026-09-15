@@ -22,34 +22,27 @@ def _current_risk_rows(store, cut) -> tuple[dict[str, Any], ...]:
 
 
 def _risk_summary(rows: tuple[dict[str, Any], ...]) -> dict[str, Any]:
+    """Derive STOP state exclusively from canonical §79 fields.
+
+    Evidence invalidation and open contradiction remain separate canonical STOP
+    inputs and are already fail-closed by the base evaluator; they are not
+    duplicated as synthetic status fields on ResidualRisk.
+    """
     summary: dict[str, Any] = {
         "residual_risk_binding_verified": True,
         "accepted_residual_risk_count": 0,
         "blocking_residual_risk_count": 0,
         "unresolved_residual_risk_count": 0,
-        "invalid_residual_risk_count": 0,
     }
-    invalid_statuses = {"INVALIDATED", "CONTRADICTED", "STALE"}
     for row in rows:
         body = row["body"]
         disposition = body.get("disposition")
-        status = body.get("status")
         blocking = bool(body.get("blocking_effect", False)) or disposition == "BLOCKED"
         approved = isinstance(body.get("owner_approval_ref"), dict)
 
-        if status in invalid_statuses:
-            summary["invalid_residual_risk_count"] += 1
         if blocking:
             summary["blocking_residual_risk_count"] += 1
-        elif status in invalid_statuses:
-            # Invalid/stale authority is a qualification blocker, not evidence
-            # that the underlying condition is itself a known technical defect.
-            continue
-        elif (
-            disposition == "ACCEPTED_RESIDUAL_RISK"
-            and status == "VALID"
-            and approved
-        ):
+        elif disposition == "ACCEPTED_RESIDUAL_RISK" and approved:
             summary["accepted_residual_risk_count"] += 1
         else:
             summary["unresolved_residual_risk_count"] += 1
