@@ -1,8 +1,8 @@
 """Byte-pinned canonical contract overlay for post-R5.3.1 remediation kinds.
 
-The historical active Registry remains byte-for-byte pinned.  This module adds
+The historical active Registry remains byte-for-byte pinned. This module adds
 small canonical contracts only when their overlay bytes, identity, base-registry
-binding and reference semantics all verify.  Runtime callers cannot replace or
+binding and reference semantics all verify. Runtime callers cannot replace or
 shadow these contracts.
 """
 from __future__ import annotations
@@ -15,7 +15,7 @@ from .canonical_json import parse
 from .errors import ValidationError
 
 OVERLAY_FILENAME = "artifact_contract_overlay_r5_3_3.json"
-OVERLAY_SHA256 = "b419042b283a6fd28a55f2e44d4ae97698c92b48211a5c846ea184f3933aad46"
+OVERLAY_SHA256 = "cdb3d3a934c4364e6c98a1a973d23e099921d184a3bdd9278def4fc418255de2"
 OVERLAY_ID = "BDB-AUDIT-V2-CANONICAL-CONTRACT-OVERLAY-R5-3-3"
 OVERLAY_VERSION = 1
 
