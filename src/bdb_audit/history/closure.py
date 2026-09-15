@@ -77,6 +77,13 @@ def typed_dependencies(nodes):
     by_ref = {(n.kind, n.revision_digest): n.node_id for n in prepared if n.revision_digest}
     by_id = {n.node_id: n for n in prepared}
     edges = set()
+    specific_temporal_consumers = {
+        "challenger_assignment",
+        "challenger_result",
+        "campaign_conclusion",
+        "final_assurance_case",
+        "release_qualification",
+    }
     for n in prepared:
         for dep in n.depends_on:
             if dep not in by_id:
@@ -103,8 +110,13 @@ def typed_dependencies(nodes):
             target = by_ref.get((ref.kind, ref.revision_digest))
             if target is None:
                 continue
+            code = (
+                "PRIOR_ACCEPTED_REFERENCE_REQUIRED"
+                if n.kind in specific_temporal_consumers
+                else "BACKWARD_REF_NOT_PRIOR_ACCEPTED"
+            )
             raise ValidationError(
-                "PRIOR_ACCEPTED_REFERENCE_REQUIRED",
+                code,
                 f"{n.kind} consumes same-commit {ref.kind} through PRIOR_ACCEPTED_ONLY",
             )
     return prepared, edges
