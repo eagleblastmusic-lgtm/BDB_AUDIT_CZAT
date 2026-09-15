@@ -96,23 +96,14 @@ def _prior_approval_body(ref, con) -> dict:
 
 
 def _validate_residual_risk_authority(obj, *, con) -> None:
-    """Approval refs are authority only when the prior decision is APPROVED."""
+    """§79 owner acceptance is authority only when the prior decision is APPROVED."""
     body = obj.body
     owner_ref = body.get("owner_approval_ref")
-    waiver_ref = body.get("waiver_ref")
-
-    if body.get("disposition") == "ACCEPTED_RESIDUAL_RISK":
-        if not isinstance(owner_ref, dict):
-            raise ValidationError("RESIDUAL_RISK_REQUIRES_APPROVAL")
-        if body.get("status") != "VALID":
-            raise ValidationError("ACCEPTED_RESIDUAL_RISK_MUST_BE_VALID")
-
+    if body.get("disposition") == "ACCEPTED_RESIDUAL_RISK" and not isinstance(owner_ref, dict):
+        raise ValidationError("RESIDUAL_RISK_REQUIRES_APPROVAL")
     if isinstance(owner_ref, dict):
         if _prior_approval_body(owner_ref, con).get("decision") != "APPROVED":
             raise ValidationError("RESIDUAL_RISK_APPROVAL_NOT_APPROVED")
-    if isinstance(waiver_ref, dict):
-        if _prior_approval_body(waiver_ref, con).get("decision") != "APPROVED":
-            raise ValidationError("RESIDUAL_RISK_WAIVER_NOT_APPROVED")
 
 
 def _validate_stop_residual_risk_projection(obj, *, current, con) -> None:
