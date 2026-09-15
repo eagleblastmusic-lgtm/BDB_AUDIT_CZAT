@@ -1,14 +1,10 @@
 """Adaptive E6 Generator (WP-E5-11 / M45 / §104 / Data Contracts §78).
 
-Generates adaptive E6 StageSpec exclusively from an accepted StopEvaluation with E6_REQUIRED.
-
-Normative requirements:
-- Strictly inherits governing source, policy, unresolved obligations, and materiality.
-- CANNOT reduce or drop requirements that caused FAIL/BLOCKED (no denominator manipulation).
-- CANNOT weaken or rewrite isolation after seeing failure results.
-- CANNOT launder unresolved contradictions.
-- CAN add new surfaces, invariants, and obligations (preserves or strengthens).
-- After E6 execution, execution must return to global STOP on the new accepted head.
+E6 is represented by the ordinary canonical ``stage_spec`` contract.  The
+adaptive plan is not a second artifact family: its exact accepted STOP source,
+source generation, trust/isolation baseline and unresolved work are encoded in
+the immutable StageSpec revision and independently re-checked by the history
+authority before acceptance.
 """
 from __future__ import annotations
 
@@ -18,12 +14,106 @@ from typing import Any, Mapping, Sequence, Set
 
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
-from ..history.objects import HistoryCut
+from ..history.objects import CanonicalObject, HistoryCut
+from ..orchestration.stages import StageSpec
 from .models import StopInput, StopEvaluation
+
+
+E6_RELATIONSHIP_PROFILE = "BDB-E6-REL-1"
+E6_RELATIONSHIP_PREFIX = f"{E6_RELATIONSHIP_PROFILE}|"
+POST_E6_STOP_OUTPUT = "POST_E6_GLOBAL_STOP_REEVALUATION"
+
+
+def _identity_digest(value: Any) -> str:
+    """Return one deterministic 64-hex identity for a ref or scalar pin."""
+    if isinstance(value, Mapping):
+        digest = value.get("revision_digest")
+        if isinstance(digest, str) and len(digest) == 64 and all(c in "0123456789abcdef" for c in digest.lower()):
+            return digest.lower()
+        return hashlib.sha256(canonical_bytes(dict(value))).hexdigest()
+    text = str(value)
+    if len(text) == 64 and all(c in "0123456789abcdef" for c in text.lower()):
+        return text.lower()
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _ref_token(value: Any) -> str:
+    kind = value.get("kind", "scalar") if isinstance(value, Mapping) else "scalar"
+    return f"BDB-REF-1:{kind}:{_identity_digest(value)}"
+
+
+def _relationship_token(
+    stop_evaluation_ref: Mapping[str, Any],
+    source_generation_ref: Mapping[str, Any],
+    trust_profile_ref: Mapping[str, Any],
+    isolation_profile_ref: Mapping[str, Any],
+) -> str:
+    level = str(isolation_profile_ref.get("isolation_level", "UNKNOWN"))
+    return (
+        f"{E6_RELATIONSHIP_PROFILE}"
+        f"|stop={_identity_digest(stop_evaluation_ref)}"
+        f"|source={_identity_digest(source_generation_ref)}"
+        f"|trust={_identity_digest(trust_profile_ref)}"
+        f"|isolation={_identity_digest(isolation_profile_ref)}"
+        f"|level={level}"
+    )
+
+
+def parse_e6_relationship(value: str) -> dict[str, str]:
+    if not isinstance(value, str) or not value.startswith(E6_RELATIONSHIP_PREFIX):
+        raise ValidationError("E6_STOP_RELATIONSHIP_INVALID")
+    parts = value.split("|")
+    if parts[0] != E6_RELATIONSHIP_PROFILE:
+        raise ValidationError("E6_STOP_RELATIONSHIP_INVALID")
+    parsed: dict[str, str] = {}
+    for part in parts[1:]:
+        if "=" not in part:
+            raise ValidationError("E6_STOP_RELATIONSHIP_INVALID")
+        key, item = part.split("=", 1)
+        if not key or not item or key in parsed:
+            raise ValidationError("E6_STOP_RELATIONSHIP_INVALID")
+        parsed[key] = item
+    required = {"stop", "source", "trust", "isolation", "level"}
+    if set(parsed) != required:
+        raise ValidationError("E6_STOP_RELATIONSHIP_INVALID")
+    for key in ("stop", "source", "trust", "isolation"):
+        item = parsed[key]
+        if len(item) != 64 or any(c not in "0123456789abcdef" for c in item.lower()):
+            raise ValidationError("E6_STOP_RELATIONSHIP_INVALID")
+        parsed[key] = item.lower()
+    return parsed
+
+
+def _obligation_output(ref: Mapping[str, Any]) -> str:
+    return f"E6_OBLIGATION:{_identity_digest(ref)}"
+
+
+def _contradiction_output(ref: Mapping[str, Any]) -> str:
+    return f"E6_CONTRADICTION:{_identity_digest(ref)}"
+
+
+def _reason_output(reason: str) -> str:
+    return f"E6_STOP_REASON:{reason}"
+
+
+def _added_output(kind: str, ref: Mapping[str, Any]) -> str:
+    return f"E6_ADDED_{kind}:{_identity_digest(ref)}"
+
+
+def _transition_pin(stop_input: StopInput) -> str:
+    cut = dict(stop_input.input_history_cut)
+    refs = tuple(cut.get("governing_spec_refs", ()))
+    if refs:
+        return str(refs[0])
+    if stop_input.policy_spec_refs:
+        return _ref_token(stop_input.policy_spec_refs[0])
+    raise ValidationError("E6_TRANSITION_POLICY_REQUIRED")
 
 
 @dataclass(frozen=True)
 class AdaptiveE6Spec:
+    """Adaptive planning envelope whose canonical artifact is exactly StageSpec."""
+
     e6_stage_spec_id: str
     source_stop_evaluation_ref: dict[str, Any]
     source_generation_ref: dict[str, Any]
@@ -36,40 +126,32 @@ class AdaptiveE6Spec:
     added_obligations: tuple[dict[str, Any], ...] = ()
     unresolved_contradictions: tuple[dict[str, Any], ...] = ()
     e6_input_history_cut: dict[str, Any] = field(default_factory=dict)
+    canonical_stage_spec: StageSpec | None = None
+
+    def __post_init__(self) -> None:
+        if self.canonical_stage_spec is None:
+            raise ValidationError("E6_CANONICAL_STAGE_SPEC_REQUIRED")
+        if self.canonical_stage_spec.stage_key != "E6":
+            raise ValidationError("E6_CANONICAL_STAGE_SPEC_REQUIRED")
 
     def body(self) -> dict[str, Any]:
-        return {
-            "e6_stage_spec_id": self.e6_stage_spec_id,
-            "source_stop_evaluation_ref": dict(self.source_stop_evaluation_ref),
-            "source_generation_ref": dict(self.source_generation_ref),
-            "governing_policy_ref": dict(self.governing_policy_ref),
-            "trust_profile_ref": dict(self.trust_profile_ref),
-            "isolation_profile_ref": dict(self.isolation_profile_ref),
-            "inherited_unresolved_obligations": [dict(r) for r in self.inherited_unresolved_obligations],
-            "added_surfaces": [dict(r) for r in self.added_surfaces],
-            "added_invariants": [dict(r) for r in self.added_invariants],
-            "added_obligations": [dict(r) for r in self.added_obligations],
-            "unresolved_contradictions": [dict(r) for r in self.unresolved_contradictions],
-            "e6_input_history_cut": dict(self.e6_input_history_cut),
-        }
+        assert self.canonical_stage_spec is not None
+        return self.canonical_stage_spec.body()
+
+    def as_object(self) -> CanonicalObject:
+        assert self.canonical_stage_spec is not None
+        return self.canonical_stage_spec.as_object()
 
     def digest(self) -> str:
-        from ..history.objects import CanonicalObject
-        return CanonicalObject("stage_spec", self.body()).digest
+        return self.as_object().digest
 
     @property
     def ref(self) -> dict[str, Any]:
-        return {
-            "kind": "stage_spec",
-            "revision_digest": self.digest(),
-            "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::stage_spec/1",
-            "ref_class": "CONTENT_OR_PRIOR",
-        }
+        return self.as_object().as_ref(ref_class="HISTORY_CONTEXT_BINDING").as_dict()
 
 
 class AdaptiveE6Generator:
-    """Generates Adaptive E6 StageSpec from a StopEvaluation."""
+    """Generate one canonical adaptive E6 StageSpec from a STOP E6_REQUIRED result."""
 
     @staticmethod
     def generate_e6_spec(
@@ -85,24 +167,37 @@ class AdaptiveE6Generator:
         attempted_dropped_obligation_digests: Set[str] | None = None,
         e6_input_history_cut: dict[str, Any] | None = None,
     ) -> AdaptiveE6Spec:
-        # Invariant 1: E6 can ONLY be generated from explicit continuation_decision == "E6_REQUIRED"
         if stop_evaluation.continuation_decision != "E6_REQUIRED":
             raise ValidationError(
                 "E6_ONLY_FROM_E6_REQUIRED",
                 f"Cannot generate E6 from STOP decision '{stop_evaluation.continuation_decision}'; requires E6_REQUIRED",
             )
 
-        # Invariant 2: Denominator manipulation forbidden: cannot drop unresolved obligations
+        stop_input_digest = stop_input.as_object().digest
+        if stop_evaluation.stop_input_ref.get("revision_digest") != stop_input_digest:
+            raise ValidationError("E6_STOP_INPUT_BINDING_MISMATCH")
+
+        remaining = tuple(dict(r) for r in stop_evaluation.remaining_obligation_refs)
         mandatory_digests = {
-            r.get("revision_digest") for r in stop_input.mandatory_obligation_refs if r.get("revision_digest")
+            r.get("revision_digest")
+            for r in stop_input.mandatory_obligation_refs
+            if isinstance(r, Mapping) and r.get("revision_digest")
         }
-        if attempted_dropped_obligation_digests and (attempted_dropped_obligation_digests & mandatory_digests):
+        remaining_digests = {
+            r.get("revision_digest")
+            for r in remaining
+            if isinstance(r, Mapping) and r.get("revision_digest")
+        }
+        if not remaining_digests.issubset(mandatory_digests):
+            raise ValidationError("E6_STOP_REMAINING_OBLIGATION_MISMATCH")
+        if attempted_dropped_obligation_digests and (
+            attempted_dropped_obligation_digests & remaining_digests
+        ):
             raise ValidationError(
                 "DENOMINATOR_MANIPULATION_FORBIDDEN",
                 "E6 cannot drop mandatory unresolved obligations to manipulate the denominator",
             )
 
-        # Invariant 3: Isolation rewrite forbidden: cannot weaken isolation
         if proposed_isolation_profile_ref is not None:
             baseline_level = isolation_profile_ref.get("isolation_level", "STRICT")
             proposed_level = proposed_isolation_profile_ref.get("isolation_level", "STRICT")
@@ -112,10 +207,45 @@ class AdaptiveE6Generator:
                     "E6 cannot weaken baseline isolation profile after failure observation",
                 )
 
-        # Invariant 4: Contradiction laundering forbidden: unresolved contradictions must be carried forward
-        unresolved_contradictions = tuple(stop_input.contradiction_refs)
+        unresolved_contradictions = tuple(dict(r) for r in stop_input.contradiction_refs)
+        hcut = dict(e6_input_history_cut or stop_input.input_history_cut)
+        accepted_cut = AdaptiveE6Generator._accepted_cut(hcut, "e6_input_history_cut")
+        if accepted_cut.campaign_id != stop_input.campaign_id:
+            raise ValidationError("E6_CAMPAIGN_MISMATCH")
 
-        hcut = e6_input_history_cut or stop_input.input_history_cut
+        relation = _relationship_token(
+            stop_evaluation.ref,
+            stop_input.source_generation_ref,
+            trust_profile_ref,
+            isolation_profile_ref,
+        )
+        outputs = {
+            POST_E6_STOP_OUTPUT,
+            *(_obligation_output(r) for r in remaining),
+            *(_contradiction_output(r) for r in unresolved_contradictions),
+            *(_reason_output(str(reason)) for reason in stop_evaluation.reason_codes),
+            *(_added_output("SURFACE", r) for r in added_surfaces),
+            *(_added_output("INVARIANT", r) for r in added_invariants),
+            *(_added_output("OBLIGATION", r) for r in added_obligations),
+        }
+
+        canonical = StageSpec(
+            stage_key="E6",
+            stage_spec_revision=f"e6-{stop_evaluation.as_object().digest[:16]}",
+            stage_role="E6",
+            stage_ordinal=6,
+            purpose=f"Adaptive E6 continuation from accepted STOP {stop_evaluation.as_object().digest}",
+            predecessor_requirements=("E5",),
+            required_lane_slots=("E6_ADAPTIVE",),
+            optional_lane_slots=(),
+            blind_reveal_phase_model="CONTROLLED",
+            allowed_corpus_roles=(),
+            forbidden_corpus_roles=(),
+            coverage_obligation_policy_ref=_ref_token(stop_input.governing_policy_ref),
+            required_stage_completion_outputs=tuple(sorted(outputs)),
+            transition_policy_ref=_transition_pin(stop_input),
+            stop_e6_relationship=relation,
+        )
 
         return AdaptiveE6Spec(
             e6_stage_spec_id=spec_id,
@@ -124,17 +254,77 @@ class AdaptiveE6Generator:
             governing_policy_ref=dict(stop_input.governing_policy_ref),
             trust_profile_ref=dict(trust_profile_ref),
             isolation_profile_ref=dict(isolation_profile_ref),
-            inherited_unresolved_obligations=tuple(stop_input.mandatory_obligation_refs),
-            added_surfaces=tuple(added_surfaces),
-            added_invariants=tuple(added_invariants),
-            added_obligations=tuple(added_obligations),
+            inherited_unresolved_obligations=remaining,
+            added_surfaces=tuple(dict(r) for r in added_surfaces),
+            added_invariants=tuple(dict(r) for r in added_invariants),
+            added_obligations=tuple(dict(r) for r in added_obligations),
             unresolved_contradictions=unresolved_contradictions,
-            e6_input_history_cut=dict(hcut),
+            e6_input_history_cut=hcut,
+            canonical_stage_spec=canonical,
+        )
+
+    @staticmethod
+    def generate_e6_spec_from_store(
+        store,
+        *,
+        spec_id: str,
+        stop_evaluation_ref: Mapping[str, Any],
+        isolation_profile_ref: dict[str, Any],
+        proposed_isolation_profile_ref: dict[str, Any] | None = None,
+        added_surfaces: Sequence[dict[str, Any]] = (),
+        added_invariants: Sequence[dict[str, Any]] = (),
+        added_obligations: Sequence[dict[str, Any]] = (),
+        attempted_dropped_obligation_digests: Set[str] | None = None,
+    ) -> AdaptiveE6Spec:
+        """Resolve all M45 authority inputs from one exact current accepted cut."""
+        from ..workflow.read_models import current_accepted_cut
+
+        cut = current_accepted_cut(store)
+        stop_record = store.resolve_accepted(dict(stop_evaluation_ref), cut)
+        if stop_record["ref"].get("kind") != "stop_evaluation":
+            raise ValidationError("E6_STOP_EVALUATION_REQUIRED")
+        stop_evaluation = StopEvaluation(**stop_record["body"])
+
+        # StopEvaluation's canonical contract historically did not require the
+        # optional logical_id member on its embedded stop_input_ref.  Prove the
+        # referenced digest/schema through accepted membership, then consume the
+        # exact accepted record rather than object-table presence.
+        stop_input_ref = dict(stop_evaluation.stop_input_ref)
+        if stop_input_ref.get("kind") != "stop_input" or not stop_input_ref.get("revision_digest"):
+            raise ValidationError("E6_STOP_INPUT_REQUIRED")
+        matches = [
+            row for row in store.accepted_records("stop_input", cut)
+            if row["ref"].get("revision_digest") == stop_input_ref.get("revision_digest")
+            and row["ref"].get("schema_revision_ref") == stop_input_ref.get("schema_revision_ref")
+        ]
+        if len(matches) != 1:
+            raise ValidationError("E6_STOP_INPUT_REQUIRED")
+        stop_input_record = matches[0]
+        stop_input = StopInput(**stop_input_record["body"])
+
+        genesis_records = store.accepted_records("campaign_genesis", cut)
+        if len(genesis_records) != 1:
+            raise ValidationError("E6_CAMPAIGN_GENESIS_REQUIRED")
+        trust_profile_ref = genesis_records[0]["body"].get("trust_profile_ref")
+        if not isinstance(trust_profile_ref, dict):
+            raise ValidationError("E6_TRUST_PROFILE_REQUIRED")
+
+        return AdaptiveE6Generator.generate_e6_spec(
+            spec_id=spec_id,
+            stop_evaluation=stop_evaluation,
+            stop_input=stop_input,
+            trust_profile_ref=trust_profile_ref,
+            isolation_profile_ref=isolation_profile_ref,
+            proposed_isolation_profile_ref=proposed_isolation_profile_ref,
+            added_surfaces=added_surfaces,
+            added_invariants=added_invariants,
+            added_obligations=added_obligations,
+            attempted_dropped_obligation_digests=attempted_dropped_obligation_digests,
+            e6_input_history_cut=cut,
         )
 
     @staticmethod
     def _accepted_cut(value: dict[str, Any], label: str) -> HistoryCut:
-        """Parse one canonical accepted-history cut without legacy aliases."""
         if not isinstance(value, dict) or value.get("variant") != "ACCEPTED_HISTORY_CUT":
             raise ValidationError(
                 "ACCEPTED_HISTORY_CUT_REQUIRED",
@@ -154,13 +344,6 @@ class AdaptiveE6Generator:
 
     @staticmethod
     def verify_post_e6_return_to_stop(new_head_cut: dict[str, Any], previous_cut: dict[str, Any]) -> None:
-        """Prove POST_E6 returns to global STOP on a newer canonical accepted head.
-
-        Legacy ``commit_seq`` / ``commit_hash`` dictionaries are intentionally
-        rejected.  E6 operates on the same canonical history-cut wire contract
-        used by the authority store, so a caller cannot manufacture progress by
-        supplying an ad-hoc sequence number detached from accepted history.
-        """
         previous = AdaptiveE6Generator._accepted_cut(previous_cut, "previous_cut")
         new = AdaptiveE6Generator._accepted_cut(new_head_cut, "new_head_cut")
 
