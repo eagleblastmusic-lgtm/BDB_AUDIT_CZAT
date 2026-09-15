@@ -16,7 +16,7 @@ class Authority(Protocol):
 class Coordinator:
     """Thin authority boundary around the durable history adapter.
 
-    Domain helpers return proposals/immutable objects.  Only this facade is
+    Domain helpers return proposals/immutable objects. Only this facade is
     handed the store's acceptance method, so projections and compilers cannot
     accidentally create a second accepted-state authority.
     """
@@ -35,8 +35,15 @@ class Coordinator:
         return self._history.rebuild_projection()
 
 
-from .reference_slice import run_foundation_reference_slice
+from . import reference_slice as _reference_slice_module
+from .reference_slice_residual_hook import install_reference_slice_zero_risk_proof
 from .e6_operation_hook import install_adaptive_e6_prepare_stage
+
+# The synthetic reference slice constructs its INTERMEDIATE StopInput directly,
+# so make its explicit empty risk set carry the corresponding zero counters.
+# Store authority still re-proves the accepted risk denominator independently.
+install_reference_slice_zero_risk_proof(_reference_slice_module)
+run_foundation_reference_slice = _reference_slice_module.run_foundation_reference_slice
 
 # E6 is the one non-baseline preparation path: it must be created from a prior
 # accepted STOP verdict and therefore cannot use the generic E1-E5 constructor.
