@@ -6,6 +6,7 @@ from .models import (
     StopEvaluation,
     Snapshot,
 )
+from . import evaluator as _evaluator_module
 from .evaluator import (
     evaluate_stop,
     validate_intermediate_stop,
@@ -18,6 +19,7 @@ from .e6 import (
 from .planner_compat import install_adaptive_e6_planner_compat
 from .input_builder import StopInputBuilder
 from .residual_risk_projection import install_residual_risk_stop_projection
+from .residual_risk_evaluator import install_residual_risk_evaluator
 
 # Compatibility is deliberately limited to pure-planner construction.  The
 # authoritative history-store boundary still re-proves canonical current STOP
@@ -28,6 +30,9 @@ install_adaptive_e6_planner_compat(AdaptiveE6Spec, AdaptiveE6Generator)
 # supplied readiness. The history-store equality validator independently
 # re-proves the exact risk set before an accepted StopInput can be durable.
 install_residual_risk_stop_projection(StopInputBuilder)
+install_residual_risk_evaluator(_evaluator_module)
+evaluate_stop = _evaluator_module.evaluate_stop
+validate_stop_snapshot_binding = _evaluator_module.validate_stop_snapshot_binding
 
 __all__ = [
     "LaneCompletion",
