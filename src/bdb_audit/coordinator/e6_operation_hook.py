@@ -46,7 +46,6 @@ def install_adaptive_e6_prepare_stage() -> None:
                 "Stage E5 must be completed before preparing E6",
             )
 
-        # A prepared-but-not-completed E6 round cannot be silently replaced.
         if "E6" in status["stages_prepared"] and "E6" not in status["stages_completed"]:
             raise ValidationError("STAGE_ALREADY_PREPARED", "Stage E6 is already prepared")
 
@@ -72,9 +71,6 @@ def install_adaptive_e6_prepare_stage() -> None:
             str(row["body"].get("stage_spec_revision")) for row in existing_e6
         }
         if requested_revision in existing_revisions:
-            # The public API historically defaulted to revision "1".  For a
-            # recursive POST_E6 round, derive a deterministic immutable suffix
-            # rather than rebinding the same revision label.
             if requested_revision == "1":
                 requested_revision = f"1.{len(existing_e6) + 1}"
             else:
@@ -129,5 +125,5 @@ def install_adaptive_e6_prepare_stage() -> None:
             "commit_hash": result.head.commit_hash,
         }
 
-    api_cls.prepare_stage = prepare_stage
-    api_cls._bdb_m45_prepare_stage_installed = True
+    setattr(api_cls, "prepare_stage", prepare_stage)
+    setattr(api_cls, "_bdb_m45_prepare_stage_installed", True)
