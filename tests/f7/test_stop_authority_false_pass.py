@@ -1,8 +1,6 @@
 """Adversarial STOP regressions for exact accepted authority and false-PASS prevention."""
 from __future__ import annotations
 
-import copy
-
 from bdb_audit.stop.evaluator import evaluate_stop
 from bdb_audit.stop.models import StopInput
 
@@ -93,15 +91,15 @@ def test_equal_number_of_unrelated_qualification_refs_cannot_pass() -> None:
     assert "QUALIFICATION_BINDING_UNVERIFIED" in result.reason_codes
 
 
-def test_confirmed_violation_is_hard_stop_blocker() -> None:
+def test_confirmed_violation_is_decisive_qualification_not_automatic_stop_blocker() -> None:
     data = _base()
     data["mandatory_obligation_refs"] = [_ref("coverage_obligation", "1")]
     data["current_obligation_qualification_refs"] = [_ref("coverage_obligation_qualification", "2")]
     data["unknown_blocked_summary"]["violation_confirmed_count"] = 1
 
     result = evaluate_stop(StopInput(**data), insufficient_data=False)
-    assert result.continuation_decision == "BLOCKED"
-    assert "MANDATORY_OBLIGATION_VIOLATION_CONFIRMED" in result.reason_codes
+    assert result.continuation_decision == "PASS"
+    assert "MANDATORY_OBLIGATION_VIOLATION_CONFIRMED" not in result.reason_codes
 
 
 def test_stale_or_blocked_qualification_cannot_pass() -> None:
