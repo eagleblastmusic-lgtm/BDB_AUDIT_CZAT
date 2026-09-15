@@ -107,9 +107,10 @@ class StopInputBuilder:
         required_specs = tuple(row for row in stage_specs if row["body"].get("stage_key") in required_keys)
         present_keys = {row["body"].get("stage_key") for row in required_specs}
         missing_keys = sorted(required_keys - present_keys)
-        if missing_keys:
-            raise ValidationError("STOP_REQUIRED_STAGE_SET_MISSING", ",".join(missing_keys))
 
+        # Missing required stage specs are STOP state, not a builder exception.
+        # The final evaluator treats this count as required work still pending;
+        # no fabricated StageSpec digest is introduced to fill the gap.
         required_stage_spec_refs = [dict(row["ref"], ref_class="HISTORY_CONTEXT_BINDING") for row in required_specs]
         spec_key_by_digest = {row["ref"]["revision_digest"]: row["body"]["stage_key"] for row in required_specs}
 
@@ -268,6 +269,7 @@ class StopInputBuilder:
             "unknown_surfaces_count": max(len(unresolved_scope_digests), len(unknown_scope_keys)),
             "is_blocked": blocked_scope_count > 0,
             "blocked_scope_count": blocked_scope_count,
+            "missing_required_stage_specs_count": len(missing_keys),
             "unresolved_obligations_count": qualification_summary["unqualified_mandatory_obligations_count"],
             **qualification_summary,
             **challenger_summary,
@@ -289,7 +291,14 @@ class StopInputBuilder:
             raise ValidationError("STOP_GOVERNING_SPEC_REQUIRED")
         policy_spec_refs = [_history_context_ref("spec_revision", token) for token in spec_tokens]
         evaluator_revision_ref = policy_spec_refs[0]
-        required_stage_set_ref = _derived_profile_ref("required-stage-set", [ref["revision_digest"] for ref in required_stage_spec_refs])
+        required_stage_set_ref = _derived_profile_ref(
+            "required-stage-set",
+            {
+                "required_stage_keys": sorted(required_keys),
+                "accepted_stage_spec_digests": [ref["revision_digest"] for ref in required_stage_spec_refs],
+                "missing_stage_keys": missing_keys,
+            },
+        )
         effort_profile_ref = _derived_profile_ref("effort-profile", {"input_history_cut": cut, "completed_stage_refs": completed_stage_refs})
         effort_results_ref = _derived_registered_ref("effort-results", {"input_history_cut": cut, "completed_stage_refs": completed_stage_refs})
 
