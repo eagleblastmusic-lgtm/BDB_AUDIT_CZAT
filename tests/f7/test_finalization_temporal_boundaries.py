@@ -70,7 +70,13 @@ class _FakeAcceptedStore:
                 }
             ],
             "source_identity": [],
-            "candidate_assurance_case": [],
+            "candidate_assurance_case": [
+                {
+                    "accepted_seq": 9,
+                    "ref": _ref("candidate_assurance_case", "candidate"),
+                    "body": {"marker": "candidate"},
+                }
+            ],
             "campaign_conclusion": [],
             "final_assurance_case": [],
             "release_qualification": [],
