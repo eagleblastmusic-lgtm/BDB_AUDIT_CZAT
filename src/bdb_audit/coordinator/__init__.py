@@ -36,6 +36,10 @@ class Coordinator:
 
 
 from .reference_slice import run_foundation_reference_slice
+from .e6_operation_hook import install_adaptive_e6_prepare_stage
+
+# E6 is the one non-baseline preparation path: it must be created from a prior
+# accepted STOP verdict and therefore cannot use the generic E1-E5 constructor.
+install_adaptive_e6_prepare_stage()
 
 __all__ = ["Authority", "Coordinator", "run_foundation_reference_slice"]
-
