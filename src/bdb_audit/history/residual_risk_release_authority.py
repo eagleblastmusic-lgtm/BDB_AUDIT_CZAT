@@ -1,16 +1,38 @@
-"""Refine M42 release residual-risk consistency without widening release policy.
+"""Refine M42 release authority without widening release policy.
 
 For a fully COMPLETED campaign, STOP_AXIS_MATERIALIZATION must copy the exact
-STOP release axis.  For COMPLETED_LIMITED the baseline only permits non-READY
-results; this M42 validator therefore enforces exact risk propagation and
-forbids false READY while leaving the pre-existing limited-release selection to
-its release policy implementation.
+STOP release axis and preserve the release-policy context seen by STOP.  For
+COMPLETED_LIMITED the baseline only permits non-READY results; this validator
+therefore enforces exact risk propagation and policy provenance while leaving
+the pre-existing limited-release selection to its release policy implementation.
 """
 from __future__ import annotations
 
 from functools import wraps
+import hashlib
 
 from ..core.errors import ValidationError
+
+
+def _policy_ref_from_cut(cut) -> dict:
+    if not isinstance(cut, dict):
+        raise ValidationError("RELEASE_ASSESSMENT_BASIS_CUT_REQUIRED")
+    token = cut.get("governing_policy_ref")
+    if not isinstance(token, str) or not token:
+        raise ValidationError("RELEASE_POLICY_CONTEXT_REQUIRED")
+    normalized = token.lower()
+    digest = (
+        normalized
+        if len(normalized) == 64 and all(ch in "0123456789abcdef" for ch in normalized)
+        else hashlib.sha256(token.encode("utf-8")).hexdigest()
+    )
+    return {
+        "kind": "policy_revision",
+        "revision_digest": digest,
+        "digest_profile": "BDB-OBJECT-DIGEST-1",
+        "schema_revision_ref": "BDB_SCHEMA_REGISTRY::policy_revision/1",
+        "ref_class": "HISTORY_CONTEXT_BINDING",
+    }
 
 
 def install_residual_risk_release_authority(authority_module) -> None:
@@ -29,6 +51,8 @@ def install_residual_risk_release_authority(authority_module) -> None:
 
         if current is None:
             raise ValidationError("PRIOR_ACCEPTED_REFERENCE_REQUIRED")
+
+        # First retain the full residual-risk/finalization authority checks.
         active_rows, _current, index = authority_module._active_risk_rows(current, con)
         current_set = authority_module._digest_set(row["ref"] for row in active_rows)
 
@@ -56,6 +80,24 @@ def install_residual_risk_release_authority(authority_module) -> None:
         stop_eval = authority_module._accepted_body("stop_evaluation", stop_digest, index, con)
         stop_readiness = stop_eval.get("release_readiness")
         result = body.get("result")
+
+        # FRESH-02: release policy is semantic history context, not a caller
+        # supplied label.  It must equal the exact policy represented by the
+        # release assessment cut and, for STOP-axis materialization, the exact
+        # policy frozen into the accepted StopInput used by StopEvaluation.
+        expected_policy_ref = _policy_ref_from_cut(body.get("release_assessment_basis_cut"))
+        if body.get("release_policy_ref") != expected_policy_ref:
+            raise ValidationError("RELEASE_POLICY_BINDING_MISMATCH")
+
+        stop_input_ref = stop_eval.get("stop_input_ref")
+        stop_input_digest = (
+            stop_input_ref.get("revision_digest") if isinstance(stop_input_ref, dict) else None
+        )
+        stop_input = authority_module._accepted_body(
+            "stop_input", stop_input_digest, index, con
+        )
+        if stop_input.get("release_policy_ref") != expected_policy_ref:
+            raise ValidationError("DRIFT_DETECTED_MATERIALIZATION_INVALID")
 
         if conclusion.get("termination_state") == "COMPLETED":
             if result != stop_readiness:
