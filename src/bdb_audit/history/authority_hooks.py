@@ -176,6 +176,13 @@ def _validate_stop_residual_risk_projection(obj, *, current, con) -> None:
     if _digest_set(actual_refs) != _digest_set(expected_refs):
         raise ValidationError("STOP_CURRENT_PROJECTION_MISMATCH", "residual_risk_refs")
 
+    # Residual-risk readiness counters are final-STOP decision inputs.  An
+    # INTERMEDIATE StopInput still has its exact risk denominator equality-
+    # checked above, but it does not need to pretend that final readiness has
+    # already been derived.
+    if obj.body.get("evaluation_context") not in {"FINAL_POST_E5", "POST_E6"}:
+        return
+
     expected_summary = _risk_summary(active_rows)
     actual_summary = obj.body.get("unknown_blocked_summary")
     if not isinstance(actual_summary, dict):
