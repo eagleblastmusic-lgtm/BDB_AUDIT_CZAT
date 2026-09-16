@@ -70,21 +70,17 @@ jobs:
           python --version
           python -c "import json,platform,sys,sysconfig; print(json.dumps({'platform':platform.platform(),'machine':platform.machine(),'implementation':sys.implementation.name,'python':platform.python_version(),'soabi':sysconfig.get_config_var('SOABI') or ''}, sort_keys=True))"
 
-      - name: Pin pip
+      - name: Pin pip from hash-locked bootstrap wheel
         shell: pwsh
-        run: python -m pip install pip==${{ env.PIP_VERSION }}
+        run: python -m pip install --require-hashes --only-binary=:all: -r requirements-ci-bootstrap-win-py314-hashes.lock
 
-      - name: Install exact runtime closure
+      - name: Install hash-locked runtime closure
         shell: pwsh
-        run: python -m pip install --no-deps -r requirements-f2.lock
+        run: python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-f2-win-py314-hashes.lock
 
-      - name: Install exact qualification tools
+      - name: Install hash-locked qualification tool closure
         shell: pwsh
-        run: python -m pip install pytest==${{ env.PYTEST_VERSION }} ruff==${{ env.RUFF_VERSION }} mypy==${{ env.MYPY_VERSION }}
-
-      - name: Install candidate project for validator CLI
-        shell: pwsh
-        run: python -m pip install --no-deps -e .
+        run: python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-ci-tools-win-py314-hashes.lock
 
       - name: Full pytest suite
         id: pytest_gate
@@ -126,7 +122,9 @@ jobs:
       - name: Release validator CLI
         id: validator_gate
         shell: pwsh
-        run: python -m bdb_audit.release_validator_cli "${{ env.ARTIFACT_PATH }}" --output dist/RELEASE_VALIDATOR.json
+        run: |
+          $env:PYTHONPATH = (Join-Path $env:GITHUB_WORKSPACE "src")
+          python -m bdb_audit.release_validator_cli "${{ env.ARTIFACT_PATH }}" --output dist/RELEASE_VALIDATOR.json
 
       - name: Standalone version
         id: standalone_version_gate
@@ -284,21 +282,17 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Pin pip
+      - name: Pin pip from hash-locked bootstrap wheel
         shell: pwsh
-        run: python -m pip install pip==${{ env.PIP_VERSION }}
+        run: python -m pip install --require-hashes --only-binary=:all: -r requirements-ci-bootstrap-win-py314-hashes.lock
 
-      - name: Install exact runtime closure
+      - name: Install hash-locked runtime closure
         shell: pwsh
-        run: python -m pip install --no-deps -r requirements-f2.lock
+        run: python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-f2-win-py314-hashes.lock
 
-      - name: Install exact qualification tools
+      - name: Install hash-locked qualification tool closure
         shell: pwsh
-        run: python -m pip install pytest==${{ env.PYTEST_VERSION }} ruff==${{ env.RUFF_VERSION }} mypy==${{ env.MYPY_VERSION }}
-
-      - name: Install candidate project
-        shell: pwsh
-        run: python -m pip install --no-deps -e .
+        run: python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-ci-tools-win-py314-hashes.lock
 
       - name: Download candidate qualification bundle
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
