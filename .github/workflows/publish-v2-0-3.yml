@@ -1,0 +1,180 @@
+name: Publish BDB Audit v2.0.3
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: publish-bdb-audit-v2-0-3
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: windows-2025
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout exact published main SHA
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prove main and product version identity
+        shell: pwsh
+        run: |
+          $actual = (git rev-parse HEAD).Trim()
+          if ($actual -ne $env:GITHUB_SHA) {
+            throw "Checked-out HEAD does not equal GITHUB_SHA"
+          }
+          $remoteLine = git ls-remote origin "refs/heads/main"
+          $remote = ($remoteLine -split "`t")[0]
+          if ($remote -ne $env:GITHUB_SHA) {
+            throw "Release candidate is not current remote main"
+          }
+          $identity = python -c "from bdb_audit.version import APP_VERSION,BUILD_ID; print(APP_VERSION + '|' + BUILD_ID)"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ($identity.Trim() -ne "2.0.3|BDB-V2-STANDALONE-2.0.3") {
+            throw "Current main is not the exact v2.0.3 product identity"
+          }
+
+      - name: Locate successful exact-SHA v2.0.3 qualification
+        id: qualification_run
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $json = gh run list `
+            --repo $env:GITHUB_REPOSITORY `
+            --workflow v2-0-3-qualification.yml `
+            --commit $env:GITHUB_SHA `
+            --status success `
+            --limit 20 `
+            --json databaseId,headSha,conclusion,event
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $runs = @($json | ConvertFrom-Json)
+          $run = @($runs | Where-Object {
+            $_.headSha -eq $env:GITHUB_SHA -and $_.conclusion -eq "success"
+          } | Select-Object -First 1)
+          if ($run.Count -ne 1) {
+            throw "No successful v2.0.3 qualification run is bound to exact main SHA $env:GITHUB_SHA"
+          }
+          "run_id=$($run[0].databaseId)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host "QUALIFICATION_RUN_ID=$($run[0].databaseId)"
+
+      - name: Download exact qualified release bundle
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $runId = "${{ steps.qualification_run.outputs.run_id }}"
+          $artifactName = "BDB-Audit-v2.0.3-RU07-qualified-$env:GITHUB_SHA"
+          gh run download $runId `
+            --repo $env:GITHUB_REPOSITORY `
+            --name $artifactName `
+            --dir release-bundle
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify qualification receipt and artifact identity
+        id: release_identity
+        shell: pwsh
+        run: |
+          $receiptFile = Get-ChildItem release-bundle -Recurse -File -Filter RU07_RELEASE_QUALIFICATION.json | Select-Object -First 1
+          $artifactFile = Get-ChildItem release-bundle -Recurse -File -Filter BDB_AUDIT_ASSISTANT_v2.0.3.py | Select-Object -First 1
+          $candidateReceiptFile = Get-ChildItem release-bundle -Recurse -File -Filter CANDIDATE_GATE_RECEIPT.json | Select-Object -First 1
+          $validatorFile = Get-ChildItem release-bundle -Recurse -File -Filter RELEASE_VALIDATOR.json | Select-Object -First 1
+          if (-not $receiptFile -or -not $artifactFile -or -not $candidateReceiptFile -or -not $validatorFile) {
+            throw "Qualified release bundle is incomplete"
+          }
+          $receipt = Get-Content -Raw -Encoding utf8 $receiptFile.FullName | ConvertFrom-Json
+          if ($receipt.status -ne "PASS") { throw "Final qualification receipt is not PASS" }
+          if ($receipt.qualification_scope -ne "RU07_RELEASE_TRUTH_AND_REPRODUCIBILITY") {
+            throw "Unexpected qualification scope"
+          }
+          if ($receipt.declared_candidate_sha -ne $env:GITHUB_SHA -or
+              $receipt.tested_head_sha -ne $env:GITHUB_SHA -or
+              $receipt.artifact_source_sha -ne $env:GITHUB_SHA) {
+            throw "Qualification receipt is not bound to exact published main SHA"
+          }
+          if ($receipt.candidate_artifact_sha256 -ne $receipt.clean_room_artifact_sha256) {
+            throw "Candidate and clean-room artifact hashes differ"
+          }
+          $artifactHash = (Get-FileHash $artifactFile.FullName -Algorithm SHA256).Hash.ToLower()
+          if ($artifactHash -ne $receipt.candidate_artifact_sha256) {
+            throw "Downloaded standalone hash differs from final qualification receipt"
+          }
+          $artifactSize = (Get-Item $artifactFile.FullName).Length
+          New-Item -ItemType Directory -Force release-dist | Out-Null
+          Copy-Item $artifactFile.FullName release-dist/BDB_AUDIT_ASSISTANT_v2.0.3.py
+          Copy-Item $receiptFile.FullName release-dist/RU07_RELEASE_QUALIFICATION.json
+          Copy-Item $candidateReceiptFile.FullName release-dist/CANDIDATE_GATE_RECEIPT.json
+          Copy-Item $validatorFile.FullName release-dist/RELEASE_VALIDATOR.json
+          "SHA256=$artifactHash" | Set-Content -Encoding ascii release-dist/SHA256SUMS.txt
+          "sha256=$artifactHash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "size=$artifactSize" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host "RELEASE_ARTIFACT_SHA256=$artifactHash"
+          Write-Host "RELEASE_ARTIFACT_SIZE=$artifactSize"
+
+      - name: Prepare immutable release notes
+        shell: pwsh
+        run: |
+          $hash = "${{ steps.release_identity.outputs.sha256 }}"
+          $size = "${{ steps.release_identity.outputs.size }}"
+          $runId = "${{ steps.qualification_run.outputs.run_id }}"
+          @"
+          # BDB Audit v2.0.3
+
+          Stable publication of the exact v2.0.3 source generation after completion of the planned BDB Audit v2 implementation and the subsequent authority/finalization hardening.
+
+          ## Qualified release state
+          - exact release commit: `$env:GITHUB_SHA`
+          - exact v2.0.3 qualification workflow run: `$runId`
+          - candidate qualification: PASS
+          - independent clean-room rebuild / raw artifact identity: PASS
+          - all planned RU07-RU17 functional milestones: CLOSED / REMOTE QUALIFIED
+          - M42/M44 Residual Risk authority remediation: CLOSED / PUBLISHED
+          - M45 Adaptive E6: CLOSED / PUBLISHED
+
+          ## Standalone
+          `BDB_AUDIT_ASSISTANT_v2.0.3.py`
+
+          SHA-256: `$hash`
+          Size: `$size` bytes
+
+          The release also includes the exact final qualification receipt, candidate-gate receipt, release-validator result and SHA-256 file used to verify this artifact.
+          "@ | Set-Content -Encoding utf8 release-dist/RELEASE_NOTES_v2.0.3.md
+
+      - name: Create exact-SHA annotated tag and stable GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "bdb-audit-v2.0.3"
+          $existingTag = git ls-remote --tags origin "refs/tags/$tag"
+          if ($existingTag | Select-String .) {
+            throw "Tag $tag already exists; refusing to overwrite"
+          }
+          gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -eq 0) {
+            throw "Release $tag already exists; refusing to overwrite"
+          }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a $tag $env:GITHUB_SHA -m "BDB Audit v2.0.3"
+          git push origin "refs/tags/$tag"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          gh release create $tag `
+            "release-dist/BDB_AUDIT_ASSISTANT_v2.0.3.py" `
+            "release-dist/SHA256SUMS.txt" `
+            "release-dist/RU07_RELEASE_QUALIFICATION.json" `
+            "release-dist/CANDIDATE_GATE_RECEIPT.json" `
+            "release-dist/RELEASE_VALIDATOR.json" `
+            --repo $env:GITHUB_REPOSITORY `
+            --title "BDB Audit v2.0.3" `
+            --notes-file "release-dist/RELEASE_NOTES_v2.0.3.md" `
+            --verify-tag
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
