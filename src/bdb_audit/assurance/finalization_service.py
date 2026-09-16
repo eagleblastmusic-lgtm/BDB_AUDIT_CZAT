@@ -44,6 +44,29 @@ class FinalizationService:
             return None
         return max(records, key=lambda record: int(record.get("accepted_seq", 0)))
 
+    @staticmethod
+    def _policy_ref_from_cut(cut: dict[str, Any]) -> dict[str, Any]:
+        """Derive the exact typed release-policy context binding from a history cut."""
+        token = cut.get("governing_policy_ref")
+        if not isinstance(token, str) or not token:
+            raise ValidationError(
+                "RELEASE_POLICY_CONTEXT_REQUIRED",
+                "Release qualification requires governing_policy_ref on its assessment cut",
+            )
+        normalized = token.lower()
+        digest = (
+            normalized
+            if len(normalized) == 64 and all(ch in "0123456789abcdef" for ch in normalized)
+            else hashlib.sha256(token.encode("utf-8")).hexdigest()
+        )
+        return {
+            "kind": "policy_revision",
+            "revision_digest": digest,
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": "BDB_TARGET/policy_revision",
+            "ref_class": "HISTORY_CONTEXT_BINDING",
+        }
+
     def _prior_commit(self) -> tuple[Any, dict[str, Any]]:
         head = self.store.head()
         if head is None:
@@ -197,6 +220,20 @@ class FinalizationService:
         stop_eval_ref = dict(stop_eval_record["ref"], ref_class="PRIOR_ACCEPTED_ONLY")
         stop_digest = stop_eval_ref["revision_digest"]
 
+        stop_input_ref = stop_eval_body.get("stop_input_ref")
+        if not isinstance(stop_input_ref, dict):
+            raise ValidationError(
+                "STOP_INPUT_REFERENCE_REQUIRED",
+                "Accepted StopEvaluation must bind an accepted StopInput",
+            )
+        stop_input_record = self.store.resolve_accepted(stop_input_ref, cut)
+        stop_release_policy_ref = stop_input_record["body"].get("release_policy_ref")
+        if not isinstance(stop_release_policy_ref, dict):
+            raise ValidationError(
+                "RELEASE_POLICY_CONTEXT_REQUIRED",
+                "Accepted StopInput must carry release_policy_ref",
+            )
+
         decision = stop_eval_body.get("continuation_decision")
         assurance = stop_eval_body.get("assurance_level")
         readiness = stop_eval_body.get("release_readiness")
@@ -346,6 +383,13 @@ class FinalizationService:
         # Boundary 3: refresh again; ReleaseQualification can only consume an
         # already accepted FinalAssuranceCase and CampaignConclusion.
         qualification_cut = current_accepted_cut(self.store)
+        qualification_policy_ref = self._policy_ref_from_cut(qualification_cut)
+        if stop_release_policy_ref != qualification_policy_ref:
+            raise ValidationError(
+                "DRIFT_DETECTED_MATERIALIZATION_INVALID",
+                "STOP_AXIS_MATERIALIZATION cannot cross a release-policy context change",
+            )
+
         existing_qualification = self._matching_record(
             "release_qualification",
             qualification_cut,
@@ -358,30 +402,29 @@ class FinalizationService:
         )
         rel_result = readiness if termination_state == "COMPLETED" else "QUALIFICATION_BLOCKED"
         if existing_qualification is not None:
-            if existing_qualification["body"].get("result") != rel_result:
+            existing_body = existing_qualification["body"]
+            if existing_body.get("result") != rel_result:
                 raise ValidationError(
                     "FINALIZATION_REPLAY_CONFLICT",
                     "An accepted release qualification exists with a different result",
+                )
+            if existing_body.get("release_policy_ref") != qualification_policy_ref:
+                raise ValidationError(
+                    "RELEASE_POLICY_BINDING_MISMATCH",
+                    "Accepted release qualification does not bind the governing release policy",
                 )
             rel_digest = existing_qualification["ref"]["revision_digest"]
             qualification_commit_seq = int(existing_qualification["accepted_seq"])
             final_head = self.store.head()
             assert final_head is not None
         else:
-            pol_ref = {
-                "kind": "policy_revision",
-                "revision_digest": "1" * 64,
-                "digest_profile": "BDB-OBJECT-DIGEST-1",
-                "schema_revision_ref": "BDB_TARGET/policy_revision",
-                "ref_class": "HISTORY_CONTEXT_BINDING",
-            }
             rel_qual = ReleaseQualification(
                 release_qualification_id=new_id("release_qualification"),
                 campaign_conclusion_ref=concl_ref,
                 final_assurance_case_ref=final_ref,
                 stop_evaluation_ref=stop_eval_ref,
                 source_generation_ref=sg_ref,
-                release_policy_ref=pol_ref,
+                release_policy_ref=qualification_policy_ref,
                 release_assessment_basis_cut=qualification_cut,
                 qualification_command_input_history_cut=qualification_cut,
                 assessment_basis="STOP_AXIS_MATERIALIZATION",
