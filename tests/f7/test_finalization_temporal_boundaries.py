@@ -51,13 +51,20 @@ class _FakeAcceptedStore:
         self.campaign_id = "campaign_temporal-boundary-test"
         self.seq = 10
         self.hash = "a" * 64
+        self.governing_policy_ref = "policy:temporal-boundary"
         stop_input_ref = _ref("stop_input", "stop-input")
+        release_policy_ref = FinalizationService._policy_ref_from_cut(
+            {"governing_policy_ref": self.governing_policy_ref}
+        )
         self.records: dict[str, list[dict]] = {
             "stop_input": [
                 {
                     "accepted_seq": 10,
                     "ref": stop_input_ref,
-                    "body": {"residual_risk_refs": []},
+                    "body": {
+                        "residual_risk_refs": [],
+                        "release_policy_ref": release_policy_ref,
+                    },
                 }
             ],
             "stop_evaluation": [
@@ -118,15 +125,13 @@ class _FakeAcceptedStore:
         raise ValidationError("OBJECT_NOT_ACCEPTED_AT_CUT")
 
 
-def test_finalization_service_uses_three_prior_accepted_boundaries_and_resumes(monkeypatch) -> None:
-    store = _FakeAcceptedStore()
-    service = FinalizationService(store)  # type: ignore[arg-type]
-
+def _install_fake_boundaries(monkeypatch, store: _FakeAcceptedStore, service: FinalizationService) -> None:
     def fake_cut(current_store: _FakeAcceptedStore) -> dict:
         return {
             "campaign_id": current_store.campaign_id,
             "accepted_head_seq": current_store.seq,
             "accepted_head_hash": current_store.hash,
+            "governing_policy_ref": current_store.governing_policy_ref,
         }
 
     def fake_accept_one(obj: CanonicalObject, scope: str):
@@ -144,6 +149,12 @@ def test_finalization_service_uses_three_prior_accepted_boundaries_and_resumes(m
     monkeypatch.setattr(finalization_module, "current_accepted_cut", fake_cut)
     monkeypatch.setattr(risk_finalization_module, "current_accepted_cut", fake_cut)
     monkeypatch.setattr(service, "_accept_one", fake_accept_one)
+
+
+def test_finalization_service_uses_three_prior_accepted_boundaries_and_resumes(monkeypatch) -> None:
+    store = _FakeAcceptedStore()
+    service = FinalizationService(store)  # type: ignore[arg-type]
+    _install_fake_boundaries(monkeypatch, store, service)
 
     result = service.conclude_campaign(
         termination_state="COMPLETED",
@@ -168,6 +179,7 @@ def test_finalization_service_uses_three_prior_accepted_boundaries_and_resumes(m
     assert qualification["campaign_conclusion_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
     assert qualification["final_assurance_case_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
     assert qualification["stop_evaluation_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
+    assert qualification["release_policy_ref"] == store.records["stop_input"][0]["body"]["release_policy_ref"]
 
     retry = service.conclude_campaign(
         termination_state="COMPLETED",
@@ -178,3 +190,22 @@ def test_finalization_service_uses_three_prior_accepted_boundaries_and_resumes(m
     assert len(store.records["campaign_conclusion"]) == 1
     assert len(store.records["final_assurance_case"]) == 1
     assert len(store.records["release_qualification"]) == 1
+
+
+def test_finalization_service_rejects_release_policy_drift_after_stop(monkeypatch) -> None:
+    store = _FakeAcceptedStore()
+    service = FinalizationService(store)  # type: ignore[arg-type]
+    _install_fake_boundaries(monkeypatch, store, service)
+
+    store.governing_policy_ref = "policy:changed-after-stop"
+
+    with pytest.raises(ValidationError) as exc:
+        service.conclude_campaign(
+            termination_state="COMPLETED",
+            bounded_statement="Policy drift must fail closed",
+        )
+
+    assert exc.value.code == "DRIFT_DETECTED_MATERIALIZATION_INVALID"
+    assert len(store.records["campaign_conclusion"]) == 1
+    assert len(store.records["final_assurance_case"]) == 1
+    assert len(store.records["release_qualification"]) == 0
