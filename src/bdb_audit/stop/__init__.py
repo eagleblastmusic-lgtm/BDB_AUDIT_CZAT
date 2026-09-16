@@ -7,11 +7,7 @@ from .models import (
     Snapshot,
 )
 from . import evaluator as _evaluator_module
-from .evaluator import (
-    evaluate_stop,
-    validate_intermediate_stop,
-    validate_stop_snapshot_binding,
-)
+from .evaluator import validate_intermediate_stop
 from .e6 import (
     AdaptiveE6Spec,
     AdaptiveE6Generator,
@@ -21,7 +17,7 @@ from .input_builder import StopInputBuilder
 from .residual_risk_projection import install_residual_risk_stop_projection
 from .residual_risk_evaluator import install_residual_risk_evaluator
 
-# Compatibility is deliberately limited to pure-planner construction.  The
+# Compatibility is deliberately limited to pure-planner construction. The
 # authoritative history-store boundary still re-proves canonical current STOP
 # provenance before any E6 StageSpec can become accepted state.
 install_adaptive_e6_planner_compat(AdaptiveE6Spec, AdaptiveE6Generator)
