@@ -227,9 +227,28 @@ class E5StopSyntheticBenchmark:
         summary["m41_hunter_claims"] = len(hu_claims)
 
         # 6. M42 Residual Risk
-        risk_reg = ResidualRiskRegister(cut_10)
-        appr_ref = _ref("approval_decision", "appr1")
-        risk_rec = ResidualRiskRecord("rr1", "r1", "scope1", "desc", "LOW", "BOUNDED", "resolved", "ACCEPTED_RESIDUAL_RISK", False, cut_10, owner_approval_ref=appr_ref)
+        risk_cut_10 = {
+            "variant": "ACCEPTED_HISTORY_CUT",
+            "campaign_id": "CAMP-001",
+            "accepted_head_seq": 10,
+            "accepted_head_hash": "a" * 64,
+            "governing_policy_ref": "pin:synthetic-policy",
+            "governing_spec_refs": ["pin:synthetic-spec"],
+        }
+        risk_reg = ResidualRiskRegister(risk_cut_10)
+        appr_ref = _ref("approval_decision", "appr1", "PRIOR_ACCEPTED_ONLY")
+        risk_rec = ResidualRiskRecord(
+            "rr1",
+            "r1",
+            "scope1",
+            "desc",
+            "LOW",
+            "BOUNDED",
+            "resolved",
+            "ACCEPTED_RESIDUAL_RISK",
+            False,
+            owner_approval_ref=appr_ref,
+        )
         risk_reg.add_record(risk_rec)
         summary["m42_risks"] = len(risk_reg.records)
 
@@ -241,7 +260,7 @@ class E5StopSyntheticBenchmark:
             _ref("claim_set", "cs1"),
         )
         builder.add_coverage_obligation(_ref("coverage_obligation", "ob1"), _ref("coverage_obligation_qualification", "oq1"))
-        builder.add_residual_risk(dict(risk_rec.body()))
+        builder.add_residual_risk(risk_rec.ref)
         cac = builder.build()
         summary["m43_cac_digest"] = cac.digest()
 
@@ -291,7 +310,7 @@ class E5StopSyntheticBenchmark:
             current_obligation_qualification_refs=[],
             evidence_invalidation_refs=[],
             contradiction_refs=[],
-            residual_risk_refs=[_ref("residual_risk_ref", "rr1")],
+            residual_risk_refs=[risk_rec.ref],
             evidence_invalidation_state={"invalidated_count": 0},
             release_policy_ref=pol_ref,
             effort_profile_ref=eff_ref,
@@ -336,7 +355,7 @@ class E5StopSyntheticBenchmark:
             bounded_conclusion_statement="Campaign concluded successfully",
             conclusion_command_input_history_cut=cut_19,
             candidate_assurance_case_ref=cac.ref,
-            residual_risk_refs=(_ref("residual_risk_ref", "rr1"),),
+            residual_risk_refs=(risk_rec.ref,),
         )
 
         fac = FinalAssuranceCase(
@@ -346,7 +365,7 @@ class E5StopSyntheticBenchmark:
             public_conclusion_statement_ref=_ref("public_stmt", "ps1", "PRIOR_ACCEPTED_ONLY"),
             final_case_input_history_cut=cut_20,
             candidate_assurance_case_ref=cac.ref,
-            residual_risk_refs=(_ref("residual_risk_ref", "rr1"),),
+            residual_risk_refs=(risk_rec.ref,),
         )
 
         rel_qual = ReleaseLifecycleManager.evaluate_release_qualification(
