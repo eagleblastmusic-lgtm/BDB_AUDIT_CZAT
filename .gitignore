@@ -3,3 +3,4 @@ __pycache__/
 .pytest-*/
 *.sqlite
 tmp*/
+/dist/BDB_AUDIT_ASSISTANT_v*.py
