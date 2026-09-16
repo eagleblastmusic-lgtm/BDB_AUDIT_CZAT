@@ -1,6 +1,7 @@
 """Repository distribution/provenance regression guards (FRESH-03)."""
 from __future__ import annotations
 
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -16,14 +17,20 @@ IGNORE_RULE = "/dist/BDB_AUDIT_ASSISTANT_v*.py"
 def _tracked_generated_standalones() -> tuple[str, ...]:
     """Return generated standalone paths tracked by the repository index.
 
-    The provenance property is a repository property, so source archives without
-    Git metadata cannot prove or disprove it and are outside this check's scope.
+    The provenance property is a repository property. Outside a Git checkout it
+    may be skipped for developer/source-archive test runs, but the authoritative
+    GitHub Actions qualification must fail closed if Git/index inspection is not
+    available.
     """
-    if shutil.which("git") is None or not (REPO_ROOT / ".git").exists():
-        pytest.skip("repository provenance check requires Git metadata")
+    git = shutil.which("git")
+    in_github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+    if git is None:
+        if in_github_actions:
+            pytest.fail("Git executable is required for the repository provenance gate")
+        pytest.skip("repository provenance check requires Git")
 
     proc = subprocess.run(
-        ["git", "ls-files", "--", GENERATED_STANDALONE_PATHSPEC],
+        [git, "ls-files", "--", GENERATED_STANDALONE_PATHSPEC],
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
@@ -31,7 +38,12 @@ def _tracked_generated_standalones() -> tuple[str, ...]:
         errors="strict",
         check=False,
     )
-    assert proc.returncode == 0, proc.stderr
+    if proc.returncode != 0:
+        detail = proc.stderr.strip() or proc.stdout.strip() or f"git exit {proc.returncode}"
+        if in_github_actions:
+            pytest.fail(f"repository provenance gate cannot inspect Git index: {detail}")
+        pytest.skip(f"repository provenance check requires a Git checkout: {detail}")
+
     return tuple(line.strip().replace("\\", "/") for line in proc.stdout.splitlines() if line.strip())
 
 
