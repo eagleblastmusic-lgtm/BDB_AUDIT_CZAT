@@ -19,6 +19,7 @@ def _fake_cut(store: _FakeAcceptedStore) -> dict:
         "campaign_id": store.campaign_id,
         "accepted_head_seq": store.seq,
         "accepted_head_hash": store.hash,
+        "governing_policy_ref": store.governing_policy_ref,
     }
 
 
@@ -97,6 +98,7 @@ def test_exact_residual_risk_set_propagates_through_finalization(monkeypatch) ->
     assert qualification["accepted_residual_risk_refs"][0]["revision_digest"] == expected
     assert qualification["accepted_residual_risk_refs"][0]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
     assert qualification["result"] == "READY_WITH_RESIDUAL_RISK"
+    assert qualification["release_policy_ref"] == store.records["stop_input"][0]["body"]["release_policy_ref"]
 
 
 def test_residual_risk_revision_after_stop_requires_fresh_stop(monkeypatch) -> None:
@@ -118,3 +120,25 @@ def test_residual_risk_revision_after_stop_requires_fresh_stop(monkeypatch) -> N
     assert store.records["campaign_conclusion"] == []
     assert store.records["final_assurance_case"] == []
     assert store.records["release_qualification"] == []
+
+
+def test_residual_risk_finalization_rejects_release_policy_drift(monkeypatch) -> None:
+    store = _FakeAcceptedStore()
+    risk_ref = _add_risk(store, "risk-v1", seq=9)
+    store.records["stop_input"][0]["body"]["residual_risk_refs"] = [risk_ref]
+    store.records["stop_evaluation"][0]["body"]["release_readiness"] = "READY_WITH_RESIDUAL_RISK"
+    service = FinalizationService(store)  # type: ignore[arg-type]
+    _install_fake_accept(monkeypatch, store, service)
+
+    store.governing_policy_ref = "policy:changed-after-residual-risk-stop"
+
+    with pytest.raises(ValidationError) as exc:
+        service.conclude_campaign(
+            termination_state="COMPLETED",
+            bounded_statement="Residual-risk policy drift must fail closed",
+        )
+
+    assert exc.value.code == "DRIFT_DETECTED_MATERIALIZATION_INVALID"
+    assert len(store.records["campaign_conclusion"]) == 1
+    assert len(store.records["final_assurance_case"]) == 1
+    assert len(store.records["release_qualification"]) == 0
