@@ -57,6 +57,12 @@ def _stop_and_risks(service, termination_state):
         raise ValidationError("FINALIZATION_STOP_INPUT_REQUIRED")
     stop_input_record = service.store.resolve_accepted(stop_input_ref, cut)
     stop_risk_refs = tuple(stop_input_record["body"].get("residual_risk_refs", ()))
+    stop_release_policy_ref = stop_input_record["body"].get("release_policy_ref")
+    if not isinstance(stop_release_policy_ref, dict):
+        raise ValidationError(
+            "RELEASE_POLICY_CONTEXT_REQUIRED",
+            "Accepted StopInput must carry release_policy_ref",
+        )
 
     current_rows = _current_risk_rows(service.store, cut)
     current_risk_refs = tuple(row["ref"] for row in current_rows)
@@ -65,7 +71,7 @@ def _stop_and_risks(service, termination_state):
             "RESIDUAL_RISK_DRIFT_AFTER_STOP",
             "Residual-risk authority changed after STOP; a fresh STOP evaluation is required",
         )
-    return cut, stop_eval_record, _prior_risk_refs(stop_risk_refs)
+    return cut, stop_eval_record, _prior_risk_refs(stop_risk_refs), stop_release_policy_ref
 
 
 def _conclude_with_residual_risk(
@@ -76,6 +82,7 @@ def _conclude_with_residual_risk(
     cut: dict[str, Any],
     stop_eval_record: dict[str, Any],
     residual_risk_refs: tuple[dict[str, Any], ...],
+    stop_release_policy_ref: dict[str, Any],
 ) -> dict[str, Any]:
     stop_eval_body = stop_eval_record["body"]
     stop_eval_ref = dict(stop_eval_record["ref"], ref_class="PRIOR_ACCEPTED_ONLY")
@@ -209,8 +216,16 @@ def _conclude_with_residual_risk(
         final_digest = final_obj.digest
         final_case_commit_seq = final_res.head.commit_seq
 
-    # Boundary 3: refresh; release materialization exposes accepted risks.
+    # Boundary 3: refresh; release materialization exposes accepted risks and
+    # must preserve the exact release-policy context frozen by STOP.
     qualification_cut = current_accepted_cut(service.store)
+    qualification_policy_ref = service._policy_ref_from_cut(qualification_cut)
+    if stop_release_policy_ref != qualification_policy_ref:
+        raise ValidationError(
+            "DRIFT_DETECTED_MATERIALIZATION_INVALID",
+            "STOP_AXIS_MATERIALIZATION cannot cross a release-policy context change",
+        )
+
     existing_qualification = service._matching_record(
         "release_qualification",
         qualification_cut,
@@ -230,25 +245,23 @@ def _conclude_with_residual_risk(
             != _digest_set(residual_risk_refs)
         ):
             raise ValidationError("FINALIZATION_REPLAY_CONFLICT")
+        if body.get("release_policy_ref") != qualification_policy_ref:
+            raise ValidationError(
+                "RELEASE_POLICY_BINDING_MISMATCH",
+                "Accepted release qualification does not bind the governing release policy",
+            )
         rel_digest = existing_qualification["ref"]["revision_digest"]
         qualification_commit_seq = int(existing_qualification["accepted_seq"])
         final_head = service.store.head()
         assert final_head is not None
     else:
-        pol_ref = {
-            "kind": "policy_revision",
-            "revision_digest": "1" * 64,
-            "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": "BDB_TARGET/policy_revision",
-            "ref_class": "HISTORY_CONTEXT_BINDING",
-        }
         rel_qual = ReleaseQualification(
             release_qualification_id=new_id("release_qualification"),
             campaign_conclusion_ref=concl_ref,
             final_assurance_case_ref=final_ref,
             stop_evaluation_ref=stop_eval_ref,
             source_generation_ref=sg_ref,
-            release_policy_ref=pol_ref,
+            release_policy_ref=qualification_policy_ref,
             release_assessment_basis_cut=qualification_cut,
             qualification_command_input_history_cut=qualification_cut,
             assessment_basis="STOP_AXIS_MATERIALIZATION",
@@ -292,7 +305,9 @@ def install_residual_risk_finalization(finalization_cls) -> None:
         termination_state: str | None = None,
         bounded_statement: str = "Campaign concluded via post-E5 finalization",
     ):
-        cut, stop_eval_record, risk_refs = _stop_and_risks(self, termination_state)
+        cut, stop_eval_record, risk_refs, stop_release_policy_ref = _stop_and_risks(
+            self, termination_state
+        )
         if not risk_refs:
             return original(self, termination_state, bounded_statement)
         return _conclude_with_residual_risk(
@@ -302,6 +317,7 @@ def install_residual_risk_finalization(finalization_cls) -> None:
             cut=cut,
             stop_eval_record=stop_eval_record,
             residual_risk_refs=risk_refs,
+            stop_release_policy_ref=stop_release_policy_ref,
         )
 
     setattr(conclude_campaign, "_bdb_residual_risk_finalization", True)
