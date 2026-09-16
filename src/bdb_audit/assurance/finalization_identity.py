@@ -53,6 +53,12 @@ def install_full_identity_stop_lookup(finalization_module) -> None:
             raise ValidationError("FINALIZATION_STOP_INPUT_IDENTITY_MISMATCH")
         stop_input_record = matches[0]
         stop_risk_refs = tuple(stop_input_record["body"].get("residual_risk_refs", ()))
+        stop_release_policy_ref = stop_input_record["body"].get("release_policy_ref")
+        if not isinstance(stop_release_policy_ref, dict):
+            raise ValidationError(
+                "RELEASE_POLICY_CONTEXT_REQUIRED",
+                "Accepted StopInput must carry release_policy_ref",
+            )
 
         current_rows = _current_risk_rows(service.store, cut)
         current_risk_refs = tuple(row["ref"] for row in current_rows)
@@ -62,7 +68,7 @@ def install_full_identity_stop_lookup(finalization_module) -> None:
                 "Residual-risk authority changed after STOP; a fresh STOP evaluation is required",
             )
         prior_refs = finalization_module._prior_risk_refs(stop_risk_refs)
-        return cut, stop_eval_record, prior_refs
+        return cut, stop_eval_record, prior_refs, stop_release_policy_ref
 
     setattr(stop_and_risks, "_bdb_full_stop_identity", True)
     finalization_module._stop_and_risks = stop_and_risks
