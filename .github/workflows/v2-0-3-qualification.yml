@@ -72,15 +72,15 @@ jobs:
 
       - name: Pin pip from hash-locked bootstrap wheel
         shell: pwsh
-        run: python -m pip install --require-hashes --only-binary=:all: -r requirements-ci-bootstrap-win-py314-hashes.lock
+        run: 'python -m pip install --force-reinstall --no-deps --require-hashes --only-binary=:all: -r requirements-ci-bootstrap-win-py314-hashes.lock'
 
       - name: Install hash-locked runtime closure
         shell: pwsh
-        run: python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-f2-win-py314-hashes.lock
+        run: 'python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-f2-win-py314-hashes.lock'
 
       - name: Install hash-locked qualification tool closure
         shell: pwsh
-        run: python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-ci-tools-win-py314-hashes.lock
+        run: 'python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-ci-tools-win-py314-hashes.lock'
 
       - name: Full pytest suite
         id: pytest_gate
@@ -284,15 +284,15 @@ jobs:
 
       - name: Pin pip from hash-locked bootstrap wheel
         shell: pwsh
-        run: python -m pip install --require-hashes --only-binary=:all: -r requirements-ci-bootstrap-win-py314-hashes.lock
+        run: 'python -m pip install --force-reinstall --no-deps --require-hashes --only-binary=:all: -r requirements-ci-bootstrap-win-py314-hashes.lock'
 
       - name: Install hash-locked runtime closure
         shell: pwsh
-        run: python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-f2-win-py314-hashes.lock
+        run: 'python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-f2-win-py314-hashes.lock'
 
       - name: Install hash-locked qualification tool closure
         shell: pwsh
-        run: python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-ci-tools-win-py314-hashes.lock
+        run: 'python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-ci-tools-win-py314-hashes.lock'
 
       - name: Download candidate qualification bundle
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
