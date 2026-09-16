@@ -73,12 +73,12 @@ class FinalizationService:
             raise ValidationError("EMPTY_STORE", "Finalization requires an accepted campaign head")
         conn = self.store._connect()
         try:
-            row = con.execute("SELECT body FROM commits WHERE commit_hash=?", (head.commit_hash,)).fetchone()
+            row = conn.execute("SELECT body FROM commits WHERE commit_hash=?", (head.commit_hash,)).fetchone()
             if row is None:
                 raise ValidationError("ACCEPTED_HEAD_COMMIT_MISSING")
             return head, json.loads(row[0])
         finally:
-            con.close()
+            conn.close()
 
     def _accept_one(self, obj: CanonicalObject, scope: str):
         """Accept exactly one finalization artifact against the current head."""
