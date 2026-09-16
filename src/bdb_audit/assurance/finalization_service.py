@@ -63,7 +63,7 @@ class FinalizationService:
             "kind": "policy_revision",
             "revision_digest": digest,
             "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": "BDB_TARGET/policy_revision",
+            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::policy_revision/1",
             "ref_class": "HISTORY_CONTEXT_BINDING",
         }
 
@@ -73,12 +73,12 @@ class FinalizationService:
             raise ValidationError("EMPTY_STORE", "Finalization requires an accepted campaign head")
         conn = self.store._connect()
         try:
-            row = conn.execute("SELECT body FROM commits WHERE commit_hash=?", (head.commit_hash,)).fetchone()
+            row = con.execute("SELECT body FROM commits WHERE commit_hash=?", (head.commit_hash,)).fetchone()
             if row is None:
                 raise ValidationError("ACCEPTED_HEAD_COMMIT_MISSING")
             return head, json.loads(row[0])
         finally:
-            conn.close()
+            con.close()
 
     def _accept_one(self, obj: CanonicalObject, scope: str):
         """Accept exactly one finalization artifact against the current head."""
