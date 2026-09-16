@@ -36,10 +36,12 @@ jobs:
           if ($remote -ne $env:GITHUB_SHA) {
             throw "Release candidate is not current remote main"
           }
-          $identity = python -c "from bdb_audit.version import APP_VERSION,BUILD_ID; print(APP_VERSION + '|' + BUILD_ID)"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          if ($identity.Trim() -ne "2.0.3|BDB-V2-STANDALONE-2.0.3") {
-            throw "Current main is not the exact v2.0.3 product identity"
+          $versionText = Get-Content -Raw -Encoding utf8 src/bdb_audit/version.py
+          if ($versionText -notmatch 'APP_VERSION\s*=\s*"2\.0\.3"') {
+            throw "Current main does not declare APP_VERSION 2.0.3"
+          }
+          if ($versionText -notmatch 'BUILD_ID\s*=\s*f"BDB-V2-STANDALONE-\{APP_VERSION\}"') {
+            throw "Current main does not declare the canonical v2.0.3 BUILD_ID expression"
           }
 
       - name: Locate successful exact-SHA v2.0.3 qualification
