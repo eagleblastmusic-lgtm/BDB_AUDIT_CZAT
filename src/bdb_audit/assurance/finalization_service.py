@@ -226,7 +226,23 @@ class FinalizationService:
                 "STOP_INPUT_REFERENCE_REQUIRED",
                 "Accepted StopEvaluation must bind an accepted StopInput",
             )
-        stop_input_record = self.store.resolve_accepted(stop_input_ref, cut)
+        stop_input_digest = stop_input_ref.get("revision_digest")
+        if not isinstance(stop_input_digest, str):
+            raise ValidationError(
+                "STOP_INPUT_REFERENCE_REQUIRED",
+                "Accepted StopEvaluation must carry a digest-bearing StopInput reference",
+            )
+        stop_input_matches = [
+            record
+            for record in self.store.accepted_records("stop_input", cut)
+            if record.get("ref", {}).get("revision_digest") == stop_input_digest
+        ]
+        if len(stop_input_matches) != 1:
+            raise ValidationError(
+                "FINALIZATION_STOP_INPUT_IDENTITY_MISMATCH",
+                "StopEvaluation must resolve to exactly one accepted StopInput at its finalization cut",
+            )
+        stop_input_record = stop_input_matches[0]
         stop_release_policy_ref = stop_input_record["body"].get("release_policy_ref")
         if not isinstance(stop_release_policy_ref, dict):
             raise ValidationError(
