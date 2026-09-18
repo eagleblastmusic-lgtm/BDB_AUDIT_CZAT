@@ -28,6 +28,8 @@ from .e2_contradiction_resolution import E2ContradictionResolutionService
 from .e3_checkpoint import E3BlindCheckpointService
 from .e3_gap import E3PositiveGapAuthorizationService
 from .e3_gap_result import E3GapResultValidationService
+from .e3_cumulative import E3CumulativeAuthorizationService
+from .e3_cumulative_result import E3CumulativeResultValidationService
 from .inbox import E1ResultInbox, ImportedResultSummary
 from .manual_stage import (
     ImportedStagePhaseSummary,
@@ -120,6 +122,24 @@ E3_GAP_LANES = (
         "E3-Z",
         "Frontend, concurrency, resources and cross-layer gap-directed exploration",
         "CROSS_LAYER_CONCURRENCY_GAP_DIRECTED_SEARCH",
+    ),
+)
+
+E3_CUMULATIVE_LANES = (
+    StageLaneDefinition(
+        "E3-X",
+        "Security, authority and trust cumulative-corpus comparison",
+        "AUTHORITY_TRUST_CUMULATIVE_COMPARISON",
+    ),
+    StageLaneDefinition(
+        "E3-Y",
+        "State, data, catalog and recovery cumulative-corpus comparison",
+        "STATE_CATALOG_RECOVERY_CUMULATIVE_COMPARISON",
+    ),
+    StageLaneDefinition(
+        "E3-Z",
+        "Frontend, concurrency, resources and cross-layer cumulative-corpus comparison",
+        "CROSS_LAYER_CONCURRENCY_CUMULATIVE_COMPARISON",
     ),
 )
 
@@ -632,6 +652,61 @@ class FullAuditOrchestrator:
         )
         return batch
 
+    def prepare_e3_cumulative_orchestration(
+        self,
+        isolation_proofs_by_slot: dict[
+            str, StageIsolationProof
+        ],
+    ) -> StageBatch:
+        """Authorize and publish late E3 cumulative-corpus comparison."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        authorization = E3CumulativeAuthorizationService(
+            store,
+            lane_definitions=E3_CUMULATIVE_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+            isolation_proofs_by_slot=(
+                isolation_proofs_by_slot
+            ),
+        ).authorize()
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E3",
+            phase_id="E3-CUMULATIVE",
+            lane_definitions=E3_CUMULATIVE_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            authorized_context=authorization,
+            isolation_proofs_by_slot=(
+                isolation_proofs_by_slot
+            ),
+            execution_mode=(
+                self.settings.execution_mode
+            ),
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(
+            store,
+            batch,
+        )
+        return batch
+
     def deliver_stage_lane_to_user(self, slot: str) -> dict[str, Any]:
         """Deliver one already accepted E2+ stage assignment/package."""
         if self.stage_batch is None:
@@ -758,6 +833,7 @@ class FullAuditOrchestrator:
                 active_stage = "E4"
             elif "E2" in completed_stages:
                 candidate_stage_phases = (
+                    ("E3", "E3-CUMULATIVE"),
                     ("E3", "E3-GAP"),
                     ("E3", "E3-BLIND"),
                 )
@@ -926,6 +1002,9 @@ class FullAuditOrchestrator:
                     "E3-GAP": (
                         "DELIVER_OR_IMPORT_E3_GAP_RESULTS"
                     ),
+                    "E3-CUMULATIVE": (
+                        "DELIVER_OR_IMPORT_E3_CUMULATIVE_RESULTS"
+                    ),
                 }
                 if phase not in next_action_by_phase:
                     raise ValidationError(
@@ -1007,6 +1086,42 @@ class FullAuditOrchestrator:
                     ),
                     "findings_count": (
                         validation.findings_count
+                    ),
+                    "next_action": (
+                        validation.next_action
+                    ),
+                }
+
+            if (
+                self.stage_batch.phase_id
+                == "E3-CUMULATIVE"
+            ):
+                validation = (
+                    E3CumulativeResultValidationService(
+                        TransactionalHistoryStore(
+                            self.active_store_path
+                        ),
+                        self.stage_batch,
+                        self.stage_inbox,
+                    ).validate()
+                )
+                return {
+                    "status": "E3_CUMULATIVE_COMPLETE",
+                    "current_stage": "E3",
+                    "current_phase": (
+                        "E3-CUMULATIVE"
+                    ),
+                    "comparison_count": (
+                        validation.comparison_count
+                    ),
+                    "matched_discoveries_count": len(
+                        validation.matched_discovery_ids
+                    ),
+                    "no_prior_match_count": len(
+                        validation.no_prior_match_discovery_ids
+                    ),
+                    "post_reveal_discoveries_count": len(
+                        validation.post_reveal_discovery_refs
                     ),
                     "next_action": (
                         validation.next_action
