@@ -20,6 +20,7 @@ from ..orchestration.templates import TemplateRegistry
 from .executors import get_executor_profile
 from .e2_checkpoint import E2BlindCheckpointService
 from .e2_reveal import E2ControlledRevealService
+from .e2_synthesis import E2MainSynthesisService
 from .inbox import E1ResultInbox, ImportedResultSummary
 from .manual_stage import (
     ImportedStagePhaseSummary,
@@ -643,11 +644,24 @@ class FullAuditOrchestrator:
             }
 
         if self.stage_batch.phase_id == "E2-REVEAL":
+            synthesis = E2MainSynthesisService(
+                TransactionalHistoryStore(self.active_store_path),
+                self.stage_batch,
+                self.stage_inbox,
+            ).synthesize()
             return {
-                "status": "READY_FOR_E2_SYNTHESIS",
+                "status": "E2_MAIN_SYNTHESIZED",
                 "current_stage": "E2",
-                "current_phase": "E2-REVEAL",
-                "next_action": "SYNTHESIZE_E2_ADJUDICATION_FROM_ACCEPTED_BLIND_AND_REVEAL_OUTPUTS",
+                "current_phase": "E2-MAIN-SYNTHESIS",
+                "synthesis_commit_seq": synthesis.accepted_commit_seq,
+                "claims_count": len(synthesis.claim_refs),
+                "decisions_count": len(
+                    synthesis.adjudication_decision_refs
+                ),
+                "proposal_disagreement_claim_ids": list(
+                    synthesis.proposal_disagreement_claim_ids
+                ),
+                "next_action": "PREPARE_E2_SHADOW_ADJUDICATOR",
             }
 
         raise ValidationError(
