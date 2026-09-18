@@ -25,7 +25,7 @@ from ..core.registry import canonical_reference_set
 from ..history.objects import CanonicalObject, CommandEnvelope, HistoryCut
 from ..history.store import TransactionalHistoryStore
 from ..orchestration.compiler import PromptPackageCompiler
-from ..schemas.foundation import F3_KINDS, foundation_schema_bindings
+from ..schemas.foundation import ALL_EXECUTABLE_KINDS, foundation_schema_bindings
 from ..schemas.identity import LayeredValidator
 from ..stop.models import LaneCompletion
 from ..vault.raw_store import RawArtifactVault
@@ -410,7 +410,7 @@ class StageAssignmentService:
                     "required_result_slots": [
                         _external_ref(
                             "result_slot_contract_ref",
-                            f"{stage_id}:{phase_id}:{slot}",
+                            f"{stage_id}:{slot}",
                             "HISTORY_CONTEXT_BINDING",
                         )
                     ],
@@ -436,7 +436,7 @@ class StageAssignmentService:
                     "result_slot_contracts": [
                         _external_ref(
                             "result_slot_contract_ref",
-                            f"{stage_id}:{phase_id}:{slot}",
+                            f"{stage_id}:{slot}",
                             "HISTORY_CONTEXT_BINDING",
                         )
                     ],
@@ -512,7 +512,7 @@ class StageAssignmentService:
                     "result_slot_contract_refs": [
                         _external_ref(
                             "result_slot_contract_ref",
-                            f"{stage_id}:{phase_id}:{slot}",
+                            f"{stage_id}:{slot}",
                             "CONTENT_OR_PRIOR",
                         )
                     ],
@@ -940,13 +940,8 @@ class StageResultInbox:
     ):
         self.store = store
         self.batch = batch
-        result_kinds = tuple(
-            dict.fromkeys(
-                (*F3_KINDS, "bdb_audit_lane_result")
-            )
-        )
         self.store.schemas = foundation_schema_bindings(
-            kinds=result_kinds
+            kinds=ALL_EXECUTABLE_KINDS
         )
         self.coordinator = Coordinator(store)
         self.vault = RawArtifactVault(
