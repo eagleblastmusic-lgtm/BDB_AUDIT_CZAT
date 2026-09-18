@@ -12,7 +12,6 @@ accepting ContradictionResolutionDecision objects.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
 import hashlib
 from typing import Any, Mapping, Sequence
 
