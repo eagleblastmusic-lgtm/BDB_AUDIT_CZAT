@@ -14,6 +14,7 @@ from bdb_audit.workflow.e2_checkpoint import E2BlindCheckpointService
 from bdb_audit.workflow.e2_reveal import E2ControlledRevealService
 from bdb_audit.workflow.e2_synthesis import E2MainSynthesisService
 from bdb_audit.workflow.e2_shadow import E2ShadowAuthorizationService
+from bdb_audit.workflow.e2_finalize import E2FinalizationService
 from bdb_audit.workflow.manual_stage import (
     StageAssignmentService,
     StageLaneDefinition,
@@ -1276,3 +1277,159 @@ def test_e2_shadow_result_uses_authorized_shadow_knowledge(
             "E2-ADJUDICATION"
         ]["revision_digest"]
     )
+
+
+def _shadow_checks(authorization, conflict=False):
+    payload = json.loads(
+        authorization.context_members[
+            "E2_MAIN_ADJUDICATION_VIEW.json"
+        ].decode("utf-8")
+    )
+    return [
+        {
+            "claim_revision_digest": item[
+                "claim_revision_ref"
+            ]["revision_digest"],
+            "conflict": conflict,
+            "conflict_types": (
+                ["EVIDENCE_OVERSTATING"]
+                if conflict
+                else []
+            ),
+            "rationale": (
+                "bounded challenge"
+                if conflict
+                else "no bounded conflict found"
+            ),
+        }
+        for item in payload["claims"]
+    ]
+
+
+def test_e2_finalization_accepts_stage_completion_only_after_clean_shadow(
+    e2_shadow_flow,
+):
+    store = e2_shadow_flow["store"]
+    batch = e2_shadow_flow["shadow_batch"]
+    authorization = e2_shadow_flow[
+        "shadow_authorization"
+    ]
+    tmp = e2_shadow_flow["tmp"]
+    inbox = StageResultInbox(store, batch)
+    imported = inbox.ingest_multiple_zips(
+        [
+            _write_result(
+                tmp / "shadow-clean-final.zip",
+                batch,
+                "E2-ADJUDICATION",
+                outputs={
+                    "shadow_checks": _shadow_checks(
+                        authorization,
+                        conflict=False,
+                    )
+                },
+            )
+        ]
+    )
+    assert imported.phase_complete is True
+
+    before = store.head().commit_seq
+    result = E2FinalizationService(
+        store,
+        batch,
+        inbox,
+    ).finalize()
+    assert result.stage_completed is True
+    assert result.stage_completion_ref is not None
+    assert result.accepted_commit_seq == before + 1
+    assert result.next_action == "PREPARE_E3"
+
+    status = AuditOperationApi().get_campaign_status(
+        store.path
+    )
+    assert "E2" in status["stages_completed"]
+
+    cut = current_accepted_cut(store)
+    stage_completion = store.resolve_accepted(
+        result.stage_completion_ref,
+        cut,
+    )
+    assert (
+        stage_completion["body"][
+            "completion_predicate_result"
+        ]
+        == "STAGE_COMPLETED"
+    )
+    assert (
+        stage_completion["body"][
+            "mandatory_obligation_summary"
+        ]["shadow_conflicts"]
+        == 0
+    )
+
+    # Retry is read-only/idempotent.
+    seq = store.head().commit_seq
+    retry = E2FinalizationService(
+        store,
+        batch,
+        inbox,
+    ).finalize()
+    assert retry.already_finalized is True
+    assert store.head().commit_seq == seq
+
+
+def test_e2_finalization_conflict_requires_contradiction_protocol(
+    e2_shadow_flow,
+):
+    store = e2_shadow_flow["store"]
+    batch = e2_shadow_flow["shadow_batch"]
+    authorization = e2_shadow_flow[
+        "shadow_authorization"
+    ]
+    tmp = e2_shadow_flow["tmp"]
+    inbox = StageResultInbox(store, batch)
+    checks = _shadow_checks(
+        authorization,
+        conflict=False,
+    )
+    checks[0] = {
+        **checks[0],
+        "conflict": True,
+        "conflict_types": [
+            "EVIDENCE_OVERSTATING"
+        ],
+        "rationale": "shadow challenges main evidence restraint",
+    }
+    imported = inbox.ingest_multiple_zips(
+        [
+            _write_result(
+                tmp / "shadow-conflict-final.zip",
+                batch,
+                "E2-ADJUDICATION",
+                outputs={
+                    "shadow_checks": checks
+                },
+            )
+        ]
+    )
+    assert imported.phase_complete is True
+    seq = store.head().commit_seq
+
+    result = E2FinalizationService(
+        store,
+        batch,
+        inbox,
+    ).finalize()
+    assert result.stage_completed is False
+    assert result.stage_completion_ref is None
+    assert result.shadow_conflict_claim_digests
+    assert (
+        result.next_action
+        == "E2_CONTRADICTION_PROTOCOL_REQUIRED"
+    )
+    assert store.head().commit_seq == seq
+
+    status = AuditOperationApi().get_campaign_status(
+        store.path
+    )
+    assert "E2" not in status["stages_completed"]
