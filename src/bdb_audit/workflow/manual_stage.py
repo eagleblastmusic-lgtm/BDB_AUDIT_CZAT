@@ -1674,9 +1674,21 @@ class StageResultInbox:
             attempt_record["body"]["lane_run_ref"],
             cut,
         )
-        knowledge_record = self.store.resolve_accepted(
-            assignment["knowledge_state_ref"], cut
+        knowledge_ref = (
+            job.authorized_knowledge_state_ref
+            if job.authorized_knowledge_state_ref
+            else assignment["knowledge_state_ref"]
         )
+        knowledge_record = self.store.resolve_accepted(
+            knowledge_ref, cut
+        )
+        if not _same_ref(
+            knowledge_record["body"].get("attempt_ref"),
+            job.attempt_ref,
+        ):
+            raise ValidationError(
+                "RESULT_KNOWLEDGE_ATTEMPT_BINDING_MISMATCH"
+            )
         isolation_record = self.store.resolve_accepted(
             knowledge_record["body"][
                 "isolation_qualification_ref"
