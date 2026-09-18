@@ -13,6 +13,7 @@ from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.workflow.e2_checkpoint import E2BlindCheckpointService
 from bdb_audit.workflow.e2_reveal import E2ControlledRevealService
 from bdb_audit.workflow.manual_stage import (
+    StageAssignmentService,
     StageLaneDefinition,
     StageResultInbox,
     prepare_stage_phase_batch,
@@ -321,14 +322,7 @@ def test_unbound_context_members_fail_closed(e2_phase):
 
 
 def test_distinct_phase_does_not_reuse_blind_assignments(e2_phase):
-    store, blind_batch, _, tmp = e2_phase
-    source = ResolvedSource(
-        target_type="github",
-        location="https://github.com/example/manual-stage",
-        display_name="example/manual-stage",
-        ref="main",
-        exact_commit_sha="c" * 40,
-    )
+    store, blind_batch, _, _ = e2_phase
     reveal_lanes = (
         StageLaneDefinition(
             "E2-CONVERGENCE",
@@ -341,21 +335,22 @@ def test_distinct_phase_does_not_reuse_blind_assignments(e2_phase):
             "REVEALED_FALSIFY",
         ),
     )
-    reveal = prepare_stage_phase_batch(
-        store=store,
-        output_dir=tmp / "work3",
-        source_info=source,
+    reveal = StageAssignmentService(
+        store
+    ).prepare_phase_assignments(
         stage_id="E2",
         phase_id="E2-REVEAL",
         lane_definitions=reveal_lanes,
         all_stage_lane_slots=[
             lane.lane_slot for lane in LANES
         ],
+        executor_profile="ChatGPT / GitHub",
+        model="Sol 5.6",
     )
     assert reveal.phase_id == "E2-REVEAL"
-    for slot in reveal.jobs:
+    for slot, assignment in reveal.assignments.items():
         assert (
-            reveal.get_job(slot).assignment_ref["revision_digest"]
+            assignment.assignment_ref["revision_digest"]
             != blind_batch.get_job(slot).assignment_ref["revision_digest"]
         )
 
@@ -761,3 +756,29 @@ def test_e2_reveal_authorization_retry_is_idempotent(
     assert store.head().commit_seq == seq
     assert second.view_manifest_ref == first.view_manifest_ref
     assert second.grant_refs_by_slot == first.grant_refs_by_slot
+
+
+def test_reveal_package_without_authorization_fails_closed(e2_phase):
+    store, _, _, tmp = e2_phase
+    source = ResolvedSource(
+        target_type="github",
+        location="https://github.com/example/manual-stage",
+        display_name="example/manual-stage",
+        ref="main",
+        exact_commit_sha="c" * 40,
+    )
+    with pytest.raises(
+        ValidationError,
+        match="STAGE_REVEAL_AUTHORIZATION_REQUIRED",
+    ):
+        prepare_stage_phase_batch(
+            store=store,
+            output_dir=tmp / "work-reveal-denied",
+            source_info=source,
+            stage_id="E2",
+            phase_id="E2-REVEAL",
+            lane_definitions=REVEAL_LANES,
+            all_stage_lane_slots=[
+                lane.lane_slot for lane in REVEAL_LANES
+            ],
+        )
