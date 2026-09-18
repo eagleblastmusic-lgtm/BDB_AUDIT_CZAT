@@ -13,6 +13,7 @@ from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.workflow.e2_checkpoint import E2BlindCheckpointService
 from bdb_audit.workflow.e2_reveal import E2ControlledRevealService
 from bdb_audit.workflow.e2_synthesis import E2MainSynthesisService
+from bdb_audit.workflow.e2_shadow import E2ShadowAuthorizationService
 from bdb_audit.workflow.manual_stage import (
     StageAssignmentService,
     StageLaneDefinition,
@@ -1057,3 +1058,221 @@ def test_e2_main_synthesis_records_proposal_disagreement(
         item["opaque_claim_view_id"]
         for item in supports
     }
+
+
+@pytest.fixture
+def e2_shadow_flow(e2_reveal_flow):
+    store = e2_reveal_flow["store"]
+    source = e2_reveal_flow["source"]
+    tmp = e2_reveal_flow["tmp"]
+    authorization = E2ControlledRevealService(
+        store,
+        lane_definitions=REVEAL_LANES,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in REVEAL_LANES
+        ],
+        executor_profile="ChatGPT / GitHub",
+        model="Sol 5.6",
+    ).authorize()
+    reveal_batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp / "shadow-work",
+        source_info=source,
+        stage_id="E2",
+        phase_id="E2-REVEAL",
+        lane_definitions=REVEAL_LANES,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in REVEAL_LANES
+        ],
+        authorized_context=authorization,
+    )
+    assessments = _reveal_assessments_from_authorization(
+        authorization,
+    )
+    reveal_inbox = StageResultInbox(
+        store,
+        reveal_batch,
+    )
+    summary = reveal_inbox.ingest_multiple_zips(
+        [
+            _write_result(
+                tmp / "shadow-prep-convergence.zip",
+                reveal_batch,
+                "E2-CONVERGENCE",
+                outputs={
+                    "claim_assessments": assessments
+                },
+            ),
+            _write_result(
+                tmp / "shadow-prep-adjudication.zip",
+                reveal_batch,
+                "E2-ADJUDICATION",
+                outputs={
+                    "claim_assessments": assessments
+                },
+            ),
+        ]
+    )
+    assert summary.phase_complete is True
+    synthesis = E2MainSynthesisService(
+        store,
+        reveal_batch,
+        reveal_inbox,
+    ).synthesize()
+    shadow_lane = StageLaneDefinition(
+        "E2-ADJUDICATION",
+        "Independent bounded shadow adjudicator",
+        "INDEPENDENT_SHADOW_ADJUDICATION",
+    )
+    shadow_authorization = E2ShadowAuthorizationService(
+        store,
+        lane_definition=shadow_lane,
+        all_stage_lane_slots=(
+            "E2-CONVERGENCE",
+            "E2-ADJUDICATION",
+        ),
+        executor_profile="ChatGPT / GitHub",
+        model="Sol 5.6",
+    ).authorize()
+    shadow_batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp / "shadow-work",
+        source_info=source,
+        stage_id="E2",
+        phase_id="E2-SHADOW",
+        lane_definitions=(shadow_lane,),
+        all_stage_lane_slots=(
+            "E2-CONVERGENCE",
+            "E2-ADJUDICATION",
+        ),
+        authorized_context=shadow_authorization,
+    )
+    return {
+        **e2_reveal_flow,
+        "reveal_authorization": authorization,
+        "reveal_batch": reveal_batch,
+        "synthesis": synthesis,
+        "shadow_authorization": shadow_authorization,
+        "shadow_batch": shadow_batch,
+    }
+
+
+def test_e2_shadow_view_is_bounded_and_granted_before_delivery(
+    e2_shadow_flow,
+):
+    store = e2_shadow_flow["store"]
+    authorization = e2_shadow_flow[
+        "shadow_authorization"
+    ]
+    batch = e2_shadow_flow["shadow_batch"]
+    payload = json.loads(
+        authorization.context_members[
+            "E2_MAIN_ADJUDICATION_VIEW.json"
+        ].decode("utf-8")
+    )
+    assert payload["format"] == "BDB-E2-SHADOW-VIEW-1"
+    assert payload["claims"]
+    raw = json.dumps(payload)
+    assert "raw_report_path" not in raw
+    assert "producer_identity" not in raw
+    assert "support_count" not in raw
+    assert "prior_popularity" not in raw
+
+    job = batch.get_job("E2-ADJUDICATION")
+    assert job.grant_ref == authorization.grant_refs_by_slot[
+        "E2-ADJUDICATION"
+    ]
+    assert job.authorized_knowledge_state_ref == (
+        authorization.knowledge_state_refs_by_slot[
+            "E2-ADJUDICATION"
+        ]
+    )
+    assert "E2 INDEPENDENT SHADOW OUTPUT CONTRACT" in job.prompt_text
+    with zipfile.ZipFile(job.package_zip_path, "r") as archive:
+        manifest = json.loads(
+            archive.read("MANIFEST.json")
+        )
+        assert (
+            "CONTEXT/E2_MAIN_ADJUDICATION_VIEW.json"
+            in set(archive.namelist())
+        )
+    assert manifest["context_authorization"]["grant_ref"] == job.grant_ref
+
+    cut = current_accepted_cut(store)
+    store.resolve_accepted(
+        job.grant_ref,
+        cut,
+    )
+    store.resolve_accepted(
+        job.authorized_knowledge_state_ref,
+        cut,
+    )
+
+
+def test_e2_shadow_result_uses_authorized_shadow_knowledge(
+    e2_shadow_flow,
+):
+    store = e2_shadow_flow["store"]
+    batch = e2_shadow_flow["shadow_batch"]
+    authorization = e2_shadow_flow[
+        "shadow_authorization"
+    ]
+    tmp = e2_shadow_flow["tmp"]
+    payload = json.loads(
+        authorization.context_members[
+            "E2_MAIN_ADJUDICATION_VIEW.json"
+        ].decode("utf-8")
+    )
+    checks = [
+        {
+            "claim_revision_digest": item[
+                "claim_revision_ref"
+            ]["revision_digest"],
+            "conflict": False,
+            "conflict_types": [],
+            "rationale": "no bounded conflict found",
+        }
+        for item in payload["claims"]
+    ]
+    inbox = StageResultInbox(store, batch)
+    result_path = _write_result(
+        tmp / "shadow-result.zip",
+        batch,
+        "E2-ADJUDICATION",
+        outputs={
+            "shadow_checks": checks
+        },
+    )
+    assert inbox.ingest_zip(result_path)[1] == "ACCEPTED"
+    cut = current_accepted_cut(store)
+    result = next(
+        row
+        for row in store.accepted_records(
+            "bdb_audit_lane_result",
+            cut,
+        )
+        if row["body"].get("phase_id") == "E2-SHADOW"
+    )
+    completion = next(
+        row
+        for row in store.accepted_records(
+            "lane_completion",
+            cut,
+        )
+        if any(
+            ref.get("revision_digest")
+            == result["ref"]["revision_digest"]
+            for ref in row["body"].get(
+                "required_output_refs",
+                [],
+            )
+        )
+    )
+    assert (
+        completion["body"]["final_knowledge_state_ref"][
+            "revision_digest"
+        ]
+        == authorization.knowledge_state_refs_by_slot[
+            "E2-ADJUDICATION"
+        ]["revision_digest"]
+    )
