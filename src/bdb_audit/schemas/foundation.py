@@ -30,7 +30,8 @@ F2_KINDS = (
     "executor_spec", "delivery_spec", "projection_policy", "view_manifest",
     "assignment_manifest", "grant_body", "potential_exposure_record",
     "isolation_qualification", "contamination_assessment", "knowledge_state",
-    "corpus_manifest", "discovery_record", "source_generation", "source_manifest",
+    "corpus_manifest", "discovery_record", "checkpoint",
+    "blind_origin_eligibility_assessment", "source_generation", "source_manifest",
     "source_identity",
     # Context objects that can become effective only on a later accepted
     # history cut.  Binding them here lets the history adapter reject a
