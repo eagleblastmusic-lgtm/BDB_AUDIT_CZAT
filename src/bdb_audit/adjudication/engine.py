@@ -161,41 +161,156 @@ def transition_finding_lifecycle(
 
 def resolve_contradiction(
     contradiction: ContradictionRevision,
-    adjudicator_ref: Any,
-    resolution_status: str,
-    rationale: str,
+    *,
+    resolved_scope: Mapping[str, Any],
+    resolution_kind: str,
+    basis_refs: Sequence[Any],
     input_history_cut: dict,
+    resulting_status: str,
     resolved_by_majority_vote: bool = False,
 ) -> ContradictionResolutionDecision:
-    """Resolve a contradiction with explicit adjudicator authority.
+    """Create the canonical resolution decision for one prior contradiction.
 
-    Fail closed: majority voting is forbidden (R5.3 §61, Roadmap §67).
+    The decision points backward to the prior contradiction revision.  It does
+    not point to a future successor revision and majority/support counts never
+    establish truth.
     """
     if resolved_by_majority_vote:
-        raise ValidationError("MAJORITY_VOTE_FORBIDDEN", "Contradiction cannot be resolved by majority voting")
+        raise ValidationError(
+            "MAJORITY_VOTE_FORBIDDEN",
+            "Contradiction cannot be resolved by majority voting",
+        )
 
     return ContradictionResolutionDecision(
-        contradiction_revision_ref=contradiction.as_object().as_ref().as_dict(),
-        adjudicator_ref=adjudicator_ref,
-        resolution_status=resolution_status,
-        rationale=rationale,
-        input_history_cut=input_history_cut,
+        contradiction_prior_revision_ref=(
+            contradiction.as_object().as_ref(
+                ref_class="PRIOR_ACCEPTED_ONLY"
+            ).as_dict()
+        ),
+        resolution_input_history_cut=dict(input_history_cut),
+        resolved_scope=dict(resolved_scope),
+        resolution_kind=resolution_kind,
+        basis_refs=list(basis_refs),
+        resulting_status=resulting_status,
         resolved_by_majority_vote=False,
     )
 
 
-def reopen_contradiction(
-    prior_resolution: ContradictionResolutionDecision,
-    new_evidence_refs: Sequence[Any],
-    claim_revision_ref: Any,
-    input_history_cut: dict,
+def apply_contradiction_resolution(
+    prior_revision: ContradictionRevision,
+    resolution: ContradictionResolutionDecision,
 ) -> ContradictionRevision:
-    """Reopen a contradiction upon discovery of new material counterevidence (R5.3 §61)."""
+    """Build the successor contradiction revision after a prior decision.
+
+    Acceptance order is enforced by the history layer through
+    PRIOR_ACCEPTED_ONLY refs.  This pure constructor preserves the prior case
+    and adds the already-decided resolution as a backward reference.
+    """
+    if resolution.resulting_status not in {
+        "RESOLVED_SCOPED",
+        "RESOLVED_FULL",
+        "BLOCKED",
+    }:
+        raise ValidationError(
+            "INVALID_CONTRADICTION_RESOLUTION_STATUS",
+            resolution.resulting_status,
+        )
+    if (
+        resolution.contradiction_prior_revision_ref[
+            "revision_digest"
+        ]
+        != prior_revision.digest
+    ):
+        raise ValidationError(
+            "CONTRADICTION_RESOLUTION_PREDECESSOR_MISMATCH"
+        )
+
     return ContradictionRevision(
-        claim_revision_ref=_ref_dict(claim_revision_ref),
-        contradicting_evidence_refs=list(new_evidence_refs),
-        input_history_cut=dict(input_history_cut),
+        claim_revision_refs=prior_revision.claim_revision_refs,
+        scope=prior_revision.scope,
+        positions=prior_revision.positions,
+        supporting_evidence_qualification_refs=(
+            prior_revision.supporting_evidence_qualification_refs
+        ),
+        opposing_evidence_qualification_refs=(
+            prior_revision.opposing_evidence_qualification_refs
+        ),
+        failure_assumption_differences=(
+            prior_revision.failure_assumption_differences
+        ),
+        environment_input_model_differences=(
+            prior_revision.environment_input_model_differences
+        ),
+        required_falsifier=prior_revision.required_falsifier,
+        status=resolution.resulting_status,
+        predecessor_contradiction_revision_ref=(
+            prior_revision.as_object().as_ref(
+                ref_class="PRIOR_ACCEPTED_ONLY"
+            ).as_dict()
+        ),
+        resolution_decision_ref=(
+            resolution.as_object().as_ref(
+                ref_class="PRIOR_ACCEPTED_ONLY"
+            ).as_dict()
+        ),
+        contradiction_id=prior_revision.contradiction_id,
+        contradiction_revision=str(
+            int(prior_revision.contradiction_revision) + 1
+        ),
+    )
+
+
+def reopen_contradiction(
+    prior_revision: ContradictionRevision,
+    *,
+    new_supporting_evidence_refs: Sequence[Any] = (),
+    new_opposing_evidence_refs: Sequence[Any] = (),
+    required_falsifier: Any | None = None,
+) -> ContradictionRevision:
+    """Create a backward-linked REOPENED successor on new counterevidence."""
+    if (
+        not new_supporting_evidence_refs
+        and not new_opposing_evidence_refs
+    ):
+        raise ValidationError(
+            "CONTRADICTION_REOPEN_EVIDENCE_REQUIRED"
+        )
+
+    supporting = [
+        *prior_revision.supporting_evidence_qualification_refs,
+        *new_supporting_evidence_refs,
+    ]
+    opposing = [
+        *prior_revision.opposing_evidence_qualification_refs,
+        *new_opposing_evidence_refs,
+    ]
+    return ContradictionRevision(
+        claim_revision_refs=prior_revision.claim_revision_refs,
+        scope=prior_revision.scope,
+        positions=prior_revision.positions,
+        supporting_evidence_qualification_refs=supporting,
+        opposing_evidence_qualification_refs=opposing,
+        failure_assumption_differences=(
+            prior_revision.failure_assumption_differences
+        ),
+        environment_input_model_differences=(
+            prior_revision.environment_input_model_differences
+        ),
+        required_falsifier=(
+            prior_revision.required_falsifier
+            if required_falsifier is None
+            else required_falsifier
+        ),
         status="REOPENED",
+        predecessor_contradiction_revision_ref=(
+            prior_revision.as_object().as_ref(
+                ref_class="PRIOR_ACCEPTED_ONLY"
+            ).as_dict()
+        ),
+        contradiction_id=prior_revision.contradiction_id,
+        contradiction_revision=str(
+            int(prior_revision.contradiction_revision) + 1
+        ),
     )
 
 
