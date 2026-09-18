@@ -334,6 +334,9 @@ class StageAssignmentService:
         lanes: Mapping[str, dict[str, Any]],
         executor_ref: dict[str, Any],
         delivery_ref: dict[str, Any],
+        isolation_proofs_by_slot: Mapping[
+            str, StageIsolationProof
+        ] | None = None,
     ) -> StageAssignmentSet | None:
         lane_digest_to_slot = {
             row["ref"]["revision_digest"]: slot for slot, row in lanes.items()
@@ -363,6 +366,46 @@ class StageAssignmentService:
             if not isinstance(isolation_ref, dict):
                 raise ValidationError("ASSIGNMENT_KNOWLEDGE_BINDING_INVALID", slot)
             isolation = self.store.resolve_accepted(isolation_ref, cut)
+            proof = (isolation_proofs_by_slot or {}).get(slot)
+            if proof is not None:
+                required_assurance = lanes[slot]["body"].get(
+                    "required_isolation_assurance",
+                    "DECLARED",
+                )
+                expected = proof.normalized_body(
+                    store=self.store,
+                    cut=cut,
+                    required_assurance=required_assurance,
+                )
+                observed = isolation["body"]
+                proof_fields = (
+                    "channel_inventory_ref",
+                    "enforcement_receipt_refs",
+                    "filesystem_boundary_evidence_refs",
+                    "network_boundary_evidence_refs",
+                    "tool_boundary_evidence_refs",
+                    "session_boundary_evidence_refs",
+                    "contamination_assessment_refs",
+                    "result",
+                    "scope",
+                    "limitations",
+                    "reason_codes",
+                )
+                drift = [
+                    field
+                    for field in proof_fields
+                    if observed.get(field) != expected.get(field)
+                ]
+                if (
+                    observed.get("required_isolation_assurance")
+                    != required_assurance
+                ):
+                    drift.append("required_isolation_assurance")
+                if drift:
+                    raise ValidationError(
+                        "ASSIGNMENT_ISOLATION_PROOF_DRIFT",
+                        f"{slot}: {sorted(set(drift))}",
+                    )
             mapped[slot] = PreparedStageAssignment(
                 lane_slot=slot,
                 assignment_ref=_ref(record, "PRIOR_ACCEPTED_ONLY"),
@@ -446,6 +489,7 @@ class StageAssignmentService:
             lanes=lanes,
             executor_ref=executor_ref,
             delivery_ref=delivery_ref,
+            isolation_proofs_by_slot=isolation_proofs_by_slot,
         )
         if existing is not None:
             return existing
