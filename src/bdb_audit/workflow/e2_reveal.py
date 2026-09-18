@@ -217,7 +217,20 @@ class E2ControlledRevealService:
             for row in self.store.accepted_records("view_manifest", cut)
             if row["body"].get("phase_id") == "E2-REVEAL"
             and row["body"].get("payload_sha256") == payload_sha256
-            and tuple(row["body"].get("checkpoint_digests", ()))
+            and tuple(
+                sorted(
+                    ref["revision_digest"]
+                    for ref in row["body"].get(
+                        "checkpoint_refs",
+                        (),
+                    )
+                    if isinstance(ref, dict)
+                    and isinstance(
+                        ref.get("revision_digest"),
+                        str,
+                    )
+                )
+            )
             == checkpoint_digests
         ]
         if len(manifests) > 1:
