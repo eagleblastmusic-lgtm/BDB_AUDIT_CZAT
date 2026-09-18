@@ -37,6 +37,10 @@ from bdb_audit.workflow.e3_cumulative import E3CumulativeAuthorizationService
 from bdb_audit.workflow.e3_cumulative_result import (
     E3CumulativeResultValidationService,
 )
+from bdb_audit.workflow.e3_holdout import E3HoldoutAuthorizationService
+from bdb_audit.workflow.e3_holdout_result import (
+    E3HoldoutResultValidationService,
+)
 from bdb_audit.workflow.manual_stage import (
     StageAssignmentService,
     StageIsolationProof,
@@ -1403,6 +1407,486 @@ def test_e3_cumulative_new_finding_cannot_claim_blind_origin(
             batch,
             inbox,
         ).validate()
+
+
+
+
+def _accept_holdout_manifest(
+    store: TransactionalHistoryStore,
+    *,
+    role: str = "AUXILIARY_HOLDOUT",
+):
+    cut, prior_commit = _current_cut(store)
+    obj = CanonicalObject(
+        "corpus_manifest",
+        {
+            "corpus_manifest_id": (
+                "corpus_manifest_test_e3_holdout"
+            ),
+            "corpus_role": role,
+            "snapshot_id": (
+                "holdout_snapshot_test_001"
+            ),
+            "entries": [
+                {
+                    "locator": "entry-1",
+                    "summary": (
+                        "independent holdout mechanism"
+                    ),
+                },
+                {
+                    "locator": "entry-2",
+                    "summary": (
+                        "independent negative control"
+                    ),
+                },
+            ],
+        },
+    )
+    head = store.head()
+    assert head is not None
+    command = CommandEnvelope(
+        command_id=_command_id(
+            "test_e3_holdout_manifest:"
+            + obj.digest
+        ),
+        command_kind="RECORD_FOUNDATION_FACT",
+        actor_ref=prior_commit.get(
+            "actor_ref",
+            "installation-owner",
+        ),
+        expected_parent_head={
+            "tag": "ACCEPTED_HEAD_REF",
+            **head.as_dict(),
+        },
+        governing_policy_ref=prior_commit[
+            "governing_policy_ref"
+        ],
+        governing_spec_refs=tuple(
+            prior_commit.get(
+                "governing_spec_refs",
+                (),
+            )
+        ),
+        idempotency_scope=(
+            "test_e3_holdout_manifest:"
+            + obj.digest
+        ),
+        campaign_ref=head.campaign_id,
+    )
+    Coordinator(store).accept(
+        command,
+        immutable_objects=[obj],
+        expected_head=head,
+    )
+    return obj.as_ref(
+        ref_class="CONTENT_OR_PRIOR"
+    ).as_dict()
+
+
+def _prepare_e3_holdout_fixture(
+    tmp_path: Path,
+    *,
+    seed: str,
+):
+    (
+        store,
+        cumulative_batch,
+        cumulative_authorization,
+        prior_claim_ref,
+    ) = _prepare_e3_cumulative_fixture(
+        tmp_path,
+        seed=seed,
+    )
+    cumulative_rows = _cumulative_match_rows(
+        cumulative_authorization,
+        prior_claim_ref,
+    )
+    cumulative_result = _write_result(
+        tmp_path
+        / f"{seed}-cumulative-result.zip",
+        cumulative_batch,
+        "E3-X",
+        outputs={
+            "corpus_matches": cumulative_rows,
+        },
+    )
+    cumulative_inbox = StageResultInbox(
+        store,
+        cumulative_batch,
+    )
+    imported = (
+        cumulative_inbox.ingest_multiple_zips(
+            [cumulative_result]
+        )
+    )
+    assert imported.phase_complete is True
+    cumulative_summary = (
+        E3CumulativeResultValidationService(
+            store,
+            cumulative_batch,
+            cumulative_inbox,
+        ).validate()
+    )
+    assert cumulative_summary.comparison_count
+
+    holdout_ref = _accept_holdout_manifest(
+        store
+    )
+    cut = current_accepted_cut(store)
+    accepted_ref = store.accepted_records(
+        "source_generation",
+        cut,
+    )[0]["ref"]
+    proof = StageIsolationProof(
+        result="ENFORCED",
+        channel_inventory_ref=accepted_ref,
+        enforcement_receipt_refs=(
+            accepted_ref,
+        ),
+        session_boundary_evidence_refs=(
+            accepted_ref,
+        ),
+        scope="TEST_CONTROLLED_SESSION",
+        reason_codes=(
+            "TEST_ACCEPTED_BOUNDARY_RECEIPTS",
+        ),
+    )
+    lane = StageLaneDefinition(
+        "E3-X",
+        "External holdout comparison",
+        "HOLDOUT_COMPARISON",
+    )
+    authorization = (
+        E3HoldoutAuthorizationService(
+            store,
+            holdout_corpus_manifest_ref=(
+                holdout_ref
+            ),
+            lane_definitions=(lane,),
+            all_stage_lane_slots=("E3-X",),
+            executor_profile=(
+                "ChatGPT / GitHub"
+            ),
+            model="Sol 5.6",
+            isolation_proofs_by_slot={
+                "E3-X": proof,
+            },
+        ).authorize()
+    )
+    source = ResolvedSource(
+        target_type="github",
+        location=(
+            "https://github.com/example/e3-isolation"
+        ),
+        display_name="example/e3-isolation",
+        ref="main",
+        exact_commit_sha="d" * 40,
+    )
+    batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=(
+            tmp_path / f"{seed}-holdout"
+        ),
+        source_info=source,
+        stage_id="E3",
+        phase_id="E3-HOLDOUT",
+        lane_definitions=(lane,),
+        all_stage_lane_slots=("E3-X",),
+        authorized_context=authorization,
+        isolation_proofs_by_slot={
+            "E3-X": proof,
+        },
+    )
+    return (
+        store,
+        batch,
+        authorization,
+        holdout_ref,
+        proof,
+        lane,
+    )
+
+
+def _holdout_match_rows(
+    authorization,
+):
+    payload = json.loads(
+        authorization.context_members[
+            "E3_EXTERNAL_HOLDOUT_VIEW.json"
+        ].decode("utf-8")
+    )
+    rows = []
+    for index, item in enumerate(
+        payload["own_e3_discoveries"]
+    ):
+        rows.append(
+            {
+                "discovery_id": item[
+                    "discovery_id"
+                ],
+                "relation": (
+                    "MATCHED_HOLDOUT"
+                    if index == 0
+                    else "NO_HOLDOUT_MATCH"
+                ),
+                "matched_holdout_locators": (
+                    ["entry-1"]
+                    if index == 0
+                    else []
+                ),
+                "rationale": (
+                    "comparison relative to exact holdout"
+                ),
+            }
+        )
+    return rows
+
+
+def test_e3_holdout_reveal_marks_exact_corpus_consumed(
+    tmp_path: Path,
+):
+    (
+        store,
+        batch,
+        authorization,
+        holdout_ref,
+        proof,
+        lane,
+    ) = _prepare_e3_holdout_fixture(
+        tmp_path,
+        seed="e3_holdout_consumed",
+    )
+    payload = json.loads(
+        authorization.context_members[
+            "E3_EXTERNAL_HOLDOUT_VIEW.json"
+        ].decode("utf-8")
+    )
+    assert (
+        payload["format"]
+        == "BDB-E3-EXTERNAL-HOLDOUT-VIEW-1"
+    )
+    assert (
+        payload["corpus_role"]
+        == "AUXILIARY_HOLDOUT"
+    )
+    assert (
+        payload[
+            "holdout_corpus_manifest_ref"
+        ]["revision_digest"]
+        == holdout_ref["revision_digest"]
+    )
+
+    job = batch.get_job("E3-X")
+    cut = current_accepted_cut(store)
+    knowledge = store.resolve_accepted(
+        job.authorized_knowledge_state_ref,
+        cut,
+    )
+    assert (
+        "CONSUMED_EXTERNAL_HOLDOUT"
+        in knowledge["body"]["known_classes"]
+    )
+    assert (
+        "E3 EXTERNAL HOLDOUT OUTPUT CONTRACT"
+        in job.prompt_text
+    )
+
+
+def test_e3_holdout_result_is_comparison_not_false_negative_authority(
+    tmp_path: Path,
+):
+    (
+        store,
+        batch,
+        authorization,
+        holdout_ref,
+        proof,
+        lane,
+    ) = _prepare_e3_holdout_fixture(
+        tmp_path,
+        seed="e3_holdout_validate",
+    )
+    rows = _holdout_match_rows(
+        authorization
+    )
+    result_path = _write_result(
+        tmp_path / "e3-holdout-result.zip",
+        batch,
+        "E3-X",
+        outputs={
+            "holdout_matches": rows,
+        },
+    )
+    inbox = StageResultInbox(
+        store,
+        batch,
+    )
+    imported = inbox.ingest_multiple_zips(
+        [result_path]
+    )
+    assert imported.phase_complete is True
+
+    summary = (
+        E3HoldoutResultValidationService(
+            store,
+            batch,
+            inbox,
+        ).validate()
+    )
+    assert (
+        summary.comparison_count
+        == len(rows)
+    )
+    assert (
+        summary.holdout_corpus_manifest_ref[
+            "revision_digest"
+        ]
+        == holdout_ref["revision_digest"]
+    )
+    assert (
+        summary.next_action
+        == "ASSESS_HOLDOUT_RELATIONSHIPS_AND_E3_GATE"
+    )
+
+    cut = current_accepted_cut(store)
+    # The comparison proposal itself does not create a canonical
+    # false-negative relationship object.
+    assert not [
+        row
+        for row in store.accepted_records(
+            "blind_origin_eligibility_assessment",
+            cut,
+        )
+        if row["body"].get(
+            "classification"
+        )
+        == "MULTI_STAGE_FALSE_NEGATIVE"
+    ]
+
+
+def test_e3_holdout_authorization_retry_is_idempotent(
+    tmp_path: Path,
+):
+    (
+        store,
+        batch,
+        authorization,
+        holdout_ref,
+        proof,
+        lane,
+    ) = _prepare_e3_holdout_fixture(
+        tmp_path,
+        seed="e3_holdout_retry",
+    )
+    seq = store.head().commit_seq
+    retry = E3HoldoutAuthorizationService(
+        store,
+        holdout_corpus_manifest_ref=(
+            holdout_ref
+        ),
+        lane_definitions=(lane,),
+        all_stage_lane_slots=("E3-X",),
+        executor_profile="ChatGPT / GitHub",
+        model="Sol 5.6",
+        isolation_proofs_by_slot={
+            "E3-X": proof,
+        },
+    ).authorize()
+    assert retry.already_authorized is True
+    assert store.head().commit_seq == seq
+    assert (
+        retry.view_manifest_ref
+        == authorization.view_manifest_ref
+    )
+
+
+def test_e3_holdout_rejects_non_auxiliary_role(
+    tmp_path: Path,
+):
+    (
+        store,
+        cumulative_batch,
+        cumulative_authorization,
+        prior_claim_ref,
+    ) = _prepare_e3_cumulative_fixture(
+        tmp_path,
+        seed="e3_holdout_wrong_role",
+    )
+    cumulative_rows = _cumulative_match_rows(
+        cumulative_authorization,
+        prior_claim_ref,
+    )
+    cumulative_inbox = StageResultInbox(
+        store,
+        cumulative_batch,
+    )
+    imported = cumulative_inbox.ingest_multiple_zips(
+        [
+            _write_result(
+                tmp_path
+                / "cumulative-wrong-role.zip",
+                cumulative_batch,
+                "E3-X",
+                outputs={
+                    "corpus_matches": (
+                        cumulative_rows
+                    )
+                },
+            )
+        ]
+    )
+    assert imported.phase_complete is True
+    E3CumulativeResultValidationService(
+        store,
+        cumulative_batch,
+        cumulative_inbox,
+    ).validate()
+
+    wrong_ref = _accept_holdout_manifest(
+        store,
+        role="CANONICAL_PREDECESSOR",
+    )
+    cut = current_accepted_cut(store)
+    accepted_ref = store.accepted_records(
+        "source_generation",
+        cut,
+    )[0]["ref"]
+    proof = StageIsolationProof(
+        result="ENFORCED",
+        channel_inventory_ref=accepted_ref,
+        enforcement_receipt_refs=(
+            accepted_ref,
+        ),
+        session_boundary_evidence_refs=(
+            accepted_ref,
+        ),
+    )
+    with pytest.raises(
+        ValidationError,
+        match="E3_HOLDOUT_ROLE_INVALID",
+    ):
+        E3HoldoutAuthorizationService(
+            store,
+            holdout_corpus_manifest_ref=(
+                wrong_ref
+            ),
+            lane_definitions=(
+                StageLaneDefinition(
+                    "E3-X",
+                    "Holdout",
+                    "HOLDOUT",
+                ),
+            ),
+            all_stage_lane_slots=("E3-X",),
+            executor_profile=(
+                "ChatGPT / GitHub"
+            ),
+            model="Sol 5.6",
+            isolation_proofs_by_slot={
+                "E3-X": proof,
+            },
+        ).authorize()
 
 
 def test_unbound_context_members_fail_closed(e2_phase):
