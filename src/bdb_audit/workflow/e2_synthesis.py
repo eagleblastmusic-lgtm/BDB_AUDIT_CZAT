@@ -66,7 +66,11 @@ class _ClaimSource:
     discovery_ref: dict[str, Any]
 
 
-def _typed_refs(value: Any) -> list[dict[str, Any]]:
+def _typed_refs(
+    value: Any,
+    *,
+    allowed_kinds: set[str],
+) -> list[dict[str, Any]]:
     values = value if isinstance(value, (list, tuple)) else [value]
     required = {
         "kind",
@@ -74,12 +78,18 @@ def _typed_refs(value: Any) -> list[dict[str, Any]]:
         "digest_profile",
         "schema_revision_ref",
     }
-    return [
-        dict(item)
-        for item in values
-        if isinstance(item, dict)
-        and required.issubset(item)
-    ]
+    refs: list[dict[str, Any]] = []
+    for item in values:
+        if (
+            not isinstance(item, dict)
+            or not required.issubset(item)
+            or item.get("kind") not in allowed_kinds
+        ):
+            continue
+        normalized = dict(item)
+        normalized["ref_class"] = "CONTENT_OR_PRIOR"
+        refs.append(normalized)
+    return refs
 
 
 def _claim_statement(finding: Mapping[str, Any]) -> str:
@@ -448,7 +458,15 @@ class E2MainSynthesisService:
                 _typed_refs(
                     finding.get("scope_refs")
                     or finding.get("scope_ref")
-                    or []
+                    or [],
+                    allowed_kinds={
+                        "typed_scope_ref",
+                        "surface_record",
+                        "surface_key",
+                        "scope_state_record",
+                        "finding_claim_revision",
+                        "invariant_revision",
+                    },
                 )
             )
             invariant_refs = canonical_reference_set(
@@ -456,7 +474,8 @@ class E2MainSynthesisService:
                     finding.get("violated_invariant_refs")
                     or finding.get("violated_invariant_ref")
                     or finding.get("invariant_ref")
-                    or []
+                    or [],
+                    allowed_kinds={"invariant_revision"},
                 )
             )
             claim = FindingClaimRevision(
@@ -489,7 +508,6 @@ class E2MainSynthesisService:
             if self._proposal_disagrees(proposals):
                 disagreements.append(opaque_id)
 
-            per_axis: dict[str, FindingAxisAssessment] = {}
             axis_refs[opaque_id] = {}
             for axis in _AXES:
                 proposed_values = sorted(
@@ -523,8 +541,6 @@ class E2MainSynthesisService:
                         ref_class="CONTENT_OR_PRIOR"
                     ).as_dict()
                 )
-                per_axis[axis] = assessment
-
             knowledge_refs = canonical_reference_set(
                 [
                     _with_ref_class(
