@@ -892,6 +892,519 @@ def test_e3_gap_authorization_requires_fresh_isolation_proof(
         )
 
 
+
+
+def _accept_prior_adjudicated_claim(
+    store: TransactionalHistoryStore,
+):
+    cut, prior_commit = _current_cut(store)
+    source_rows = store.accepted_records(
+        "source_generation",
+        cut,
+    )
+    assert len(source_rows) == 1
+    source_ref = {
+        **source_rows[0]["ref"],
+        "ref_class": "CONTENT_OR_PRIOR",
+    }
+    claim = FindingClaimRevision(
+        statement="Accepted prior E2 claim for cumulative comparison",
+        source_generation_ref=source_ref,
+        claim_id=deterministic_id(
+            "finding_claim_revision",
+            "test-e3-cumulative-prior-claim",
+        ),
+    )
+    claim_obj = claim.as_object()
+    claim_ref = claim_obj.as_ref(
+        ref_class="CONTENT_OR_PRIOR"
+    ).as_dict()
+    policy_ref = _external_ref(
+        "external_profile_ref",
+        "TEST_E3_CUMULATIVE_AXIS_POLICY",
+        "HISTORY_CONTEXT_BINDING",
+    )
+    axis_objects = {}
+    for axis in (
+        "MECHANISM",
+        "REACHABILITY",
+        "IMPACT",
+        "SEVERITY",
+    ):
+        assessment = FindingAxisAssessment(
+            claim_revision_ref=claim_ref,
+            assessment_input_history_cut=cut,
+            assessment_policy_ref=policy_ref,
+            axis=axis,
+            epistemic_outcome="INCONCLUSIVE",
+            method="TEST_ACCEPTED_PRIOR_CORPUS",
+            assessment_id=deterministic_id(
+                "finding_axis_assessment",
+                "test-e3-cumulative-" + axis,
+            ),
+        ).as_object()
+        axis_objects[axis] = assessment
+
+    adjudicator_ref = _external_ref(
+        "actor_or_authority_ref",
+        "TEST_TRUSTED_COORDINATOR",
+        "CONTENT_OR_PRIOR",
+    )
+    decision = FindingAdjudicationDecision(
+        claim_revision_ref=claim_ref,
+        input_history_cut=cut,
+        adjudicator_ref=adjudicator_ref,
+        mechanism_assessment_ref=axis_objects[
+            "MECHANISM"
+        ].as_ref(
+            ref_class="CONTENT_OR_PRIOR"
+        ).as_dict(),
+        reachability_assessment_ref=axis_objects[
+            "REACHABILITY"
+        ].as_ref(
+            ref_class="CONTENT_OR_PRIOR"
+        ).as_dict(),
+        impact_assessment_ref=axis_objects[
+            "IMPACT"
+        ].as_ref(
+            ref_class="CONTENT_OR_PRIOR"
+        ).as_dict(),
+        severity_assessment_ref=axis_objects[
+            "SEVERITY"
+        ].as_ref(
+            ref_class="CONTENT_OR_PRIOR"
+        ).as_dict(),
+        lifecycle_status="OPEN",
+        decision_id=deterministic_id(
+            "finding_adjudication_decision",
+            "test-e3-cumulative-prior-decision",
+        ),
+    ).as_object()
+
+    objects = [
+        claim_obj,
+        *axis_objects.values(),
+        decision,
+    ]
+    head = store.head()
+    assert head is not None
+    command = CommandEnvelope(
+        command_id=_command_id(
+            "test_e3_prior_corpus:"
+            + decision.digest
+        ),
+        command_kind="RECORD_FOUNDATION_FACT",
+        actor_ref=prior_commit.get(
+            "actor_ref",
+            "installation-owner",
+        ),
+        expected_parent_head={
+            "tag": "ACCEPTED_HEAD_REF",
+            **head.as_dict(),
+        },
+        governing_policy_ref=prior_commit[
+            "governing_policy_ref"
+        ],
+        governing_spec_refs=tuple(
+            prior_commit.get(
+                "governing_spec_refs",
+                (),
+            )
+        ),
+        idempotency_scope=(
+            "test_e3_prior_corpus:"
+            + decision.digest
+        ),
+        campaign_ref=head.campaign_id,
+    )
+    Coordinator(store).accept(
+        command,
+        immutable_objects=objects,
+        expected_head=head,
+    )
+    return claim_ref
+
+
+def _prepare_e3_cumulative_fixture(
+    tmp_path: Path,
+    *,
+    seed: str,
+):
+    (
+        store,
+        gap_batch,
+        gap_authorization,
+        scope_ref,
+    ) = _prepare_e3_gap_fixture(
+        tmp_path,
+        seed=seed,
+    )
+    gap_result = _write_result(
+        tmp_path / f"{seed}-gap-result.zip",
+        gap_batch,
+        "E3-X",
+        findings=[
+            {
+                "statement": (
+                    "post-reveal gap discovery"
+                ),
+                "classification": (
+                    "POST_REVEAL_CONFIRMATION"
+                ),
+            }
+        ],
+        outputs={
+            "gap_target_results": [
+                {
+                    "target_ref_digest": (
+                        scope_ref[
+                            "revision_digest"
+                        ]
+                    ),
+                    "target_kind": "SCOPE_GAP",
+                    "status": "EXPLORED",
+                    "rationale": (
+                        "gap target inspected"
+                    ),
+                    "discovery_indexes": [0],
+                }
+            ]
+        },
+    )
+    gap_inbox = StageResultInbox(
+        store,
+        gap_batch,
+    )
+    imported = gap_inbox.ingest_multiple_zips(
+        [gap_result]
+    )
+    assert imported.phase_complete is True
+    gap_summary = E3GapResultValidationService(
+        store,
+        gap_batch,
+        gap_inbox,
+    ).validate()
+    assert gap_summary.discovery_refs
+
+    prior_claim_ref = (
+        _accept_prior_adjudicated_claim(
+            store
+        )
+    )
+    cut = current_accepted_cut(store)
+    accepted_ref = store.accepted_records(
+        "source_generation",
+        cut,
+    )[0]["ref"]
+    proof = StageIsolationProof(
+        result="ENFORCED",
+        channel_inventory_ref=accepted_ref,
+        enforcement_receipt_refs=(
+            accepted_ref,
+        ),
+        session_boundary_evidence_refs=(
+            accepted_ref,
+        ),
+        scope="TEST_CONTROLLED_SESSION",
+        reason_codes=(
+            "TEST_ACCEPTED_BOUNDARY_RECEIPTS",
+        ),
+    )
+    lane = StageLaneDefinition(
+        "E3-X",
+        "Cumulative corpus comparison",
+        "CUMULATIVE_COMPARISON",
+    )
+    authorization = (
+        E3CumulativeAuthorizationService(
+            store,
+            lane_definitions=(lane,),
+            all_stage_lane_slots=("E3-X",),
+            executor_profile="ChatGPT / GitHub",
+            model="Sol 5.6",
+            isolation_proofs_by_slot={
+                "E3-X": proof,
+            },
+        ).authorize()
+    )
+    source = ResolvedSource(
+        target_type="github",
+        location=(
+            "https://github.com/example/e3-isolation"
+        ),
+        display_name="example/e3-isolation",
+        ref="main",
+        exact_commit_sha="d" * 40,
+    )
+    batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp_path / f"{seed}-cumulative",
+        source_info=source,
+        stage_id="E3",
+        phase_id="E3-CUMULATIVE",
+        lane_definitions=(lane,),
+        all_stage_lane_slots=("E3-X",),
+        authorized_context=authorization,
+        isolation_proofs_by_slot={
+            "E3-X": proof,
+        },
+    )
+    return (
+        store,
+        batch,
+        authorization,
+        prior_claim_ref,
+    )
+
+
+def _cumulative_match_rows(
+    authorization,
+    prior_claim_ref,
+):
+    payload = json.loads(
+        authorization.context_members[
+            "E3_CUMULATIVE_CORPUS_VIEW.json"
+        ].decode("utf-8")
+    )
+    rows = []
+    for index, item in enumerate(
+        payload["own_e3_discoveries"]
+    ):
+        rows.append(
+            {
+                "discovery_id": item[
+                    "discovery_id"
+                ],
+                "relation": (
+                    "MATCHED_PRIOR"
+                    if index == 0
+                    else "NO_PRIOR_MATCH"
+                ),
+                "matched_prior_claim_revision_digests": (
+                    [
+                        prior_claim_ref[
+                            "revision_digest"
+                        ]
+                    ]
+                    if index == 0
+                    else []
+                ),
+                "rationale": (
+                    "bounded comparison"
+                ),
+            }
+        )
+    return rows
+
+
+def test_e3_cumulative_view_is_late_grant_bound_and_preserves_origin(
+    tmp_path: Path,
+):
+    (
+        store,
+        batch,
+        authorization,
+        prior_claim_ref,
+    ) = _prepare_e3_cumulative_fixture(
+        tmp_path,
+        seed="e3_cumulative_view",
+    )
+    payload = json.loads(
+        authorization.context_members[
+            "E3_CUMULATIVE_CORPUS_VIEW.json"
+        ].decode("utf-8")
+    )
+    assert (
+        payload["format"]
+        == "BDB-E3-CUMULATIVE-CORPUS-VIEW-1"
+    )
+    assert payload[
+        "own_e3_discoveries"
+    ]
+    assert payload[
+        "prior_e1_e2_adjudicated_claims"
+    ]
+    origins = {
+        item["origin_classification"]
+        for item in payload[
+            "own_e3_discoveries"
+        ]
+    }
+    assert "PRE_REVEAL_DISCOVERY" in origins
+    assert (
+        "POST_REVEAL_CONFIRMATION"
+        in origins
+    )
+    raw = json.dumps(payload).lower()
+    assert "raw_report_path" not in raw
+    assert "producer_identity" not in raw
+    assert "support_count" not in raw
+
+    job = batch.get_job("E3-X")
+    assert job.grant_ref
+    assert job.authorized_knowledge_state_ref
+    assert (
+        "E3 CUMULATIVE CORPUS OUTPUT CONTRACT"
+        in job.prompt_text
+    )
+
+
+def test_e3_cumulative_result_exactly_covers_own_discoveries(
+    tmp_path: Path,
+):
+    (
+        store,
+        batch,
+        authorization,
+        prior_claim_ref,
+    ) = _prepare_e3_cumulative_fixture(
+        tmp_path,
+        seed="e3_cumulative_validate",
+    )
+    rows = _cumulative_match_rows(
+        authorization,
+        prior_claim_ref,
+    )
+    result_path = _write_result(
+        tmp_path / "e3-cumulative-result.zip",
+        batch,
+        "E3-X",
+        findings=[],
+        outputs={
+            "corpus_matches": rows,
+        },
+    )
+    inbox = StageResultInbox(
+        store,
+        batch,
+    )
+    imported = inbox.ingest_multiple_zips(
+        [result_path]
+    )
+    assert imported.phase_complete is True
+
+    summary = (
+        E3CumulativeResultValidationService(
+            store,
+            batch,
+            inbox,
+        ).validate()
+    )
+    assert (
+        summary.comparison_count
+        == len(rows)
+    )
+    assert summary.matched_discovery_ids
+    assert summary.no_prior_match_discovery_ids
+    assert (
+        summary.next_action
+        == "PREPARE_OPTIONAL_E3_HOLDOUT_OR_FINALIZE"
+    )
+
+
+def test_e3_cumulative_rejects_match_outside_authorized_view(
+    tmp_path: Path,
+):
+    (
+        store,
+        batch,
+        authorization,
+        prior_claim_ref,
+    ) = _prepare_e3_cumulative_fixture(
+        tmp_path,
+        seed="e3_cumulative_bad_match",
+    )
+    rows = _cumulative_match_rows(
+        authorization,
+        prior_claim_ref,
+    )
+    rows[0][
+        "matched_prior_claim_revision_digests"
+    ] = ["f" * 64]
+    result_path = _write_result(
+        tmp_path / "e3-cumulative-bad-match.zip",
+        batch,
+        "E3-X",
+        outputs={
+            "corpus_matches": rows,
+        },
+    )
+    inbox = StageResultInbox(
+        store,
+        batch,
+    )
+    imported = inbox.ingest_multiple_zips(
+        [result_path]
+    )
+    assert imported.phase_complete is True
+    with pytest.raises(
+        ValidationError,
+        match=(
+            "E3_CUMULATIVE_MATCH_OUTSIDE_AUTHORIZED_VIEW"
+        ),
+    ):
+        E3CumulativeResultValidationService(
+            store,
+            batch,
+            inbox,
+        ).validate()
+
+
+def test_e3_cumulative_new_finding_cannot_claim_blind_origin(
+    tmp_path: Path,
+):
+    (
+        store,
+        batch,
+        authorization,
+        prior_claim_ref,
+    ) = _prepare_e3_cumulative_fixture(
+        tmp_path,
+        seed="e3_cumulative_bad_origin",
+    )
+    rows = _cumulative_match_rows(
+        authorization,
+        prior_claim_ref,
+    )
+    result_path = _write_result(
+        tmp_path / "e3-cumulative-bad-origin.zip",
+        batch,
+        "E3-X",
+        findings=[
+            {
+                "statement": (
+                    "late cumulative observation"
+                ),
+                "classification": (
+                    "PRE_REVEAL_DISCOVERY"
+                ),
+            }
+        ],
+        outputs={
+            "corpus_matches": rows,
+        },
+    )
+    inbox = StageResultInbox(
+        store,
+        batch,
+    )
+    imported = inbox.ingest_multiple_zips(
+        [result_path]
+    )
+    assert imported.phase_complete is True
+    with pytest.raises(
+        ValidationError,
+        match=(
+            "POST_REVEAL_DISCOVERY_MISCLASSIFIED_AS_BLIND"
+        ),
+    ):
+        E3CumulativeResultValidationService(
+            store,
+            batch,
+            inbox,
+        ).validate()
+
+
 def test_unbound_context_members_fail_closed(e2_phase):
     store, _, _, tmp = e2_phase
     source = ResolvedSource(
