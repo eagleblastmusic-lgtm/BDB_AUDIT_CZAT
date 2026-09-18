@@ -230,6 +230,8 @@ class StageAssignmentService:
         mapped: dict[str, PreparedStageAssignment] = {}
         for record in self.store.accepted_records("assignment_manifest", cut):
             body = record["body"]
+            if body.get("phase_id") != phase_id:
+                continue
             slot = lane_digest_to_slot.get(_ref_digest(body.get("lane_spec_ref")))
             if slot is None:
                 continue
@@ -337,6 +339,34 @@ class StageAssignmentService:
         source_prior_ref = _ref(source, "PRIOR_ACCEPTED_ONLY")
         source_content_ref = _ref(source, "CONTENT_OR_PRIOR")
         stage_ref = _ref(stage, "HISTORY_CONTEXT_BINDING")
+
+        stage_ordinal = stage["body"].get("stage_ordinal")
+        predecessor_completion_refs: list[dict[str, Any]] = []
+        if isinstance(stage_ordinal, int) and stage_ordinal > 1:
+            predecessor_specs = [
+                row
+                for row in self.store.accepted_records("stage_spec", input_cut)
+                if row["body"].get("stage_ordinal") == stage_ordinal - 1
+            ]
+            predecessor_spec = _one(
+                predecessor_specs,
+                f"{stage_id} predecessor stage_spec",
+            )
+            predecessor_completions = [
+                row
+                for row in self.store.accepted_records("stage_completion", input_cut)
+                if _ref_digest(row["body"].get("stage_spec_ref"))
+                == predecessor_spec["ref"]["revision_digest"]
+                and row["body"].get("completion_predicate_result") == "STAGE_COMPLETED"
+            ]
+            predecessor_completion = _one(
+                predecessor_completions,
+                f"{stage_id} predecessor stage_completion",
+            )
+            predecessor_completion_refs = [
+                _ref(predecessor_completion, "PRIOR_ACCEPTED_ONLY")
+            ]
+
         existing_stage_run = self._existing_stage_run(
             input_cut, stage["ref"], source["ref"]
         )
@@ -369,7 +399,7 @@ class StageAssignmentService:
                     "source_generation_ref": source_prior_ref,
                     "creation_input_history_cut": input_cut,
                     "assigned_history_cut": input_cut,
-                    "predecessor_stage_completion_refs": [],
+                    "predecessor_stage_completion_refs": predecessor_completion_refs,
                     "required_lane_slot_contract_refs": required_slots,
                 },
             )
@@ -761,6 +791,12 @@ def prepare_stage_phase_batch(
                 f"'{execution_mode}' is not implemented"
             ),
         )
+    if context_members:
+        raise ValidationError(
+            "UNBOUND_STAGE_CONTEXT_FORBIDDEN",
+            "Context bytes require an accepted ViewManifest/Grant binding before delivery",
+        )
+
     assignments = StageAssignmentService(
         store
     ).prepare_phase_assignments(
@@ -772,7 +808,7 @@ def prepare_stage_phase_batch(
         model=model,
     )
     frozen_cut = assignments.assignment_input_history_cut
-    context = dict(context_members or {})
+    context: dict[str, bytes] = {}
     ctx_manifest = _context_manifest(context)
 
     root = (
