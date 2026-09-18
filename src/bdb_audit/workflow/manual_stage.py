@@ -986,6 +986,29 @@ binds the accepted lane result as provenance. BLOCKED is valid when the
 authorized evidence cannot support a narrower truth claim. Never fabricate
 EvidenceQualificationAssessment refs.
 """
+    elif stage_id == "E3" and phase_id == "E3-GAP":
+        output_contract = """
+
+E3 GAP-DIRECTED OUTPUT CONTRACT
+Use only CONTEXT/E3_POSITIVE_GAP_VIEW.json plus the exact source revision.
+Do not reconstruct or request the prior finding corpus.
+
+Return outputs.gap_target_results as a list. Every item must identify exactly
+one target from the authorized positive gap view:
+{
+  "target_ref_digest": "<exact obligation_revision_ref or scope_state_record_ref digest>",
+  "target_kind": "COVERAGE_OBLIGATION|SCOPE_GAP",
+  "status": "EXPLORED|BLOCKED|NO_MATERIAL_DISCOVERY",
+  "rationale": "<bounded explanation>",
+  "discovery_indexes": [0]
+}
+
+Any new material observation belongs in root MANIFEST.json findings[].
+discovery_indexes may reference only indexes in that same findings[] list.
+A post-reveal discovery is never PRE_REVEAL_DISCOVERY and must not be labelled
+as blind novelty. Do not mark obligations QUALIFIED, waive scope, or invent
+canonical evidence/coverage state from this external result.
+"""
 
     return f"""# BDB AUDIT v2.0.3 - {stage_id} / {phase_id} / {definition.lane_slot}
 
@@ -1087,6 +1110,7 @@ def prepare_stage_phase_batch(
         phase_upper in {
             "E2-SHADOW",
             "E2-CONTRADICTION",
+            "E3-GAP",
         }
         and authorized_context is None
     ):
