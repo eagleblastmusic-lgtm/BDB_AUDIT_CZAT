@@ -13,6 +13,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from ..adjudication.models import (
+    ContradictionRevision,
+    FindingClaimRevision,
+)
 from ..coordinator import Coordinator
 from ..core.errors import ValidationError
 from ..core.ids import deterministic_id
@@ -45,6 +49,7 @@ class E2FinalizationSummary:
     shadow_conflict_claim_digests: tuple[str, ...]
     shadow_result_ref: dict[str, Any]
     adjudication_decision_refs: tuple[dict[str, Any], ...]
+    contradiction_refs: tuple[dict[str, Any], ...]
     accepted_commit_seq: int
     already_finalized: bool
     next_action: str
@@ -103,7 +108,7 @@ class E2FinalizationService:
         self,
         result: dict[str, Any],
         decisions: tuple[dict[str, Any], ...],
-    ) -> tuple[str, ...]:
+    ) -> dict[str, dict[str, Any]]:
         expected = {
             decision["body"]["claim_revision_ref"][
                 "revision_digest"
@@ -122,7 +127,7 @@ class E2FinalizationService:
             )
 
         seen: set[str] = set()
-        conflicts: list[str] = []
+        conflicts: dict[str, dict[str, Any]] = {}
         for item in checks:
             if not isinstance(item, dict):
                 raise ValidationError(
@@ -186,7 +191,11 @@ class E2FinalizationService:
                     claim_digest,
                 )
             if conflict:
-                conflicts.append(claim_digest)
+                conflicts[claim_digest] = {
+                    "claim_revision_digest": claim_digest,
+                    "conflict_types": list(conflict_types),
+                    "rationale": rationale,
+                }
 
         missing = sorted(expected - seen)
         if missing:
@@ -194,7 +203,288 @@ class E2FinalizationService:
                 "E2_SHADOW_CHECKS_INCOMPLETE",
                 ",".join(missing),
             )
-        return tuple(sorted(conflicts))
+        return {
+            key: conflicts[key]
+            for key in sorted(conflicts)
+        }
+
+    def _materialize_shadow_contradictions(
+        self,
+        *,
+        cut: dict[str, Any],
+        prior_commit: dict[str, Any],
+        shadow_result: dict[str, Any],
+        decisions: tuple[dict[str, Any], ...],
+        conflicts: dict[str, dict[str, Any]],
+    ) -> tuple[tuple[dict[str, Any], ...], int, bool]:
+        """Persist exact shadow conflicts as canonical contradiction cases.
+
+        The shadow result is a proposal, not EvidenceQualification.  Therefore
+        it creates a second evidence-free claim side and a contradiction case;
+        it never fabricates opposing qualified evidence.
+        """
+        decision_by_claim = {
+            row["body"]["claim_revision_ref"]["revision_digest"]: row
+            for row in decisions
+        }
+        expected_ids = {
+            claim_digest: deterministic_id(
+                "contradiction_revision",
+                (
+                    "e2-shadow:"
+                    + shadow_result["ref"]["revision_digest"]
+                    + ":"
+                    + claim_digest
+                ),
+            )
+            for claim_digest in conflicts
+        }
+
+        existing_rows = tuple(
+            self.store.accepted_records(
+                "contradiction_revision",
+                cut,
+            )
+        )
+        existing_by_id = {
+            row["body"].get("contradiction_id"): row
+            for row in existing_rows
+            if row["body"].get("contradiction_id")
+            in set(expected_ids.values())
+        }
+        if existing_by_id:
+            if set(existing_by_id) != set(expected_ids.values()):
+                raise ValidationError(
+                    "PARTIAL_E2_SHADOW_CONTRADICTION_SET"
+                )
+            refs = tuple(
+                canonical_reference_set(
+                    [
+                        _with_ref_class(
+                            existing_by_id[
+                                expected_ids[claim_digest]
+                            ]["ref"],
+                            "CONTENT_OR_PRIOR",
+                        )
+                        for claim_digest in sorted(expected_ids)
+                    ]
+                )
+            )
+            seqs = {
+                existing_by_id[value]["accepted_seq"]
+                for value in expected_ids.values()
+            }
+            if len(seqs) != 1:
+                raise ValidationError(
+                    "E2_SHADOW_CONTRADICTION_COMMIT_DIVERGENCE"
+                )
+            return refs, next(iter(seqs)), True
+
+        objects = []
+        contradiction_objects = []
+        for claim_digest in sorted(conflicts):
+            conflict = conflicts[claim_digest]
+            decision = decision_by_claim.get(claim_digest)
+            if decision is None:
+                raise ValidationError(
+                    "E2_SHADOW_DECISION_BINDING_MISSING",
+                    claim_digest,
+                )
+            original_claim = self.store.resolve_accepted(
+                decision["body"]["claim_revision_ref"],
+                cut,
+            )
+            original_body = original_claim["body"]
+
+            challenge_statement = (
+                "Independent E2 shadow challenge to adjudication of "
+                f"claim {claim_digest[:16]}: "
+                + ", ".join(conflict["conflict_types"])
+            )
+            if conflict["rationale"].strip():
+                challenge_statement += (
+                    ". " + conflict["rationale"].strip()
+                )
+
+            challenge_claim = FindingClaimRevision(
+                statement=challenge_statement,
+                source_generation_ref=original_body[
+                    "source_generation_ref"
+                ],
+                scope_refs=original_body.get(
+                    "scope_refs",
+                    (),
+                ),
+                violated_invariant_refs=original_body.get(
+                    "violated_invariant_refs",
+                    (),
+                ),
+                discovery_relation_refs=(),
+                claim_id=deterministic_id(
+                    "finding_claim_revision",
+                    (
+                        "e2-shadow-challenge:"
+                        + shadow_result["ref"]["revision_digest"]
+                        + ":"
+                        + claim_digest
+                    ),
+                ),
+            )
+            challenge_obj = challenge_claim.as_object()
+            objects.append(challenge_obj)
+
+            supporting_refs = canonical_reference_set(
+                [
+                    dict(ref)
+                    for ref in decision["body"].get(
+                        "evidence_qualification_refs",
+                        [],
+                    )
+                ]
+            )
+            contradiction = ContradictionRevision(
+                claim_revision_refs=[
+                    _with_ref_class(
+                        original_claim["ref"],
+                        "CONTENT_OR_PRIOR",
+                    ),
+                    challenge_obj.as_ref(
+                        ref_class="CONTENT_OR_PRIOR"
+                    ).as_dict(),
+                ],
+                scope={
+                    "original_claim_revision_digest": (
+                        claim_digest
+                    ),
+                    "shadow_result_revision_digest": (
+                        shadow_result["ref"][
+                            "revision_digest"
+                        ]
+                    ),
+                },
+                positions=[
+                    {
+                        "role": "MAIN_ADJUDICATION",
+                        "claim_revision_digest": (
+                            claim_digest
+                        ),
+                        "decision_revision_digest": (
+                            decision["ref"][
+                                "revision_digest"
+                            ]
+                        ),
+                        "lifecycle_status": (
+                            decision["body"].get(
+                                "lifecycle_status"
+                            )
+                        ),
+                    },
+                    {
+                        "role": "INDEPENDENT_SHADOW_CHALLENGE",
+                        "claim_revision_digest": (
+                            challenge_obj.digest
+                        ),
+                        "shadow_result_revision_digest": (
+                            shadow_result["ref"][
+                                "revision_digest"
+                            ]
+                        ),
+                        "conflict_types": list(
+                            conflict["conflict_types"]
+                        ),
+                        "rationale": conflict[
+                            "rationale"
+                        ],
+                    },
+                ],
+                supporting_evidence_qualification_refs=(
+                    supporting_refs
+                ),
+                opposing_evidence_qualification_refs=(),
+                failure_assumption_differences=[],
+                environment_input_model_differences=[],
+                required_falsifier={
+                    "protocol": (
+                        "E2_CONTRADICTION_RESOLUTION"
+                    ),
+                    "must_address_conflict_types": list(
+                        conflict["conflict_types"]
+                    ),
+                    "truth_rule": (
+                        "NO_MAJORITY_VOTE"
+                    ),
+                },
+                status="OPEN",
+                contradiction_id=expected_ids[
+                    claim_digest
+                ],
+            )
+            contradiction_obj = (
+                contradiction.as_object()
+            )
+            objects.append(contradiction_obj)
+            contradiction_objects.append(
+                contradiction_obj
+            )
+
+        head = self.store.head()
+        if head is None:
+            raise ValidationError(
+                "CAMPAIGN_NOT_INITIALIZED"
+            )
+        command = CommandEnvelope(
+            command_id=_command_id(
+                "e2_shadow_contradictions:"
+                + shadow_result["ref"][
+                    "revision_digest"
+                ]
+            ),
+            command_kind="RECORD_FOUNDATION_FACT",
+            actor_ref=prior_commit.get(
+                "actor_ref",
+                "installation-owner",
+            ),
+            expected_parent_head={
+                "tag": "ACCEPTED_HEAD_REF",
+                **head.as_dict(),
+            },
+            governing_policy_ref=prior_commit[
+                "governing_policy_ref"
+            ],
+            governing_spec_refs=tuple(
+                prior_commit.get(
+                    "governing_spec_refs",
+                    (),
+                )
+            ),
+            idempotency_scope=(
+                "e2_shadow_contradictions:"
+                + shadow_result["ref"][
+                    "revision_digest"
+                ]
+            ),
+            campaign_ref=head.campaign_id,
+        )
+        accepted = self.coordinator.accept(
+            command,
+            immutable_objects=objects,
+            expected_head=head,
+        )
+        refs = tuple(
+            canonical_reference_set(
+                [
+                    obj.as_ref(
+                        ref_class="CONTENT_OR_PRIOR"
+                    ).as_dict()
+                    for obj in contradiction_objects
+                ]
+            )
+        )
+        return (
+            refs,
+            accepted.head.commit_seq,
+            False,
+        )
 
     def _all_e2_lane_completions(
         self,
@@ -341,6 +631,7 @@ class E2FinalizationService:
                 shadow_conflict_claim_digests=(),
                 shadow_result_ref=shadow_ref,
                 adjudication_decision_refs=decision_refs,
+                contradiction_refs=(),
                 accepted_commit_seq=existing[
                     "accepted_seq"
                 ],
@@ -349,15 +640,27 @@ class E2FinalizationService:
             )
 
         if conflicts:
+            contradiction_refs, contradiction_seq, existed = (
+                self._materialize_shadow_contradictions(
+                    cut=cut,
+                    prior_commit=prior_commit,
+                    shadow_result=shadow_result,
+                    decisions=decisions,
+                    conflicts=conflicts,
+                )
+            )
             return E2FinalizationSummary(
                 campaign_id=self.batch.campaign_id,
                 stage_completed=False,
                 stage_completion_ref=None,
-                shadow_conflict_claim_digests=conflicts,
+                shadow_conflict_claim_digests=tuple(
+                    sorted(conflicts)
+                ),
                 shadow_result_ref=shadow_ref,
                 adjudication_decision_refs=decision_refs,
-                accepted_commit_seq=self.store.head().commit_seq,
-                already_finalized=False,
+                contradiction_refs=contradiction_refs,
+                accepted_commit_seq=contradiction_seq,
+                already_finalized=existed,
                 next_action=(
                     "E2_CONTRADICTION_PROTOCOL_REQUIRED"
                 ),
@@ -527,6 +830,7 @@ class E2FinalizationService:
             shadow_conflict_claim_digests=(),
             shadow_result_ref=shadow_ref,
             adjudication_decision_refs=decision_refs,
+            contradiction_refs=(),
             accepted_commit_seq=accepted.head.commit_seq,
             already_finalized=False,
             next_action="PREPARE_E3",
