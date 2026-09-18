@@ -21,6 +21,7 @@ from .executors import get_executor_profile
 from .e2_checkpoint import E2BlindCheckpointService
 from .e2_reveal import E2ControlledRevealService
 from .e2_synthesis import E2MainSynthesisService
+from .e2_shadow import E2ShadowAuthorizationService
 from .inbox import E1ResultInbox, ImportedResultSummary
 from .manual_stage import (
     ImportedStagePhaseSummary,
@@ -60,6 +61,14 @@ E2_REVEAL_LANES = (
         "E2-ADJUDICATION",
         "Controlled E1 claim-card falsification and adjudication",
         "CONTROLLED_REVEAL_ADJUDICATION",
+    ),
+)
+
+E2_SHADOW_LANES = (
+    StageLaneDefinition(
+        "E2-ADJUDICATION",
+        "Independent bounded shadow adjudicator",
+        "INDEPENDENT_SHADOW_ADJUDICATION",
     ),
 )
 
@@ -363,6 +372,41 @@ class FullAuditOrchestrator:
         self.stage_inbox = StageResultInbox(store, batch)
         return batch
 
+    def prepare_e2_shadow_orchestration(self) -> StageBatch:
+        """Publish a fresh, grant-bound independent E2 shadow package."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        store = TransactionalHistoryStore(self.active_store_path)
+        authorization = E2ShadowAuthorizationService(
+            store,
+            lane_definition=E2_SHADOW_LANES[0],
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_BLIND_LANES
+            ),
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+        ).authorize()
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E2",
+            phase_id="E2-SHADOW",
+            lane_definitions=E2_SHADOW_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_BLIND_LANES
+            ),
+            authorized_context=authorization,
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(store, batch)
+        return batch
+
     def deliver_stage_lane_to_user(self, slot: str) -> dict[str, Any]:
         """Deliver one already accepted E2+ stage assignment/package."""
         if self.stage_batch is None:
@@ -481,7 +525,7 @@ class FullAuditOrchestrator:
         if self.e1_inbox.stage_complete:
             loaded_stage = None
             resume_error = None
-            for candidate_phase in ("E2-REVEAL", "E2-BLIND"):
+            for candidate_phase in ("E2-SHADOW", "E2-REVEAL", "E2-BLIND"):
                 try:
                     loaded_stage = load_stage_phase_batch(
                         store,
@@ -649,10 +693,11 @@ class FullAuditOrchestrator:
                 self.stage_batch,
                 self.stage_inbox,
             ).synthesize()
+            shadow_batch = self.prepare_e2_shadow_orchestration()
             return {
-                "status": "E2_MAIN_SYNTHESIZED",
+                "status": "WAITING_EXTERNAL_RESULTS",
                 "current_stage": "E2",
-                "current_phase": "E2-MAIN-SYNTHESIS",
+                "current_phase": "E2-SHADOW",
                 "synthesis_commit_seq": synthesis.accepted_commit_seq,
                 "claims_count": len(synthesis.claim_refs),
                 "decisions_count": len(
@@ -661,7 +706,20 @@ class FullAuditOrchestrator:
                 "proposal_disagreement_claim_ids": list(
                     synthesis.proposal_disagreement_claim_ids
                 ),
-                "next_action": "PREPARE_E2_SHADOW_ADJUDICATOR",
+                "missing_lanes": list(shadow_batch.lane_slots),
+                "next_action": "DELIVER_OR_IMPORT_E2_SHADOW_RESULTS",
+                "packages": {
+                    slot: str(job.package_zip_path)
+                    for slot, job in shadow_batch.jobs.items()
+                },
+            }
+
+        if self.stage_batch.phase_id == "E2-SHADOW":
+            return {
+                "status": "READY_FOR_E2_FINALIZATION",
+                "current_stage": "E2",
+                "current_phase": "E2-SHADOW",
+                "next_action": "APPLY_CONTRADICTION_PROTOCOL_AND_FINALIZE_E2",
             }
 
         raise ValidationError(
