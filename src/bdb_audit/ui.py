@@ -186,7 +186,11 @@ class InteractiveAuditUI:
             return
 
         output_func(f"\nProcessing {len(files)} result file(s)...")
-        is_stage_phase = self.orchestrator.stage_batch is not None
+        is_stage_phase = getattr(
+            self.orchestrator,
+            "stage_batch",
+            None,
+        ) is not None
         if is_stage_phase:
             summary = self.orchestrator.import_stage_results(files)
             active_batch = self.orchestrator.stage_batch
