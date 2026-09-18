@@ -1,15 +1,22 @@
 """Targeted tests for durable external E2+ phase transport."""
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import zipfile
 
 import pytest
 
+from bdb_audit.adjudication.models import (
+    FindingAdjudicationDecision,
+    FindingAxisAssessment,
+    FindingClaimRevision,
+)
 from bdb_audit.coordinator import Coordinator
 from bdb_audit.coordinator.operations import AuditOperationApi
 from bdb_audit.core.errors import ValidationError
+from bdb_audit.core.ids import deterministic_id
 from bdb_audit.history.objects import CanonicalObject, CommandEnvelope
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.workflow.e2_checkpoint import E2BlindCheckpointService
@@ -26,6 +33,10 @@ from bdb_audit.workflow.e2_contradiction_resolution import (
 from bdb_audit.workflow.e3_checkpoint import E3BlindCheckpointService
 from bdb_audit.workflow.e3_gap import E3PositiveGapAuthorizationService
 from bdb_audit.workflow.e3_gap_result import E3GapResultValidationService
+from bdb_audit.workflow.e3_cumulative import E3CumulativeAuthorizationService
+from bdb_audit.workflow.e3_cumulative_result import (
+    E3CumulativeResultValidationService,
+)
 from bdb_audit.workflow.manual_stage import (
     StageAssignmentService,
     StageIsolationProof,
@@ -33,7 +44,7 @@ from bdb_audit.workflow.manual_stage import (
     StageResultInbox,
     prepare_stage_phase_batch,
 )
-from bdb_audit.workflow.assignments import _command_id, _current_cut
+from bdb_audit.workflow.assignments import _command_id, _current_cut, _external_ref
 from bdb_audit.workflow.source_target import ResolvedSource
 from bdb_audit.workflow.read_models import current_accepted_cut
 from bdb_audit.workflow.inbox import E1ResultInbox
