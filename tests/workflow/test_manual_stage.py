@@ -7,8 +7,10 @@ import zipfile
 
 import pytest
 
+from bdb_audit.coordinator import Coordinator
 from bdb_audit.coordinator.operations import AuditOperationApi
 from bdb_audit.core.errors import ValidationError
+from bdb_audit.history.objects import CanonicalObject, CommandEnvelope
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.workflow.e2_checkpoint import E2BlindCheckpointService
 from bdb_audit.workflow.e2_reveal import E2ControlledRevealService
@@ -21,6 +23,9 @@ from bdb_audit.workflow.e2_contradiction import (
 from bdb_audit.workflow.e2_contradiction_resolution import (
     E2ContradictionResolutionService,
 )
+from bdb_audit.workflow.e3_checkpoint import E3BlindCheckpointService
+from bdb_audit.workflow.e3_gap import E3PositiveGapAuthorizationService
+from bdb_audit.workflow.e3_gap_result import E3GapResultValidationService
 from bdb_audit.workflow.manual_stage import (
     StageAssignmentService,
     StageIsolationProof,
@@ -28,6 +33,7 @@ from bdb_audit.workflow.manual_stage import (
     StageResultInbox,
     prepare_stage_phase_batch,
 )
+from bdb_audit.workflow.assignments import _command_id, _current_cut
 from bdb_audit.workflow.source_target import ResolvedSource
 from bdb_audit.workflow.read_models import current_accepted_cut
 from bdb_audit.workflow.inbox import E1ResultInbox
@@ -532,6 +538,346 @@ def test_e3_enforced_proof_rejects_unaccepted_receipt(
             isolation_proofs_by_slot={
                 "E3-X": proof,
             },
+        )
+
+
+
+
+def _accept_scope_gap(
+    store: TransactionalHistoryStore,
+    *,
+    scope_key: str = "runtime-unknown-surface",
+):
+    cut, prior_commit = _current_cut(store)
+    obj = CanonicalObject(
+        "scope_state_record",
+        {
+            "scope_state_record_id": (
+                "scope_state_record_"
+                + hashlib.sha256(
+                    scope_key.encode("utf-8")
+                ).hexdigest()[:32]
+            ),
+            "scope_key": scope_key,
+            "state": "UNKNOWN_SCOPE",
+            "basis_refs": [],
+            "scope_state_input_history_cut": cut,
+            "reason_codes": [
+                "E3_GAP_TEST_UNKNOWN_SCOPE"
+            ],
+        },
+    )
+    head = store.head()
+    assert head is not None
+    command = CommandEnvelope(
+        command_id=_command_id(
+            "test_e3_scope_gap:" + obj.digest
+        ),
+        command_kind="RECORD_FOUNDATION_FACT",
+        actor_ref=prior_commit.get(
+            "actor_ref",
+            "installation-owner",
+        ),
+        expected_parent_head={
+            "tag": "ACCEPTED_HEAD_REF",
+            **head.as_dict(),
+        },
+        governing_policy_ref=prior_commit[
+            "governing_policy_ref"
+        ],
+        governing_spec_refs=tuple(
+            prior_commit.get(
+                "governing_spec_refs",
+                (),
+            )
+        ),
+        idempotency_scope=(
+            "test_e3_scope_gap:" + obj.digest
+        ),
+        campaign_ref=head.campaign_id,
+    )
+    Coordinator(store).accept(
+        command,
+        immutable_objects=[obj],
+        expected_head=head,
+    )
+    return obj.as_ref(
+        ref_class="CONTENT_OR_PRIOR"
+    ).as_dict()
+
+
+def _prepare_e3_gap_fixture(
+    tmp_path: Path,
+    *,
+    seed: str,
+):
+    store, source, blind_lane, accepted_ref = (
+        _prepare_e3_isolation_fixture(
+            tmp_path,
+            seed=seed,
+        )
+    )
+    proof = StageIsolationProof(
+        result="ENFORCED",
+        channel_inventory_ref=accepted_ref,
+        enforcement_receipt_refs=(accepted_ref,),
+        session_boundary_evidence_refs=(accepted_ref,),
+        scope="TEST_CONTROLLED_SESSION",
+        reason_codes=(
+            "TEST_ACCEPTED_BOUNDARY_RECEIPTS",
+        ),
+    )
+    blind_batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp_path / f"{seed}-blind",
+        source_info=source,
+        stage_id="E3",
+        phase_id="E3-BLIND",
+        lane_definitions=(blind_lane,),
+        all_stage_lane_slots=("E3-X",),
+        isolation_proofs_by_slot={
+            "E3-X": proof,
+        },
+    )
+    blind_inbox = StageResultInbox(
+        store,
+        blind_batch,
+    )
+    blind_result = _write_result(
+        tmp_path / f"{seed}-blind-result.zip",
+        blind_batch,
+        "E3-X",
+        findings=[
+            {
+                "statement": "blind novelty precursor",
+            }
+        ],
+    )
+    imported = blind_inbox.ingest_multiple_zips(
+        [blind_result]
+    )
+    assert imported.phase_complete is True
+    E3BlindCheckpointService(
+        store,
+        blind_batch,
+        blind_inbox,
+    ).seal()
+    scope_ref = _accept_scope_gap(store)
+
+    gap_lane = StageLaneDefinition(
+        "E3-X",
+        "Security / authority / trust gap exploration",
+        "AUTHORITY_TRUST_GAP_DIRECTED_SEARCH",
+    )
+    authorization = E3PositiveGapAuthorizationService(
+        store,
+        lane_definitions=(gap_lane,),
+        all_stage_lane_slots=("E3-X",),
+        executor_profile="ChatGPT / GitHub",
+        model="Sol 5.6",
+        isolation_proofs_by_slot={
+            "E3-X": proof,
+        },
+    ).authorize()
+    batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp_path / f"{seed}-gap",
+        source_info=source,
+        stage_id="E3",
+        phase_id="E3-GAP",
+        lane_definitions=(gap_lane,),
+        all_stage_lane_slots=("E3-X",),
+        authorized_context=authorization,
+        isolation_proofs_by_slot={
+            "E3-X": proof,
+        },
+    )
+    return (
+        store,
+        batch,
+        authorization,
+        scope_ref,
+    )
+
+
+def test_e3_positive_gap_view_is_grant_bound_and_excludes_finding_corpus(
+    tmp_path: Path,
+):
+    store, batch, authorization, scope_ref = (
+        _prepare_e3_gap_fixture(
+            tmp_path,
+            seed="e3_gap_positive_view",
+        )
+    )
+    payload = json.loads(
+        authorization.context_members[
+            "E3_POSITIVE_GAP_VIEW.json"
+        ].decode("utf-8")
+    )
+    assert (
+        payload["format"]
+        == "BDB-E3-POSITIVE-GAP-VIEW-1"
+    )
+    assert payload["explicit_scope_gaps"]
+    raw = json.dumps(payload)
+    assert "prior_finding_corpus" not in raw.lower()
+    assert "producer_identity" not in raw.lower()
+
+    job = batch.get_job("E3-X")
+    assert job.view_manifest_ref
+    assert job.grant_ref
+    assert job.authorized_knowledge_state_ref
+    assert (
+        "E3 GAP-DIRECTED OUTPUT CONTRACT"
+        in job.prompt_text
+    )
+
+
+def test_e3_gap_result_validation_requires_authorized_target_coverage(
+    tmp_path: Path,
+):
+    store, batch, authorization, scope_ref = (
+        _prepare_e3_gap_fixture(
+            tmp_path,
+            seed="e3_gap_result_validation",
+        )
+    )
+    target_digest = scope_ref["revision_digest"]
+    result_path = _write_result(
+        tmp_path / "e3-gap-result.zip",
+        batch,
+        "E3-X",
+        findings=[
+            {
+                "statement": (
+                    "post-reveal observation on unknown scope"
+                ),
+                "classification": (
+                    "POST_REVEAL_CONFIRMATION"
+                ),
+            }
+        ],
+        outputs={
+            "gap_target_results": [
+                {
+                    "target_ref_digest": (
+                        target_digest
+                    ),
+                    "target_kind": "SCOPE_GAP",
+                    "status": "EXPLORED",
+                    "rationale": (
+                        "authorized gap inspected"
+                    ),
+                    "discovery_indexes": [0],
+                }
+            ]
+        },
+    )
+    inbox = StageResultInbox(store, batch)
+    imported = inbox.ingest_multiple_zips(
+        [result_path]
+    )
+    assert imported.phase_complete is True
+
+    summary = E3GapResultValidationService(
+        store,
+        batch,
+        inbox,
+    ).validate()
+    assert summary.authorized_target_digests == (
+        target_digest,
+    )
+    assert summary.covered_target_digests == (
+        target_digest,
+    )
+    assert summary.findings_count == 1
+    assert (
+        summary.next_action
+        == "PREPARE_E3_CUMULATIVE_CORPUS_REVEAL"
+    )
+
+
+def test_e3_gap_rejects_post_reveal_finding_mislabelled_as_blind(
+    tmp_path: Path,
+):
+    store, batch, authorization, scope_ref = (
+        _prepare_e3_gap_fixture(
+            tmp_path,
+            seed="e3_gap_mislabel",
+        )
+    )
+    result_path = _write_result(
+        tmp_path / "e3-gap-mislabel.zip",
+        batch,
+        "E3-X",
+        findings=[
+            {
+                "statement": "revealed target discovery",
+                "classification": (
+                    "PRE_REVEAL_DISCOVERY"
+                ),
+            }
+        ],
+        outputs={
+            "gap_target_results": [
+                {
+                    "target_ref_digest": (
+                        scope_ref[
+                            "revision_digest"
+                        ]
+                    ),
+                    "target_kind": "SCOPE_GAP",
+                    "status": "EXPLORED",
+                    "rationale": "invalid label test",
+                    "discovery_indexes": [0],
+                }
+            ]
+        },
+    )
+    inbox = StageResultInbox(store, batch)
+    imported = inbox.ingest_multiple_zips(
+        [result_path]
+    )
+    assert imported.phase_complete is True
+    with pytest.raises(
+        ValidationError,
+        match=(
+            "POST_REVEAL_DISCOVERY_MISCLASSIFIED_AS_BLIND"
+        ),
+    ):
+        E3GapResultValidationService(
+            store,
+            batch,
+            inbox,
+        ).validate()
+
+
+def test_e3_gap_authorization_requires_fresh_isolation_proof(
+    tmp_path: Path,
+):
+    store, source, blind_lane, accepted_ref = (
+        _prepare_e3_isolation_fixture(
+            tmp_path,
+            seed="e3_gap_requires_proof",
+        )
+    )
+    with pytest.raises(
+        ValidationError,
+        match="E3_GAP_ENFORCED_ISOLATION_PROOF_REQUIRED",
+    ):
+        E3PositiveGapAuthorizationService(
+            store,
+            lane_definitions=(
+                StageLaneDefinition(
+                    "E3-X",
+                    "Gap search",
+                    "GAP_DIRECTED",
+                ),
+            ),
+            all_stage_lane_slots=("E3-X",),
+            executor_profile="ChatGPT / GitHub",
+            model="Sol 5.6",
+            isolation_proofs_by_slot={},
         )
 
 
