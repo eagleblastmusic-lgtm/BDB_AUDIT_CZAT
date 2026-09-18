@@ -472,34 +472,72 @@ def test_full_domain_integration_lifecycle():
     # -------------------------------------------------------------
     # 11. CONTRADICTION RESOLUTION AUTHORITY (WP-F4-08)
     # -------------------------------------------------------------
+    opposing_claim = FindingClaimRevision(
+        statement=(
+            "Heap overflow claim is refuted under the same declared "
+            "packet-parser scope"
+        ),
+        source_generation_ref=src_gen,
+    )
+    ev_supports = ref(
+        "evidence_qualification_assessment",
+        "ev_supports",
+    )
+    ev_refutes = ref(
+        "evidence_qualification_assessment",
+        "ev_refutes",
+    )
     contra = ContradictionRevision(
-        claim_revision_ref=claim.as_object().as_ref(),
-        contradicting_evidence_refs=[
-            ref("evidence_qualification_assessment", "ev_supports"),
-            ref("evidence_qualification_assessment", "ev_refutes"),
+        claim_revision_refs=[
+            claim.as_object().as_ref(),
+            opposing_claim.as_object().as_ref(),
         ],
-        input_history_cut=cut,
+        scope={"subsystem": "packet_parser"},
+        positions=[
+            {"side": "SUPPORTING"},
+            {"side": "OPPOSING"},
+        ],
+        supporting_evidence_qualification_refs=[
+            ev_supports
+        ],
+        opposing_evidence_qualification_refs=[
+            ev_refutes
+        ],
+        failure_assumption_differences=[],
+        environment_input_model_differences=[],
+        required_falsifier=(
+            "SAME_SCOPE_CONTROLLED_REPRODUCTION"
+        ),
         status="OPEN",
     )
-    # Fail closed: majority vote forbidden
-    with pytest.raises(ValidationError, match="MAJORITY_VOTE_FORBIDDEN"):
+    # Fail closed: majority vote forbidden.
+    with pytest.raises(
+        ValidationError,
+        match="MAJORITY_VOTE_FORBIDDEN",
+    ):
         resolve_contradiction(
             contradiction=contra,
-            adjudicator_ref=adjudicator,
-            resolution_status="RESOLVED_FULL",
-            rationale="2 vs 1 vote",
+            resolved_scope={
+                "subsystem": "packet_parser"
+            },
+            resolution_kind="REFUTED",
+            basis_refs=[ev_supports, ev_refutes],
             input_history_cut=cut,
+            resulting_status="RESOLVED_FULL",
             resolved_by_majority_vote=True,
         )
-    # Resolved by proper authority
+    # Proper resolution decision binds exact prior contradiction and basis.
     contra_res = resolve_contradiction(
         contradiction=contra,
-        adjudicator_ref=adjudicator,
-        resolution_status="RESOLVED_FULL",
-        rationale="Controlled isolated reproduction proved reachability under all valid network profiles",
+        resolved_scope={
+            "subsystem": "packet_parser"
+        },
+        resolution_kind="REFUTED",
+        basis_refs=[ev_supports, ev_refutes],
         input_history_cut=cut,
+        resulting_status="RESOLVED_FULL",
     )
-    assert contra_res.resolution_status == "RESOLVED_FULL"
+    assert contra_res.resulting_status == "RESOLVED_FULL"
 
     # -------------------------------------------------------------
     # 12. REPLAY CAPSULE & SUCCESSOR CAMPAIGN (WP-F4-10)
