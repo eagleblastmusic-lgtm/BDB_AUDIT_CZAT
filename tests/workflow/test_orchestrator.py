@@ -319,6 +319,13 @@ def test_e3_blind_preparation_fails_before_package_publication_without_enforced_
 ):
     orch, mgr, mock_platform, tmp = orchestrator_setup
     orch.initialize_campaign()
+    assert orch.active_store_path is not None
+    # Build only the predecessor acceptance needed to reach the capability
+    # check. This test is not exercising the user workflow itself.
+    orch.api.prepare_stage(orch.active_store_path, "E1")
+    orch.api.qualify_stage(orch.active_store_path, "E1")
+    orch.api.prepare_stage(orch.active_store_path, "E2")
+    orch.api.qualify_stage(orch.active_store_path, "E2")
     artifacts = orch._artifact_root()
 
     with pytest.raises(
@@ -328,7 +335,41 @@ def test_e3_blind_preparation_fails_before_package_publication_without_enforced_
         orch.prepare_e3_blind_orchestration()
 
     # Capability refusal happens before E3 assignment/package publication.
-    e3_root = artifacts / orch.api.get_campaign_status(
+    campaign_id = orch.api.get_campaign_status(
         orch.active_store_path
-    )["campaign_id"] / "E3"
+    )["campaign_id"]
+    e3_root = artifacts / campaign_id / "E3"
     assert not e3_root.exists()
+
+def test_resume_does_not_resurrect_completed_e2_phase(
+    orchestrator_setup,
+    monkeypatch,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    init = orch.initialize_campaign()
+    e1 = orch.prepare_e1_orchestration()
+    orch.import_results(
+        [
+            _create_lane_result_zip(
+                tmp / f"resume_{slot}.zip",
+                e1,
+                slot,
+            )
+            for slot in E1_LANE_SLOTS
+        ]
+    )
+    # Prepare E2 via real workflow so durable E2 packages exist, then mark E2
+    # complete only for this resume authority regression.
+    orch.advance_to_next_stage()
+    assert orch.active_store_path is not None
+    orch.api.qualify_stage(orch.active_store_path, "E2")
+
+    resumed = FullAuditOrchestrator(
+        settings_mgr=mgr,
+        platform_adapter=MockPlatformAdapter(),
+    )
+    result = resumed.resume_campaign(init["store_path"])
+    assert result["status"] == "SUCCESS"
+    assert result["current_stage"] == "E3"
+    assert result["current_phase"] is None
+    assert resumed.stage_batch is None
