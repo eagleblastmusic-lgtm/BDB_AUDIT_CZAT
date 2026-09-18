@@ -69,6 +69,25 @@ def _safe_scalar(value: Any) -> Any:
     return None
 
 
+def opaque_claim_view_id(
+    result_digest: str,
+    finding_index: int,
+    finding: Mapping[str, Any],
+) -> str:
+    fingerprint = hashlib.sha256(
+        canonical_bytes(dict(finding))
+    ).hexdigest()
+    return hashlib.sha256(
+        canonical_bytes(
+            {
+                "result_digest": result_digest,
+                "finding_index": finding_index,
+                "finding_fingerprint": fingerprint,
+            }
+        )
+    ).hexdigest()
+
+
 def _claim_cards(
     records: Sequence[dict[str, Any]],
 ) -> tuple[dict[str, Any], ...]:
@@ -83,19 +102,12 @@ def _claim_cards(
         for index, finding in enumerate(findings):
             if not isinstance(finding, dict):
                 raise ValidationError("INVALID_FINDING_STRUCTURE", "E1")
-            fingerprint = hashlib.sha256(
-                canonical_bytes(finding)
-            ).hexdigest()
             card: dict[str, Any] = {
-                "opaque_claim_view_id": hashlib.sha256(
-                    canonical_bytes(
-                        {
-                            "result_digest": record["ref"]["revision_digest"],
-                            "finding_index": index,
-                            "finding_fingerprint": fingerprint,
-                        }
-                    )
-                ).hexdigest(),
+                "opaque_claim_view_id": opaque_claim_view_id(
+                    record["ref"]["revision_digest"],
+                    index,
+                    finding,
+                ),
             }
             for field in _SAFE_CLAIM_FIELDS:
                 if field not in finding:
@@ -595,4 +607,5 @@ __all__ = [
     "E2RevealAuthorization",
     "E2ControlledRevealService",
     "build_e2_claim_view",
+    "opaque_claim_view_id",
 ]
