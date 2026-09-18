@@ -1,11 +1,9 @@
 """R5.3.1 Finding, Root Cause, and Contradiction domain models (M21/M22)."""
-from dataclasses import dataclass, field
-import hashlib
+from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
-from ..core.hashing import DIGEST_PROFILE, object_digest
 from ..core.ids import new_id, validate_id
 from ..core.registry import canonical_reference_set
 from ..history.objects import CanonicalObject, ObjectRef
@@ -28,12 +26,6 @@ CONTRADICTION_RESOLUTION_RESULTS = {
     "RESOLVED_SCOPED", "RESOLVED_FULL", "BLOCKED"
 }
 
-
-def _canonical_strings(values: Sequence[str], name: str = "strings") -> list[str]:
-    vals = list(values)
-    if len(vals) != len(set(vals)):
-        raise ValidationError(f"DUPLICATE_{name.upper()}")
-    return sorted(vals)
 
 
 def _ref_dict(ref_or_obj: Any) -> dict:
