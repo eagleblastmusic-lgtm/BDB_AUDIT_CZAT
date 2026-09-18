@@ -371,6 +371,17 @@ class E3PositiveGapAuthorizationService:
         self.isolation_proofs_by_slot = dict(
             isolation_proofs_by_slot or {}
         )
+        missing_proofs = [
+            definition.lane_slot
+            for definition in self.lane_definitions
+            if definition.lane_slot
+            not in self.isolation_proofs_by_slot
+        ]
+        if missing_proofs:
+            raise ValidationError(
+                "E3_GAP_ENFORCED_ISOLATION_PROOF_REQUIRED",
+                ",".join(sorted(missing_proofs)),
+            )
         self.coordinator = Coordinator(store)
 
     def _existing_authorization(
