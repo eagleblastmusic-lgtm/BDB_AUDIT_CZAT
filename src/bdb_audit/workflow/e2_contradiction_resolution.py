@@ -422,7 +422,7 @@ class E2ContradictionResolutionService:
                 raise ValidationError(
                     "PARTIAL_E2_CONTRADICTION_RESOLUTION_DECISION_SET"
                 )
-            models = {
+            existing_models = {
                 digest: ContradictionResolutionDecision(
                     **row["body"]
                 )
@@ -437,7 +437,7 @@ class E2ContradictionResolutionService:
                     "E2_CONTRADICTION_RESOLUTION_DECISION_COMMIT_DIVERGENCE"
                 )
             return (
-                models,
+                existing_models,
                 next(iter(seqs)),
                 True,
             )
