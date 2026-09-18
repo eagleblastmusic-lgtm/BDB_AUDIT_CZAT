@@ -783,6 +783,28 @@ An assertion in this result is a proposal, not qualified canonical evidence.
 Do not fabricate typed evidence references. If the authorized context and your
 own permitted inspection do not establish an axis, use INCONCLUSIVE or BLOCKED.
 """
+    elif stage_id == "E2" and phase_id == "E2-SHADOW":
+        output_contract = """
+
+E2 INDEPENDENT SHADOW OUTPUT CONTRACT
+For EVERY claim in CONTEXT/E2_MAIN_ADJUDICATION_VIEW.json return exactly one
+item in outputs.shadow_checks. Do not perform a new full-repository audit and
+do not rewrite the main adjudication.
+
+Each item:
+{
+  "claim_revision_digest": "<exact claim_revision_ref.revision_digest>",
+  "conflict": true|false,
+  "conflict_types": [
+    "OVER_MERGING|UNDER_MERGING|SEVERITY_INFLATION|FALSE_DISMISSAL|ORIGIN_MISCLASSIFICATION|EVIDENCE_OVERSTATING|PREVIOUS_FALSE_NEGATIVE_MISCLASSIFICATION"
+  ],
+  "rationale": "<bounded explanation>"
+}
+
+Use conflict=false with an empty conflict_types list when the bounded shadow
+view gives no concrete reason to challenge the main decision. A conflict is a
+proposal for the Contradiction Protocol, never a majority-vote truth decision.
+"""
 
     return f"""# BDB AUDIT v2.0.3 - {stage_id} / {phase_id} / {definition.lane_slot}
 
