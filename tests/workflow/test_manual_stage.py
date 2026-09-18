@@ -8,6 +8,7 @@ import zipfile
 import pytest
 
 from bdb_audit.coordinator.operations import AuditOperationApi
+from bdb_audit.core.errors import ValidationError
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.workflow.manual_stage import (
     StageLaneDefinition,
@@ -282,7 +283,7 @@ def test_unbound_context_members_fail_closed(e2_phase):
         exact_commit_sha="c" * 40,
     )
     with pytest.raises(
-        Exception,
+        ValidationError,
         match="UNBOUND_STAGE_CONTEXT_FORBIDDEN",
     ):
         prepare_stage_phase_batch(
