@@ -23,6 +23,8 @@ from .e2_reveal import E2ControlledRevealService
 from .e2_synthesis import E2MainSynthesisService
 from .e2_shadow import E2ShadowAuthorizationService
 from .e2_finalize import E2FinalizationService
+from .e2_contradiction import E2ContradictionAuthorizationService
+from .e2_contradiction_resolution import E2ContradictionResolutionService
 from .inbox import E1ResultInbox, ImportedResultSummary
 from .manual_stage import (
     ImportedStagePhaseSummary,
@@ -70,6 +72,14 @@ E2_SHADOW_LANES = (
         "E2-ADJUDICATION",
         "Independent bounded shadow adjudicator",
         "INDEPENDENT_SHADOW_ADJUDICATION",
+    ),
+)
+
+E2_CONTRADICTION_LANES = (
+    StageLaneDefinition(
+        "E2-ADJUDICATION",
+        "Scoped contradiction protocol adjudicator",
+        "CONTRADICTION_PROTOCOL",
     ),
 )
 
@@ -408,6 +418,47 @@ class FullAuditOrchestrator:
         self.stage_inbox = StageResultInbox(store, batch)
         return batch
 
+    def prepare_e2_contradiction_orchestration(
+        self,
+        contradiction_refs: Sequence[dict[str, Any]],
+    ) -> StageBatch:
+        """Authorize and publish the bounded E2 contradiction protocol."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+        if not contradiction_refs:
+            raise ValidationError("E2_CONTRADICTION_CASE_REQUIRED")
+
+        store = TransactionalHistoryStore(self.active_store_path)
+        authorization = E2ContradictionAuthorizationService(
+            store,
+            contradiction_refs=contradiction_refs,
+            lane_definition=E2_CONTRADICTION_LANES[0],
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_BLIND_LANES
+            ),
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+        ).authorize()
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E2",
+            phase_id="E2-CONTRADICTION",
+            lane_definitions=E2_CONTRADICTION_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_BLIND_LANES
+            ),
+            authorized_context=authorization,
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(store, batch)
+        return batch
+
     def deliver_stage_lane_to_user(self, slot: str) -> dict[str, Any]:
         """Deliver one already accepted E2+ stage assignment/package."""
         if self.stage_batch is None:
@@ -526,7 +577,12 @@ class FullAuditOrchestrator:
         if self.e1_inbox.stage_complete:
             loaded_stage = None
             resume_error = None
-            for candidate_phase in ("E2-SHADOW", "E2-REVEAL", "E2-BLIND"):
+            for candidate_phase in (
+                "E2-CONTRADICTION",
+                "E2-SHADOW",
+                "E2-REVEAL",
+                "E2-BLIND",
+            ):
                 try:
                     loaded_stage = load_stage_phase_batch(
                         store,
@@ -635,7 +691,6 @@ class FullAuditOrchestrator:
         if (
             self.stage_batch is None
             or self.stage_batch.stage_id != "E2"
-            or self.stage_batch.phase_id != "E2-BLIND"
         ):
             self.prepare_e2_blind_orchestration()
 
@@ -653,13 +708,27 @@ class FullAuditOrchestrator:
             and lane.completion_status != "LANE_COMPLETED"
         ]
         if missing or blocked:
+            phase = self.stage_batch.phase_id
+            next_action_by_phase = {
+                "E2-BLIND": "DELIVER_OR_IMPORT_E2_BLIND_RESULTS",
+                "E2-REVEAL": "DELIVER_OR_IMPORT_E2_REVEAL_RESULTS",
+                "E2-SHADOW": "DELIVER_OR_IMPORT_E2_SHADOW_RESULTS",
+                "E2-CONTRADICTION": (
+                    "DELIVER_OR_IMPORT_E2_CONTRADICTION_RESULTS"
+                ),
+            }
+            if phase not in next_action_by_phase:
+                raise ValidationError(
+                    "UNSUPPORTED_E2_PHASE",
+                    phase,
+                )
             return {
                 "status": "WAITING_EXTERNAL_RESULTS",
                 "current_stage": "E2",
-                "current_phase": "E2-BLIND",
+                "current_phase": phase,
                 "missing_lanes": missing,
                 "blocked_lanes": blocked,
-                "next_action": "DELIVER_OR_IMPORT_E2_BLIND_RESULTS",
+                "next_action": next_action_by_phase[phase],
                 "packages": {
                     slot: str(job.package_zip_path)
                     for slot, job in self.stage_batch.jobs.items()
@@ -722,14 +791,36 @@ class FullAuditOrchestrator:
                 self.stage_inbox,
             ).finalize()
             if not finalization.stage_completed:
+                contradiction_batch = (
+                    self.prepare_e2_contradiction_orchestration(
+                        finalization.contradiction_refs
+                    )
+                )
                 return {
-                    "status": "E2_CONTRADICTION_PROTOCOL_REQUIRED",
+                    "status": "WAITING_EXTERNAL_RESULTS",
                     "current_stage": "E2",
-                    "current_phase": "E2-SHADOW",
+                    "current_phase": "E2-CONTRADICTION",
                     "shadow_conflict_claim_digests": list(
                         finalization.shadow_conflict_claim_digests
                     ),
-                    "next_action": finalization.next_action,
+                    "contradiction_refs": list(
+                        finalization.contradiction_refs
+                    ),
+                    "contradiction_commit_seq": (
+                        finalization.accepted_commit_seq
+                    ),
+                    "missing_lanes": list(
+                        contradiction_batch.lane_slots
+                    ),
+                    "next_action": (
+                        "DELIVER_OR_IMPORT_E2_CONTRADICTION_RESULTS"
+                    ),
+                    "packages": {
+                        slot: str(job.package_zip_path)
+                        for slot, job in (
+                            contradiction_batch.jobs.items()
+                        )
+                    },
                 }
             return {
                 "status": "E2_COMPLETED",
@@ -743,6 +834,41 @@ class FullAuditOrchestrator:
                 ),
                 "already_finalized": (
                     finalization.already_finalized
+                ),
+                "next_action": "PREPARE_E3_BLIND_NOVELTY",
+            }
+
+        if self.stage_batch.phase_id == "E2-CONTRADICTION":
+            resolution = E2ContradictionResolutionService(
+                TransactionalHistoryStore(self.active_store_path),
+                self.stage_batch,
+                self.stage_inbox,
+            ).resolve()
+            if not resolution.stage_completed:
+                return {
+                    "status": "E2_BLOCKED_BY_CONTRADICTION",
+                    "current_stage": "E2",
+                    "current_phase": "E2-CONTRADICTION",
+                    "resulting_status_by_prior_digest": (
+                        resolution.resulting_status_by_prior_digest
+                    ),
+                    "successor_contradiction_refs": list(
+                        resolution.successor_contradiction_refs
+                    ),
+                    "next_action": resolution.next_action,
+                }
+            return {
+                "status": "E2_COMPLETED",
+                "current_stage": "E2",
+                "next_stage": "E3",
+                "stage_completion_ref": (
+                    resolution.stage_completion_ref
+                ),
+                "completion_commit_seq": (
+                    resolution.stage_completion_commit_seq
+                ),
+                "already_finalized": (
+                    resolution.already_resolved
                 ),
                 "next_action": "PREPARE_E3_BLIND_NOVELTY",
             }
