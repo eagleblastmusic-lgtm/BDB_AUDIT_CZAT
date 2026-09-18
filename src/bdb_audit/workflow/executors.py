@@ -12,6 +12,7 @@ class ExecutorProfileDefinition:
     default_model: str
     available_models: tuple[str, ...]
     delivery_profile: str
+    max_isolation_assurance: str
     description: str
 
 
@@ -22,6 +23,7 @@ EXECUTION_MODES: dict[str, ExecutorProfileDefinition] = {
         default_model="Sol 5.6",
         available_models=("Sol 5.6",),
         delivery_profile="ZIP_PROMPT_CLIPBOARD",
+        max_isolation_assurance="DECLARED",
         description="External audit via dedicated ChatGPT sessions with package ZIP and prompt",
     ),
     "Antigravity": ExecutorProfileDefinition(
@@ -30,6 +32,7 @@ EXECUTION_MODES: dict[str, ExecutorProfileDefinition] = {
         default_model="Flash 3.7",
         available_models=("Flash 3.7",),
         delivery_profile="ANTIGRAVITY_AGENT_SESSION",
+        max_isolation_assurance="DECLARED",
         description="Autonomous audit execution using Antigravity agentic platform",
     ),
     "Codex": ExecutorProfileDefinition(
@@ -43,6 +46,7 @@ EXECUTION_MODES: dict[str, ExecutorProfileDefinition] = {
             "Sol 5.6 ultra",
         ),
         delivery_profile="CODEX_EXECUTION_HARNESS",
+        max_isolation_assurance="DECLARED",
         description="Deep reasoning audit execution via Codex engine",
     ),
 }
