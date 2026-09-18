@@ -26,7 +26,7 @@ env:
   CANDIDATE_REPOSITORY: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
 
 concurrency:
-  group: v2-0-3-qualification-${{ github.event_name }}-${{ github.ref }}
+  group: v2-0-3-qualification-r2-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
