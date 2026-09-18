@@ -15,6 +15,7 @@ from bdb_audit.workflow.manual_stage import (
     prepare_stage_phase_batch,
 )
 from bdb_audit.workflow.source_target import ResolvedSource
+from bdb_audit.workflow.read_models import current_accepted_cut
 
 
 LANES = (
@@ -154,22 +155,7 @@ def test_phase_inbox_accepts_order_independent_results_without_stage_completion(
     preexisting = len(
         store.accepted_records(
             "stage_completion",
-            {
-                "tag": "ACCEPTED_HISTORY_CUT",
-                "campaign_id": store.head().campaign_id,
-                "accepted_head_seq": store.head().commit_seq,
-                "accepted_head_hash": store.head().commit_hash,
-                "governing_policy_ref": (
-                    store.commits()[-1][
-                        "governing_policy_ref"
-                    ]
-                ),
-                "governing_spec_refs": (
-                    store.commits()[-1][
-                        "governing_spec_refs"
-                    ]
-                ),
-            },
+            current_accepted_cut(store),
         )
     )
     paths = [
@@ -193,9 +179,6 @@ def test_phase_inbox_accepts_order_independent_results_without_stage_completion(
     )
     assert summary.missing_lanes == []
     # Phase transport does not itself accept E2 StageCompletion.
-    from bdb_audit.workflow.read_models import (
-        current_accepted_cut,
-    )
     current = current_accepted_cut(store)
     assert len(
         store.accepted_records(
