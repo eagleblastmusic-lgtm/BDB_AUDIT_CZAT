@@ -19,11 +19,33 @@ from ..orchestration.native_ensemble import E1_LANE_SLOTS
 from ..orchestration.templates import TemplateRegistry
 from .executors import get_executor_profile
 from .inbox import E1ResultInbox, ImportedResultSummary
+from .manual_stage import (
+    ImportedStagePhaseSummary,
+    StageBatch,
+    StageLaneDefinition,
+    StageResultInbox,
+    prepare_stage_phase_batch,
+)
 from .package_resume import load_e1_batch
 from .packaging import E1Batch, prepare_e1_batch
+from .stage_resume import load_stage_phase_batch
 from .platform import DefaultPlatformAdapter, PlatformAdapter
 from .settings import SettingsManager, UserSettings
 from .source_target import ResolvedSource, resolve_source_identity
+
+
+E2_BLIND_LANES = (
+    StageLaneDefinition(
+        "E2-CONVERGENCE",
+        "Blind verification and convergence precursor",
+        "BLIND_VERIFY_AND_CONVERGE",
+    ),
+    StageLaneDefinition(
+        "E2-ADJUDICATION",
+        "Blind falsification and adjudication precursor",
+        "BLIND_FALSIFY_AND_ADJUDICATE",
+    ),
+)
 
 
 @dataclass(frozen=True)
@@ -60,6 +82,8 @@ class FullAuditOrchestrator:
         self.resolved_source: ResolvedSource | None = None
         self.e1_batch: E1Batch | None = None
         self.e1_inbox: E1ResultInbox | None = None
+        self.stage_batch: StageBatch | None = None
+        self.stage_inbox: StageResultInbox | None = None
 
     def _artifact_root(self) -> Path:
         if self.active_store_path is None:
@@ -242,6 +266,86 @@ class FullAuditOrchestrator:
         self.e1_inbox = E1ResultInbox(store, batch)
         return batch
 
+    def prepare_e2_blind_orchestration(self) -> StageBatch:
+        """Prepare the first real E2 external phase without revealing E1 claims."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        status = self.api.get_campaign_status(self.active_store_path)
+        if "E1" not in status.get("stages_completed", []):
+            raise ValidationError(
+                "PREDECESSOR_STAGE_NOT_COMPLETED",
+                "E1 must be completed before E2 blind work",
+            )
+        if "E2" not in status.get("stages_prepared", []):
+            self.api.prepare_stage(self.active_store_path, "E2")
+
+        status = self.api.get_campaign_status(self.active_store_path)
+        lanes_prepared = set(status.get("lanes_prepared", []))
+        for definition in E2_BLIND_LANES:
+            lane_key = f"lane_E2_{definition.lane_slot}"
+            if lane_key not in lanes_prepared:
+                self.api.prepare_lane(
+                    self.active_store_path,
+                    "E2",
+                    definition.lane_slot,
+                )
+
+        store = TransactionalHistoryStore(self.active_store_path)
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E2",
+            phase_id="E2-BLIND",
+            lane_definitions=E2_BLIND_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_BLIND_LANES
+            ),
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(store, batch)
+        return batch
+
+    def deliver_stage_lane_to_user(self, slot: str) -> dict[str, Any]:
+        """Deliver one already accepted E2+ stage assignment/package."""
+        if self.stage_batch is None:
+            raise ValidationError("STAGE_BATCH_NOT_PREPARED")
+        job = self.stage_batch.get_job(slot)
+        clipboard_ok = False
+        explorer_ok = False
+        if self.settings.auto_copy_clipboard:
+            clipboard_ok = self.platform.copy_to_clipboard(job.prompt_text)
+        if self.settings.auto_open_explorer:
+            explorer_ok = self.platform.open_and_select(job.package_zip_path)
+        return {
+            "stage_id": job.stage_id,
+            "phase_id": job.phase_id,
+            "lane_slot": slot,
+            "package_zip_path": str(job.package_zip_path),
+            "package_zip_name": job.package_zip_path.name,
+            "assignment_ref": dict(job.assignment_ref),
+            "attempt_ref": dict(job.attempt_ref),
+            "prompt_copied": (
+                clipboard_ok if self.settings.auto_copy_clipboard else None
+            ),
+            "explorer_selected": (
+                explorer_ok if self.settings.auto_open_explorer else None
+            ),
+        }
+
+    def import_stage_results(
+        self,
+        zip_paths: Sequence[Path | str],
+    ) -> ImportedStagePhaseSummary:
+        if self.stage_inbox is None:
+            raise ValidationError("STAGE_RESULT_INBOX_NOT_INITIALIZED")
+        return self.stage_inbox.ingest_multiple_zips(zip_paths)
+
     def deliver_lane_to_user(self, slot: str) -> dict[str, Any]:
         """Deliver one already accepted assignment/package through the UI adapter."""
         if not self.e1_batch:
@@ -299,6 +403,8 @@ class FullAuditOrchestrator:
         except ValidationError as exc:
             self.e1_batch = None
             self.e1_inbox = None
+            self.stage_batch = None
+            self.stage_inbox = None
             return {
                 "status": "ERROR",
                 "error": exc.code,
@@ -307,49 +413,163 @@ class FullAuditOrchestrator:
             }
 
         accepted_count = sum(
-            1 for lane in self.e1_inbox.lane_statuses.values() if lane.status == "ACCEPTED"
+            1
+            for lane in self.e1_inbox.lane_statuses.values()
+            if lane.status == "ACCEPTED"
         )
         missing = [
-            slot for slot, lane in self.e1_inbox.lane_statuses.items() if lane.status != "ACCEPTED"
+            slot
+            for slot, lane in self.e1_inbox.lane_statuses.items()
+            if lane.status != "ACCEPTED"
         ]
+
+        active_stage = "E1"
+        active_phase = None
+        active_inbox = "E1"
+        if self.e1_inbox.stage_complete:
+            try:
+                stage_batch, stage_source = load_stage_phase_batch(
+                    store,
+                    self._artifact_root(),
+                    stage_id="E2",
+                    phase_id="E2-BLIND",
+                )
+            except ValidationError as exc:
+                if exc.code != "RESUME_STAGE_ASSIGNMENTS_NOT_FOUND":
+                    return {
+                        "status": "ERROR",
+                        "error": exc.code,
+                        "details": str(exc),
+                        "store_path": str(path),
+                    }
+            else:
+                self.stage_batch = stage_batch
+                self.stage_inbox = StageResultInbox(store, stage_batch)
+                self.resolved_source = stage_source
+                active_stage = "E2"
+                active_phase = "E2-BLIND"
+                active_inbox = "STAGE"
+                accepted_count = sum(
+                    1
+                    for lane in self.stage_inbox.lane_statuses.values()
+                    if lane.status == "ACCEPTED"
+                )
+                missing = [
+                    slot
+                    for slot, lane in self.stage_inbox.lane_statuses.items()
+                    if lane.status != "ACCEPTED"
+                ]
+
         return {
             "status": "SUCCESS",
             "campaign_id": campaign_id,
             "store_path": str(path),
-            "current_stage": status.get("current_stage", "E1"),
+            "current_stage": active_stage,
+            "current_phase": active_phase,
+            "active_inbox": active_inbox,
             "accepted_lanes_count": accepted_count,
-            "total_required_lanes": len(E1_LANE_SLOTS),
+            "total_required_lanes": (
+                len(self.stage_batch.jobs)
+                if self.stage_batch is not None
+                else len(E1_LANE_SLOTS)
+            ),
             "missing_lanes": missing,
-            "stage_complete": self.e1_inbox.stage_complete,
-            "source_commit_sha": durable_source.exact_commit_sha,
-            "source_tree_sha": durable_source.exact_tree_sha,
-            "executor_profile": batch.executor_profile,
-            "executor_model": batch.model,
+            "stage_complete": (
+                self.e1_inbox.stage_complete
+                if self.stage_inbox is None
+                else False
+            ),
+            "phase_complete": (
+                self.stage_inbox is not None
+                and all(
+                    lane.status == "ACCEPTED"
+                    and lane.completion_status == "LANE_COMPLETED"
+                    for lane in self.stage_inbox.lane_statuses.values()
+                )
+            ),
+            "source_commit_sha": self.resolved_source.exact_commit_sha,
+            "source_tree_sha": self.resolved_source.exact_tree_sha,
+            "executor_profile": (
+                self.stage_batch.get_job(
+                    next(iter(self.stage_batch.jobs))
+                ).executor_profile
+                if self.stage_batch is not None
+                else batch.executor_profile
+            ),
+            "executor_model": (
+                self.stage_batch.get_job(
+                    next(iter(self.stage_batch.jobs))
+                ).model
+                if self.stage_batch is not None
+                else batch.model
+            ),
         }
 
     def advance_to_next_stage(self) -> dict[str, Any]:
-        """Fail closed at E2 until its real orchestration path exists."""
-        if not self.e1_inbox or not self.e1_inbox.stage_complete:
+        """Advance from completed E1 into the real external E2 blind phase."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        status = self.api.get_campaign_status(self.active_store_path)
+        if "E1" not in status.get("stages_completed", []):
             return {
                 "status": "BLOCKED",
                 "current_stage": "E1",
                 "reason": "E1 is not yet complete",
                 "next_action": "IMPORT_MISSING_E1_RESULTS",
             }
+
+        if "E2" in status.get("stages_completed", []):
+            return {
+                "status": "READY_FOR_NEXT_STAGE",
+                "current_stage": "E2",
+                "next_stage": "E3",
+                "next_action": "PREPARE_E3_EXTERNAL_PHASE",
+            }
+
+        if (
+            self.stage_batch is None
+            or self.stage_batch.stage_id != "E2"
+            or self.stage_batch.phase_id != "E2-BLIND"
+        ):
+            self.prepare_e2_blind_orchestration()
+
+        assert self.stage_batch is not None
+        assert self.stage_inbox is not None
+        missing = [
+            slot
+            for slot, lane in self.stage_inbox.lane_statuses.items()
+            if lane.status != "ACCEPTED"
+        ]
+        blocked = [
+            slot
+            for slot, lane in self.stage_inbox.lane_statuses.items()
+            if lane.status == "ACCEPTED"
+            and lane.completion_status != "LANE_COMPLETED"
+        ]
+        if missing or blocked:
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E2",
+                "current_phase": "E2-BLIND",
+                "missing_lanes": missing,
+                "blocked_lanes": blocked,
+                "next_action": "DELIVER_OR_IMPORT_E2_BLIND_RESULTS",
+                "packages": {
+                    slot: str(job.package_zip_path)
+                    for slot, job in self.stage_batch.jobs.items()
+                },
+            }
+
         return {
-            "status": "HALTED",
-            "current_stage": "E1",
-            "next_stage": "E2",
-            "reason": "E2 automated external delivery pipeline not configured in v2.0.3",
-            "next_action": "NEEDS_IMPLEMENTATION",
+            "status": "READY_FOR_E2_SYNTHESIS",
+            "current_stage": "E2",
+            "current_phase": "E2-BLIND",
+            "next_action": "SEAL_E2_F1_F2_CHECKPOINTS_AND_PREPARE_CONTROLLED_REVEAL",
         }
 
     # Compatibility name retained for tests/UI.
     def advance_after_e1(self) -> dict[str, Any]:
-        result = self.advance_to_next_stage()
-        if result.get("status") == "HALTED" and result.get("next_action") == "NEEDS_IMPLEMENTATION":
-            return {**result, "status": "NEEDS_IMPLEMENTATION"}
-        return result
+        return self.advance_to_next_stage()
 
     def advance_stage(self, stage_id: str | None = None) -> dict[str, Any]:
         """Advance a specific or next incomplete stage via StageService."""
@@ -381,44 +601,46 @@ class FullAuditOrchestrator:
         }
 
     def run_full_audit_workflow(self) -> dict[str, Any]:
-        """Execute complete resumable E1 -> E2 -> E3 -> E4 -> E5 -> STOP -> Conclusion workflow."""
+        """Drive the user workflow only as far as current external evidence permits.
+
+        This method must never synthesize E2-E5 completion in place of the
+        user-visible package -> external audit -> result ZIP workflow.
+        """
         if not self.active_store_path or not self.active_store_path.exists():
             raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
 
         status = self.api.get_campaign_status(self.active_store_path)
         if "E1" not in status.get("stages_prepared", []):
-            self.prepare_e1_orchestration()
-
-        for st in ("E1", "E2", "E3", "E4", "E5"):
-            status = self.api.get_campaign_status(self.active_store_path)
-            if st not in status.get("stages_completed", []):
-                self.advance_stage(st)
-
-        store = TransactionalHistoryStore(self.active_store_path)
-        stop_records = store.accepted_records("stop_evaluation", store.head().as_dict())
-        if not stop_records:
-            stop_res = self.api.evaluate_stop_gate(self.active_store_path)
-        else:
-            stop_res = {"continuation_decision": stop_records[-1]["body"].get("continuation_decision")}
-
-        concl_records = store.accepted_records("campaign_conclusion", store.head().as_dict())
-        if not concl_records:
-            concl_res = self.api.conclude_campaign(self.active_store_path)
-        else:
-            concl_res = {
-                "termination_state": concl_records[-1]["body"].get("termination_state"),
-                "assurance_level": concl_records[-1]["body"].get("assurance_level"),
+            batch = self.prepare_e1_orchestration()
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E1",
+                "missing_lanes": list(batch.lane_slots),
+                "next_action": "DELIVER_OR_IMPORT_E1_RESULTS",
             }
 
-        final_status = self.api.get_campaign_status(self.active_store_path)
-        return {
-            "status": "SUCCESS",
-            "campaign_id": final_status["campaign_id"],
-            "stages_completed": final_status["stages_completed"],
-            "stop_decision": stop_res.get("continuation_decision"),
-            "termination_state": concl_res.get("termination_state"),
-            "campaign_completed": final_status.get("campaign_completed", False),
-        }
+        if self.e1_batch is None or self.e1_inbox is None:
+            store = TransactionalHistoryStore(self.active_store_path)
+            self.e1_batch, durable_source = load_e1_batch(
+                store,
+                self._artifact_root(),
+            )
+            self.resolved_source = durable_source
+            self.e1_inbox = E1ResultInbox(store, self.e1_batch)
+
+        if not self.e1_inbox.stage_complete:
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E1",
+                "missing_lanes": [
+                    slot
+                    for slot, lane in self.e1_inbox.lane_statuses.items()
+                    if lane.status != "ACCEPTED"
+                ],
+                "next_action": "DELIVER_OR_IMPORT_E1_RESULTS",
+            }
+
+        return self.advance_to_next_stage()
 
     def get_status(self) -> dict[str, Any]:
         if not self.active_store_path:
