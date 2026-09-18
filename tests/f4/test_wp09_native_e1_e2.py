@@ -194,7 +194,13 @@ def test_execute_e2_convergence_deduplication_and_contradiction():
     assert len(e2_result.contradiction_revisions) == 1
     contra = e2_result.contradiction_revisions[0]
     assert contra.status == "OPEN"
-    assert len(contra.contradicting_evidence_refs) == 2
+    assert len(
+        contra.supporting_evidence_qualification_refs
+    ) == 1
+    assert len(
+        contra.opposing_evidence_qualification_refs
+    ) == 1
+    assert len(contra.claim_revision_refs) >= 2
 
 
 def test_missing_evidence_never_confirms_claim():
