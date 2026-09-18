@@ -18,6 +18,7 @@ from ..history.store import TransactionalHistoryStore
 from ..orchestration.native_ensemble import E1_LANE_SLOTS
 from ..orchestration.templates import TemplateRegistry
 from .executors import get_executor_profile
+from .e2_checkpoint import E2BlindCheckpointService
 from .inbox import E1ResultInbox, ImportedResultSummary
 from .manual_stage import (
     ImportedStagePhaseSummary,
@@ -560,11 +561,19 @@ class FullAuditOrchestrator:
                 },
             }
 
+        checkpoint = E2BlindCheckpointService(
+            TransactionalHistoryStore(self.active_store_path),
+            self.stage_batch,
+            self.stage_inbox,
+        ).seal()
         return {
-            "status": "READY_FOR_E2_SYNTHESIS",
+            "status": "E2_BLIND_CHECKPOINTED",
             "current_stage": "E2",
             "current_phase": "E2-BLIND",
-            "next_action": "SEAL_E2_F1_F2_CHECKPOINTS_AND_PREPARE_CONTROLLED_REVEAL",
+            "checkpoint_commit_seq": checkpoint.accepted_commit_seq,
+            "checkpoint_refs": checkpoint.checkpoint_refs,
+            "already_sealed": checkpoint.already_sealed,
+            "next_action": "PREPARE_E2_CONTROLLED_REVEAL",
         }
 
     # Compatibility name retained for tests/UI.
