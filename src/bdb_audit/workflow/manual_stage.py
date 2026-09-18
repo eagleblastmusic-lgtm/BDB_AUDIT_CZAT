@@ -1083,6 +1083,59 @@ beyond the stated bounds/environment and do not convert absence of findings
 into evidence of correctness.
 """
 
+    elif stage_id == "E5" and phase_id == "E5A-ATTACK":
+        output_contract = """
+
+E5A ATTACK / SYNTHESIS OUTPUT CONTRACT
+This is pre-candidate adversarial work. Do not emit challenger results.
+
+For E5-A-INTERACTION return outputs.e5a_interaction_results as a non-empty
+list. Each item requires status PASS|FAIL|INCONCLUSIVE|BLOCKED and a bounded
+rationale. A FAIL must also be represented in findings[].
+
+For E5-A-MUTATION return outputs.e5a_mutation_results covering all three
+mutation_class values IMPLEMENTATION, ORACLE, SPECIFICATION. Each item requires
+status MUTANT_KILLED|MUTANT_SURVIVED|MUTATION_NOT_ACTIVATED|
+REDUNDANT_OBSERVER|HARNESS_FAILURE|INVALID_MUTATION|INCONCLUSIVE, rationale,
+and activation_witness for MUTANT_KILLED or MUTANT_SURVIVED. A survived mutant
+must also be represented in findings[].
+
+For E5-A-CALIBRATION return outputs.e5a_calibration with status
+QUALIFIED|INCONCLUSIVE|BLOCKED, profile_ref, per_class_metrics, unknown_count,
+and rationale.
+
+INCONCLUSIVE/BLOCKED interaction or calibration, and non-activated/harness/
+invalid/inconclusive mutation work, cannot silently become candidate closure.
+Any findings[] must be canonically adjudicated before CandidateAssuranceCase.
+"""
+
+    elif stage_id == "E5" and phase_id == "E5B-CHALLENGE":
+        output_contract = """
+
+E5B DUAL CHALLENGE OUTPUT CONTRACT
+Read only the authorized frozen-candidate context in CONTEXT/. Never use prior
+challenger results. Your lane role is fixed by the assignment.
+
+Return outputs.challenger_result:
+{
+  "status": "NO_MATERIAL_COUNTEREVIDENCE|MATERIAL_COUNTEREVIDENCE_FOUND|INCONCLUSIVE|BLOCKED",
+  "candidate_revision_digest": "<exact candidate digest from context>",
+  "challenge_assignment_revision_digest": "<exact assignment digest for this lane>",
+  "challenged_revision_digests": ["<only refs present in the frozen candidate>"],
+  "reason_codes": ["<bounded reason codes>"]
+}
+
+E5-B1 is the FALSE_POSITIVE_SKEPTIC: try to refute current material findings,
+SOUND/severity/evidence claims and alternative explanations.
+E5-B2 is the FALSE_NEGATIVE_HUNTER: search negative space for one material or
+release-changing mechanism missed by E1-E5A.
+
+MATERIAL_COUNTEREVIDENCE_FOUND must include concrete findings[]. Do not claim
+NO_MATERIAL_COUNTEREVIDENCE merely because the allotted search found nothing;
+report INCONCLUSIVE or BLOCKED when the required challenge could not be
+qualified.
+"""
+
     return f"""# BDB AUDIT v2.0.3 - {stage_id} / {phase_id} / {definition.lane_slot}
 
 You are executing one bounded external audit lane for BDB Audit v2.

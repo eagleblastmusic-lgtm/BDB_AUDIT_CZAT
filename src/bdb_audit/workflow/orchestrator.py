@@ -49,6 +49,15 @@ from .stage_finalize import (
     ExternalStageFinalizationService,
     E4FinalizationService,
 )
+from .e5_runtime import (
+    CandidateAssuranceCaseService,
+    E5A_LANES,
+    E5B_LANES,
+    E5_ALL_LANE_SLOTS,
+    E5ChallengeAuthorizationService,
+    E5ChallengerResultService,
+    E5FinalizationService,
+)
 from .platform import DefaultPlatformAdapter, PlatformAdapter
 from .settings import SettingsManager, UserSettings
 from .source_target import ResolvedSource, resolve_source_identity
@@ -918,12 +927,7 @@ class FullAuditOrchestrator:
     def _advance_e4_external(self) -> dict[str, Any]:
         status = self.api.get_campaign_status(self.active_store_path)
         if "E4" in status.get("stages_completed", []):
-            return {
-                "status": "READY_FOR_NEXT_STAGE",
-                "current_stage": "E4",
-                "next_stage": "E5",
-                "next_action": "PREPARE_E5A_ATTACK",
-            }
+            return self._advance_e5_external()
         if self.stage_batch is None or self.stage_batch.stage_id != "E4":
             self.prepare_e4_orchestration()
         assert self.stage_batch is not None
@@ -960,6 +964,276 @@ class FullAuditOrchestrator:
             "already_finalized": finalized.already_finalized,
             "next_action": finalized.next_action,
         }
+
+    def _prepare_e5_lane_specs(self) -> None:
+        assert self.active_store_path is not None
+        status = self.api.get_campaign_status(
+            self.active_store_path
+        )
+        if "E5" not in status.get("stages_prepared", []):
+            self.api.prepare_stage(
+                self.active_store_path, "E5"
+            )
+            status = self.api.get_campaign_status(
+                self.active_store_path
+            )
+        lanes_prepared = set(
+            status.get("lanes_prepared", [])
+        )
+        for definition in (*E5A_LANES, *E5B_LANES):
+            lane_key = (
+                f"lane_E5_{definition.lane_slot}"
+            )
+            if lane_key not in lanes_prepared:
+                self.api.prepare_lane(
+                    self.active_store_path,
+                    "E5",
+                    definition.lane_slot,
+                )
+
+    def prepare_e5a_orchestration(self) -> StageBatch:
+        """Prepare pre-candidate E5A attack/mutation/calibration work."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+        status = self.api.get_campaign_status(
+            self.active_store_path
+        )
+        if "E4" not in status.get("stages_completed", []):
+            raise ValidationError(
+                "PREDECESSOR_STAGE_NOT_COMPLETED",
+                "E4 must be completed before E5A",
+            )
+        self._prepare_e5_lane_specs()
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E5",
+            phase_id="E5A-ATTACK",
+            lane_definitions=E5A_LANES,
+            all_stage_lane_slots=E5_ALL_LANE_SLOTS,
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(
+            store, batch
+        )
+        return batch
+
+    def prepare_e5b_orchestration(
+        self,
+        candidate=None,
+    ) -> StageBatch:
+        """Accept challenger assignments and publish exact-candidate E5B packages."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+        self._prepare_e5_lane_specs()
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        candidate_service = CandidateAssuranceCaseService(
+            store
+        )
+        if candidate is None:
+            candidate = (
+                candidate_service.current_candidate().candidate
+            )
+        authorization = E5ChallengeAuthorizationService(
+            store,
+            candidate=candidate,
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+        ).authorize()
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E5",
+            phase_id="E5B-CHALLENGE",
+            lane_definitions=E5B_LANES,
+            all_stage_lane_slots=E5_ALL_LANE_SLOTS,
+            authorized_context=authorization,
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(
+            store, batch
+        )
+        return batch
+
+    def _advance_e5_external(self) -> dict[str, Any]:
+        assert self.active_store_path is not None
+        status = self.api.get_campaign_status(
+            self.active_store_path
+        )
+        if "E5" in status.get("stages_completed", []):
+            return {
+                "status": "READY_FOR_FINAL_STOP",
+                "current_stage": "E5",
+                "next_action": (
+                    "EVALUATE_FINAL_POST_E5_STOP"
+                ),
+            }
+
+        if (
+            self.stage_batch is None
+            or self.stage_batch.stage_id != "E5"
+        ):
+            self.prepare_e5a_orchestration()
+
+        assert self.stage_batch is not None
+        assert self.stage_inbox is not None
+
+        missing = [
+            slot
+            for slot, lane in (
+                self.stage_inbox.lane_statuses.items()
+            )
+            if lane.status != "ACCEPTED"
+        ]
+        blocked = [
+            slot
+            for slot, lane in (
+                self.stage_inbox.lane_statuses.items()
+            )
+            if lane.status == "ACCEPTED"
+            and lane.completion_status
+            != "LANE_COMPLETED"
+        ]
+        if missing or blocked:
+            phase = self.stage_batch.phase_id
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E5",
+                "current_phase": phase,
+                "missing_lanes": missing,
+                "blocked_lanes": blocked,
+                "next_action": (
+                    "DELIVER_OR_IMPORT_E5A_RESULTS"
+                    if phase == "E5A-ATTACK"
+                    else "DELIVER_OR_IMPORT_E5B_RESULTS"
+                ),
+                "packages": {
+                    slot: str(job.package_zip_path)
+                    for slot, job in (
+                        self.stage_batch.jobs.items()
+                    )
+                },
+            }
+
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        if self.stage_batch.phase_id == "E5A-ATTACK":
+            try:
+                frozen = CandidateAssuranceCaseService(
+                    store
+                ).freeze(
+                    self.stage_batch,
+                    self.stage_inbox,
+                )
+            except ValidationError as exc:
+                if exc.code in {
+                    "E5A_FINDINGS_REQUIRE_ADJUDICATION",
+                    "CANDIDATE_SCOPE_INVENTORY_REQUIRED",
+                }:
+                    return {
+                        "status": "BLOCKED",
+                        "current_stage": "E5",
+                        "current_phase": "E5A-ATTACK",
+                        "reason": str(exc),
+                        "next_action": (
+                            "ADJUDICATE_E5A_FINDINGS"
+                            if exc.code
+                            == "E5A_FINDINGS_REQUIRE_ADJUDICATION"
+                            else "BUILD_OR_QUALIFY_SCOPE_INVENTORY"
+                        ),
+                    }
+                raise
+            e5b = self.prepare_e5b_orchestration(
+                frozen.candidate
+            )
+            return {
+                "status": "E5A_CANDIDATE_FROZEN",
+                "current_stage": "E5",
+                "current_phase": "E5B-CHALLENGE",
+                "candidate_ref": frozen.candidate_ref,
+                "candidate_commit_seq": (
+                    frozen.accepted_commit_seq
+                ),
+                "candidate_already_frozen": (
+                    frozen.already_frozen
+                ),
+                "next_action": (
+                    "DELIVER_OR_IMPORT_E5B_RESULTS"
+                ),
+                "packages": {
+                    slot: str(job.package_zip_path)
+                    for slot, job in e5b.jobs.items()
+                },
+            }
+
+        if (
+            self.stage_batch.phase_id
+            == "E5B-CHALLENGE"
+        ):
+            challenger_summary = (
+                E5ChallengerResultService(
+                    store,
+                    self.stage_batch,
+                    self.stage_inbox,
+                ).materialize()
+            )
+            try:
+                completion = E5FinalizationService(
+                    store
+                ).finalize()
+            except ValidationError as exc:
+                if (
+                    exc.code
+                    == "E5_CHALLENGER_ADJUDICATION_REQUIRED"
+                ):
+                    return {
+                        "status": "BLOCKED",
+                        "current_stage": "E5",
+                        "current_phase": "E5B-CHALLENGE",
+                        "reason": str(exc),
+                        "challenger_statuses": (
+                            challenger_summary.statuses
+                        ),
+                        "next_action": (
+                            "ADJUDICATE_OR_REVISE_CANDIDATE"
+                        ),
+                    }
+                raise
+            return {
+                "status": "E5_COMPLETED",
+                "current_stage": "E5",
+                "stage_completion_ref": (
+                    completion.stage_completion_ref
+                ),
+                "completion_commit_seq": (
+                    completion.accepted_commit_seq
+                ),
+                "challenger_statuses": (
+                    challenger_summary.statuses
+                ),
+                "next_action": completion.next_action,
+            }
+
+        raise ValidationError(
+            "UNSUPPORTED_E5_PHASE",
+            self.stage_batch.phase_id,
+        )
 
     def deliver_stage_lane_to_user(self, slot: str) -> dict[str, Any]:
         """Deliver one already accepted E2+ stage assignment/package."""
@@ -1085,8 +1359,14 @@ class FullAuditOrchestrator:
             candidate_stage_phases: tuple[
                 tuple[str, str], ...
             ]
-            if "E4" in completed_stages:
+            if "E5" in completed_stages:
                 candidate_stage_phases = ()
+                active_stage = "E5"
+            elif "E4" in completed_stages:
+                candidate_stage_phases = (
+                    ("E5", "E5B-CHALLENGE"),
+                    ("E5", "E5A-ATTACK"),
+                )
                 active_stage = "E5"
             elif "E3" in completed_stages:
                 candidate_stage_phases = (("E4", "E4-DEEPEN"),)

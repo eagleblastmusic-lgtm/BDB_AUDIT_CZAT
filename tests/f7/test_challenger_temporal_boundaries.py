@@ -47,81 +47,31 @@ def test_r5n50_assignment_and_result_same_commit_are_rejected() -> None:
     assert exc.value.code == "PRIOR_ACCEPTED_REFERENCE_REQUIRED"
 
 
-def test_e5_service_materializes_candidate_assignments_results_and_completion_in_order(
+def test_e5_legacy_qualify_stage_fails_closed_without_external_challengers(
     tmp_path: Path,
 ) -> None:
     target = tmp_path / "target"
     target.mkdir()
-    (target / "README.md").write_text("# R5N-50 target\n", encoding="utf-8")
-    (target / "app.py").write_text("def run(): return 50\n", encoding="utf-8")
+    (target / "README.md").write_text(
+        "# R5N-50 target\n", encoding="utf-8"
+    )
     store_path = tmp_path / "campaign.sqlite"
 
     api = AuditOperationApi()
-    api.create_campaign(store_path, seed="r5n50", target_repo=str(target))
-
+    api.create_campaign(
+        store_path,
+        seed="r5n50",
+        target_repo=str(target),
+    )
     for stage in ("E1", "E2", "E3", "E4"):
         api.prepare_stage(store_path, stage)
         result = api.qualify_stage(store_path, stage)
         assert result["status"] == "SUCCESS"
 
     api.prepare_stage(store_path, "E5")
-    result = api.qualify_stage(store_path, "E5")
-    assert result["status"] == "SUCCESS"
+    with pytest.raises(
+        ValidationError,
+        match="E5_EXTERNAL_CHALLENGER_RUNTIME_REQUIRED",
+    ):
+        api.qualify_stage(store_path, "E5")
 
-    store = TransactionalHistoryStore(store_path)
-    cut = current_accepted_cut(store)
-
-    candidate = max(
-        store.accepted_records("candidate_assurance_case", cut),
-        key=lambda record: int(record["accepted_seq"]),
-    )
-    candidate_digest = candidate["ref"]["revision_digest"]
-
-    assignments = [
-        record
-        for record in store.accepted_records("challenger_assignment", cut)
-        if record["body"]["candidate_assurance_case_ref"]["revision_digest"]
-        == candidate_digest
-    ]
-    assignment_digests = {record["ref"]["revision_digest"] for record in assignments}
-    results = [
-        record
-        for record in store.accepted_records("challenger_result", cut)
-        if record["body"]["challenge_assignment_ref"]["revision_digest"]
-        in assignment_digests
-    ]
-    completion = max(
-        store.accepted_records("stage_completion", cut),
-        key=lambda record: int(record["accepted_seq"]),
-    )
-
-    assert len(assignments) == 2
-    assert len(results) == 2
-
-    candidate_seq = int(candidate["accepted_seq"])
-    assignment_seqs = {int(record["accepted_seq"]) for record in assignments}
-    result_seqs = {int(record["accepted_seq"]) for record in results}
-    completion_seq = int(completion["accepted_seq"])
-
-    assert len(assignment_seqs) == 1
-    assert len(result_seqs) == 1
-    assignment_seq = next(iter(assignment_seqs))
-    result_seq = next(iter(result_seqs))
-
-    assert candidate_seq < assignment_seq < result_seq < completion_seq
-
-    for assignment in assignments:
-        body = assignment["body"]
-        assert body["assignment_input_history_cut"]["accepted_head_seq"] == candidate_seq
-        assert body["candidate_assurance_case_ref"]["revision_digest"] == candidate_digest
-        assert body["candidate_assurance_case_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
-
-    for challenger_result in results:
-        body = challenger_result["body"]
-        assert body["result_input_history_cut"]["accepted_head_seq"] == assignment_seq
-        assert body["challenge_assignment_ref"]["revision_digest"] in assignment_digests
-        assert body["challenge_assignment_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
-        assert body["candidate_assurance_case_ref"]["revision_digest"] == candidate_digest
-        assert body["candidate_assurance_case_ref"]["ref_class"] == "PRIOR_ACCEPTED_ONLY"
-
-    assert completion["body"]["input_history_cut"]["accepted_head_seq"] == result_seq

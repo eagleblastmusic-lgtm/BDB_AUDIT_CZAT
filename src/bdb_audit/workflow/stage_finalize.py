@@ -210,6 +210,13 @@ class ExternalStageFinalizationService:
     ) -> None:
         """Hook for stage-specific output-contract validation."""
 
+    def additional_required_output_refs(
+        self,
+        cut: dict[str, Any],
+    ) -> Sequence[dict[str, Any]]:
+        """Hook for prior-accepted stage outputs beyond lane proposals."""
+        return ()
+
     def finalize(self) -> ExternalStageFinalizationSummary:
         cut, prior_commit = _current_cut(self.store)
         stage_spec = self._stage_spec(cut)
@@ -324,6 +331,10 @@ class ExternalStageFinalizationService:
                 )
                 for row in completion_rows
             ]
+        )
+        extra_output_refs.extend(
+            dict(ref)
+            for ref in self.additional_required_output_refs(cut)
         )
         required_outputs = canonical_reference_set(
             [*result_refs, *extra_output_refs]

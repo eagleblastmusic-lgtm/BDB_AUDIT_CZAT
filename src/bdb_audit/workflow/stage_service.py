@@ -11,12 +11,6 @@ from pathlib import Path
 import time
 from typing import Any, Mapping, Sequence
 
-from ..assurance.candidate_case import CandidateAssuranceCaseBuilder
-from ..assurance.challenger import (
-    ChallengerAssignment,
-    ChallengerResult,
-    E5ChallengerOrchestrator,
-)
 from ..history.objects import CommandEnvelope
 from ..coordinator import Coordinator
 from ..core.canonical_json import canonical_bytes
@@ -41,51 +35,6 @@ class StageService:
     def __init__(self, store: TransactionalHistoryStore):
         self.store = store
         self.coordinator = Coordinator(store)
-
-    def _accept_e5_boundary(self, objects: Sequence[CanonicalObject], scope: str):
-        """Accept one E5 temporal boundary against the current accepted head.
-
-        R5.3 requires CandidateAssuranceCase -> ChallengerAssignment ->
-        ChallengerResult to cross real accepted-history boundaries.  This helper
-        creates a dedicated command for each boundary without changing the
-        public ``qualify_stage`` API.
-        """
-        head = self.store.head()
-        if head is None:
-            raise ValidationError("EMPTY_STORE", "E5 boundary requires an accepted campaign head")
-
-        conn = self.store._connect()
-        try:
-            row = conn.execute("SELECT body FROM commits WHERE commit_hash=?", (head.commit_hash,)).fetchone()
-            if row is None:
-                raise ValidationError("ACCEPTED_HEAD_COMMIT_MISSING")
-            prior_commit = json.loads(row[0])
-        finally:
-            conn.close()
-
-        material = "|".join(obj.digest for obj in objects)
-        digest = hashlib.sha256(
-            f"{head.campaign_id}_{scope}_{head.commit_seq}_{material}".encode("utf-8")
-        ).hexdigest()
-        command_id = (
-            f"command_{digest[:8]}-{digest[8:12]}-4{digest[13:16]}-"
-            f"8{digest[17:20]}-{digest[20:32]}"
-        )
-        cmd = CommandEnvelope(
-            command_id=command_id,
-            command_kind="RECORD_FOUNDATION_FACT",
-            actor_ref=prior_commit.get("actor_ref", "installation-owner"),
-            expected_parent_head={"tag": "ACCEPTED_HEAD_REF", **head.as_dict()},
-            governing_policy_ref=prior_commit.get(
-                "governing_policy_ref", "pin:initial_governing_policy_ref"
-            ),
-            governing_spec_refs=tuple(
-                prior_commit.get("governing_spec_refs", ("pin:initial_transition_profile_ref",))
-            ),
-            idempotency_scope=f"{scope}_{digest[:16]}",
-            campaign_ref=head.campaign_id,
-        )
-        return self.coordinator.accept(cmd, immutable_objects=list(objects))
 
     def qualify_and_complete_stage(
         self,
@@ -294,148 +243,14 @@ class StageService:
                 if not ev_refs:
                     f["claim_status"] = "UNKNOWN"
         elif stage_key == "E5":
-            # Retrieve real source generation from the pre-candidate cut.
-            sg_records = self.store.accepted_records("source_generation", cut)
-            si_records = self.store.accepted_records("source_identity", cut)
-            sg_ref = sg_records[-1]["ref"] if sg_records else (
-                si_records[-1]["ref"] if si_records else _external_ref("source_generation", "0" * 64)
+            raise ValidationError(
+                "E5_EXTERNAL_CHALLENGER_RUNTIME_REQUIRED",
+                (
+                    "E5 completion requires real E5A external results, "
+                    "a frozen CandidateAssuranceCase, and two externally "
+                    "executed E5B challenger results"
+                ),
             )
-
-            inv_records = self.store.accepted_records("inventory_revision", cut)
-            inv_ref = inv_records[-1]["ref"] if inv_records else _external_ref(
-                "inventory_revision", "0" * 64, ref_class="CONTENT_OR_PRIOR"
-            )
-
-            camp_ref = {
-                "kind": "campaign_ref",
-                "revision_digest": hashlib.sha256(head.campaign_id.encode()).hexdigest(),
-                "digest_profile": "BDB-OBJECT-DIGEST-1",
-                "schema_revision_ref": "BDB_TARGET/campaign_ref",
-                "ref_class": "PRIOR_ACCEPTED_ONLY",
-            }
-            claim_set_ref = {
-                "kind": "assurance_claim_set_ref",
-                "revision_digest": "0" * 64,
-                "digest_profile": "BDB-OBJECT-DIGEST-1",
-                "schema_revision_ref": "BDB_TARGET/assurance_claim_set_ref",
-                "ref_class": "CONTENT_OR_PRIOR",
-            }
-
-            cac_builder = CandidateAssuranceCaseBuilder(
-                case_id=new_id("candidate_assurance_case"),
-                campaign_ref=camp_ref,
-                source_generation_ref=sg_ref,
-                candidate_input_history_cut=cut,
-                scope_inventory_ref=inv_ref,
-                assurance_claim_set_ref=claim_set_ref,
-            )
-            cac = cac_builder.build()
-            cac_obj = CanonicalObject(
-                "candidate_assurance_case", cac.body(), logical_id=cac.candidate_assurance_case_id
-            )
-
-            # Boundary 1: operational E5 artifacts and the frozen candidate are
-            # accepted before any challenger assignment exists.
-            candidate_res = self._accept_e5_boundary(
-                [*objects_to_commit, cac_obj],
-                f"e5_candidate_{cac_obj.digest[:16]}",
-            )
-            objects_to_commit = []
-            head = candidate_res.head
-            cut = current_accepted_cut(self.store)
-            cac_prior_ref = dict(cac_obj.as_ref().as_dict(), ref_class="PRIOR_ACCEPTED_ONLY")
-
-            challenger_pol_ref = {
-                "kind": "policy_revision",
-                "revision_digest": "1" * 64,
-                "digest_profile": "BDB-OBJECT-DIGEST-1",
-                "schema_revision_ref": "BDB_TARGET/policy_revision",
-                "ref_class": "HISTORY_CONTEXT_BINDING",
-            }
-            challenger_exec_ref = {
-                "kind": "executor_spec",
-                "revision_digest": "2" * 64,
-                "digest_profile": "BDB-OBJECT-DIGEST-1",
-                "schema_revision_ref": "BDB_TARGET/executor_spec",
-                "ref_class": "HISTORY_CONTEXT_BINDING",
-            }
-
-            asgn_sk = ChallengerAssignment(
-                challenge_assignment_id=new_id("challenger_assignment"),
-                candidate_assurance_case_ref=cac_prior_ref,
-                challenger_type="FALSE_POSITIVE_SKEPTIC",
-                challenge_scope="ALL",
-                challenge_policy_ref=challenger_pol_ref,
-                executor_profile_ref=challenger_exec_ref,
-                assignment_input_history_cut=cut,
-            )
-            asgn_hu = ChallengerAssignment(
-                challenge_assignment_id=new_id("challenger_assignment"),
-                candidate_assurance_case_ref=cac_prior_ref,
-                challenger_type="FALSE_NEGATIVE_HUNTER",
-                challenge_scope="ALL",
-                challenge_policy_ref=challenger_pol_ref,
-                executor_profile_ref=challenger_exec_ref,
-                assignment_input_history_cut=cut,
-            )
-            asgn_sk_obj = CanonicalObject(
-                "challenger_assignment", asgn_sk.body(), logical_id=asgn_sk.challenge_assignment_id
-            )
-            asgn_hu_obj = CanonicalObject(
-                "challenger_assignment", asgn_hu.body(), logical_id=asgn_hu.challenge_assignment_id
-            )
-
-            # Boundary 2: assignments bind only the already accepted candidate.
-            assignment_res = self._accept_e5_boundary(
-                [asgn_sk_obj, asgn_hu_obj],
-                f"e5_assignments_{cac_obj.digest[:16]}",
-            )
-            head = assignment_res.head
-            cut = current_accepted_cut(self.store)
-            asgn_sk_prior_ref = dict(
-                asgn_sk_obj.as_ref().as_dict(), ref_class="PRIOR_ACCEPTED_ONLY"
-            )
-            asgn_hu_prior_ref = dict(
-                asgn_hu_obj.as_ref().as_dict(), ref_class="PRIOR_ACCEPTED_ONLY"
-            )
-
-            res_sk = ChallengerResult(
-                challenger_result_id=new_id("challenger_result"),
-                challenge_assignment_ref=asgn_sk_prior_ref,
-                candidate_assurance_case_ref=cac_prior_ref,
-                result_input_history_cut=cut,
-                status="NO_MATERIAL_COUNTEREVIDENCE",
-            )
-            res_hu = ChallengerResult(
-                challenger_result_id=new_id("challenger_result"),
-                challenge_assignment_ref=asgn_hu_prior_ref,
-                candidate_assurance_case_ref=cac_prior_ref,
-                result_input_history_cut=cut,
-                status="NO_MATERIAL_COUNTEREVIDENCE",
-            )
-            eligible, reasons = E5ChallengerOrchestrator.validate_challenger_results_pair(
-                cac, res_sk, res_hu, asgn_sk, asgn_hu
-            )
-            if not eligible:
-                raise ValidationError(
-                    "CHALLENGER_VALIDATION_FAILED", f"Challengers failed: {reasons}"
-                )
-
-            res_sk_obj = CanonicalObject(
-                "challenger_result", res_sk.body(), logical_id=res_sk.challenger_result_id
-            )
-            res_hu_obj = CanonicalObject(
-                "challenger_result", res_hu.body(), logical_id=res_hu.challenger_result_id
-            )
-
-            # Boundary 3: results bind only assignments already accepted at the
-            # result input cut. StageCompletion is still forbidden here.
-            result_res = self._accept_e5_boundary(
-                [res_sk_obj, res_hu_obj],
-                f"e5_results_{cac_obj.digest[:16]}",
-            )
-            head = result_res.head
-            cut = current_accepted_cut(self.store)
 
         summary = unknown_blocked_summary or {"unknown_surfaces_count": 0, "is_blocked": False}
 
