@@ -10,6 +10,7 @@ from bdb_audit.workflow.settings import SettingsManager
 from bdb_audit.workflow.platform import MockPlatformAdapter
 from bdb_audit.workflow.source_target import ResolvedSource
 from bdb_audit.workflow.orchestrator import FullAuditOrchestrator
+from bdb_audit.workflow.executors import EXECUTION_MODES
 from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
 
 
@@ -273,3 +274,61 @@ def test_advance_does_not_reset_existing_e2_phase_to_blind(
     assert result["status"] == "WAITING_EXTERNAL_RESULTS"
     assert result["current_phase"] == "E2-REVEAL"
     assert result["next_action"] == "DELIVER_OR_IMPORT_E2_REVEAL_RESULTS"
+
+
+def test_advance_stage_never_uses_synthetic_qualify_stage(
+    orchestrator_setup,
+    monkeypatch,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    orch.prepare_e1_orchestration()
+
+    called = {"qualify": False}
+
+    def forbidden_qualify(*args, **kwargs):
+        called["qualify"] = True
+        raise AssertionError("synthetic StageCompletion backdoor used")
+
+    monkeypatch.setattr(
+        orch.api,
+        "qualify_stage",
+        forbidden_qualify,
+    )
+    result = orch.advance_stage("E1")
+    assert called["qualify"] is False
+    assert result["status"] == "WAITING_EXTERNAL_RESULTS"
+    assert result["current_stage"] == "E1"
+
+
+def test_current_executor_profiles_do_not_overclaim_enforced_isolation():
+    assert EXECUTION_MODES
+    for profile in EXECUTION_MODES.values():
+        assert profile.max_isolation_assurance in {
+            "UNKNOWN",
+            "DECLARED",
+            "ENFORCED",
+        }
+        # No current transport adapter records the material boundary receipts
+        # required to truthfully claim ENFORCED isolation.
+        assert profile.max_isolation_assurance != "ENFORCED"
+
+
+def test_e3_blind_preparation_fails_before_package_publication_without_enforced_backend(
+    orchestrator_setup,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    artifacts = orch._artifact_root()
+
+    with pytest.raises(
+        Exception,
+        match="E3_ENFORCED_ISOLATION_BACKEND_REQUIRED",
+    ):
+        orch.prepare_e3_blind_orchestration()
+
+    # Capability refusal happens before E3 assignment/package publication.
+    e3_root = artifacts / orch.api.get_campaign_status(
+        orch.active_store_path
+    )["campaign_id"] / "E3"
+    assert not e3_root.exists()
