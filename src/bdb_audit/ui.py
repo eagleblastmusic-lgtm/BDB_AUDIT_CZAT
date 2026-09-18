@@ -191,6 +191,7 @@ class InteractiveAuditUI:
             "stage_batch",
             None,
         ) is not None
+        summary: Any
         if is_stage_phase:
             summary = self.orchestrator.import_stage_results(files)
             active_batch = self.orchestrator.stage_batch
