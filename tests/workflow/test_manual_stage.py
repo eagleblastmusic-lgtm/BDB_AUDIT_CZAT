@@ -21,12 +21,12 @@ from bdb_audit.workflow.read_models import current_accepted_cut
 
 LANES = (
     StageLaneDefinition(
-        "E2-F1",
+        "E2-CONVERGENCE",
         "Blind verification",
         "BLIND_VERIFY",
     ),
     StageLaneDefinition(
-        "E2-F2",
+        "E2-ADJUDICATION",
         "Blind falsification",
         "BLIND_FALSIFY",
     ),
@@ -126,8 +126,8 @@ def test_phase_packages_share_exact_input_cut_and_distinct_assignments(
     assert batch.stage_id == "E2"
     assert batch.phase_id == "E2-BLIND"
     assert set(batch.jobs) == {
-        "E2-F1",
-        "E2-F2",
+        "E2-CONVERGENCE",
+        "E2-ADJUDICATION",
     }
     cuts = {
         json.dumps(
@@ -161,14 +161,14 @@ def test_phase_inbox_accepts_order_independent_results_without_stage_completion(
     )
     paths = [
         _write_result(
-            tmp / "f2.zip",
+            tmp / "adjudication.zip",
             batch,
-            "E2-F2",
+            "E2-ADJUDICATION",
         ),
         _write_result(
-            tmp / "f1.zip",
+            tmp / "convergence.zip",
             batch,
-            "E2-F1",
+            "E2-CONVERGENCE",
         ),
     ]
     summary = inbox.ingest_multiple_zips(paths)
@@ -193,7 +193,7 @@ def test_wrong_phase_rejected(e2_phase):
     path = _write_result(
         tmp / "wrong-phase.zip",
         batch,
-        "E2-F1",
+        "E2-CONVERGENCE",
         phase_id="E2-REVEAL",
     )
     _, status, reason = inbox.ingest_zip(path)
@@ -206,7 +206,7 @@ def test_exact_retry_is_idempotent(e2_phase):
     path = _write_result(
         tmp / "retry.zip",
         batch,
-        "E2-F1",
+        "E2-CONVERGENCE",
     )
     before = store.head().commit_seq
     assert inbox.ingest_zip(path)[1] == "ACCEPTED"
@@ -313,12 +313,12 @@ def test_distinct_phase_does_not_reuse_blind_assignments(e2_phase):
     )
     reveal_lanes = (
         StageLaneDefinition(
-            "E2-F1",
+            "E2-CONVERGENCE",
             "Re-adjudication after controlled reveal",
             "REVEALED_REVIEW",
         ),
         StageLaneDefinition(
-            "E2-F2",
+            "E2-ADJUDICATION",
             "Falsification after controlled reveal",
             "REVEALED_FALSIFY",
         ),
