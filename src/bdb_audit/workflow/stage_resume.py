@@ -86,10 +86,21 @@ def _load_one(
             f"{path.name}: {exc.code}",
         ) from exc
 
-    if set(members) != _REQUIRED_MEMBERS:
+    member_names = set(members)
+    if not _REQUIRED_MEMBERS.issubset(member_names):
         raise ValidationError(
             "RESUME_STAGE_PACKAGE_MEMBER_SET_INVALID",
-            f"{path.name}: expected {sorted(_REQUIRED_MEMBERS)}, got {sorted(members)}",
+            f"{path.name}: missing required members",
+        )
+    unexpected = {
+        name
+        for name in member_names - _REQUIRED_MEMBERS
+        if not name.startswith("CONTEXT/")
+    }
+    if unexpected:
+        raise ValidationError(
+            "RESUME_STAGE_PACKAGE_MEMBER_SET_INVALID",
+            f"{path.name}: unexpected={sorted(unexpected)}",
         )
 
     try:
@@ -147,10 +158,67 @@ def _load_one(
         raise ValidationError("RESUME_STAGE_EXECUTOR_BINDING_MISSING", slot)
 
     context_manifest = manifest.get("context_manifest", {})
-    if context_manifest != {}:
-        # Current transport intentionally forbids context bytes until
-        # ViewManifest/Grant acceptance is wired into package publication.
-        raise ValidationError("RESUME_STAGE_UNBOUND_CONTEXT_PRESENT", slot)
+    if not isinstance(context_manifest, dict):
+        raise ValidationError("RESUME_STAGE_CONTEXT_MANIFEST_INVALID", slot)
+    context_members = {
+        name[len("CONTEXT/"):]: raw
+        for name, raw in members.items()
+        if name.startswith("CONTEXT/")
+    }
+    actual_context_manifest = {
+        name: hashlib.sha256(raw).hexdigest()
+        for name, raw in sorted(context_members.items())
+    }
+    if actual_context_manifest != context_manifest:
+        raise ValidationError("RESUME_STAGE_CONTEXT_DIGEST_MISMATCH", slot)
+
+    authorization = manifest.get("context_authorization", {})
+    if not isinstance(authorization, dict):
+        raise ValidationError("RESUME_STAGE_CONTEXT_AUTHORIZATION_INVALID", slot)
+    if context_manifest:
+        required_auth = {
+            "view_manifest_ref",
+            "grant_ref",
+            "knowledge_state_ref",
+            "authorization_history_cut",
+        }
+        if not required_auth.issubset(authorization):
+            raise ValidationError("RESUME_STAGE_UNBOUND_CONTEXT_PRESENT", slot)
+        auth_cut = authorization["authorization_history_cut"]
+        if not isinstance(auth_cut, dict):
+            raise ValidationError("RESUME_STAGE_CONTEXT_AUTHORIZATION_INVALID", slot)
+        view = store.resolve_accepted(
+            authorization["view_manifest_ref"],
+            auth_cut,
+        )
+        grant = store.resolve_accepted(
+            authorization["grant_ref"],
+            auth_cut,
+        )
+        knowledge = store.resolve_accepted(
+            authorization["knowledge_state_ref"],
+            auth_cut,
+        )
+        if view["body"].get("payload_manifest") != context_manifest:
+            raise ValidationError("RESUME_STAGE_CONTEXT_VIEW_PAYLOAD_MISMATCH", slot)
+        if (
+            not _same_ref(grant["body"].get("attempt_ref"), attempt_ref)
+            or not _same_ref(
+                grant["body"].get("view_manifest_ref"),
+                authorization["view_manifest_ref"],
+            )
+        ):
+            raise ValidationError("RESUME_STAGE_CONTEXT_GRANT_BINDING_MISMATCH", slot)
+        if not _same_ref(knowledge["body"].get("attempt_ref"), attempt_ref):
+            raise ValidationError("RESUME_STAGE_CONTEXT_KNOWLEDGE_BINDING_MISMATCH", slot)
+        if not any(
+            _same_ref(ref, authorization["view_manifest_ref"])
+            for ref in knowledge["body"].get("allowed_view_refs", [])
+            if isinstance(ref, dict)
+        ):
+            raise ValidationError("RESUME_STAGE_CONTEXT_VIEW_NOT_IN_KNOWLEDGE", slot)
+    elif authorization:
+        raise ValidationError("RESUME_STAGE_CONTEXT_AUTH_WITHOUT_PAYLOAD", slot)
 
     expected_digest = compute_stage_package_identity_digest(
         compiled_digest=compiled_digest,
@@ -167,6 +235,7 @@ def _load_one(
         source_tree_sha=source.exact_tree_sha or "",
         source_location=source.location,
         context_manifest=context_manifest,
+        authorization_binding=authorization,
     )
     if manifest.get("package_digest") != expected_digest:
         raise ValidationError("RESUME_STAGE_PACKAGE_SEMANTIC_DIGEST_MISMATCH", slot)
@@ -211,7 +280,19 @@ def _load_one(
             assignment_ref=dict(assignment_ref),
             attempt_ref=dict(attempt_ref),
             prompt_sha256=prompt_sha,
-            context_manifest={},
+            context_manifest=dict(context_manifest),
+            view_manifest_ref=dict(
+                authorization.get("view_manifest_ref", {})
+            ),
+            grant_ref=dict(
+                authorization.get("grant_ref", {})
+            ),
+            authorized_knowledge_state_ref=dict(
+                authorization.get("knowledge_state_ref", {})
+            ),
+            authorization_history_cut=dict(
+                authorization.get("authorization_history_cut", {})
+            ),
         ),
         source,
     )
