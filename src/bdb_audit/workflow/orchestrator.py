@@ -485,6 +485,22 @@ class FullAuditOrchestrator:
         if self.resolved_source is None:
             raise ValidationError("SOURCE_IDENTITY_REQUIRED")
 
+        profile = get_executor_profile(
+            self.settings.execution_mode
+        )
+        if profile.max_isolation_assurance != "ENFORCED":
+            raise ValidationError(
+                "E3_ENFORCED_ISOLATION_BACKEND_REQUIRED",
+                (
+                    f"{profile.display_name} / "
+                    f"{profile.delivery_profile} currently proves at most "
+                    f"{profile.max_isolation_assurance}; E3-X/Y/Z require "
+                    "ENFORCED isolation. Do not publish blind packages "
+                    "until a controlled backend can emit accepted boundary "
+                    "receipts."
+                ),
+            )
+
         status = self.api.get_campaign_status(self.active_store_path)
         if "E2" not in status.get("stages_completed", []):
             raise ValidationError(
