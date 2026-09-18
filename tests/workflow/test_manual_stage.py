@@ -11,6 +11,7 @@ from bdb_audit.coordinator.operations import AuditOperationApi
 from bdb_audit.core.errors import ValidationError
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.workflow.e2_checkpoint import E2BlindCheckpointService
+from bdb_audit.workflow.e2_reveal import E2ControlledRevealService
 from bdb_audit.workflow.manual_stage import (
     StageLaneDefinition,
     StageResultInbox,
@@ -18,6 +19,9 @@ from bdb_audit.workflow.manual_stage import (
 )
 from bdb_audit.workflow.source_target import ResolvedSource
 from bdb_audit.workflow.read_models import current_accepted_cut
+from bdb_audit.workflow.inbox import E1ResultInbox
+from bdb_audit.workflow.packaging import prepare_e1_batch
+from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
 
 
 LANES = (
@@ -30,6 +34,19 @@ LANES = (
         "E2-ADJUDICATION",
         "Blind falsification",
         "BLIND_FALSIFY",
+    ),
+)
+
+REVEAL_LANES = (
+    StageLaneDefinition(
+        "E2-CONVERGENCE",
+        "Controlled claim convergence",
+        "CONTROLLED_REVEAL_CONVERGENCE",
+    ),
+    StageLaneDefinition(
+        "E2-ADJUDICATION",
+        "Controlled claim adjudication",
+        "CONTROLLED_REVEAL_ADJUDICATION",
     ),
 )
 
@@ -446,3 +463,301 @@ def test_e2_blind_checkpoint_rejects_incomplete_phase(e2_phase):
             batch,
             inbox,
         ).seal()
+
+
+def _write_e1_result(path: Path, batch, slot: str) -> Path:
+    job = batch.get_job(slot)
+    body = {
+        "kind": "bdb_audit_lane_result",
+        "version": "1",
+        "campaign_id": batch.campaign_id,
+        "stage_id": "E1",
+        "lane_slot": slot,
+        "executor_profile": job.executor_profile,
+        "executor_model": job.model,
+        "input_package_digest": job.package_digest,
+        "source_commit_sha": job.source_commit_sha,
+        "history_cut": batch.frozen_history_cut,
+        "assignment_ref": job.assignment_ref,
+        "attempt_ref": job.attempt_ref,
+        "findings": [
+            {
+                "finding_id": f"{slot}-finding",
+                "statement": f"Claim discovered by {slot}",
+                "mechanism": "bounded mechanism",
+                "location": "src/example.py",
+                "severity": "CRITICAL",
+                "support_count": 99,
+                "producer_identity": "SHOULD_NOT_REVEAL",
+                "raw_report_path": "/secret/report.md",
+            }
+        ],
+    }
+    with zipfile.ZipFile(
+        path,
+        "w",
+        compression=zipfile.ZIP_DEFLATED,
+    ) as archive:
+        archive.writestr("MANIFEST.json", json.dumps(body))
+    return path
+
+
+@pytest.fixture
+def e2_reveal_flow(tmp_path: Path):
+    store_path = tmp_path / "campaign.sqlite"
+    api = AuditOperationApi()
+    api.create_campaign(
+        store_path,
+        seed="e2_reveal_flow",
+    )
+    api.prepare_stage(store_path, "E1")
+    for slot in E1_LANE_SLOTS:
+        api.prepare_lane(store_path, "E1", slot)
+
+    source = ResolvedSource(
+        target_type="github",
+        location="https://github.com/example/e2-reveal",
+        display_name="example/e2-reveal",
+        ref="main",
+        exact_commit_sha="e" * 40,
+    )
+    store = TransactionalHistoryStore(store_path)
+    e1_batch = prepare_e1_batch(
+        store=store,
+        output_dir=tmp_path / "work",
+        source_info=source,
+    )
+    e1_inbox = E1ResultInbox(store, e1_batch)
+    e1_summary = e1_inbox.ingest_multiple_zips(
+        [
+            _write_e1_result(
+                tmp_path / f"{slot}.zip",
+                e1_batch,
+                slot,
+            )
+            for slot in E1_LANE_SLOTS
+        ]
+    )
+    assert e1_summary.stage_complete is True
+
+    api.prepare_stage(store_path, "E2")
+    for lane in LANES:
+        api.prepare_lane(
+            store_path,
+            "E2",
+            lane.lane_slot,
+        )
+
+    blind_batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp_path / "work",
+        source_info=source,
+        stage_id="E2",
+        phase_id="E2-BLIND",
+        lane_definitions=LANES,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in LANES
+        ],
+    )
+    blind_inbox = StageResultInbox(
+        store,
+        blind_batch,
+    )
+    blind_summary = blind_inbox.ingest_multiple_zips(
+        [
+            _write_result(
+                tmp_path / "blind-convergence.zip",
+                blind_batch,
+                "E2-CONVERGENCE",
+                findings=[
+                    {
+                        "finding_id": "blind-c1",
+                        "statement": "blind independent discovery",
+                    }
+                ],
+            ),
+            _write_result(
+                tmp_path / "blind-adjudication.zip",
+                blind_batch,
+                "E2-ADJUDICATION",
+            ),
+        ]
+    )
+    assert blind_summary.phase_complete is True
+    checkpoint = E2BlindCheckpointService(
+        store,
+        blind_batch,
+        blind_inbox,
+    ).seal()
+    return {
+        "store": store,
+        "source": source,
+        "blind_batch": blind_batch,
+        "blind_inbox": blind_inbox,
+        "checkpoint": checkpoint,
+        "tmp": tmp_path,
+    }
+
+
+def test_e2_controlled_reveal_authorized_before_package_delivery(
+    e2_reveal_flow,
+):
+    store = e2_reveal_flow["store"]
+    source = e2_reveal_flow["source"]
+    tmp = e2_reveal_flow["tmp"]
+
+    authorization = E2ControlledRevealService(
+        store,
+        lane_definitions=REVEAL_LANES,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in REVEAL_LANES
+        ],
+        executor_profile="ChatGPT / GitHub",
+        model="Sol 5.6",
+    ).authorize()
+
+    assert authorization.phase_id == "E2-REVEAL"
+    assert set(authorization.grant_refs_by_slot) == {
+        "E2-CONVERGENCE",
+        "E2-ADJUDICATION",
+    }
+    payload = json.loads(
+        authorization.context_members[
+            "E1_CLAIM_VIEW.json"
+        ].decode("utf-8")
+    )
+    assert payload["format"] == "BDB-E2-POSITIVE-CLAIM-VIEW-1"
+    assert payload["claims"]
+    encoded = json.dumps(payload)
+    assert "severity" not in encoded
+    assert "support_count" not in encoded
+    assert "producer_identity" not in encoded
+    assert "raw_report_path" not in encoded
+
+    seq_before_publish = store.head().commit_seq
+    reveal_batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp / "work",
+        source_info=source,
+        stage_id="E2",
+        phase_id="E2-REVEAL",
+        lane_definitions=REVEAL_LANES,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in REVEAL_LANES
+        ],
+        authorized_context=authorization,
+    )
+    # Package publication is a transport write only; accepted grant/history
+    # existed first and publication does not advance canonical history.
+    assert store.head().commit_seq == seq_before_publish
+
+    for slot, job in reveal_batch.jobs.items():
+        assert job.grant_ref == authorization.grant_refs_by_slot[slot]
+        assert (
+            job.authorized_knowledge_state_ref
+            == authorization.knowledge_state_refs_by_slot[slot]
+        )
+        with zipfile.ZipFile(job.package_zip_path, "r") as archive:
+            names = set(archive.namelist())
+            assert "CONTEXT/E1_CLAIM_VIEW.json" in names
+            manifest = json.loads(
+                archive.read("MANIFEST.json")
+            )
+        assert manifest["context_authorization"]["grant_ref"] == job.grant_ref
+        assert manifest["context_manifest"] == authorization.context_manifest
+
+
+def test_e2_reveal_result_completion_uses_authorized_knowledge_state(
+    e2_reveal_flow,
+):
+    store = e2_reveal_flow["store"]
+    source = e2_reveal_flow["source"]
+    tmp = e2_reveal_flow["tmp"]
+    authorization = E2ControlledRevealService(
+        store,
+        lane_definitions=REVEAL_LANES,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in REVEAL_LANES
+        ],
+        executor_profile="ChatGPT / GitHub",
+        model="Sol 5.6",
+    ).authorize()
+    reveal_batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp / "work",
+        source_info=source,
+        stage_id="E2",
+        phase_id="E2-REVEAL",
+        lane_definitions=REVEAL_LANES,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in REVEAL_LANES
+        ],
+        authorized_context=authorization,
+    )
+    inbox = StageResultInbox(store, reveal_batch)
+    path = _write_result(
+        tmp / "reveal-convergence.zip",
+        reveal_batch,
+        "E2-CONVERGENCE",
+    )
+    assert inbox.ingest_zip(path)[1] == "ACCEPTED"
+
+    cut = current_accepted_cut(store)
+    result = next(
+        row
+        for row in store.accepted_records(
+            "bdb_audit_lane_result",
+            cut,
+        )
+        if row["body"].get("phase_id") == "E2-REVEAL"
+        and row["body"].get("lane_slot") == "E2-CONVERGENCE"
+    )
+    completion = next(
+        row
+        for row in store.accepted_records(
+            "lane_completion",
+            cut,
+        )
+        if any(
+            ref.get("revision_digest")
+            == result["ref"]["revision_digest"]
+            for ref in row["body"].get(
+                "required_output_refs", []
+            )
+        )
+    )
+    assert (
+        completion["body"][
+            "final_knowledge_state_ref"
+        ]["revision_digest"]
+        == authorization.knowledge_state_refs_by_slot[
+            "E2-CONVERGENCE"
+        ]["revision_digest"]
+    )
+
+
+def test_e2_reveal_authorization_retry_is_idempotent(
+    e2_reveal_flow,
+):
+    store = e2_reveal_flow["store"]
+    kwargs = {
+        "lane_definitions": REVEAL_LANES,
+        "all_stage_lane_slots": [
+            lane.lane_slot for lane in REVEAL_LANES
+        ],
+        "executor_profile": "ChatGPT / GitHub",
+        "model": "Sol 5.6",
+    }
+    first = E2ControlledRevealService(
+        store,
+        **kwargs,
+    ).authorize()
+    seq = store.head().commit_seq
+    second = E2ControlledRevealService(
+        store,
+        **kwargs,
+    ).authorize()
+    assert second.already_authorized is True
+    assert store.head().commit_seq == seq
+    assert second.view_manifest_ref == first.view_manifest_ref
+    assert second.grant_refs_by_slot == first.grant_refs_by_slot
