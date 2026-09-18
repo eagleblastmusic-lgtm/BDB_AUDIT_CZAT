@@ -804,7 +804,23 @@ class FullAuditOrchestrator:
                 self.stage_batch is None
                 or self.stage_batch.stage_id != "E3"
             ):
-                self.prepare_e3_blind_orchestration()
+                try:
+                    self.prepare_e3_blind_orchestration()
+                except ValidationError as exc:
+                    if (
+                        exc.code
+                        != "E3_ENFORCED_ISOLATION_BACKEND_REQUIRED"
+                    ):
+                        raise
+                    return {
+                        "status": "BLOCKED",
+                        "current_stage": "E3",
+                        "current_phase": "E3-BLIND",
+                        "reason": str(exc),
+                        "next_action": (
+                            "CONFIGURE_ENFORCED_ISOLATION_BACKEND"
+                        ),
+                    }
             assert self.stage_batch is not None
             assert self.stage_inbox is not None
 
@@ -1234,7 +1250,13 @@ class FullAuditOrchestrator:
             self.stage_batch is not None
             and self.stage_inbox is not None
         ):
-            stage_status[self.stage_batch.stage_id] = "IN_PROGRESS"
+            if (
+                stage_status[self.stage_batch.stage_id]
+                != "COMPLETE"
+            ):
+                stage_status[
+                    self.stage_batch.stage_id
+                ] = "IN_PROGRESS"
             for slot, lane in self.stage_inbox.lane_statuses.items():
                 lanes_detail[
                     f"{self.stage_batch.phase_id}:{slot}"
