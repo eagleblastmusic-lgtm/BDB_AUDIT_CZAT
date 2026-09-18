@@ -154,7 +154,7 @@ def test_import_all_5_results_completes_e1(orchestrator_setup):
     assert summary.stage_complete is True
 
 
-def test_advance_after_e1_is_fail_closed_needs_implementation(orchestrator_setup):
+def test_advance_after_e1_prepares_real_e2_blind_phase(orchestrator_setup):
     orch, mgr, mock_platform, tmp = orchestrator_setup
     orch.initialize_campaign()
     batch = orch.prepare_e1_orchestration()
@@ -166,8 +166,16 @@ def test_advance_after_e1_is_fail_closed_needs_implementation(orchestrator_setup
     orch.import_results(paths)
 
     res = orch.advance_after_e1()
-    assert res["status"] == "NEEDS_IMPLEMENTATION"
-    assert res["next_stage"] == "E2"
+    assert res["status"] == "WAITING_EXTERNAL_RESULTS"
+    assert res["current_stage"] == "E2"
+    assert res["current_phase"] == "E2-BLIND"
+    assert set(res["missing_lanes"]) == {
+        "E2-CONVERGENCE",
+        "E2-ADJUDICATION",
+    }
+    assert res["next_action"] == "DELIVER_OR_IMPORT_E2_BLIND_RESULTS"
+    assert orch.stage_batch is not None
+    assert orch.stage_batch.phase_id == "E2-BLIND"
 
 
 def test_advance_before_e1_complete_is_blocked(orchestrator_setup):
@@ -214,3 +222,54 @@ def test_status_after_initialization(orchestrator_setup):
     result = orch.get_status()
     assert result["status"] == "ACTIVE"
     assert result["stage"] in ("E0", "E1")
+
+
+def test_advance_does_not_reset_existing_e2_phase_to_blind(
+    orchestrator_setup,
+    monkeypatch,
+):
+    """Regression: an active E2 phase must never be silently regenerated as BLIND."""
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    e1_batch = orch.prepare_e1_orchestration()
+    orch.import_results(
+        [
+            _create_lane_result_zip(
+                tmp / f"result_{slot}.zip",
+                e1_batch,
+                slot,
+            )
+            for slot in E1_LANE_SLOTS
+        ]
+    )
+    first = orch.advance_to_next_stage()
+    assert first["current_phase"] == "E2-BLIND"
+
+    # Use the already accepted E2 batch as a state carrier and relabel only the
+    # in-memory phase for this guard regression. The call must inspect current
+    # phase state rather than invoking prepare_e2_blind_orchestration.
+    assert orch.stage_batch is not None
+    original_batch = orch.stage_batch
+    from dataclasses import replace
+    orch.stage_batch = replace(
+        original_batch,
+        phase_id="E2-REVEAL",
+    )
+
+    called = {"blind": False}
+    def forbidden_blind_prepare():
+        called["blind"] = True
+        raise AssertionError("active E2 phase was reset to blind")
+
+    monkeypatch.setattr(
+        orch,
+        "prepare_e2_blind_orchestration",
+        forbidden_blind_prepare,
+    )
+    # Existing inbox still has missing lanes, so the orchestrator should return
+    # the current phase as waiting rather than replace it with E2-BLIND.
+    result = orch.advance_to_next_stage()
+    assert called["blind"] is False
+    assert result["status"] == "WAITING_EXTERNAL_RESULTS"
+    assert result["current_phase"] == "E2-REVEAL"
+    assert result["next_action"] == "DELIVER_OR_IMPORT_E2_REVEAL_RESULTS"
