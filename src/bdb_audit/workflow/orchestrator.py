@@ -1146,6 +1146,7 @@ class FullAuditOrchestrator:
             }
 
         return self.advance_to_next_stage()
+
     def run_full_audit_workflow(self) -> dict[str, Any]:
         """Drive the user workflow only as far as current external evidence permits.
 
@@ -1202,6 +1203,7 @@ class FullAuditOrchestrator:
             "stages_completed": canonical.get("stages_completed", []),
             **summary,
         }
+
     def get_dashboard_summary(self) -> dict[str, Any]:
         target = self.resolved_source.display_name if self.resolved_source else (
             self.settings.github_repo_url
