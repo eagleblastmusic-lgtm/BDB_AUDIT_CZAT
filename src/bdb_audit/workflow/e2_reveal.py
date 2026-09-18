@@ -530,7 +530,9 @@ class E2ControlledRevealService:
             canonical_bytes(
                 {
                     "payload_sha256": payload_sha,
-                    "checkpoint_digests": checkpoint_digests,
+                    "checkpoint_digests": list(
+                        checkpoint_digests
+                    ),
                     "assignment_digests": sorted(
                         assignment.assignment_ref[
                             "revision_digest"
