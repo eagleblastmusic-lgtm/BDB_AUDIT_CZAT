@@ -325,6 +325,14 @@ class E3BlindCheckpointService:
                         ),
                         "surface_location_refs": [],
                         "own_observation_refs": [],
+                        "stage_id": "E3",
+                        "phase_id": "E3-BLIND",
+                        "lane_slot": slot,
+                        "result_proposal_digest": (
+                            result["ref"][
+                                "revision_digest"
+                            ]
+                        ),
                         "submission_finding_index": (
                             index
                         ),
@@ -335,6 +343,9 @@ class E3BlindCheckpointService:
                         ),
                         "origin_classification": (
                             "PRE_REVEAL_DISCOVERY"
+                        ),
+                        "discovery_mode": (
+                            "BLIND_NOVELTY"
                         ),
                     },
                 )
