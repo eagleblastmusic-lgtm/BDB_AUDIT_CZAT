@@ -818,6 +818,11 @@ def prepare_stage_phase_batch(
             "UNBOUND_STAGE_CONTEXT_FORBIDDEN",
             "Context bytes require an accepted ViewManifest/Grant binding before delivery",
         )
+    if "REVEAL" in phase_id.upper() and authorized_context is None:
+        raise ValidationError(
+            "STAGE_REVEAL_AUTHORIZATION_REQUIRED",
+            phase_id,
+        )
 
     assignments = StageAssignmentService(
         store
