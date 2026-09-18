@@ -1825,3 +1825,47 @@ def test_e2_contradiction_rejects_basis_outside_authorized_view(
             batch,
             inbox,
         ).resolve()
+
+
+@pytest.mark.parametrize(
+    "phase_id",
+    ["E2-SHADOW", "E2-CONTRADICTION"],
+)
+def test_controlled_e2_context_phase_without_authorization_fails_closed(
+    e2_phase,
+    phase_id,
+):
+    store, _, _, tmp = e2_phase
+    source = ResolvedSource(
+        target_type="github",
+        location="https://github.com/example/manual-stage",
+        display_name="example/manual-stage",
+        ref="main",
+        exact_commit_sha="c" * 40,
+    )
+    lanes = (
+        StageLaneDefinition(
+            "E2-ADJUDICATION",
+            "Controlled phase",
+            "CONTROLLED_CONTEXT",
+        ),
+    )
+    with pytest.raises(
+        ValidationError,
+        match="STAGE_CONTEXT_AUTHORIZATION_REQUIRED",
+    ):
+        prepare_stage_phase_batch(
+            store=store,
+            output_dir=tmp / (
+                "work-ungranted-"
+                + phase_id.lower()
+            ),
+            source_info=source,
+            stage_id="E2",
+            phase_id=phase_id,
+            lane_definitions=lanes,
+            all_stage_lane_slots=(
+                "E2-CONVERGENCE",
+                "E2-ADJUDICATION",
+            ),
+        )
