@@ -28,10 +28,13 @@ from ..adjudication.models import (
 )
 from ..coordinator import Coordinator
 from ..core.errors import ValidationError
+from ..core.ids import deterministic_id
 from ..core.registry import canonical_reference_set
 from ..history.objects import CanonicalObject, CommandEnvelope
 from ..history.store import TransactionalHistoryStore
+from ..stop.models import StageCompletion
 from .assignments import _command_id, _current_cut
+from .e2_shadow import _main_decisions
 from .inbox import _same_ref, _with_ref_class
 from .manual_stage import StageBatch, StageResultInbox
 
@@ -62,6 +65,9 @@ class E2ContradictionResolutionSummary:
     ]
     decision_commit_seq: int
     successor_commit_seq: int
+    stage_completed: bool
+    stage_completion_ref: dict[str, Any] | None
+    stage_completion_commit_seq: int | None
     already_resolved: bool
     next_action: str
 
@@ -703,6 +709,329 @@ class E2ContradictionResolutionService:
             False,
         )
 
+    def _existing_e2_stage_completion(
+        self,
+        cut: dict[str, Any],
+    ) -> dict[str, Any] | None:
+        rows = []
+        for row in self.store.accepted_records(
+            "stage_completion",
+            cut,
+        ):
+            if (
+                row["body"].get(
+                    "completion_predicate_result"
+                )
+                != "STAGE_COMPLETED"
+            ):
+                continue
+            spec = self.store.resolve_accepted(
+                row["body"]["stage_spec_ref"],
+                cut,
+            )
+            if spec["body"].get("stage_key") == "E2":
+                rows.append(row)
+        if len(rows) > 1:
+            raise ValidationError(
+                "MULTIPLE_E2_STAGE_COMPLETIONS"
+            )
+        return rows[0] if rows else None
+
+    def _e2_lane_completions(
+        self,
+        cut: dict[str, Any],
+    ) -> tuple[dict[str, Any], ...]:
+        phases = {
+            "E2-BLIND",
+            "E2-REVEAL",
+            "E2-SHADOW",
+            "E2-CONTRADICTION",
+        }
+        results = [
+            row
+            for row in self.store.accepted_records(
+                "bdb_audit_lane_result",
+                cut,
+            )
+            if row["body"].get("stage_id") == "E2"
+            and row["body"].get("phase_id") in phases
+        ]
+        result_digests = {
+            row["ref"]["revision_digest"]
+            for row in results
+        }
+        covered: set[str] = set()
+        completions: list[dict[str, Any]] = []
+        for row in self.store.accepted_records(
+            "lane_completion",
+            cut,
+        ):
+            matched = {
+                ref["revision_digest"]
+                for ref in row["body"].get(
+                    "required_output_refs",
+                    [],
+                )
+                if isinstance(ref, dict)
+                and ref.get("kind")
+                == "bdb_audit_lane_result"
+                and ref.get("revision_digest")
+                in result_digests
+            }
+            if not matched:
+                continue
+            if (
+                row["body"].get(
+                    "completion_predicate_result"
+                )
+                != "LANE_COMPLETED"
+            ):
+                raise ValidationError(
+                    "E2_LANE_COMPLETION_BLOCKED"
+                )
+            covered.update(matched)
+            completions.append(row)
+        if covered != result_digests:
+            raise ValidationError(
+                "E2_LANE_COMPLETION_SET_INCOMPLETE",
+                f"missing={sorted(result_digests - covered)}",
+            )
+        return tuple(completions)
+
+    def _accept_stage_completion(
+        self,
+        *,
+        contradiction_result: dict[str, Any],
+        case_records: Mapping[
+            str, dict[str, Any]
+        ],
+        decision_refs: tuple[
+            dict[str, Any], ...
+        ],
+        successor_refs: tuple[
+            dict[str, Any], ...
+        ],
+    ) -> tuple[
+        dict[str, Any],
+        int,
+        bool,
+    ]:
+        cut, prior_commit = _current_cut(
+            self.store
+        )
+        existing = (
+            self._existing_e2_stage_completion(
+                cut
+            )
+        )
+        if existing is not None:
+            return (
+                _with_ref_class(
+                    existing["ref"],
+                    "CONTENT_OR_PRIOR",
+                ),
+                existing["accepted_seq"],
+                True,
+            )
+
+        lane_completions = (
+            self._e2_lane_completions(cut)
+        )
+        job = next(
+            iter(self.batch.jobs.values())
+        )
+        assignment = self.store.resolve_accepted(
+            job.assignment_ref,
+            cut,
+        )
+        attempt = self.store.resolve_accepted(
+            assignment["body"]["attempt_ref"],
+            cut,
+        )
+        lane_run = self.store.resolve_accepted(
+            attempt["body"]["lane_run_ref"],
+            cut,
+        )
+        stage_run = self.store.resolve_accepted(
+            lane_run["body"]["stage_run_ref"],
+            cut,
+        )
+        stage_spec = self.store.resolve_accepted(
+            assignment["body"]["stage_spec_ref"],
+            cut,
+        )
+        if stage_spec["body"].get(
+            "stage_key"
+        ) != "E2":
+            raise ValidationError(
+                "E2_STAGE_SPEC_BINDING_MISMATCH"
+            )
+
+        main_decisions = _main_decisions(
+            self.store,
+            cut,
+        )
+        main_decision_refs = [
+            _with_ref_class(
+                row["ref"],
+                "CONTENT_OR_PRIOR",
+            )
+            for row in main_decisions
+        ]
+        checkpoints = [
+            _with_ref_class(
+                row["ref"],
+                "CONTENT_OR_PRIOR",
+            )
+            for row in self.store.accepted_records(
+                "checkpoint",
+                cut,
+            )
+            if row["body"].get("stage_id") == "E2"
+            and row["body"].get("phase_id")
+            == "E2-BLIND"
+        ]
+        shadow_results = [
+            _with_ref_class(
+                row["ref"],
+                "CONTENT_OR_PRIOR",
+            )
+            for row in self.store.accepted_records(
+                "bdb_audit_lane_result",
+                cut,
+            )
+            if row["body"].get("stage_id") == "E2"
+            and row["body"].get("phase_id")
+            == "E2-SHADOW"
+        ]
+        case_refs = [
+            _with_ref_class(
+                row["ref"],
+                "CONTENT_OR_PRIOR",
+            )
+            for row in case_records.values()
+        ]
+        required_outputs = canonical_reference_set(
+            [
+                *main_decision_refs,
+                *checkpoints,
+                *shadow_results,
+                *case_refs,
+                *decision_refs,
+                *successor_refs,
+                _with_ref_class(
+                    contradiction_result["ref"],
+                    "CONTENT_OR_PRIOR",
+                ),
+            ]
+        )
+        completion_refs = canonical_reference_set(
+            [
+                _with_ref_class(
+                    row["ref"],
+                    "CONTENT_OR_PRIOR",
+                )
+                for row in lane_completions
+            ]
+        )
+
+        completion = StageCompletion(
+            stage_completion_id=deterministic_id(
+                "stage_completion",
+                "e2-contradiction-final:"
+                + ":".join(
+                    ref["revision_digest"]
+                    for ref in required_outputs
+                ),
+            ),
+            stage_run_ref=_with_ref_class(
+                stage_run["ref"],
+                "CONTENT_OR_PRIOR",
+            ),
+            stage_spec_ref=_with_ref_class(
+                stage_spec["ref"],
+                "HISTORY_CONTEXT_BINDING",
+            ),
+            input_history_cut=cut,
+            required_lane_slot_results=(
+                completion_refs
+            ),
+            required_output_refs=(
+                required_outputs
+            ),
+            mandatory_obligation_summary={
+                "blind_phase_required": True,
+                "controlled_reveal_required": True,
+                "shadow_adjudicator_required": True,
+                "contradiction_protocol_required": True,
+                "contradiction_cases": len(
+                    case_records
+                ),
+                "contradiction_cases_resolved_full": len(
+                    successor_refs
+                ),
+                "majority_vote_forbidden": True,
+            },
+            unresolved_material_refs=[],
+            unknown_blocked_summary={
+                "unknown_surfaces_count": 0,
+                "scope_note": (
+                    "E2 completion is stage-local and "
+                    "does not imply global STOP PASS"
+                ),
+            },
+            completion_predicate_result=(
+                "STAGE_COMPLETED"
+            ),
+        )
+        obj = completion.as_object()
+        head = self.store.head()
+        if head is None:
+            raise ValidationError(
+                "CAMPAIGN_NOT_INITIALIZED"
+            )
+        command = CommandEnvelope(
+            command_id=_command_id(
+                "e2_contradiction_stage_completion:"
+                + obj.digest
+            ),
+            command_kind="RECORD_FOUNDATION_FACT",
+            actor_ref=prior_commit.get(
+                "actor_ref",
+                "installation-owner",
+            ),
+            expected_parent_head={
+                "tag": "ACCEPTED_HEAD_REF",
+                **head.as_dict(),
+            },
+            governing_policy_ref=prior_commit[
+                "governing_policy_ref"
+            ],
+            governing_spec_refs=tuple(
+                prior_commit.get(
+                    "governing_spec_refs",
+                    (),
+                )
+            ),
+            idempotency_scope=(
+                "e2_contradiction_stage_completion:"
+                + obj.digest
+            ),
+            campaign_ref=head.campaign_id,
+        )
+        accepted = self.coordinator.accept(
+            command,
+            immutable_objects=[obj],
+            expected_head=head,
+        )
+        return (
+            obj.as_ref(
+                ref_class="CONTENT_OR_PRIOR"
+            ).as_dict(),
+            accepted.head.commit_seq,
+            False,
+        )
+
     def resolve(
         self,
     ) -> E2ContradictionResolutionSummary:
@@ -771,6 +1100,21 @@ class E2ContradictionResolutionService:
             status == "RESOLVED_FULL"
             for status in statuses.values()
         )
+        stage_ref = None
+        stage_seq = None
+        stage_existed = False
+        if all_full:
+            (
+                stage_ref,
+                stage_seq,
+                stage_existed,
+            ) = self._accept_stage_completion(
+                contradiction_result=result,
+                case_records=cases,
+                decision_refs=decision_refs,
+                successor_refs=successor_refs,
+            )
+
         return E2ContradictionResolutionSummary(
             campaign_id=self.batch.campaign_id,
             decision_refs=decision_refs,
@@ -784,12 +1128,21 @@ class E2ContradictionResolutionService:
             successor_commit_seq=(
                 successor_seq
             ),
+            stage_completed=all_full,
+            stage_completion_ref=stage_ref,
+            stage_completion_commit_seq=(
+                stage_seq
+            ),
             already_resolved=(
                 decision_existed
                 and successor_existed
+                and (
+                    not all_full
+                    or stage_existed
+                )
             ),
             next_action=(
-                "FINALIZE_E2"
+                "PREPARE_E3"
                 if all_full
                 else "E2_CONTRADICTION_REMAINS_BLOCKING"
             ),
