@@ -319,10 +319,9 @@ class E3BlindCheckpointService:
                             f"e3_blind_external_{slot}",
                             "HISTORY_CONTEXT_BINDING",
                         ),
-                        "producer_ref": _external_ref(
-                            "actor_or_authority_ref",
-                            f"external_auditor_{slot}",
-                            "PRIOR_ACCEPTED_ONLY",
+                        "producer_ref": prior_commit.get(
+                            "actor_ref",
+                            "installation-owner",
                         ),
                         "surface_location_refs": [],
                         "own_observation_refs": [],
