@@ -22,6 +22,7 @@ from .e2_checkpoint import E2BlindCheckpointService
 from .e2_reveal import E2ControlledRevealService
 from .e2_synthesis import E2MainSynthesisService
 from .e2_shadow import E2ShadowAuthorizationService
+from .e2_finalize import E2FinalizationService
 from .inbox import E1ResultInbox, ImportedResultSummary
 from .manual_stage import (
     ImportedStagePhaseSummary,
@@ -715,11 +716,35 @@ class FullAuditOrchestrator:
             }
 
         if self.stage_batch.phase_id == "E2-SHADOW":
+            finalization = E2FinalizationService(
+                TransactionalHistoryStore(self.active_store_path),
+                self.stage_batch,
+                self.stage_inbox,
+            ).finalize()
+            if not finalization.stage_completed:
+                return {
+                    "status": "E2_CONTRADICTION_PROTOCOL_REQUIRED",
+                    "current_stage": "E2",
+                    "current_phase": "E2-SHADOW",
+                    "shadow_conflict_claim_digests": list(
+                        finalization.shadow_conflict_claim_digests
+                    ),
+                    "next_action": finalization.next_action,
+                }
             return {
-                "status": "READY_FOR_E2_FINALIZATION",
+                "status": "E2_COMPLETED",
                 "current_stage": "E2",
-                "current_phase": "E2-SHADOW",
-                "next_action": "APPLY_CONTRADICTION_PROTOCOL_AND_FINALIZE_E2",
+                "next_stage": "E3",
+                "stage_completion_ref": (
+                    finalization.stage_completion_ref
+                ),
+                "completion_commit_seq": (
+                    finalization.accepted_commit_seq
+                ),
+                "already_finalized": (
+                    finalization.already_finalized
+                ),
+                "next_action": "PREPARE_E3_BLIND_NOVELTY",
             }
 
         raise ValidationError(
