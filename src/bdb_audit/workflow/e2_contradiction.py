@@ -356,7 +356,7 @@ class E2ContradictionAuthorizationService:
             for slot, assignment in (
                 assignments.assignments.items()
             ):
-                grants = [
+                grant_rows = [
                     row
                     for row in self.store.accepted_records(
                         "grant_body",
@@ -375,7 +375,7 @@ class E2ContradictionAuthorizationService:
                         manifest["ref"],
                     )
                 ]
-                states = [
+                state_rows = [
                     row
                     for row in self.store.accepted_records(
                         "knowledge_state",
@@ -404,20 +404,20 @@ class E2ContradictionAuthorizationService:
                     is not None
                 ]
                 if (
-                    len(grants) != 1
-                    or len(states) != 1
+                    len(grant_rows) != 1
+                    or len(state_rows) != 1
                 ):
                     raise ValidationError(
                         "PARTIAL_E2_CONTRADICTION_AUTHORIZATION",
                         slot,
                     )
                 grant_refs[slot] = _with_ref_class(
-                    grants[0]["ref"],
+                    grant_rows[0]["ref"],
                     "CONTENT_OR_PRIOR",
                 )
                 knowledge_refs[slot] = (
                     _with_ref_class(
-                        states[0]["ref"],
+                        state_rows[0]["ref"],
                         "CONTENT_OR_PRIOR",
                     )
                 )
