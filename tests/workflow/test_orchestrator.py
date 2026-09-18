@@ -370,7 +370,7 @@ def test_resume_does_not_resurrect_completed_e2_phase(
         platform_adapter=MockPlatformAdapter(),
     )
     result = resumed.resume_campaign(init["store_path"])
-    assert result["status"] == "SUCCESS"
+    assert result["status"] == "SUCCESS", result
     assert result["current_stage"] == "E3"
     assert result["current_phase"] is None
     assert resumed.stage_batch is None
