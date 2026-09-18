@@ -805,6 +805,32 @@ Use conflict=false with an empty conflict_types list when the bounded shadow
 view gives no concrete reason to challenge the main decision. A conflict is a
 proposal for the Contradiction Protocol, never a majority-vote truth decision.
 """
+    elif stage_id == "E2" and phase_id == "E2-CONTRADICTION":
+        output_contract = """
+
+E2 CONTRADICTION PROTOCOL OUTPUT CONTRACT
+For EVERY contradiction in CONTEXT/E2_CONTRADICTION_CASES.json return exactly
+one item in outputs.contradiction_resolutions. Do not omit cases, invent case
+digests or use majority/support count as a truth oracle.
+
+Each item:
+{
+  "contradiction_revision_digest": "<exact contradiction_revision_ref.revision_digest>",
+  "resolution_kind": "REFUTED|SCOPES_SEPARATED|HARNESS_INVALIDATED|CONTRACT_CHANGED|BLOCKED",
+  "resulting_status": "RESOLVED_SCOPED|RESOLVED_FULL|BLOCKED",
+  "resolved_scope": {},
+  "basis_ref_digests": [
+    "<digest of an artifact explicitly present in the authorized contradiction view>"
+  ],
+  "rationale": "<bounded explanation>"
+}
+
+basis_ref_digests must reference only artifacts exposed by the authorized view.
+The coordinator maps those digests back to exact accepted typed refs and also
+binds the accepted lane result as provenance. BLOCKED is valid when the
+authorized evidence cannot support a narrower truth claim. Never fabricate
+EvidenceQualificationAssessment refs.
+"""
 
     return f"""# BDB AUDIT v2.0.3 - {stage_id} / {phase_id} / {definition.lane_slot}
 
