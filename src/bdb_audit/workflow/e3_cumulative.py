@@ -448,10 +448,6 @@ def build_e3_cumulative_view(
             cut,
         )
     )
-    if not own_cards:
-        raise ValidationError(
-            "E3_OWN_DISCOVERY_CORPUS_REQUIRED"
-        )
     (
         prior_cards,
         contradictions,
