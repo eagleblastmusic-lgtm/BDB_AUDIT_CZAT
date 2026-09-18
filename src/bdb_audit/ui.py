@@ -256,6 +256,14 @@ class InteractiveAuditUI:
                 adv = self.orchestrator.advance_to_next_stage()
                 output_func(f"\nStage Transition: {adv['status']}")
                 output_func(f"Next Action: {adv.get('next_action', '')}")
+                if (
+                    adv.get("status") == "WAITING_EXTERNAL_RESULTS"
+                    and self.orchestrator.stage_batch is not None
+                ):
+                    self._deliver_current_stage_packages(
+                        input_func,
+                        output_func,
+                    )
             return
 
         output_func("\nE1 COMPLETE")
