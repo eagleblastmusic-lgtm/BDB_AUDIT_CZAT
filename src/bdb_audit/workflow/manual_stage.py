@@ -70,6 +70,98 @@ class StageAssignmentSet:
     accepted_history_cut: dict[str, Any]
     assignments: dict[str, PreparedStageAssignment]
 
+@dataclass(frozen=True)
+class StageIsolationProof:
+    """Accepted boundary evidence supplied by a controlled executor adapter."""
+
+    result: str
+    channel_inventory_ref: dict[str, Any]
+    enforcement_receipt_refs: tuple[dict[str, Any], ...] = ()
+    filesystem_boundary_evidence_refs: tuple[dict[str, Any], ...] = ()
+    network_boundary_evidence_refs: tuple[dict[str, Any], ...] = ()
+    tool_boundary_evidence_refs: tuple[dict[str, Any], ...] = ()
+    session_boundary_evidence_refs: tuple[dict[str, Any], ...] = ()
+    contamination_assessment_refs: tuple[dict[str, Any], ...] = ()
+    scope: str = "CONTROLLED_EXECUTOR_SESSION"
+    limitations: tuple[str, ...] = ()
+    reason_codes: tuple[str, ...] = ()
+
+    def normalized_body(
+        self,
+        *,
+        store: TransactionalHistoryStore,
+        cut: dict[str, Any],
+        required_assurance: str,
+    ) -> dict[str, Any]:
+        ranks = {"UNKNOWN": 0, "DECLARED": 1, "ENFORCED": 2}
+        if self.result not in ranks:
+            raise ValidationError(
+                "INVALID_ISOLATION_ASSURANCE_RESULT",
+                self.result,
+            )
+        if required_assurance not in ranks:
+            raise ValidationError(
+                "INVALID_REQUIRED_ISOLATION_ASSURANCE",
+                required_assurance,
+            )
+        if ranks[self.result] < ranks[required_assurance]:
+            raise ValidationError(
+                "ISOLATION_PROOF_INSUFFICIENT",
+                f"required={required_assurance}; actual={self.result}",
+            )
+        if not isinstance(self.scope, str) or not self.scope:
+            raise ValidationError("ISOLATION_PROOF_SCOPE_REQUIRED")
+
+        def accepted(ref: dict[str, Any]) -> dict[str, Any]:
+            record = store.resolve_accepted(ref, cut)
+            return _with_ref_class(
+                record["ref"],
+                "CONTENT_OR_PRIOR",
+            )
+
+        def accepted_set(
+            refs: Sequence[dict[str, Any]],
+        ) -> list[dict[str, Any]]:
+            return canonical_reference_set(
+                [accepted(dict(ref)) for ref in refs]
+            )
+
+        channel = accepted(dict(self.channel_inventory_ref))
+        enforcement = accepted_set(self.enforcement_receipt_refs)
+        filesystem = accepted_set(
+            self.filesystem_boundary_evidence_refs
+        )
+        network = accepted_set(
+            self.network_boundary_evidence_refs
+        )
+        tools = accepted_set(self.tool_boundary_evidence_refs)
+        session = accepted_set(
+            self.session_boundary_evidence_refs
+        )
+        contamination = accepted_set(
+            self.contamination_assessment_refs
+        )
+        if self.result == "ENFORCED":
+            if not enforcement or not session:
+                raise ValidationError(
+                    "ENFORCED_ISOLATION_RECEIPTS_REQUIRED",
+                    "ENFORCED requires accepted enforcement and session-boundary receipts",
+                )
+
+        return {
+            "channel_inventory_ref": channel,
+            "enforcement_receipt_refs": enforcement,
+            "filesystem_boundary_evidence_refs": filesystem,
+            "network_boundary_evidence_refs": network,
+            "tool_boundary_evidence_refs": tools,
+            "session_boundary_evidence_refs": session,
+            "contamination_assessment_refs": contamination,
+            "result": self.result,
+            "scope": self.scope,
+            "limitations": sorted(set(self.limitations)),
+            "reason_codes": sorted(set(self.reason_codes)),
+        }
+
 
 @dataclass(frozen=True)
 class StageAuthorizedContext:
@@ -319,6 +411,9 @@ class StageAssignmentService:
         executor_profile: str,
         model: str,
         delivery_profile: str = "ZIP_PROMPT_CLIPBOARD",
+        isolation_proofs_by_slot: Mapping[
+            str, StageIsolationProof
+        ] | None = None,
     ) -> StageAssignmentSet:
         stage_id = stage_id.upper()
         if stage_id == "E1":
@@ -491,17 +586,15 @@ class StageAssignmentService:
                     ],
                 },
             )
-            isolation = CanonicalObject(
-                "isolation_qualification",
-                {
-                    "isolation_qualification_id": (
-                        f"iso_{stage_id}_{phase_id}_{slot}_"
-                        f"{hashlib.sha256(seed_root.encode()).hexdigest()[:12]}"
-                    ),
-                    "attempt_ref": attempt.as_ref().as_dict(),
-                    "assessment_input_history_cut": input_cut,
-                    "executor_profile_ref": executor_ref,
-                    "delivery_profile_ref": delivery_ref,
+            required_assurance = lane_record["body"].get(
+                "required_isolation_assurance",
+                "DECLARED",
+            )
+            proof = (
+                isolation_proofs_by_slot or {}
+            ).get(slot)
+            if proof is None:
+                isolation_details = {
                     "channel_inventory_ref": _external_ref(
                         "registered_immutable_object",
                         "manual_external_channel",
@@ -513,9 +606,6 @@ class StageAssignmentService:
                     "tool_boundary_evidence_refs": [],
                     "session_boundary_evidence_refs": [],
                     "contamination_assessment_refs": [],
-                    "required_isolation_assurance": lane_record["body"].get(
-                        "required_isolation_assurance", "DECLARED"
-                    ),
                     "result": "DECLARED",
                     "scope": "MANUAL_EXTERNAL_SESSION",
                     "limitations": [
@@ -524,6 +614,27 @@ class StageAssignmentService:
                     "reason_codes": [
                         "MANUAL_TRANSPORT_DECLARATION_ONLY"
                     ],
+                }
+            else:
+                isolation_details = proof.normalized_body(
+                    store=self.store,
+                    cut=input_cut,
+                    required_assurance=required_assurance,
+                )
+
+            isolation = CanonicalObject(
+                "isolation_qualification",
+                {
+                    "isolation_qualification_id": (
+                        f"iso_{stage_id}_{phase_id}_{slot}_"
+                        f"{hashlib.sha256(seed_root.encode()).hexdigest()[:12]}"
+                    ),
+                    "attempt_ref": attempt.as_ref().as_dict(),
+                    "assessment_input_history_cut": input_cut,
+                    "executor_profile_ref": executor_ref,
+                    "delivery_profile_ref": delivery_ref,
+                    "required_isolation_assurance": required_assurance,
+                    **isolation_details,
                 },
             )
             knowledge = CanonicalObject(
@@ -903,6 +1014,9 @@ def prepare_stage_phase_batch(
     all_stage_lane_slots: Sequence[str],
     context_members: Mapping[str, bytes] | None = None,
     authorized_context: StageAuthorizedContext | None = None,
+    isolation_proofs_by_slot: Mapping[
+        str, StageIsolationProof
+    ] | None = None,
     execution_mode: str = "ChatGPT / GitHub",
     model: str = "Sol 5.6",
 ) -> StageBatch:
@@ -946,6 +1060,7 @@ def prepare_stage_phase_batch(
         all_stage_lane_slots=all_stage_lane_slots,
         executor_profile=execution_mode,
         model=model,
+        isolation_proofs_by_slot=isolation_proofs_by_slot,
     )
     frozen_cut = assignments.assignment_input_history_cut
     context: dict[str, bytes] = {}
@@ -1992,6 +2107,7 @@ __all__ = [
     "StageLaneDefinition",
     "PreparedStageAssignment",
     "StageAssignmentSet",
+    "StageIsolationProof",
     "StageAuthorizedContext",
     "StageLaneJob",
     "StageBatch",
