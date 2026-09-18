@@ -270,3 +270,72 @@ def test_manual_e3_enforced_lane_blocks_phase_completion(
     assert "PHASE_COMPLETION_BLOCKED" in (
         summary.error or ""
     )
+
+
+def test_unbound_context_members_fail_closed(e2_phase):
+    store, _, _, tmp = e2_phase
+    source = ResolvedSource(
+        target_type="github",
+        location="https://github.com/example/manual-stage",
+        display_name="example/manual-stage",
+        ref="main",
+        exact_commit_sha="c" * 40,
+    )
+    with pytest.raises(
+        Exception,
+        match="UNBOUND_STAGE_CONTEXT_FORBIDDEN",
+    ):
+        prepare_stage_phase_batch(
+            store=store,
+            output_dir=tmp / "work2",
+            source_info=source,
+            stage_id="E2",
+            phase_id="E2-REVEAL",
+            lane_definitions=LANES,
+            all_stage_lane_slots=[
+                lane.lane_slot for lane in LANES
+            ],
+            context_members={
+                "prior_claims.json": b"{}"
+            },
+        )
+
+
+def test_distinct_phase_does_not_reuse_blind_assignments(e2_phase):
+    store, blind_batch, _, tmp = e2_phase
+    source = ResolvedSource(
+        target_type="github",
+        location="https://github.com/example/manual-stage",
+        display_name="example/manual-stage",
+        ref="main",
+        exact_commit_sha="c" * 40,
+    )
+    reveal_lanes = (
+        StageLaneDefinition(
+            "E2-F1",
+            "Re-adjudication after controlled reveal",
+            "REVEALED_REVIEW",
+        ),
+        StageLaneDefinition(
+            "E2-F2",
+            "Falsification after controlled reveal",
+            "REVEALED_FALSIFY",
+        ),
+    )
+    reveal = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp / "work3",
+        source_info=source,
+        stage_id="E2",
+        phase_id="E2-REVEAL",
+        lane_definitions=reveal_lanes,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in LANES
+        ],
+    )
+    assert reveal.phase_id == "E2-REVEAL"
+    for slot in reveal.jobs:
+        assert (
+            reveal.get_job(slot).assignment_ref["revision_digest"]
+            != blind_batch.get_job(slot).assignment_ref["revision_digest"]
+        )
