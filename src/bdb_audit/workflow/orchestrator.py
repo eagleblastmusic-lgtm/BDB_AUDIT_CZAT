@@ -30,6 +30,8 @@ from .e3_gap import E3PositiveGapAuthorizationService
 from .e3_gap_result import E3GapResultValidationService
 from .e3_cumulative import E3CumulativeAuthorizationService
 from .e3_cumulative_result import E3CumulativeResultValidationService
+from .e3_holdout import E3HoldoutAuthorizationService
+from .e3_holdout_result import E3HoldoutResultValidationService
 from .inbox import E1ResultInbox, ImportedResultSummary
 from .manual_stage import (
     ImportedStagePhaseSummary,
@@ -140,6 +142,24 @@ E3_CUMULATIVE_LANES = (
         "E3-Z",
         "Frontend, concurrency, resources and cross-layer cumulative-corpus comparison",
         "CROSS_LAYER_CONCURRENCY_CUMULATIVE_COMPARISON",
+    ),
+)
+
+E3_HOLDOUT_LANES = (
+    StageLaneDefinition(
+        "E3-X",
+        "Security, authority and trust external holdout comparison",
+        "AUTHORITY_TRUST_HOLDOUT_COMPARISON",
+    ),
+    StageLaneDefinition(
+        "E3-Y",
+        "State, data, catalog and recovery external holdout comparison",
+        "STATE_CATALOG_RECOVERY_HOLDOUT_COMPARISON",
+    ),
+    StageLaneDefinition(
+        "E3-Z",
+        "Frontend, concurrency, resources and cross-layer external holdout comparison",
+        "CROSS_LAYER_CONCURRENCY_HOLDOUT_COMPARISON",
     ),
 )
 
@@ -707,6 +727,67 @@ class FullAuditOrchestrator:
         )
         return batch
 
+    def prepare_e3_holdout_orchestration(
+        self,
+        holdout_corpus_manifest_ref: dict[
+            str, Any
+        ],
+        isolation_proofs_by_slot: dict[
+            str, StageIsolationProof
+        ],
+    ) -> StageBatch:
+        """Authorize and publish optional E3 auxiliary holdout comparison."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        authorization = E3HoldoutAuthorizationService(
+            store,
+            holdout_corpus_manifest_ref=(
+                holdout_corpus_manifest_ref
+            ),
+            lane_definitions=E3_HOLDOUT_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+            isolation_proofs_by_slot=(
+                isolation_proofs_by_slot
+            ),
+        ).authorize()
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E3",
+            phase_id="E3-HOLDOUT",
+            lane_definitions=E3_HOLDOUT_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            authorized_context=authorization,
+            isolation_proofs_by_slot=(
+                isolation_proofs_by_slot
+            ),
+            execution_mode=(
+                self.settings.execution_mode
+            ),
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(
+            store,
+            batch,
+        )
+        return batch
+
     def deliver_stage_lane_to_user(self, slot: str) -> dict[str, Any]:
         """Deliver one already accepted E2+ stage assignment/package."""
         if self.stage_batch is None:
@@ -833,6 +914,7 @@ class FullAuditOrchestrator:
                 active_stage = "E4"
             elif "E2" in completed_stages:
                 candidate_stage_phases = (
+                    ("E3", "E3-HOLDOUT"),
                     ("E3", "E3-CUMULATIVE"),
                     ("E3", "E3-GAP"),
                     ("E3", "E3-BLIND"),
@@ -1005,6 +1087,9 @@ class FullAuditOrchestrator:
                     "E3-CUMULATIVE": (
                         "DELIVER_OR_IMPORT_E3_CUMULATIVE_RESULTS"
                     ),
+                    "E3-HOLDOUT": (
+                        "DELIVER_OR_IMPORT_E3_HOLDOUT_RESULTS"
+                    ),
                 }
                 if phase not in next_action_by_phase:
                     raise ValidationError(
@@ -1122,6 +1207,43 @@ class FullAuditOrchestrator:
                     ),
                     "post_reveal_discoveries_count": len(
                         validation.post_reveal_discovery_refs
+                    ),
+                    "next_action": (
+                        validation.next_action
+                    ),
+                }
+
+            if (
+                self.stage_batch.phase_id
+                == "E3-HOLDOUT"
+            ):
+                validation = (
+                    E3HoldoutResultValidationService(
+                        TransactionalHistoryStore(
+                            self.active_store_path
+                        ),
+                        self.stage_batch,
+                        self.stage_inbox,
+                    ).validate()
+                )
+                return {
+                    "status": "E3_HOLDOUT_COMPLETE",
+                    "current_stage": "E3",
+                    "current_phase": "E3-HOLDOUT",
+                    "comparison_count": (
+                        validation.comparison_count
+                    ),
+                    "matched_holdout_count": len(
+                        validation.matched_discovery_ids
+                    ),
+                    "no_holdout_match_count": len(
+                        validation.no_holdout_match_discovery_ids
+                    ),
+                    "post_reveal_discoveries_count": len(
+                        validation.post_reveal_discovery_refs
+                    ),
+                    "holdout_corpus_manifest_ref": (
+                        validation.holdout_corpus_manifest_ref
                     ),
                     "next_action": (
                         validation.next_action
