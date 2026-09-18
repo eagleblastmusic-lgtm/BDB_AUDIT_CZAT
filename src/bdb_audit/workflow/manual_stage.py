@@ -72,6 +72,21 @@ class StageAssignmentSet:
 
 
 @dataclass(frozen=True)
+class StageAuthorizedContext:
+    campaign_id: str
+    stage_id: str
+    phase_id: str
+    context_members: dict[str, bytes]
+    context_manifest: dict[str, str]
+    view_manifest_ref: dict[str, Any]
+    grant_refs_by_slot: dict[str, dict[str, Any]]
+    knowledge_state_refs_by_slot: dict[str, dict[str, Any]]
+    authorization_history_cut: dict[str, Any]
+    assignments: dict[str, PreparedStageAssignment]
+    already_authorized: bool = False
+
+
+@dataclass(frozen=True)
 class StageLaneJob:
     campaign_id: str
     stage_id: str
@@ -92,6 +107,10 @@ class StageLaneJob:
     attempt_ref: dict[str, Any] = field(default_factory=dict)
     prompt_sha256: str = ""
     context_manifest: dict[str, str] = field(default_factory=dict)
+    view_manifest_ref: dict[str, Any] = field(default_factory=dict)
+    grant_ref: dict[str, Any] = field(default_factory=dict)
+    authorized_knowledge_state_ref: dict[str, Any] = field(default_factory=dict)
+    authorization_history_cut: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -665,6 +684,7 @@ def compute_stage_package_identity_digest(
     source_tree_sha: str,
     source_location: str,
     context_manifest: Mapping[str, str],
+    authorization_binding: Mapping[str, Any] | None = None,
 ) -> str:
     body = {
         "compiled_digest": compiled_digest,
@@ -689,6 +709,7 @@ def compute_stage_package_identity_digest(
         "source_tree_sha": source_tree_sha,
         "source_location": source_location,
         "context_manifest": dict(context_manifest),
+        "authorization_binding": dict(authorization_binding or {}),
     }
     return hashlib.sha256(canonical_bytes(body)).hexdigest()
 
@@ -780,6 +801,7 @@ def prepare_stage_phase_batch(
     lane_definitions: Sequence[StageLaneDefinition],
     all_stage_lane_slots: Sequence[str],
     context_members: Mapping[str, bytes] | None = None,
+    authorized_context: StageAuthorizedContext | None = None,
     execution_mode: str = "ChatGPT / GitHub",
     model: str = "Sol 5.6",
 ) -> StageBatch:
@@ -809,7 +831,73 @@ def prepare_stage_phase_batch(
     )
     frozen_cut = assignments.assignment_input_history_cut
     context: dict[str, bytes] = {}
-    ctx_manifest = _context_manifest(context)
+    ctx_manifest: dict[str, str] = {}
+    authorization_by_slot: dict[str, dict[str, Any]] = {}
+
+    if authorized_context is not None:
+        if (
+            authorized_context.campaign_id != assignments.campaign_id
+            or authorized_context.stage_id != stage_id
+            or authorized_context.phase_id != phase_id
+        ):
+            raise ValidationError("STAGE_CONTEXT_AUTHORITY_SCOPE_MISMATCH")
+        if set(authorized_context.assignments) != set(assignments.assignments):
+            raise ValidationError("STAGE_CONTEXT_ASSIGNMENT_SET_MISMATCH")
+
+        current_cut, _ = _current_cut(store)
+        if current_cut != authorized_context.authorization_history_cut:
+            raise ValidationError("STALE_STAGE_CONTEXT_AUTHORIZATION")
+        view = store.resolve_accepted(
+            authorized_context.view_manifest_ref,
+            current_cut,
+            require_current=False,
+        )
+        context = dict(authorized_context.context_members)
+        ctx_manifest = _context_manifest(context)
+        if ctx_manifest != authorized_context.context_manifest:
+            raise ValidationError("STAGE_CONTEXT_MANIFEST_MISMATCH")
+        if view["body"].get("payload_manifest") != ctx_manifest:
+            raise ValidationError("STAGE_CONTEXT_VIEW_PAYLOAD_MISMATCH")
+
+        for slot, assignment in assignments.assignments.items():
+            auth_assignment = authorized_context.assignments[slot]
+            if (
+                not _same_ref(auth_assignment.assignment_ref, assignment.assignment_ref)
+                or not _same_ref(auth_assignment.attempt_ref, assignment.attempt_ref)
+            ):
+                raise ValidationError("STAGE_CONTEXT_ASSIGNMENT_BINDING_MISMATCH", slot)
+
+            grant_ref = authorized_context.grant_refs_by_slot.get(slot)
+            knowledge_ref = authorized_context.knowledge_state_refs_by_slot.get(slot)
+            if not isinstance(grant_ref, dict) or not isinstance(knowledge_ref, dict):
+                raise ValidationError("STAGE_CONTEXT_GRANT_REQUIRED", slot)
+            grant = store.resolve_accepted(grant_ref, current_cut)
+            knowledge = store.resolve_accepted(knowledge_ref, current_cut)
+            if (
+                not _same_ref(grant["body"].get("attempt_ref"), assignment.attempt_ref)
+                or not _same_ref(
+                    grant["body"].get("view_manifest_ref"),
+                    authorized_context.view_manifest_ref,
+                )
+            ):
+                raise ValidationError("STAGE_CONTEXT_GRANT_BINDING_MISMATCH", slot)
+            if not _same_ref(knowledge["body"].get("attempt_ref"), assignment.attempt_ref):
+                raise ValidationError("STAGE_CONTEXT_KNOWLEDGE_BINDING_MISMATCH", slot)
+            if not any(
+                _same_ref(ref, authorized_context.view_manifest_ref)
+                for ref in knowledge["body"].get("allowed_view_refs", [])
+                if isinstance(ref, dict)
+            ):
+                raise ValidationError("STAGE_CONTEXT_VIEW_NOT_IN_KNOWLEDGE", slot)
+
+            authorization_by_slot[slot] = {
+                "view_manifest_ref": dict(authorized_context.view_manifest_ref),
+                "grant_ref": dict(grant_ref),
+                "knowledge_state_ref": dict(knowledge_ref),
+                "authorization_history_cut": dict(current_cut),
+            }
+    else:
+        ctx_manifest = _context_manifest(context)
 
     root = (
         Path(output_dir).resolve()
@@ -862,6 +950,10 @@ def prepare_stage_phase_batch(
         )
         prompt_raw = prompt_text.encode("utf-8")
         prompt_sha = hashlib.sha256(prompt_raw).hexdigest()
+        authorization_binding = authorization_by_slot.get(
+            definition.lane_slot,
+            {},
+        )
         package_digest = compute_stage_package_identity_digest(
             compiled_digest=compiled.digest,
             prompt_sha256=prompt_sha,
@@ -881,6 +973,7 @@ def prepare_stage_phase_batch(
             source_tree_sha=source_info.exact_tree_sha or "",
             source_location=source_info.location,
             context_manifest=ctx_manifest,
+            authorization_binding=authorization_binding,
         )
         manifest = {
             "format": "BDB-STAGE-PROMPT-PACKAGE-1",
@@ -900,6 +993,7 @@ def prepare_stage_phase_batch(
             "execution_mode": execution_mode,
             "model": model,
             "context_manifest": ctx_manifest,
+            "context_authorization": authorization_binding,
         }
         members = {
             "MANIFEST.json": canonical_bytes(manifest),
@@ -952,6 +1046,18 @@ def prepare_stage_phase_batch(
             attempt_ref=dict(assignment.attempt_ref),
             prompt_sha256=prompt_sha,
             context_manifest=dict(ctx_manifest),
+            view_manifest_ref=dict(
+                authorization_binding.get("view_manifest_ref", {})
+            ),
+            grant_ref=dict(
+                authorization_binding.get("grant_ref", {})
+            ),
+            authorized_knowledge_state_ref=dict(
+                authorization_binding.get("knowledge_state_ref", {})
+            ),
+            authorization_history_cut=dict(
+                authorization_binding.get("authorization_history_cut", {})
+            ),
         )
 
     return StageBatch(
@@ -1751,6 +1857,7 @@ __all__ = [
     "StageLaneDefinition",
     "PreparedStageAssignment",
     "StageAssignmentSet",
+    "StageAuthorizedContext",
     "StageLaneJob",
     "StageBatch",
     "ImportedStagePhaseSummary",
