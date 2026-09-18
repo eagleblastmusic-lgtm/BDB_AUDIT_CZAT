@@ -23,6 +23,7 @@ from bdb_audit.workflow.e2_contradiction_resolution import (
 )
 from bdb_audit.workflow.manual_stage import (
     StageAssignmentService,
+    StageIsolationProof,
     StageLaneDefinition,
     StageResultInbox,
     prepare_stage_phase_batch,
@@ -299,6 +300,239 @@ def test_manual_e3_enforced_lane_blocks_phase_completion(
     assert "PHASE_COMPLETION_BLOCKED" in (
         summary.error or ""
     )
+
+
+
+def _prepare_e3_isolation_fixture(
+    tmp_path: Path,
+    *,
+    seed: str,
+):
+    store_path = tmp_path / f"{seed}.sqlite"
+    api = AuditOperationApi()
+    api.create_campaign(
+        store_path,
+        seed=seed,
+    )
+    for stage in ("E1", "E2"):
+        api.prepare_stage(store_path, stage)
+        api.qualify_stage(store_path, stage)
+    api.prepare_stage(store_path, "E3")
+    api.prepare_lane(
+        store_path,
+        "E3",
+        "E3-X",
+    )
+    store = TransactionalHistoryStore(store_path)
+    source = ResolvedSource(
+        target_type="github",
+        location=(
+            "https://github.com/example/e3-isolation"
+        ),
+        display_name="example/e3-isolation",
+        ref="main",
+        exact_commit_sha="d" * 40,
+    )
+    lane = StageLaneDefinition(
+        "E3-X",
+        "Security / authority / trust",
+        "BLIND_NOVELTY",
+    )
+    cut = current_accepted_cut(store)
+    source_generation = store.accepted_records(
+        "source_generation",
+        cut,
+    )[-1]["ref"]
+    return store, source, lane, source_generation
+
+
+def test_e3_enforced_proof_requires_accepted_boundary_receipts(
+    tmp_path: Path,
+):
+    store, source, lane, accepted_ref = (
+        _prepare_e3_isolation_fixture(
+            tmp_path,
+            seed="e3_proof_missing_receipts",
+        )
+    )
+    proof = StageIsolationProof(
+        result="ENFORCED",
+        channel_inventory_ref=accepted_ref,
+    )
+    with pytest.raises(
+        ValidationError,
+        match="ENFORCED_ISOLATION_RECEIPTS_REQUIRED",
+    ):
+        prepare_stage_phase_batch(
+            store=store,
+            output_dir=tmp_path / "proof-missing",
+            source_info=source,
+            stage_id="E3",
+            phase_id="E3-BLIND",
+            lane_definitions=(lane,),
+            all_stage_lane_slots=("E3-X",),
+            isolation_proofs_by_slot={
+                "E3-X": proof,
+            },
+        )
+
+
+def test_e3_declared_proof_cannot_satisfy_enforced_lane(
+    tmp_path: Path,
+):
+    store, source, lane, accepted_ref = (
+        _prepare_e3_isolation_fixture(
+            tmp_path,
+            seed="e3_declared_proof",
+        )
+    )
+    proof = StageIsolationProof(
+        result="DECLARED",
+        channel_inventory_ref=accepted_ref,
+        enforcement_receipt_refs=(
+            accepted_ref,
+        ),
+        session_boundary_evidence_refs=(
+            accepted_ref,
+        ),
+    )
+    with pytest.raises(
+        ValidationError,
+        match="ISOLATION_PROOF_INSUFFICIENT",
+    ):
+        prepare_stage_phase_batch(
+            store=store,
+            output_dir=tmp_path / "proof-declared",
+            source_info=source,
+            stage_id="E3",
+            phase_id="E3-BLIND",
+            lane_definitions=(lane,),
+            all_stage_lane_slots=("E3-X",),
+            isolation_proofs_by_slot={
+                "E3-X": proof,
+            },
+        )
+
+
+def test_e3_accepted_enforced_proof_allows_lane_completion(
+    tmp_path: Path,
+):
+    store, source, lane, accepted_ref = (
+        _prepare_e3_isolation_fixture(
+            tmp_path,
+            seed="e3_enforced_proof",
+        )
+    )
+    proof = StageIsolationProof(
+        result="ENFORCED",
+        channel_inventory_ref=accepted_ref,
+        enforcement_receipt_refs=(
+            accepted_ref,
+        ),
+        session_boundary_evidence_refs=(
+            accepted_ref,
+        ),
+        scope="TEST_CONTROLLED_SESSION",
+        reason_codes=(
+            "TEST_ACCEPTED_BOUNDARY_RECEIPTS",
+        ),
+    )
+    batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp_path / "proof-enforced",
+        source_info=source,
+        stage_id="E3",
+        phase_id="E3-BLIND",
+        lane_definitions=(lane,),
+        all_stage_lane_slots=("E3-X",),
+        isolation_proofs_by_slot={
+            "E3-X": proof,
+        },
+    )
+    cut = current_accepted_cut(store)
+    assignment = store.resolve_accepted(
+        batch.get_job(
+            "E3-X"
+        ).assignment_ref,
+        cut,
+    )
+    knowledge = store.resolve_accepted(
+        assignment["body"]["knowledge_state_ref"],
+        cut,
+    )
+    isolation = store.resolve_accepted(
+        knowledge["body"][
+            "isolation_qualification_ref"
+        ],
+        cut,
+    )
+    assert isolation["body"]["result"] == "ENFORCED"
+    assert isolation["body"][
+        "enforcement_receipt_refs"
+    ]
+    assert isolation["body"][
+        "session_boundary_evidence_refs"
+    ]
+
+    inbox = StageResultInbox(
+        store,
+        batch,
+    )
+    path = _write_result(
+        tmp_path / "e3-enforced-result.zip",
+        batch,
+        "E3-X",
+    )
+    summary = inbox.ingest_multiple_zips(
+        [path]
+    )
+    assert summary.accepted_count == 1
+    assert summary.phase_complete is True
+    assert summary.error is None
+
+
+def test_e3_enforced_proof_rejects_unaccepted_receipt(
+    tmp_path: Path,
+):
+    store, source, lane, accepted_ref = (
+        _prepare_e3_isolation_fixture(
+            tmp_path,
+            seed="e3_unaccepted_receipt",
+        )
+    )
+    fake_ref = {
+        **accepted_ref,
+        "revision_digest": "f" * 64,
+    }
+    proof = StageIsolationProof(
+        result="ENFORCED",
+        channel_inventory_ref=accepted_ref,
+        enforcement_receipt_refs=(
+            fake_ref,
+        ),
+        session_boundary_evidence_refs=(
+            accepted_ref,
+        ),
+    )
+    with pytest.raises(
+        ValidationError,
+        match=(
+            "OBJECT_NOT_ACCEPTED_AT_CUT"
+            "|ACCEPTED_HISTORY_INTEGRITY_FAILURE"
+        ),
+    ):
+        prepare_stage_phase_batch(
+            store=store,
+            output_dir=tmp_path / "proof-unaccepted",
+            source_info=source,
+            stage_id="E3",
+            phase_id="E3-BLIND",
+            lane_definitions=(lane,),
+            all_stage_lane_slots=("E3-X",),
+            isolation_proofs_by_slot={
+                "E3-X": proof,
+            },
+        )
 
 
 def test_unbound_context_members_fail_closed(e2_phase):
