@@ -1009,6 +1009,32 @@ A post-reveal discovery is never PRE_REVEAL_DISCOVERY and must not be labelled
 as blind novelty. Do not mark obligations QUALIFIED, waive scope, or invent
 canonical evidence/coverage state from this external result.
 """
+    elif stage_id == "E3" and phase_id == "E3-CUMULATIVE":
+        output_contract = """
+
+E3 CUMULATIVE CORPUS OUTPUT CONTRACT
+Use only CONTEXT/E3_CUMULATIVE_CORPUS_VIEW.json plus the exact source revision.
+This is a late reveal. Nothing learned here can retroactively acquire the
+KnowledgeState of a blind or gap-directed discovery.
+
+For EVERY item in own_e3_discoveries whose originating_lane equals your
+lane_slot, return exactly one item in outputs.corpus_matches:
+{
+  "discovery_id": "<exact own discovery_id>",
+  "relation": "MATCHED_PRIOR|NO_PRIOR_MATCH|CONFLICT|INCONCLUSIVE",
+  "matched_prior_claim_revision_digests": [
+    "<exact prior claim_revision_ref.revision_digest from the authorized view>"
+  ],
+  "rationale": "<bounded explanation>"
+}
+
+NO_PRIOR_MATCH requires an empty matched_prior_claim_revision_digests list.
+MATCHED_PRIOR or CONFLICT requires at least one authorized prior claim digest.
+Do not infer prior omission merely from absence of a text match: this result is
+a proposal for later false-negative adjudication, not the canonical decision.
+Any genuinely new post-reveal observation belongs in findings[] and cannot be
+labelled PRE_REVEAL_DISCOVERY.
+"""
 
     return f"""# BDB AUDIT v2.0.3 - {stage_id} / {phase_id} / {definition.lane_slot}
 
@@ -1111,6 +1137,7 @@ def prepare_stage_phase_batch(
             "E2-SHADOW",
             "E2-CONTRADICTION",
             "E3-GAP",
+            "E3-CUMULATIVE",
         }
         and authorized_context is None
     ):
