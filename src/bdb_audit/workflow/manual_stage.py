@@ -1035,6 +1035,29 @@ a proposal for later false-negative adjudication, not the canonical decision.
 Any genuinely new post-reveal observation belongs in findings[] and cannot be
 labelled PRE_REVEAL_DISCOVERY.
 """
+    elif stage_id == "E3" and phase_id == "E3-HOLDOUT":
+        output_contract = """
+
+E3 EXTERNAL HOLDOUT OUTPUT CONTRACT
+Use only CONTEXT/E3_EXTERNAL_HOLDOUT_VIEW.json plus the exact source revision.
+The holdout is AUXILIARY_HOLDOUT and must never be treated as the canonical
+predecessor. Its accepted grant makes it CONSUMED for unseen-evaluation claims.
+
+For EVERY item in own_e3_discoveries whose originating_lane equals your
+lane_slot, return exactly one item in outputs.holdout_matches:
+{
+  "discovery_id": "<exact own discovery_id>",
+  "relation": "MATCHED_HOLDOUT|NO_HOLDOUT_MATCH|CONFLICT|INCONCLUSIVE",
+  "matched_holdout_locators": ["<bounded locator from the authorized holdout>"],
+  "rationale": "<bounded explanation>"
+}
+
+NO_HOLDOUT_MATCH requires an empty matched_holdout_locators list.
+MATCHED_HOLDOUT or CONFLICT requires at least one locator. The external result
+is only a comparison proposal. It does NOT establish MULTI_STAGE_FALSE_NEGATIVE;
+that later decision must bind the exact holdout corpus snapshot and matching
+rules. Any new observation belongs in findings[] and cannot claim blind origin.
+"""
 
     return f"""# BDB AUDIT v2.0.3 - {stage_id} / {phase_id} / {definition.lane_slot}
 
@@ -1138,6 +1161,7 @@ def prepare_stage_phase_batch(
             "E2-CONTRADICTION",
             "E3-GAP",
             "E3-CUMULATIVE",
+            "E3-HOLDOUT",
         }
         and authorized_context is None
     ):
