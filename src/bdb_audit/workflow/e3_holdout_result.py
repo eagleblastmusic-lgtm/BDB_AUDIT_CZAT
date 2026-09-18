@@ -140,7 +140,9 @@ class E3HoldoutResultValidationService:
             and ref.get("kind") == "discovery_record"
             and isinstance(ref.get("revision_digest"), str)
         }
-        mapped = {
+        mapped: dict[
+            str, dict[str, dict[str, Any]]
+        ] = {
             slot: {}
             for slot in self.batch.jobs
         }
@@ -170,7 +172,7 @@ class E3HoldoutResultValidationService:
         self,
         cut: dict[str, Any],
     ) -> dict[str, dict[str, Any]]:
-        mapped = {}
+        mapped: dict[str, dict[str, Any]] = {}
         for slot, job in self.batch.jobs.items():
             rows = [
                 row
@@ -198,7 +200,7 @@ class E3HoldoutResultValidationService:
         self,
         cut: dict[str, Any],
     ) -> dict[str, dict[str, Any]]:
-        mapped = {}
+        mapped: dict[str, dict[str, Any]] = {}
         for row in self.store.accepted_records(
             "checkpoint",
             cut,
@@ -233,7 +235,9 @@ class E3HoldoutResultValidationService:
         bool,
     ]:
         checkpoints = self._checkpoint_by_slot(cut)
-        expected = {}
+        expected: dict[
+            tuple[str, int], dict[str, Any]
+        ] = {}
         for slot, result in results.items():
             findings = result["body"].get("findings", [])
             if not isinstance(findings, list):
@@ -270,7 +274,9 @@ class E3HoldoutResultValidationService:
             row["ref"]["revision_digest"]
             for row in results.values()
         }
-        existing = {}
+        existing: dict[
+            tuple[str, int], dict[str, Any]
+        ] = {}
         for row in self.store.accepted_records(
             "discovery_record",
             cut,
@@ -336,7 +342,7 @@ class E3HoldoutResultValidationService:
                 True,
             )
 
-        objects = []
+        objects: list[CanonicalObject] = []
         for (slot, index), item in sorted(expected.items()):
             job = self.batch.get_job(slot)
             assignment = self.store.resolve_accepted(
