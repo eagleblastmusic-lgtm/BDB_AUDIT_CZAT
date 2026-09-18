@@ -26,10 +26,12 @@ from .e2_finalize import E2FinalizationService
 from .e2_contradiction import E2ContradictionAuthorizationService
 from .e2_contradiction_resolution import E2ContradictionResolutionService
 from .e3_checkpoint import E3BlindCheckpointService
+from .e3_gap import E3PositiveGapAuthorizationService
 from .inbox import E1ResultInbox, ImportedResultSummary
 from .manual_stage import (
     ImportedStagePhaseSummary,
     StageBatch,
+    StageIsolationProof,
     StageLaneDefinition,
     StageResultInbox,
     prepare_stage_phase_batch,
@@ -99,6 +101,24 @@ E3_BLIND_LANES = (
         "E3-Z",
         "Frontend, concurrency, resources and cross-layer blind novelty",
         "CROSS_LAYER_CONCURRENCY_SEARCH",
+    ),
+)
+
+E3_GAP_LANES = (
+    StageLaneDefinition(
+        "E3-X",
+        "Security, authority and trust gap-directed exploration",
+        "AUTHORITY_TRUST_GAP_DIRECTED_SEARCH",
+    ),
+    StageLaneDefinition(
+        "E3-Y",
+        "State, data, catalog and recovery gap-directed exploration",
+        "STATE_CATALOG_RECOVERY_GAP_DIRECTED_SEARCH",
+    ),
+    StageLaneDefinition(
+        "E3-Z",
+        "Frontend, concurrency, resources and cross-layer gap-directed exploration",
+        "CROSS_LAYER_CONCURRENCY_GAP_DIRECTED_SEARCH",
     ),
 )
 
@@ -556,6 +576,61 @@ class FullAuditOrchestrator:
         )
         return batch
 
+    def prepare_e3_gap_orchestration(
+        self,
+        isolation_proofs_by_slot: dict[
+            str, StageIsolationProof
+        ],
+    ) -> StageBatch:
+        """Authorize and publish fresh E3 gap-directed attempts."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        authorization = E3PositiveGapAuthorizationService(
+            store,
+            lane_definitions=E3_GAP_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+            isolation_proofs_by_slot=(
+                isolation_proofs_by_slot
+            ),
+        ).authorize()
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E3",
+            phase_id="E3-GAP",
+            lane_definitions=E3_GAP_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            authorized_context=authorization,
+            isolation_proofs_by_slot=(
+                isolation_proofs_by_slot
+            ),
+            execution_mode=(
+                self.settings.execution_mode
+            ),
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(
+            store,
+            batch,
+        )
+        return batch
+
     def deliver_stage_lane_to_user(self, slot: str) -> dict[str, Any]:
         """Deliver one already accepted E2+ stage assignment/package."""
         if self.stage_batch is None:
@@ -682,6 +757,7 @@ class FullAuditOrchestrator:
                 active_stage = "E4"
             elif "E2" in completed_stages:
                 candidate_stage_phases = (
+                    ("E3", "E3-GAP"),
                     ("E3", "E3-BLIND"),
                 )
                 active_stage = "E3"
@@ -841,16 +917,28 @@ class FullAuditOrchestrator:
                 != "LANE_COMPLETED"
             ]
             if missing or blocked:
+                phase = self.stage_batch.phase_id
+                next_action_by_phase = {
+                    "E3-BLIND": (
+                        "DELIVER_OR_IMPORT_E3_BLIND_RESULTS"
+                    ),
+                    "E3-GAP": (
+                        "DELIVER_OR_IMPORT_E3_GAP_RESULTS"
+                    ),
+                }
+                if phase not in next_action_by_phase:
+                    raise ValidationError(
+                        "UNSUPPORTED_E3_PHASE",
+                        phase,
+                    )
                 return {
                     "status": "WAITING_EXTERNAL_RESULTS",
                     "current_stage": "E3",
-                    "current_phase": (
-                        self.stage_batch.phase_id
-                    ),
+                    "current_phase": phase,
                     "missing_lanes": missing,
                     "blocked_lanes": blocked,
                     "next_action": (
-                        "DELIVER_OR_IMPORT_E3_BLIND_RESULTS"
+                        next_action_by_phase[phase]
                     ),
                     "packages": {
                         slot: str(
@@ -890,6 +978,19 @@ class FullAuditOrchestrator:
                     ),
                     "next_action": (
                         "PREPARE_E3_POSITIVE_GAP_REVEAL"
+                    ),
+                }
+
+            if (
+                self.stage_batch.phase_id
+                == "E3-GAP"
+            ):
+                return {
+                    "status": "E3_GAP_DIRECTED_COMPLETE",
+                    "current_stage": "E3",
+                    "current_phase": "E3-GAP",
+                    "next_action": (
+                        "PREPARE_E3_CUMULATIVE_CORPUS_REVEAL"
                     ),
                 }
 
