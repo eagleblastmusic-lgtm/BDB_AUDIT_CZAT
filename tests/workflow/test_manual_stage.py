@@ -10,6 +10,7 @@ import pytest
 from bdb_audit.coordinator.operations import AuditOperationApi
 from bdb_audit.core.errors import ValidationError
 from bdb_audit.history.store import TransactionalHistoryStore
+from bdb_audit.workflow.e2_checkpoint import E2BlindCheckpointService
 from bdb_audit.workflow.manual_stage import (
     StageLaneDefinition,
     StageResultInbox,
@@ -340,3 +341,108 @@ def test_distinct_phase_does_not_reuse_blind_assignments(e2_phase):
             reveal.get_job(slot).assignment_ref["revision_digest"]
             != blind_batch.get_job(slot).assignment_ref["revision_digest"]
         )
+
+
+def test_e2_blind_checkpoint_seals_both_lanes_on_one_cut(e2_phase):
+    store, batch, inbox, tmp = e2_phase
+    paths = [
+        _write_result(
+            tmp / "convergence-checkpoint.zip",
+            batch,
+            "E2-CONVERGENCE",
+            findings=[
+                {
+                    "finding_id": "e2-conv-1",
+                    "statement": "Independent blind precursor finding",
+                }
+            ],
+        ),
+        _write_result(
+            tmp / "adjudication-checkpoint.zip",
+            batch,
+            "E2-ADJUDICATION",
+            findings=[],
+        ),
+    ]
+    imported = inbox.ingest_multiple_zips(paths)
+    assert imported.phase_complete is True
+
+    before = store.head().commit_seq
+    summary = E2BlindCheckpointService(
+        store,
+        batch,
+        inbox,
+    ).seal()
+    assert summary.already_sealed is False
+    assert set(summary.checkpoint_refs) == {
+        "E2-CONVERGENCE",
+        "E2-ADJUDICATION",
+    }
+    assert summary.accepted_commit_seq == before + 1
+
+    cut = current_accepted_cut(store)
+    rows = [
+        row
+        for row in store.accepted_records("checkpoint", cut)
+        if row["body"].get("phase_id") == "E2-BLIND"
+    ]
+    assert len(rows) == 2
+    assert {row["accepted_seq"] for row in rows} == {
+        summary.accepted_commit_seq
+    }
+    convergence = next(
+        row
+        for row in rows
+        if row["body"].get("lane_slot") == "E2-CONVERGENCE"
+    )
+    kinds = {
+        ref["kind"]
+        for ref in convergence["body"]["sealed_output_refs"]
+    }
+    assert "bdb_audit_lane_result" in kinds
+    assert "discovery_record" in kinds
+
+
+def test_e2_blind_checkpoint_retry_is_idempotent(e2_phase):
+    store, batch, inbox, tmp = e2_phase
+    inbox.ingest_multiple_zips(
+        [
+            _write_result(
+                tmp / "convergence-retry.zip",
+                batch,
+                "E2-CONVERGENCE",
+            ),
+            _write_result(
+                tmp / "adjudication-retry.zip",
+                batch,
+                "E2-ADJUDICATION",
+            ),
+        ]
+    )
+    service = E2BlindCheckpointService(store, batch, inbox)
+    first = service.seal()
+    seq = store.head().commit_seq
+    second = service.seal()
+    assert second.already_sealed is True
+    assert store.head().commit_seq == seq
+    assert second.checkpoint_refs == first.checkpoint_refs
+
+
+def test_e2_blind_checkpoint_rejects_incomplete_phase(e2_phase):
+    store, batch, inbox, tmp = e2_phase
+    inbox.ingest_zip(
+        _write_result(
+            tmp / "only-convergence.zip",
+            batch,
+            "E2-CONVERGENCE",
+        )
+    )
+    with pytest.raises(
+        ValidationError,
+        match="E2_BLIND_PHASE_NOT_COMPLETE",
+    ):
+        E2BlindCheckpointService(
+            store,
+            batch,
+            inbox,
+        ).seal()
