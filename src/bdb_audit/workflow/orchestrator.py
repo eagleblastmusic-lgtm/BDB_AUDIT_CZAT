@@ -1066,34 +1066,59 @@ class FullAuditOrchestrator:
         return self.advance_to_next_stage()
 
     def advance_stage(self, stage_id: str | None = None) -> dict[str, Any]:
-        """Advance a specific or next incomplete stage via StageService."""
+        """Advance only through the evidence-backed user workflow.
+
+        This compatibility entry point never calls the synthetic
+        ``qualify_stage`` helper. Stage completion for E1-E5 is owned by the
+        durable assignment/package/result/synthesis path.
+        """
         if not self.active_store_path or not self.active_store_path.exists():
             raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
 
         status = self.api.get_campaign_status(self.active_store_path)
         completed = set(status.get("stages_completed", []))
-        prepared = set(status.get("stages_prepared", []))
+        order = ("E1", "E2", "E3", "E4", "E5")
+        next_incomplete = next(
+            (stage for stage in order if stage not in completed),
+            None,
+        )
+        if next_incomplete is None:
+            return {
+                "status": "ALL_STAGES_COMPLETED",
+                "next_action": "EVALUATE_STOP_GATE",
+            }
 
-        target_stage: str | None
         if stage_id is not None:
-            target_stage = stage_id.upper()
-        else:
-            target_stage = next((s for s in ("E1", "E2", "E3", "E4", "E5") if s not in completed), None)
-            if target_stage is None:
-                return {"status": "ALL_STAGES_COMPLETED", "next_action": "EVALUATE_STOP_GATE"}
+            requested = stage_id.upper()
+            if requested != next_incomplete:
+                raise ValidationError(
+                    "INVALID_STAGE_TRANSITION",
+                    (
+                        f"Current evidence-backed stage is {next_incomplete}; "
+                        f"requested {requested}"
+                    ),
+                )
 
-        if target_stage not in prepared:
-            self.api.prepare_stage(self.active_store_path, target_stage)
+        if next_incomplete == "E1":
+            if self.e1_inbox is None:
+                return {
+                    "status": "BLOCKED",
+                    "current_stage": "E1",
+                    "next_action": "PREPARE_OR_RESUME_E1",
+                }
+            missing = [
+                slot
+                for slot, lane in self.e1_inbox.lane_statuses.items()
+                if lane.status != "ACCEPTED"
+            ]
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E1",
+                "missing_lanes": missing,
+                "next_action": "DELIVER_OR_IMPORT_E1_RESULTS",
+            }
 
-        res = self.api.qualify_stage(self.active_store_path, target_stage)
-        return {
-            "status": "SUCCESS",
-            "stage": target_stage,
-            "stage_completion_digest": res.get("stage_completion_digest"),
-            "commit_seq": res.get("commit_seq"),
-            "commit_hash": res.get("commit_hash"),
-        }
-
+        return self.advance_to_next_stage()
     def run_full_audit_workflow(self) -> dict[str, Any]:
         """Drive the user workflow only as far as current external evidence permits.
 
@@ -1139,9 +1164,17 @@ class FullAuditOrchestrator:
     def get_status(self) -> dict[str, Any]:
         if not self.active_store_path:
             return {"status": "NO_ACTIVE_CAMPAIGN"}
+        canonical = self.api.get_campaign_status(
+            self.active_store_path
+        )
         summary = self.get_dashboard_summary()
-        return {"status": "ACTIVE", "stage": "E1", **summary}
-
+        return {
+            "status": "ACTIVE",
+            "stage": canonical.get("current_stage"),
+            "accepted_head_seq": canonical.get("accepted_head_seq"),
+            "stages_completed": canonical.get("stages_completed", []),
+            **summary,
+        }
     def get_dashboard_summary(self) -> dict[str, Any]:
         target = self.resolved_source.display_name if self.resolved_source else (
             self.settings.github_repo_url
@@ -1160,10 +1193,41 @@ class FullAuditOrchestrator:
             "STOP": "PENDING",
         }
         lanes_detail: dict[str, str] = {}
+        if (
+            self.active_store_path
+            and self.active_store_path.exists()
+        ):
+            canonical = self.api.get_campaign_status(
+                self.active_store_path
+            )
+            completed = set(
+                canonical.get("stages_completed", [])
+            )
+            prepared = set(
+                canonical.get("stages_prepared", [])
+            )
+            for stage in ("E1", "E2", "E3", "E4", "E5"):
+                if stage in completed:
+                    stage_status[stage] = "COMPLETE"
+                elif stage in prepared:
+                    stage_status[stage] = "IN_PROGRESS"
         if self.e1_inbox:
-            stage_status["E1"] = "COMPLETE" if self.e1_inbox.stage_complete else "IN_PROGRESS"
+            stage_status["E1"] = (
+                "COMPLETE"
+                if self.e1_inbox.stage_complete
+                else "IN_PROGRESS"
+            )
             for slot, lane in self.e1_inbox.lane_statuses.items():
                 lanes_detail[slot] = lane.status
+        if (
+            self.stage_batch is not None
+            and self.stage_inbox is not None
+        ):
+            stage_status[self.stage_batch.stage_id] = "IN_PROGRESS"
+            for slot, lane in self.stage_inbox.lane_statuses.items():
+                lanes_detail[
+                    f"{self.stage_batch.phase_id}:{slot}"
+                ] = lane.status
 
         if self.e1_batch:
             execution_profile = f"{self.e1_batch.executor_profile} ({self.e1_batch.model})"
