@@ -373,3 +373,24 @@ def test_resume_does_not_resurrect_completed_e2_phase(
     assert result["current_stage"] == "E3"
     assert result["current_phase"] is None
     assert resumed.stage_batch is None
+
+def test_advance_surfaces_e3_isolation_backend_blocker(
+    orchestrator_setup,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    assert orch.active_store_path is not None
+    orch.api.prepare_stage(orch.active_store_path, "E1")
+    orch.api.qualify_stage(orch.active_store_path, "E1")
+    orch.api.prepare_stage(orch.active_store_path, "E2")
+    orch.api.qualify_stage(orch.active_store_path, "E2")
+
+    result = orch.advance_to_next_stage()
+    assert result["status"] == "BLOCKED"
+    assert result["current_stage"] == "E3"
+    assert result["current_phase"] == "E3-BLIND"
+    assert (
+        result["next_action"]
+        == "CONFIGURE_ENFORCED_ISOLATION_BACKEND"
+    )
+    assert "E3_ENFORCED_ISOLATION_BACKEND_REQUIRED" in result["reason"]
