@@ -758,6 +758,32 @@ AUTHORIZED CONTEXT
 - Do not infer or reconstruct hidden provenance, support count, producer identity,
   severity history, raw report paths, or evidence payloads not present in the view.
 """
+    output_contract = ""
+    if stage_id == "E2" and phase_id == "E2-REVEAL":
+        output_contract = """
+
+E2 REVEAL OUTPUT CONTRACT
+For EVERY claim in CONTEXT/E1_CLAIM_VIEW.json, return exactly one item in
+outputs.claim_assessments. Do not omit a claim and do not invent claim IDs.
+
+Each item:
+{
+  "opaque_claim_view_id": "<exact id from the authorized claim view>",
+  "claim_outcome": "SUPPORTED|REFUTED|INCONCLUSIVE|BLOCKED|NOT_APPLICABLE",
+  "axis_outcomes": {
+    "MECHANISM": "SUPPORTED|REFUTED|INCONCLUSIVE|BLOCKED|NOT_APPLICABLE",
+    "REACHABILITY": "SUPPORTED|REFUTED|INCONCLUSIVE|BLOCKED|NOT_APPLICABLE",
+    "IMPACT": "SUPPORTED|REFUTED|INCONCLUSIVE|BLOCKED|NOT_APPLICABLE",
+    "SEVERITY": "SUPPORTED|REFUTED|INCONCLUSIVE|BLOCKED|NOT_APPLICABLE"
+  },
+  "rationale": "<bounded explanation>"
+}
+
+An assertion in this result is a proposal, not qualified canonical evidence.
+Do not fabricate typed evidence references. If the authorized context and your
+own permitted inspection do not establish an axis, use INCONCLUSIVE or BLOCKED.
+"""
+
     return f"""# BDB AUDIT v2.0.3 - {stage_id} / {phase_id} / {definition.lane_slot}
 
 You are executing one bounded external audit lane for BDB Audit v2.
@@ -788,7 +814,7 @@ RULES
 4. Do not claim ENFORCED isolation for a manually delivered external chat.
 5. Return structured findings/outputs even when the result is negative or inconclusive.
 6. Copy input_package_digest from MANIFEST.json exactly; do not recompute it.
-
+{output_contract}
 REQUIRED RESULT ZIP
 Return a ZIP with root MANIFEST.json containing:
 {{
