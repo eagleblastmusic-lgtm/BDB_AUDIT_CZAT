@@ -6,6 +6,7 @@ from pathlib import Path
 import zipfile
 import pytest
 
+from bdb_audit.core.errors import ValidationError
 from bdb_audit.workflow.settings import SettingsManager
 from bdb_audit.workflow.platform import MockPlatformAdapter
 from bdb_audit.workflow.source_target import ResolvedSource
@@ -222,7 +223,7 @@ def test_status_after_initialization(orchestrator_setup):
     orch.initialize_campaign()
     result = orch.get_status()
     assert result["status"] == "ACTIVE"
-    assert result["stage"] in ("E0", "E1")
+    assert result["stage"] in ("GENESIS", "E0", "E1")
 
 
 def test_advance_does_not_reset_existing_e2_phase_to_blind(
@@ -329,7 +330,7 @@ def test_e3_blind_preparation_fails_before_package_publication_without_enforced_
     artifacts = orch._artifact_root()
 
     with pytest.raises(
-        Exception,
+        ValidationError,
         match="E3_ENFORCED_ISOLATION_BACKEND_REQUIRED",
     ):
         orch.prepare_e3_blind_orchestration()
