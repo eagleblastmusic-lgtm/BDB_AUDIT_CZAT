@@ -15,6 +15,12 @@ from bdb_audit.workflow.e2_reveal import E2ControlledRevealService
 from bdb_audit.workflow.e2_synthesis import E2MainSynthesisService
 from bdb_audit.workflow.e2_shadow import E2ShadowAuthorizationService
 from bdb_audit.workflow.e2_finalize import E2FinalizationService
+from bdb_audit.workflow.e2_contradiction import (
+    E2ContradictionAuthorizationService,
+)
+from bdb_audit.workflow.e2_contradiction_resolution import (
+    E2ContradictionResolutionService,
+)
 from bdb_audit.workflow.manual_stage import (
     StageAssignmentService,
     StageLaneDefinition,
@@ -1423,13 +1429,399 @@ def test_e2_finalization_conflict_requires_contradiction_protocol(
     assert result.stage_completed is False
     assert result.stage_completion_ref is None
     assert result.shadow_conflict_claim_digests
+    assert result.contradiction_refs
     assert (
         result.next_action
         == "E2_CONTRADICTION_PROTOCOL_REQUIRED"
     )
-    assert store.head().commit_seq == seq
+    # The conflict is no longer ephemeral: one atomic commit records the
+    # shadow challenge claim(s) and canonical ContradictionRevision case(s).
+    assert store.head().commit_seq == seq + 1
+
+    cut = current_accepted_cut(store)
+    for ref in result.contradiction_refs:
+        contradiction = store.resolve_accepted(
+            ref,
+            cut,
+        )
+        assert contradiction["body"]["status"] == "OPEN"
+        assert len(
+            contradiction["body"]["claim_revision_refs"]
+        ) == 2
+        assert (
+            contradiction["body"][
+                "opposing_evidence_qualification_refs"
+            ]
+            == []
+        )
+
+    # Retry is idempotent and reuses the same accepted contradiction set.
+    committed_seq = store.head().commit_seq
+    retry = E2FinalizationService(
+        store,
+        batch,
+        inbox,
+    ).finalize()
+    assert retry.already_finalized is True
+    assert retry.contradiction_refs == result.contradiction_refs
+    assert store.head().commit_seq == committed_seq
 
     status = AuditOperationApi().get_campaign_status(
         store.path
     )
     assert "E2" not in status["stages_completed"]
+
+
+@pytest.fixture
+def e2_contradiction_flow(e2_shadow_flow):
+    store = e2_shadow_flow["store"]
+    shadow_batch = e2_shadow_flow["shadow_batch"]
+    shadow_authorization = e2_shadow_flow[
+        "shadow_authorization"
+    ]
+    source = e2_shadow_flow["source"]
+    tmp = e2_shadow_flow["tmp"]
+
+    shadow_inbox = StageResultInbox(
+        store,
+        shadow_batch,
+    )
+    imported = shadow_inbox.ingest_multiple_zips(
+        [
+            _write_result(
+                tmp / "shadow-all-conflicts.zip",
+                shadow_batch,
+                "E2-ADJUDICATION",
+                outputs={
+                    "shadow_checks": _shadow_checks(
+                        shadow_authorization,
+                        conflict=True,
+                    )
+                },
+            )
+        ]
+    )
+    assert imported.phase_complete is True
+    finalization = E2FinalizationService(
+        store,
+        shadow_batch,
+        shadow_inbox,
+    ).finalize()
+    assert finalization.stage_completed is False
+    assert finalization.contradiction_refs
+
+    contradiction_lane = StageLaneDefinition(
+        "E2-ADJUDICATION",
+        "Scoped contradiction protocol adjudicator",
+        "CONTRADICTION_PROTOCOL",
+    )
+    authorization = E2ContradictionAuthorizationService(
+        store,
+        contradiction_refs=finalization.contradiction_refs,
+        lane_definition=contradiction_lane,
+        all_stage_lane_slots=(
+            "E2-CONVERGENCE",
+            "E2-ADJUDICATION",
+        ),
+        executor_profile="ChatGPT / GitHub",
+        model="Sol 5.6",
+    ).authorize()
+    batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp / "contradiction-work",
+        source_info=source,
+        stage_id="E2",
+        phase_id="E2-CONTRADICTION",
+        lane_definitions=(contradiction_lane,),
+        all_stage_lane_slots=(
+            "E2-CONVERGENCE",
+            "E2-ADJUDICATION",
+        ),
+        authorized_context=authorization,
+    )
+    return {
+        **e2_shadow_flow,
+        "shadow_inbox": shadow_inbox,
+        "shadow_finalization": finalization,
+        "contradiction_authorization": authorization,
+        "contradiction_batch": batch,
+    }
+
+
+def _contradiction_resolutions(
+    authorization,
+    *,
+    blocked=False,
+):
+    payload = json.loads(
+        authorization.context_members[
+            "E2_CONTRADICTION_CASES.json"
+        ].decode("utf-8")
+    )
+    rows = []
+    for item in payload["contradictions"]:
+        ref = item["contradiction_revision_ref"]
+        rows.append(
+            {
+                "contradiction_revision_digest": ref[
+                    "revision_digest"
+                ],
+                "resolution_kind": (
+                    "BLOCKED"
+                    if blocked
+                    else "REFUTED"
+                ),
+                "resulting_status": (
+                    "BLOCKED"
+                    if blocked
+                    else "RESOLVED_FULL"
+                ),
+                "resolved_scope": dict(
+                    item["scope"]
+                ),
+                "basis_ref_digests": [
+                    ref["revision_digest"]
+                ],
+                "rationale": (
+                    "authorized evidence is insufficient"
+                    if blocked
+                    else "bounded contradiction falsifier resolves the case"
+                ),
+            }
+        )
+    return rows
+
+
+def test_e2_contradiction_view_is_grant_bound_and_bounded(
+    e2_contradiction_flow,
+):
+    authorization = e2_contradiction_flow[
+        "contradiction_authorization"
+    ]
+    batch = e2_contradiction_flow[
+        "contradiction_batch"
+    ]
+    payload = json.loads(
+        authorization.context_members[
+            "E2_CONTRADICTION_CASES.json"
+        ].decode("utf-8")
+    )
+    assert (
+        payload["format"]
+        == "BDB-E2-CONTRADICTION-PROTOCOL-VIEW-1"
+    )
+    assert payload["contradictions"]
+    raw = json.dumps(payload)
+    assert "raw_report_path" not in raw
+    assert "producer_identity" not in raw
+    assert "support_count" not in raw
+    assert "prior_popularity" not in raw
+
+    job = batch.get_job("E2-ADJUDICATION")
+    assert job.grant_ref == authorization.grant_refs_by_slot[
+        "E2-ADJUDICATION"
+    ]
+    assert (
+        "E2 CONTRADICTION PROTOCOL OUTPUT CONTRACT"
+        in job.prompt_text
+    )
+    with zipfile.ZipFile(
+        job.package_zip_path,
+        "r",
+    ) as archive:
+        names = set(archive.namelist())
+        assert (
+            "CONTEXT/E2_CONTRADICTION_CASES.json"
+            in names
+        )
+        manifest = json.loads(
+            archive.read("MANIFEST.json")
+        )
+    assert (
+        manifest["context_authorization"]["grant_ref"]
+        == job.grant_ref
+    )
+
+
+def test_e2_contradiction_resolution_uses_two_commit_dag_and_completes_e2(
+    e2_contradiction_flow,
+):
+    store = e2_contradiction_flow["store"]
+    batch = e2_contradiction_flow[
+        "contradiction_batch"
+    ]
+    authorization = e2_contradiction_flow[
+        "contradiction_authorization"
+    ]
+    tmp = e2_contradiction_flow["tmp"]
+    inbox = StageResultInbox(store, batch)
+    imported = inbox.ingest_multiple_zips(
+        [
+            _write_result(
+                tmp / "contradiction-resolved.zip",
+                batch,
+                "E2-ADJUDICATION",
+                outputs={
+                    "contradiction_resolutions": (
+                        _contradiction_resolutions(
+                            authorization,
+                            blocked=False,
+                        )
+                    )
+                },
+            )
+        ]
+    )
+    assert imported.phase_complete is True
+
+    before = store.head().commit_seq
+    result = E2ContradictionResolutionService(
+        store,
+        batch,
+        inbox,
+    ).resolve()
+    assert result.stage_completed is True
+    assert result.stage_completion_ref is not None
+    # Decision commit -> successor contradiction commit -> StageCompletion.
+    assert result.decision_commit_seq == before + 1
+    assert result.successor_commit_seq == before + 2
+    assert (
+        result.stage_completion_commit_seq
+        == before + 3
+    )
+    assert set(
+        result.resulting_status_by_prior_digest.values()
+    ) == {"RESOLVED_FULL"}
+
+    cut = current_accepted_cut(store)
+    for ref in result.successor_contradiction_refs:
+        successor = store.resolve_accepted(
+            ref,
+            cut,
+        )
+        assert (
+            successor["body"]["status"]
+            == "RESOLVED_FULL"
+        )
+        assert (
+            successor["body"][
+                "predecessor_contradiction_revision_ref"
+            ]["ref_class"]
+            == "PRIOR_ACCEPTED_ONLY"
+        )
+        assert (
+            successor["body"][
+                "resolution_decision_ref"
+            ]["ref_class"]
+            == "PRIOR_ACCEPTED_ONLY"
+        )
+
+    status = AuditOperationApi().get_campaign_status(
+        store.path
+    )
+    assert "E2" in status["stages_completed"]
+
+    seq = store.head().commit_seq
+    retry = E2ContradictionResolutionService(
+        store,
+        batch,
+        inbox,
+    ).resolve()
+    assert retry.already_resolved is True
+    assert store.head().commit_seq == seq
+
+
+def test_e2_contradiction_blocked_resolution_keeps_stage_incomplete(
+    e2_contradiction_flow,
+):
+    store = e2_contradiction_flow["store"]
+    batch = e2_contradiction_flow[
+        "contradiction_batch"
+    ]
+    authorization = e2_contradiction_flow[
+        "contradiction_authorization"
+    ]
+    tmp = e2_contradiction_flow["tmp"]
+    inbox = StageResultInbox(store, batch)
+    imported = inbox.ingest_multiple_zips(
+        [
+            _write_result(
+                tmp / "contradiction-blocked.zip",
+                batch,
+                "E2-ADJUDICATION",
+                outputs={
+                    "contradiction_resolutions": (
+                        _contradiction_resolutions(
+                            authorization,
+                            blocked=True,
+                        )
+                    )
+                },
+            )
+        ]
+    )
+    assert imported.phase_complete is True
+
+    result = E2ContradictionResolutionService(
+        store,
+        batch,
+        inbox,
+    ).resolve()
+    assert result.stage_completed is False
+    assert result.stage_completion_ref is None
+    assert (
+        result.next_action
+        == "E2_CONTRADICTION_REMAINS_BLOCKING"
+    )
+    assert set(
+        result.resulting_status_by_prior_digest.values()
+    ) == {"BLOCKED"}
+
+    status = AuditOperationApi().get_campaign_status(
+        store.path
+    )
+    assert "E2" not in status["stages_completed"]
+
+
+def test_e2_contradiction_rejects_basis_outside_authorized_view(
+    e2_contradiction_flow,
+):
+    store = e2_contradiction_flow["store"]
+    batch = e2_contradiction_flow[
+        "contradiction_batch"
+    ]
+    authorization = e2_contradiction_flow[
+        "contradiction_authorization"
+    ]
+    tmp = e2_contradiction_flow["tmp"]
+    resolutions = _contradiction_resolutions(
+        authorization,
+        blocked=False,
+    )
+    resolutions[0]["basis_ref_digests"] = [
+        "f" * 64
+    ]
+    inbox = StageResultInbox(store, batch)
+    inbox.ingest_multiple_zips(
+        [
+            _write_result(
+                tmp / "contradiction-bad-basis.zip",
+                batch,
+                "E2-ADJUDICATION",
+                outputs={
+                    "contradiction_resolutions": (
+                        resolutions
+                    )
+                },
+            )
+        ]
+    )
+    with pytest.raises(
+        ValidationError,
+        match="E2_CONTRADICTION_BASIS_OUTSIDE_VIEW",
+    ):
+        E2ContradictionResolutionService(
+            store,
+            batch,
+            inbox,
+        ).resolve()
