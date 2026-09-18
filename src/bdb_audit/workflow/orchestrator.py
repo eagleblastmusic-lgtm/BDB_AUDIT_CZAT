@@ -35,6 +35,7 @@ from .e3_holdout_result import E3HoldoutResultValidationService
 from .inbox import E1ResultInbox, ImportedResultSummary
 from .manual_stage import (
     ImportedStagePhaseSummary,
+    StageAuthorizedContext,
     StageBatch,
     StageIsolationProof,
     StageLaneDefinition,
@@ -444,6 +445,35 @@ class FullAuditOrchestrator:
             executor_profile=self.settings.execution_mode,
             model=self.settings.model,
         ).authorize()
+        authorized_context = StageAuthorizedContext(
+            campaign_id=authorization.campaign_id,
+            stage_id=authorization.stage_id,
+            phase_id=authorization.phase_id,
+            context_members=dict(
+                authorization.context_members
+            ),
+            context_manifest=dict(
+                authorization.context_manifest
+            ),
+            view_manifest_ref=dict(
+                authorization.view_manifest_ref
+            ),
+            grant_refs_by_slot=dict(
+                authorization.grant_refs_by_slot
+            ),
+            knowledge_state_refs_by_slot=dict(
+                authorization.knowledge_state_refs_by_slot
+            ),
+            authorization_history_cut=dict(
+                authorization.authorization_history_cut
+            ),
+            assignments=dict(
+                authorization.assignments
+            ),
+            already_authorized=(
+                authorization.already_authorized
+            ),
+        )
 
         batch = prepare_stage_phase_batch(
             store=store,
@@ -455,7 +485,7 @@ class FullAuditOrchestrator:
             all_stage_lane_slots=tuple(
                 item.lane_slot for item in E2_REVEAL_LANES
             ),
-            authorized_context=authorization,
+            authorized_context=authorized_context,
             execution_mode=self.settings.execution_mode,
             model=self.settings.model,
         )
@@ -901,7 +931,7 @@ class FullAuditOrchestrator:
         ]
 
         active_stage = "E1"
-        active_phase = None
+        active_phase: str | None = None
         active_inbox = "E1"
         if self.e1_inbox.stage_complete:
             loaded_stage = None
@@ -909,6 +939,9 @@ class FullAuditOrchestrator:
             completed_stages = set(
                 status.get("stages_completed", [])
             )
+            candidate_stage_phases: tuple[
+                tuple[str, str], ...
+            ]
             if "E3" in completed_stages:
                 candidate_stage_phases = ()
                 active_stage = "E4"
@@ -1119,7 +1152,7 @@ class FullAuditOrchestrator:
                 self.stage_batch.phase_id
                 == "E3-BLIND"
             ):
-                checkpoint = (
+                e3_checkpoint = (
                     E3BlindCheckpointService(
                         TransactionalHistoryStore(
                             self.active_store_path
@@ -1133,13 +1166,13 @@ class FullAuditOrchestrator:
                     "current_stage": "E3",
                     "current_phase": "E3-BLIND",
                     "checkpoint_commit_seq": (
-                        checkpoint.accepted_commit_seq
+                        e3_checkpoint.accepted_commit_seq
                     ),
                     "checkpoint_refs": (
-                        checkpoint.checkpoint_refs
+                        e3_checkpoint.checkpoint_refs
                     ),
                     "already_sealed": (
-                        checkpoint.already_sealed
+                        e3_checkpoint.already_sealed
                     ),
                     "next_action": (
                         "PREPARE_E3_POSITIVE_GAP_REVEAL"
@@ -1150,7 +1183,7 @@ class FullAuditOrchestrator:
                 self.stage_batch.phase_id
                 == "E3-GAP"
             ):
-                validation = (
+                gap_validation = (
                     E3GapResultValidationService(
                         TransactionalHistoryStore(
                             self.active_store_path
@@ -1164,16 +1197,16 @@ class FullAuditOrchestrator:
                     "current_stage": "E3",
                     "current_phase": "E3-GAP",
                     "authorized_targets_count": len(
-                        validation.authorized_target_digests
+                        gap_validation.authorized_target_digests
                     ),
                     "covered_targets_count": len(
-                        validation.covered_target_digests
+                        gap_validation.covered_target_digests
                     ),
                     "findings_count": (
-                        validation.findings_count
+                        gap_validation.findings_count
                     ),
                     "next_action": (
-                        validation.next_action
+                        gap_validation.next_action
                     ),
                 }
 
@@ -1181,7 +1214,7 @@ class FullAuditOrchestrator:
                 self.stage_batch.phase_id
                 == "E3-CUMULATIVE"
             ):
-                validation = (
+                cumulative_validation = (
                     E3CumulativeResultValidationService(
                         TransactionalHistoryStore(
                             self.active_store_path
@@ -1197,19 +1230,19 @@ class FullAuditOrchestrator:
                         "E3-CUMULATIVE"
                     ),
                     "comparison_count": (
-                        validation.comparison_count
+                        cumulative_validation.comparison_count
                     ),
                     "matched_discoveries_count": len(
-                        validation.matched_discovery_ids
+                        cumulative_validation.matched_discovery_ids
                     ),
                     "no_prior_match_count": len(
-                        validation.no_prior_match_discovery_ids
+                        cumulative_validation.no_prior_match_discovery_ids
                     ),
                     "post_reveal_discoveries_count": len(
-                        validation.post_reveal_discovery_refs
+                        cumulative_validation.post_reveal_discovery_refs
                     ),
                     "next_action": (
-                        validation.next_action
+                        cumulative_validation.next_action
                     ),
                 }
 
@@ -1217,7 +1250,7 @@ class FullAuditOrchestrator:
                 self.stage_batch.phase_id
                 == "E3-HOLDOUT"
             ):
-                validation = (
+                holdout_validation = (
                     E3HoldoutResultValidationService(
                         TransactionalHistoryStore(
                             self.active_store_path
@@ -1231,22 +1264,22 @@ class FullAuditOrchestrator:
                     "current_stage": "E3",
                     "current_phase": "E3-HOLDOUT",
                     "comparison_count": (
-                        validation.comparison_count
+                        holdout_validation.comparison_count
                     ),
                     "matched_holdout_count": len(
-                        validation.matched_discovery_ids
+                        holdout_validation.matched_discovery_ids
                     ),
                     "no_holdout_match_count": len(
-                        validation.no_holdout_match_discovery_ids
+                        holdout_validation.no_holdout_match_discovery_ids
                     ),
                     "post_reveal_discoveries_count": len(
-                        validation.post_reveal_discovery_refs
+                        holdout_validation.post_reveal_discovery_refs
                     ),
                     "holdout_corpus_manifest_ref": (
-                        validation.holdout_corpus_manifest_ref
+                        holdout_validation.holdout_corpus_manifest_ref
                     ),
                     "next_action": (
-                        validation.next_action
+                        holdout_validation.next_action
                     ),
                 }
 
@@ -1303,7 +1336,7 @@ class FullAuditOrchestrator:
             }
 
         if self.stage_batch.phase_id == "E2-BLIND":
-            checkpoint = E2BlindCheckpointService(
+            e2_checkpoint = E2BlindCheckpointService(
                 TransactionalHistoryStore(self.active_store_path),
                 self.stage_batch,
                 self.stage_inbox,
@@ -1313,9 +1346,9 @@ class FullAuditOrchestrator:
                 "status": "WAITING_EXTERNAL_RESULTS",
                 "current_stage": "E2",
                 "current_phase": "E2-REVEAL",
-                "checkpoint_commit_seq": checkpoint.accepted_commit_seq,
-                "checkpoint_refs": checkpoint.checkpoint_refs,
-                "already_sealed": checkpoint.already_sealed,
+                "checkpoint_commit_seq": e2_checkpoint.accepted_commit_seq,
+                "checkpoint_refs": e2_checkpoint.checkpoint_refs,
+                "already_sealed": e2_checkpoint.already_sealed,
                 "missing_lanes": list(reveal_batch.lane_slots),
                 "next_action": "DELIVER_OR_IMPORT_E2_REVEAL_RESULTS",
                 "packages": {
