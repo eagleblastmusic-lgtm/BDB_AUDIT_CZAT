@@ -19,6 +19,7 @@ from ..orchestration.native_ensemble import E1_LANE_SLOTS
 from ..orchestration.templates import TemplateRegistry
 from .executors import get_executor_profile
 from .e2_checkpoint import E2BlindCheckpointService
+from .e2_reveal import E2ControlledRevealService
 from .inbox import E1ResultInbox, ImportedResultSummary
 from .manual_stage import (
     ImportedStagePhaseSummary,
@@ -45,6 +46,19 @@ E2_BLIND_LANES = (
         "E2-ADJUDICATION",
         "Blind falsification and adjudication precursor",
         "BLIND_FALSIFY_AND_ADJUDICATE",
+    ),
+)
+
+E2_REVEAL_LANES = (
+    StageLaneDefinition(
+        "E2-CONVERGENCE",
+        "Controlled E1 claim-card convergence review",
+        "CONTROLLED_REVEAL_CONVERGENCE",
+    ),
+    StageLaneDefinition(
+        "E2-ADJUDICATION",
+        "Controlled E1 claim-card falsification and adjudication",
+        "CONTROLLED_REVEAL_ADJUDICATION",
     ),
 )
 
@@ -312,6 +326,42 @@ class FullAuditOrchestrator:
         self.stage_inbox = StageResultInbox(store, batch)
         return batch
 
+    def prepare_e2_reveal_orchestration(self) -> StageBatch:
+        """Authorize and publish the controlled E1 claim-card reveal."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        store = TransactionalHistoryStore(self.active_store_path)
+        authorization = E2ControlledRevealService(
+            store,
+            lane_definitions=E2_REVEAL_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_REVEAL_LANES
+            ),
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+        ).authorize()
+
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E2",
+            phase_id="E2-REVEAL",
+            lane_definitions=E2_REVEAL_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_REVEAL_LANES
+            ),
+            authorized_context=authorization,
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(store, batch)
+        return batch
+
     def deliver_stage_lane_to_user(self, slot: str) -> dict[str, Any]:
         """Deliver one already accepted E2+ stage assignment/package."""
         if self.stage_batch is None:
@@ -428,27 +478,36 @@ class FullAuditOrchestrator:
         active_phase = None
         active_inbox = "E1"
         if self.e1_inbox.stage_complete:
-            try:
-                stage_batch, stage_source = load_stage_phase_batch(
-                    store,
-                    self._artifact_root(),
-                    stage_id="E2",
-                    phase_id="E2-BLIND",
-                )
-            except ValidationError as exc:
-                if exc.code != "RESUME_STAGE_ASSIGNMENTS_NOT_FOUND":
-                    return {
-                        "status": "ERROR",
-                        "error": exc.code,
-                        "details": str(exc),
-                        "store_path": str(path),
-                    }
-            else:
+            loaded_stage = None
+            resume_error = None
+            for candidate_phase in ("E2-REVEAL", "E2-BLIND"):
+                try:
+                    loaded_stage = load_stage_phase_batch(
+                        store,
+                        self._artifact_root(),
+                        stage_id="E2",
+                        phase_id=candidate_phase,
+                    )
+                    active_phase = candidate_phase
+                    break
+                except ValidationError as exc:
+                    if exc.code != "RESUME_STAGE_ASSIGNMENTS_NOT_FOUND":
+                        resume_error = exc
+                        break
+
+            if resume_error is not None:
+                return {
+                    "status": "ERROR",
+                    "error": resume_error.code,
+                    "details": str(resume_error),
+                    "store_path": str(path),
+                }
+            if loaded_stage is not None:
+                stage_batch, stage_source = loaded_stage
                 self.stage_batch = stage_batch
                 self.stage_inbox = StageResultInbox(store, stage_batch)
                 self.resolved_source = stage_source
                 active_stage = "E2"
-                active_phase = "E2-BLIND"
                 active_inbox = "STAGE"
                 accepted_count = sum(
                     1
@@ -561,20 +620,40 @@ class FullAuditOrchestrator:
                 },
             }
 
-        checkpoint = E2BlindCheckpointService(
-            TransactionalHistoryStore(self.active_store_path),
-            self.stage_batch,
-            self.stage_inbox,
-        ).seal()
-        return {
-            "status": "E2_BLIND_CHECKPOINTED",
-            "current_stage": "E2",
-            "current_phase": "E2-BLIND",
-            "checkpoint_commit_seq": checkpoint.accepted_commit_seq,
-            "checkpoint_refs": checkpoint.checkpoint_refs,
-            "already_sealed": checkpoint.already_sealed,
-            "next_action": "PREPARE_E2_CONTROLLED_REVEAL",
-        }
+        if self.stage_batch.phase_id == "E2-BLIND":
+            checkpoint = E2BlindCheckpointService(
+                TransactionalHistoryStore(self.active_store_path),
+                self.stage_batch,
+                self.stage_inbox,
+            ).seal()
+            reveal_batch = self.prepare_e2_reveal_orchestration()
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E2",
+                "current_phase": "E2-REVEAL",
+                "checkpoint_commit_seq": checkpoint.accepted_commit_seq,
+                "checkpoint_refs": checkpoint.checkpoint_refs,
+                "already_sealed": checkpoint.already_sealed,
+                "missing_lanes": list(reveal_batch.lane_slots),
+                "next_action": "DELIVER_OR_IMPORT_E2_REVEAL_RESULTS",
+                "packages": {
+                    slot: str(job.package_zip_path)
+                    for slot, job in reveal_batch.jobs.items()
+                },
+            }
+
+        if self.stage_batch.phase_id == "E2-REVEAL":
+            return {
+                "status": "READY_FOR_E2_SYNTHESIS",
+                "current_stage": "E2",
+                "current_phase": "E2-REVEAL",
+                "next_action": "SYNTHESIZE_E2_ADJUDICATION_FROM_ACCEPTED_BLIND_AND_REVEAL_OUTPUTS",
+            }
+
+        raise ValidationError(
+            "UNSUPPORTED_E2_PHASE",
+            self.stage_batch.phase_id,
+        )
 
     # Compatibility name retained for tests/UI.
     def advance_after_e1(self) -> dict[str, Any]:
