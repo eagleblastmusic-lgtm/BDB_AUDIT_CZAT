@@ -27,6 +27,7 @@ from .e2_contradiction import E2ContradictionAuthorizationService
 from .e2_contradiction_resolution import E2ContradictionResolutionService
 from .e3_checkpoint import E3BlindCheckpointService
 from .e3_gap import E3PositiveGapAuthorizationService
+from .e3_gap_result import E3GapResultValidationService
 from .inbox import E1ResultInbox, ImportedResultSummary
 from .manual_stage import (
     ImportedStagePhaseSummary,
@@ -985,12 +986,30 @@ class FullAuditOrchestrator:
                 self.stage_batch.phase_id
                 == "E3-GAP"
             ):
+                validation = (
+                    E3GapResultValidationService(
+                        TransactionalHistoryStore(
+                            self.active_store_path
+                        ),
+                        self.stage_batch,
+                        self.stage_inbox,
+                    ).validate()
+                )
                 return {
                     "status": "E3_GAP_DIRECTED_COMPLETE",
                     "current_stage": "E3",
                     "current_phase": "E3-GAP",
+                    "authorized_targets_count": len(
+                        validation.authorized_target_digests
+                    ),
+                    "covered_targets_count": len(
+                        validation.covered_target_digests
+                    ),
+                    "findings_count": (
+                        validation.findings_count
+                    ),
                     "next_action": (
-                        "PREPARE_E3_CUMULATIVE_CORPUS_REVEAL"
+                        validation.next_action
                     ),
                 }
 
