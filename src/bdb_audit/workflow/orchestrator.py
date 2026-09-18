@@ -485,6 +485,13 @@ class FullAuditOrchestrator:
         if self.resolved_source is None:
             raise ValidationError("SOURCE_IDENTITY_REQUIRED")
 
+        status = self.api.get_campaign_status(self.active_store_path)
+        if "E2" not in status.get("stages_completed", []):
+            raise ValidationError(
+                "PREDECESSOR_STAGE_NOT_COMPLETED",
+                "E2 must be completed before E3 blind novelty",
+            )
+
         profile = get_executor_profile(
             self.settings.execution_mode
         )
@@ -499,13 +506,6 @@ class FullAuditOrchestrator:
                     "until a controlled backend can emit accepted boundary "
                     "receipts."
                 ),
-            )
-
-        status = self.api.get_campaign_status(self.active_store_path)
-        if "E2" not in status.get("stages_completed", []):
-            raise ValidationError(
-                "PREDECESSOR_STAGE_NOT_COMPLETED",
-                "E2 must be completed before E3 blind novelty",
             )
         if "E3" not in status.get("stages_prepared", []):
             self.api.prepare_stage(
@@ -674,13 +674,24 @@ class FullAuditOrchestrator:
         if self.e1_inbox.stage_complete:
             loaded_stage = None
             resume_error = None
-            candidate_stage_phases = (
-                ("E3", "E3-BLIND"),
-                ("E2", "E2-CONTRADICTION"),
-                ("E2", "E2-SHADOW"),
-                ("E2", "E2-REVEAL"),
-                ("E2", "E2-BLIND"),
+            completed_stages = set(
+                status.get("stages_completed", [])
             )
+            if "E3" in completed_stages:
+                candidate_stage_phases = ()
+                active_stage = "E4"
+            elif "E2" in completed_stages:
+                candidate_stage_phases = (
+                    ("E3", "E3-BLIND"),
+                )
+                active_stage = "E3"
+            else:
+                candidate_stage_phases = (
+                    ("E2", "E2-CONTRADICTION"),
+                    ("E2", "E2-SHADOW"),
+                    ("E2", "E2-REVEAL"),
+                    ("E2", "E2-BLIND"),
+                )
             for candidate_stage, candidate_phase in (
                 candidate_stage_phases
             ):
