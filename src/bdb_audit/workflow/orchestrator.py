@@ -45,6 +45,10 @@ from .manual_stage import (
 from .package_resume import load_e1_batch
 from .packaging import E1Batch, prepare_e1_batch
 from .stage_resume import load_stage_phase_batch
+from .stage_finalize import (
+    ExternalStageFinalizationService,
+    E4FinalizationService,
+)
 from .platform import DefaultPlatformAdapter, PlatformAdapter
 from .settings import SettingsManager, UserSettings
 from .source_target import ResolvedSource, resolve_source_identity
@@ -161,6 +165,25 @@ E3_HOLDOUT_LANES = (
         "E3-Z",
         "Frontend, concurrency, resources and cross-layer external holdout comparison",
         "CROSS_LAYER_CONCURRENCY_HOLDOUT_COMPARISON",
+    ),
+)
+
+
+E4_DEEPEN_LANES = (
+    StageLaneDefinition(
+        "E4-MODEL",
+        "State, temporal and bounded model deepening",
+        "STATE_TEMPORAL_MODEL_DEEPENING",
+    ),
+    StageLaneDefinition(
+        "E4-RESILIENCE",
+        "Fault, concurrency, crash and endurance deepening",
+        "RESILIENCE_FAILURE_LAB",
+    ),
+    StageLaneDefinition(
+        "E4-CAUSAL",
+        "Causal-chain and sibling mechanism deepening",
+        "CAUSAL_CHAIN_DEEPENING",
     ),
 )
 
@@ -818,6 +841,126 @@ class FullAuditOrchestrator:
         )
         return batch
 
+    def finalize_e3_orchestration(self):
+        """Accept E3 StageCompletion only from completed external phases."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        slots = tuple(item.lane_slot for item in E3_BLIND_LANES)
+        return ExternalStageFinalizationService(
+            TransactionalHistoryStore(self.active_store_path),
+            stage_id="E3",
+            required_phase_slots={
+                "E3-BLIND": slots,
+                "E3-GAP": slots,
+                "E3-CUMULATIVE": slots,
+            },
+            optional_phase_slots={"E3-HOLDOUT": slots},
+            next_action="PREPARE_E4_EXTERNAL_PHASE",
+        ).finalize()
+
+    def prepare_e4_orchestration(self) -> StageBatch:
+        """Prepare the real external E4 deepen/model phase."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+        status = self.api.get_campaign_status(self.active_store_path)
+        if "E3" not in status.get("stages_completed", []):
+            raise ValidationError(
+                "PREDECESSOR_STAGE_NOT_COMPLETED",
+                "E3 must be completed before E4 deepening",
+            )
+        if "E4" not in status.get("stages_prepared", []):
+            self.api.prepare_stage(self.active_store_path, "E4")
+            status = self.api.get_campaign_status(self.active_store_path)
+        lanes_prepared = set(status.get("lanes_prepared", []))
+        for definition in E4_DEEPEN_LANES:
+            lane_key = f"lane_E4_{definition.lane_slot}"
+            if lane_key not in lanes_prepared:
+                self.api.prepare_lane(
+                    self.active_store_path,
+                    "E4",
+                    definition.lane_slot,
+                )
+        store = TransactionalHistoryStore(self.active_store_path)
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E4",
+            phase_id="E4-DEEPEN",
+            lane_definitions=E4_DEEPEN_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E4_DEEPEN_LANES
+            ),
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(store, batch)
+        return batch
+
+    def finalize_e4_orchestration(self):
+        """Validate E4 result contracts and accept evidence-backed completion."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        return E4FinalizationService(
+            TransactionalHistoryStore(self.active_store_path),
+            stage_id="E4",
+            required_phase_slots={
+                "E4-DEEPEN": tuple(
+                    item.lane_slot for item in E4_DEEPEN_LANES
+                )
+            },
+            next_action="PREPARE_E5A_ATTACK",
+        ).finalize()
+
+    def _advance_e4_external(self) -> dict[str, Any]:
+        status = self.api.get_campaign_status(self.active_store_path)
+        if "E4" in status.get("stages_completed", []):
+            return {
+                "status": "READY_FOR_NEXT_STAGE",
+                "current_stage": "E4",
+                "next_stage": "E5",
+                "next_action": "PREPARE_E5A_ATTACK",
+            }
+        if self.stage_batch is None or self.stage_batch.stage_id != "E4":
+            self.prepare_e4_orchestration()
+        assert self.stage_batch is not None
+        assert self.stage_inbox is not None
+        missing = [
+            slot for slot, lane in self.stage_inbox.lane_statuses.items()
+            if lane.status != "ACCEPTED"
+        ]
+        blocked = [
+            slot for slot, lane in self.stage_inbox.lane_statuses.items()
+            if lane.status == "ACCEPTED"
+            and lane.completion_status != "LANE_COMPLETED"
+        ]
+        if missing or blocked:
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E4",
+                "current_phase": "E4-DEEPEN",
+                "missing_lanes": missing,
+                "blocked_lanes": blocked,
+                "next_action": "DELIVER_OR_IMPORT_E4_DEEPEN_RESULTS",
+                "packages": {
+                    slot: str(job.package_zip_path)
+                    for slot, job in self.stage_batch.jobs.items()
+                },
+            }
+        finalized = self.finalize_e4_orchestration()
+        return {
+            "status": "E4_COMPLETED",
+            "current_stage": "E4",
+            "next_stage": "E5",
+            "stage_completion_ref": finalized.stage_completion_ref,
+            "completion_commit_seq": finalized.accepted_commit_seq,
+            "already_finalized": finalized.already_finalized,
+            "next_action": finalized.next_action,
+        }
+
     def deliver_stage_lane_to_user(self, slot: str) -> dict[str, Any]:
         """Deliver one already accepted E2+ stage assignment/package."""
         if self.stage_batch is None:
@@ -942,8 +1085,11 @@ class FullAuditOrchestrator:
             candidate_stage_phases: tuple[
                 tuple[str, str], ...
             ]
-            if "E3" in completed_stages:
+            if "E4" in completed_stages:
                 candidate_stage_phases = ()
+                active_stage = "E5"
+            elif "E3" in completed_stages:
+                candidate_stage_phases = (("E4", "E4-DEEPEN"),)
                 active_stage = "E4"
             elif "E2" in completed_stages:
                 candidate_stage_phases = (
@@ -1062,12 +1208,7 @@ class FullAuditOrchestrator:
 
         if "E2" in status.get("stages_completed", []):
             if "E3" in status.get("stages_completed", []):
-                return {
-                    "status": "READY_FOR_NEXT_STAGE",
-                    "current_stage": "E3",
-                    "next_stage": "E4",
-                    "next_action": "PREPARE_E4_EXTERNAL_PHASE",
-                }
+                return self._advance_e4_external()
             if (
                 self.stage_batch is None
                 or self.stage_batch.stage_id != "E3"
@@ -1223,15 +1364,12 @@ class FullAuditOrchestrator:
                         self.stage_inbox,
                     ).validate()
                 )
+                finalization = self.finalize_e3_orchestration()
                 return {
-                    "status": "E3_CUMULATIVE_COMPLETE",
+                    "status": "E3_COMPLETED",
                     "current_stage": "E3",
-                    "current_phase": (
-                        "E3-CUMULATIVE"
-                    ),
-                    "comparison_count": (
-                        cumulative_validation.comparison_count
-                    ),
+                    "current_phase": "E3-CUMULATIVE",
+                    "comparison_count": cumulative_validation.comparison_count,
                     "matched_discoveries_count": len(
                         cumulative_validation.matched_discovery_ids
                     ),
@@ -1241,9 +1379,10 @@ class FullAuditOrchestrator:
                     "post_reveal_discoveries_count": len(
                         cumulative_validation.post_reveal_discovery_refs
                     ),
-                    "next_action": (
-                        cumulative_validation.next_action
-                    ),
+                    "stage_completion_ref": finalization.stage_completion_ref,
+                    "completion_commit_seq": finalization.accepted_commit_seq,
+                    "next_stage": "E4",
+                    "next_action": finalization.next_action,
                 }
 
             if (
@@ -1259,13 +1398,12 @@ class FullAuditOrchestrator:
                         self.stage_inbox,
                     ).validate()
                 )
+                finalization = self.finalize_e3_orchestration()
                 return {
-                    "status": "E3_HOLDOUT_COMPLETE",
+                    "status": "E3_COMPLETED",
                     "current_stage": "E3",
                     "current_phase": "E3-HOLDOUT",
-                    "comparison_count": (
-                        holdout_validation.comparison_count
-                    ),
+                    "comparison_count": holdout_validation.comparison_count,
                     "matched_holdout_count": len(
                         holdout_validation.matched_discovery_ids
                     ),
@@ -1278,9 +1416,10 @@ class FullAuditOrchestrator:
                     "holdout_corpus_manifest_ref": (
                         holdout_validation.holdout_corpus_manifest_ref
                     ),
-                    "next_action": (
-                        holdout_validation.next_action
-                    ),
+                    "stage_completion_ref": finalization.stage_completion_ref,
+                    "completion_commit_seq": finalization.accepted_commit_seq,
+                    "next_stage": "E4",
+                    "next_action": finalization.next_action,
                 }
 
             raise ValidationError(

@@ -1059,6 +1059,30 @@ that later decision must bind the exact holdout corpus snapshot and matching
 rules. Any new observation belongs in findings[] and cannot claim blind origin.
 """
 
+    elif stage_id == "E4" and phase_id == "E4-DEEPEN":
+        output_contract = """
+
+E4 DEEPEN OUTPUT CONTRACT
+Return outputs.e4_assessments as a list of bounded assessments.
+Each item must be:
+{
+  "assessment_kind": "<kind>",
+  "status": "PASS|FAIL|NOT_APPLICABLE|INCONCLUSIVE|BLOCKED",
+  "rationale": "<bounded explanation>"
+}
+
+Required assessment_kind values by lane:
+- E4-MODEL: STATE_MODEL, MODEL_IMPLEMENTATION_CONFORMANCE, TEMPORAL_INVARIANT, PROPERTY_STATEFUL, BOUNDED_EXPLORATION
+- E4-RESILIENCE: FAULT_INJECTION, CONCURRENCY, CRASH_RECOVERY, ENDURANCE
+- E4-CAUSAL: CAUSAL_CHAIN, SIBLING_ASSESSMENT
+
+FAIL means a completed assessment found a defect and may be accompanied by
+findings[]. INCONCLUSIVE or BLOCKED means the required E4 obligation is not
+closed and therefore blocks E4 StageCompletion. Do not claim model conclusions
+beyond the stated bounds/environment and do not convert absence of findings
+into evidence of correctness.
+"""
+
     return f"""# BDB AUDIT v2.0.3 - {stage_id} / {phase_id} / {definition.lane_slot}
 
 You are executing one bounded external audit lane for BDB Audit v2.
