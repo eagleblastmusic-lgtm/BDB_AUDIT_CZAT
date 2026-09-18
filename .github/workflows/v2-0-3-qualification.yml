@@ -179,7 +179,7 @@ jobs:
         if: github.event_name == 'push'
         shell: pwsh
         run: |
-          $remoteLine = git ls-remote origin "refs/heads/feature/v2.0.3-user-orchestration"
+          $remoteLine = git ls-remote origin "${{ github.ref }}"
           $remote = ($remoteLine -split "`t")[0]
           $declared = "${{ env.CANDIDATE_SHA }}"
           Write-Host "REMOTE_HEAD=$remote"
