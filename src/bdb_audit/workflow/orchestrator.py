@@ -25,6 +25,7 @@ from .e2_shadow import E2ShadowAuthorizationService
 from .e2_finalize import E2FinalizationService
 from .e2_contradiction import E2ContradictionAuthorizationService
 from .e2_contradiction_resolution import E2ContradictionResolutionService
+from .e3_checkpoint import E3BlindCheckpointService
 from .inbox import E1ResultInbox, ImportedResultSummary
 from .manual_stage import (
     ImportedStagePhaseSummary,
@@ -80,6 +81,24 @@ E2_CONTRADICTION_LANES = (
         "E2-ADJUDICATION",
         "Scoped contradiction protocol adjudicator",
         "CONTRADICTION_PROTOCOL",
+    ),
+)
+
+E3_BLIND_LANES = (
+    StageLaneDefinition(
+        "E3-X",
+        "Security, authority and trust blind novelty",
+        "AUTHORITY_TRUST_NOVELTY_SEARCH",
+    ),
+    StageLaneDefinition(
+        "E3-Y",
+        "State, data, catalog and recovery blind novelty",
+        "STATE_CATALOG_RECOVERY_SEARCH",
+    ),
+    StageLaneDefinition(
+        "E3-Z",
+        "Frontend, concurrency, resources and cross-layer blind novelty",
+        "CROSS_LAYER_CONCURRENCY_SEARCH",
     ),
 )
 
@@ -459,6 +478,68 @@ class FullAuditOrchestrator:
         self.stage_inbox = StageResultInbox(store, batch)
         return batch
 
+    def prepare_e3_blind_orchestration(self) -> StageBatch:
+        """Prepare the real E3-X/Y/Z blind novelty phase."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        status = self.api.get_campaign_status(self.active_store_path)
+        if "E2" not in status.get("stages_completed", []):
+            raise ValidationError(
+                "PREDECESSOR_STAGE_NOT_COMPLETED",
+                "E2 must be completed before E3 blind novelty",
+            )
+        if "E3" not in status.get("stages_prepared", []):
+            self.api.prepare_stage(
+                self.active_store_path,
+                "E3",
+            )
+            status = self.api.get_campaign_status(
+                self.active_store_path
+            )
+
+        lanes_prepared = set(
+            status.get("lanes_prepared", [])
+        )
+        for definition in E3_BLIND_LANES:
+            lane_key = (
+                f"lane_E3_{definition.lane_slot}"
+            )
+            if lane_key not in lanes_prepared:
+                self.api.prepare_lane(
+                    self.active_store_path,
+                    "E3",
+                    definition.lane_slot,
+                )
+
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E3",
+            phase_id="E3-BLIND",
+            lane_definitions=E3_BLIND_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            execution_mode=(
+                self.settings.execution_mode
+            ),
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(
+            store,
+            batch,
+        )
+        return batch
+
     def deliver_stage_lane_to_user(self, slot: str) -> dict[str, Any]:
         """Deliver one already accepted E2+ stage assignment/package."""
         if self.stage_batch is None:
@@ -577,17 +658,21 @@ class FullAuditOrchestrator:
         if self.e1_inbox.stage_complete:
             loaded_stage = None
             resume_error = None
-            for candidate_phase in (
-                "E2-CONTRADICTION",
-                "E2-SHADOW",
-                "E2-REVEAL",
-                "E2-BLIND",
+            candidate_stage_phases = (
+                ("E3", "E3-BLIND"),
+                ("E2", "E2-CONTRADICTION"),
+                ("E2", "E2-SHADOW"),
+                ("E2", "E2-REVEAL"),
+                ("E2", "E2-BLIND"),
+            )
+            for candidate_stage, candidate_phase in (
+                candidate_stage_phases
             ):
                 try:
                     loaded_stage = load_stage_phase_batch(
                         store,
                         self._artifact_root(),
-                        stage_id="E2",
+                        stage_id=candidate_stage,
                         phase_id=candidate_phase,
                     )
                     active_phase = candidate_phase
@@ -609,7 +694,7 @@ class FullAuditOrchestrator:
                 self.stage_batch = stage_batch
                 self.stage_inbox = StageResultInbox(store, stage_batch)
                 self.resolved_source = stage_source
-                active_stage = "E2"
+                active_stage = stage_batch.stage_id
                 active_inbox = "STAGE"
                 accepted_count = sum(
                     1
@@ -681,12 +766,94 @@ class FullAuditOrchestrator:
             }
 
         if "E2" in status.get("stages_completed", []):
-            return {
-                "status": "READY_FOR_NEXT_STAGE",
-                "current_stage": "E2",
-                "next_stage": "E3",
-                "next_action": "PREPARE_E3_EXTERNAL_PHASE",
-            }
+            if "E3" in status.get("stages_completed", []):
+                return {
+                    "status": "READY_FOR_NEXT_STAGE",
+                    "current_stage": "E3",
+                    "next_stage": "E4",
+                    "next_action": "PREPARE_E4_EXTERNAL_PHASE",
+                }
+            if (
+                self.stage_batch is None
+                or self.stage_batch.stage_id != "E3"
+            ):
+                self.prepare_e3_blind_orchestration()
+            assert self.stage_batch is not None
+            assert self.stage_inbox is not None
+
+            missing = [
+                slot
+                for slot, lane in (
+                    self.stage_inbox.lane_statuses.items()
+                )
+                if lane.status != "ACCEPTED"
+            ]
+            blocked = [
+                slot
+                for slot, lane in (
+                    self.stage_inbox.lane_statuses.items()
+                )
+                if lane.status == "ACCEPTED"
+                and lane.completion_status
+                != "LANE_COMPLETED"
+            ]
+            if missing or blocked:
+                return {
+                    "status": "WAITING_EXTERNAL_RESULTS",
+                    "current_stage": "E3",
+                    "current_phase": (
+                        self.stage_batch.phase_id
+                    ),
+                    "missing_lanes": missing,
+                    "blocked_lanes": blocked,
+                    "next_action": (
+                        "DELIVER_OR_IMPORT_E3_BLIND_RESULTS"
+                    ),
+                    "packages": {
+                        slot: str(
+                            job.package_zip_path
+                        )
+                        for slot, job in (
+                            self.stage_batch.jobs.items()
+                        )
+                    },
+                }
+
+            if (
+                self.stage_batch.phase_id
+                == "E3-BLIND"
+            ):
+                checkpoint = (
+                    E3BlindCheckpointService(
+                        TransactionalHistoryStore(
+                            self.active_store_path
+                        ),
+                        self.stage_batch,
+                        self.stage_inbox,
+                    ).seal()
+                )
+                return {
+                    "status": "E3_BLIND_CHECKPOINTED",
+                    "current_stage": "E3",
+                    "current_phase": "E3-BLIND",
+                    "checkpoint_commit_seq": (
+                        checkpoint.accepted_commit_seq
+                    ),
+                    "checkpoint_refs": (
+                        checkpoint.checkpoint_refs
+                    ),
+                    "already_sealed": (
+                        checkpoint.already_sealed
+                    ),
+                    "next_action": (
+                        "PREPARE_E3_POSITIVE_GAP_REVEAL"
+                    ),
+                }
+
+            raise ValidationError(
+                "UNSUPPORTED_E3_PHASE",
+                self.stage_batch.phase_id,
+            )
 
         if (
             self.stage_batch is None
