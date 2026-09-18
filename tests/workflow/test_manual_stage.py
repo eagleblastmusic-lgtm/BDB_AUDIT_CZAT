@@ -12,6 +12,7 @@ from bdb_audit.core.errors import ValidationError
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.workflow.e2_checkpoint import E2BlindCheckpointService
 from bdb_audit.workflow.e2_reveal import E2ControlledRevealService
+from bdb_audit.workflow.e2_synthesis import E2MainSynthesisService
 from bdb_audit.workflow.manual_stage import (
     StageAssignmentService,
     StageLaneDefinition,
@@ -782,3 +783,277 @@ def test_reveal_package_without_authorization_fails_closed(e2_phase):
                 lane.lane_slot for lane in REVEAL_LANES
             ],
         )
+
+
+def _reveal_assessments_from_authorization(authorization, outcome="INCONCLUSIVE"):
+    payload = json.loads(
+        authorization.context_members[
+            "E1_CLAIM_VIEW.json"
+        ].decode("utf-8")
+    )
+    return [
+        {
+            "opaque_claim_view_id": item["opaque_claim_view_id"],
+            "claim_outcome": outcome,
+            "axis_outcomes": {
+                "MECHANISM": outcome,
+                "REACHABILITY": outcome,
+                "IMPACT": outcome,
+                "SEVERITY": outcome,
+            },
+            "rationale": "bounded external proposal",
+        }
+        for item in payload["claims"]
+    ]
+
+
+def test_e2_main_synthesis_is_individual_and_evidence_fail_closed(
+    e2_reveal_flow,
+):
+    store = e2_reveal_flow["store"]
+    source = e2_reveal_flow["source"]
+    tmp = e2_reveal_flow["tmp"]
+    authorization = E2ControlledRevealService(
+        store,
+        lane_definitions=REVEAL_LANES,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in REVEAL_LANES
+        ],
+        executor_profile="ChatGPT / GitHub",
+        model="Sol 5.6",
+    ).authorize()
+    reveal_batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp / "work",
+        source_info=source,
+        stage_id="E2",
+        phase_id="E2-REVEAL",
+        lane_definitions=REVEAL_LANES,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in REVEAL_LANES
+        ],
+        authorized_context=authorization,
+    )
+    assessments = _reveal_assessments_from_authorization(
+        authorization,
+        outcome="SUPPORTED",
+    )
+    reveal_inbox = StageResultInbox(
+        store,
+        reveal_batch,
+    )
+    imported = reveal_inbox.ingest_multiple_zips(
+        [
+            _write_result(
+                tmp / "reveal-main-convergence.zip",
+                reveal_batch,
+                "E2-CONVERGENCE",
+                outputs={
+                    "claim_assessments": assessments
+                },
+            ),
+            _write_result(
+                tmp / "reveal-main-adjudication.zip",
+                reveal_batch,
+                "E2-ADJUDICATION",
+                outputs={
+                    "claim_assessments": assessments
+                },
+            ),
+        ]
+    )
+    assert imported.phase_complete is True
+
+    before = store.head().commit_seq
+    synthesis = E2MainSynthesisService(
+        store,
+        reveal_batch,
+        reveal_inbox,
+    ).synthesize()
+    assert synthesis.accepted_commit_seq == before + 1
+    assert len(synthesis.claim_refs) == len(assessments)
+    assert len(
+        synthesis.adjudication_decision_refs
+    ) == len(assessments)
+
+    cut = current_accepted_cut(store)
+    decisions = [
+        row
+        for row in store.accepted_records(
+            "finding_adjudication_decision",
+            cut,
+        )
+        if row["body"].get("decision_id")
+        in {
+            store.resolve_accepted(ref, cut)["body"]["decision_id"]
+            for ref in synthesis.adjudication_decision_refs.values()
+        }
+    ]
+    assert len(decisions) == len(assessments)
+    assert {
+        row["body"]["lifecycle_status"]
+        for row in decisions
+    } == {"OPEN"}
+
+    axis_rows = [
+        store.resolve_accepted(ref, cut)["body"]
+        for axes in synthesis.axis_assessment_refs.values()
+        for ref in axes.values()
+    ]
+    # External SUPPORTED proposals are not canonical qualified evidence.
+    assert {
+        row["epistemic_outcome"]
+        for row in axis_rows
+    } == {"INCONCLUSIVE"}
+    assert all(
+        row["evidence_qualification_refs"] == []
+        for row in axis_rows
+    )
+    assert all(
+        "NO_QUALIFIED_EVIDENCE" in row["method"]
+        for row in axis_rows
+    )
+    # Main synthesis deliberately does not finalize E2.
+    e2_stage_completion = [
+        row
+        for row in store.accepted_records(
+            "stage_completion",
+            cut,
+        )
+        if store.resolve_accepted(
+            row["body"]["stage_spec_ref"],
+            cut,
+        )["body"].get("stage_key") == "E2"
+    ]
+    assert e2_stage_completion == []
+
+
+def test_e2_main_synthesis_rejects_missing_claim_assessment(
+    e2_reveal_flow,
+):
+    store = e2_reveal_flow["store"]
+    source = e2_reveal_flow["source"]
+    tmp = e2_reveal_flow["tmp"]
+    authorization = E2ControlledRevealService(
+        store,
+        lane_definitions=REVEAL_LANES,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in REVEAL_LANES
+        ],
+        executor_profile="ChatGPT / GitHub",
+        model="Sol 5.6",
+    ).authorize()
+    reveal_batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp / "work-missing",
+        source_info=source,
+        stage_id="E2",
+        phase_id="E2-REVEAL",
+        lane_definitions=REVEAL_LANES,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in REVEAL_LANES
+        ],
+        authorized_context=authorization,
+    )
+    assessments = _reveal_assessments_from_authorization(
+        authorization,
+    )
+    reveal_inbox = StageResultInbox(store, reveal_batch)
+    reveal_inbox.ingest_multiple_zips(
+        [
+            _write_result(
+                tmp / "reveal-missing-convergence.zip",
+                reveal_batch,
+                "E2-CONVERGENCE",
+                outputs={
+                    "claim_assessments": assessments
+                },
+            ),
+            _write_result(
+                tmp / "reveal-missing-adjudication.zip",
+                reveal_batch,
+                "E2-ADJUDICATION",
+                outputs={
+                    "claim_assessments": assessments[:-1]
+                },
+            ),
+        ]
+    )
+    with pytest.raises(
+        ValidationError,
+        match="E2_REVEAL_ASSESSMENT_INCOMPLETE",
+    ):
+        E2MainSynthesisService(
+            store,
+            reveal_batch,
+            reveal_inbox,
+        ).synthesize()
+
+
+def test_e2_main_synthesis_records_proposal_disagreement(
+    e2_reveal_flow,
+):
+    store = e2_reveal_flow["store"]
+    source = e2_reveal_flow["source"]
+    tmp = e2_reveal_flow["tmp"]
+    authorization = E2ControlledRevealService(
+        store,
+        lane_definitions=REVEAL_LANES,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in REVEAL_LANES
+        ],
+        executor_profile="ChatGPT / GitHub",
+        model="Sol 5.6",
+    ).authorize()
+    reveal_batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp / "work-disagree",
+        source_info=source,
+        stage_id="E2",
+        phase_id="E2-REVEAL",
+        lane_definitions=REVEAL_LANES,
+        all_stage_lane_slots=[
+            lane.lane_slot for lane in REVEAL_LANES
+        ],
+        authorized_context=authorization,
+    )
+    supports = _reveal_assessments_from_authorization(
+        authorization,
+        outcome="SUPPORTED",
+    )
+    refutes = _reveal_assessments_from_authorization(
+        authorization,
+        outcome="REFUTED",
+    )
+    reveal_inbox = StageResultInbox(store, reveal_batch)
+    reveal_inbox.ingest_multiple_zips(
+        [
+            _write_result(
+                tmp / "reveal-disagree-convergence.zip",
+                reveal_batch,
+                "E2-CONVERGENCE",
+                outputs={
+                    "claim_assessments": supports
+                },
+            ),
+            _write_result(
+                tmp / "reveal-disagree-adjudication.zip",
+                reveal_batch,
+                "E2-ADJUDICATION",
+                outputs={
+                    "claim_assessments": refutes
+                },
+            ),
+        ]
+    )
+    synthesis = E2MainSynthesisService(
+        store,
+        reveal_batch,
+        reveal_inbox,
+    ).synthesize()
+    assert set(
+        synthesis.proposal_disagreement_claim_ids
+    ) == {
+        item["opaque_claim_view_id"]
+        for item in supports
+    }
