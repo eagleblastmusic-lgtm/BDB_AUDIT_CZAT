@@ -13,7 +13,7 @@ from ..coordinator import Coordinator
 from ..core.errors import ValidationError
 from ..core.ids import deterministic_id
 from ..core.registry import canonical_reference_set
-from ..history.objects import CommandEnvelope
+from ..history.objects import CanonicalObject, CommandEnvelope
 from ..history.store import TransactionalHistoryStore
 from ..stop.models import StageCompletion
 from .assignments import _command_id, _current_cut
@@ -466,7 +466,128 @@ _E4_STATUSES = {
 
 
 class E4FinalizationService(ExternalStageFinalizationService):
-    """Validate the E4 external contract before accepting E4 completion."""
+    """Validate E4 and bind canonical model-to-implementation fidelity."""
+
+    _FIDELITY_REQUIRED_FIELDS = frozenset(
+        {
+            "fidelity_assessment_id",
+            "model_revision_ref",
+            "source_generation_ref",
+            "implementation_anchor_refs",
+            "abstraction_mapping_refs",
+            "abstraction_assumptions",
+            "omitted_states",
+            "bounds",
+            "fairness_time_assumptions",
+            "execution_conformance_evidence_refs",
+            "scope",
+            "assessment_input_history_cut",
+            "result",
+            "reason_codes",
+        }
+    )
+
+    def _model_result(
+        self,
+        cut: dict[str, Any],
+    ) -> dict[str, Any]:
+        rows = [
+            row
+            for row in self.store.accepted_records(
+                "bdb_audit_lane_result", cut
+            )
+            if row["body"].get("stage_id") == "E4"
+            and row["body"].get("phase_id") == "E4-DEEPEN"
+            and row["body"].get("lane_slot") == "E4-MODEL"
+        ]
+        if len(rows) != 1:
+            raise ValidationError(
+                "E4_MODEL_RESULT_AMBIGUOUS",
+                f"expected 1, got {len(rows)}",
+            )
+        return rows[0]
+
+    def _fidelity_body(
+        self,
+        result: dict[str, Any],
+    ) -> dict[str, Any]:
+        outputs = result["body"].get("outputs", {})
+        fidelity = (
+            outputs.get("model_fidelity_assessment")
+            if isinstance(outputs, Mapping)
+            else None
+        )
+        if not isinstance(fidelity, Mapping):
+            raise ValidationError(
+                "E4_MODEL_FIDELITY_REQUIRED"
+            )
+        body = dict(fidelity)
+        missing = sorted(
+            self._FIDELITY_REQUIRED_FIELDS - set(body)
+        )
+        if missing:
+            raise ValidationError(
+                "E4_MODEL_FIDELITY_INCOMPLETE",
+                ",".join(missing),
+            )
+        if (
+            body.get("assessment_input_history_cut")
+            != result["body"].get("history_cut")
+        ):
+            raise ValidationError(
+                "E4_MODEL_FIDELITY_HISTORY_CUT_MISMATCH"
+            )
+        fidelity_result = body.get("result")
+        if fidelity_result not in {
+            "QUALIFIED",
+            "BOUNDED",
+            "INSUFFICIENT",
+            "INVALIDATED",
+        }:
+            raise ValidationError(
+                "E4_MODEL_FIDELITY_RESULT_INVALID",
+                str(fidelity_result),
+            )
+        if fidelity_result in {"INSUFFICIENT", "INVALIDATED"}:
+            raise ValidationError(
+                "E4_MODEL_FIDELITY_UNRESOLVED",
+                str(fidelity_result),
+            )
+        for field in (
+            "implementation_anchor_refs",
+            "abstraction_mapping_refs",
+            "execution_conformance_evidence_refs",
+        ):
+            value = body.get(field)
+            if not isinstance(value, list) or not value:
+                raise ValidationError(
+                    "E4_MODEL_FIDELITY_MAPPING_INCOMPLETE",
+                    field,
+                )
+        if (
+            not isinstance(body.get("scope"), str)
+            or not body["scope"].strip()
+            or not isinstance(body.get("reason_codes"), list)
+        ):
+            raise ValidationError(
+                "E4_MODEL_FIDELITY_INVALID"
+            )
+        if (
+            fidelity_result == "BOUNDED"
+            and not any(
+                body.get(field)
+                for field in (
+                    "abstraction_assumptions",
+                    "omitted_states",
+                    "bounds",
+                    "fairness_time_assumptions",
+                )
+            )
+        ):
+            raise ValidationError(
+                "E4_BOUNDED_FIDELITY_WITHOUT_BOUND"
+            )
+        return body
 
     def validate_result(
         self,
@@ -482,7 +603,11 @@ class E4FinalizationService(ExternalStageFinalizationService):
         if expected is None:
             raise ValidationError("UNKNOWN_E4_LANE", slot)
         outputs = result["body"].get("outputs", {})
-        assessments = outputs.get("e4_assessments")
+        assessments = (
+            outputs.get("e4_assessments")
+            if isinstance(outputs, Mapping)
+            else None
+        )
         if not isinstance(assessments, list):
             raise ValidationError(
                 "E4_ASSESSMENTS_REQUIRED", slot
@@ -523,13 +648,121 @@ class E4FinalizationService(ExternalStageFinalizationService):
             kind
             for kind in expected
             if by_kind[kind]["status"]
-            in {"INCONCLUSIVE", "BLOCKED"}
+            in {"INCONCLUSIVE", "BLOCKED", "NOT_APPLICABLE"}
         )
         if unresolved:
             raise ValidationError(
                 "E4_STAGE_UNRESOLVED",
                 f"{slot}: {unresolved}",
             )
+        failed = sorted(
+            kind
+            for kind in expected
+            if by_kind[kind]["status"] == "FAIL"
+        )
+        if failed and not result["body"].get("findings"):
+            raise ValidationError(
+                "E4_FAILURE_FINDING_REQUIRED",
+                f"{slot}: {failed}",
+            )
+        if slot == "E4-MODEL":
+            self._fidelity_body(result)
+
+    def materialize_model_fidelity(
+        self,
+    ) -> dict[str, Any]:
+        cut, prior_commit = _current_cut(self.store)
+        result = self._model_result(cut)
+        self.validate_result("E4-DEEPEN", "E4-MODEL", result)
+        body = self._fidelity_body(result)
+        obj = CanonicalObject(
+            "model_fidelity_assessment",
+            body,
+            logical_id=str(body["fidelity_assessment_id"]),
+        )
+        existing = [
+            row
+            for row in self.store.accepted_records(
+                "model_fidelity_assessment", cut
+            )
+            if row["ref"]["revision_digest"] == obj.digest
+        ]
+        if len(existing) > 1:
+            raise ValidationError(
+                "MULTIPLE_E4_MODEL_FIDELITY_ASSESSMENTS"
+            )
+        if existing:
+            return _with_ref_class(
+                existing[0]["ref"], "CONTENT_OR_PRIOR"
+            )
+
+        head = self.store.head()
+        if head is None:
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        command = CommandEnvelope(
+            command_id=_command_id(
+                "e4_model_fidelity:" + obj.digest
+            ),
+            command_kind="RECORD_ASSURANCE_DECISION",
+            actor_ref=prior_commit.get(
+                "actor_ref", "installation-owner"
+            ),
+            expected_parent_head={
+                "tag": "ACCEPTED_HEAD_REF",
+                **head.as_dict(),
+            },
+            governing_policy_ref=prior_commit[
+                "governing_policy_ref"
+            ],
+            governing_spec_refs=tuple(
+                prior_commit.get("governing_spec_refs", ())
+            ),
+            idempotency_scope="e4_model_fidelity:" + obj.digest,
+            campaign_ref=head.campaign_id,
+        )
+        self.coordinator.accept(
+            command,
+            immutable_objects=[obj],
+            expected_head=head,
+        )
+        return obj.as_ref(
+            ref_class="CONTENT_OR_PRIOR"
+        ).as_dict()
+
+    def additional_required_output_refs(
+        self,
+        cut: dict[str, Any],
+    ) -> Sequence[dict[str, Any]]:
+        result = self._model_result(cut)
+        obj = CanonicalObject(
+            "model_fidelity_assessment",
+            self._fidelity_body(result),
+            logical_id=str(
+                self._fidelity_body(result)[
+                    "fidelity_assessment_id"
+                ]
+            ),
+        )
+        rows = [
+            row
+            for row in self.store.accepted_records(
+                "model_fidelity_assessment", cut
+            )
+            if row["ref"]["revision_digest"] == obj.digest
+        ]
+        if len(rows) != 1:
+            raise ValidationError(
+                "E4_MODEL_FIDELITY_ACCEPTANCE_REQUIRED"
+            )
+        return (
+            _with_ref_class(
+                rows[0]["ref"], "CONTENT_OR_PRIOR"
+            ),
+        )
+
+    def finalize(self) -> ExternalStageFinalizationSummary:
+        self.materialize_model_fidelity()
+        return super().finalize()
 
 
 __all__ = [

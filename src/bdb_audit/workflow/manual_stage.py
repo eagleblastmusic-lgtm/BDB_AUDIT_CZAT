@@ -1076,11 +1076,34 @@ Required assessment_kind values by lane:
 - E4-RESILIENCE: FAULT_INJECTION, CONCURRENCY, CRASH_RECOVERY, ENDURANCE
 - E4-CAUSAL: CAUSAL_CHAIN, SIBLING_ASSESSMENT
 
-FAIL means a completed assessment found a defect and may be accompanied by
-findings[]. INCONCLUSIVE or BLOCKED means the required E4 obligation is not
-closed and therefore blocks E4 StageCompletion. Do not claim model conclusions
-beyond the stated bounds/environment and do not convert absence of findings
-into evidence of correctness.
+E4-MODEL additionally MUST return outputs.model_fidelity_assessment using the
+canonical ModelFidelityAssessment body:
+{
+  "fidelity_assessment_id": "<stable id>",
+  "model_revision_ref": {},
+  "source_generation_ref": {},
+  "implementation_anchor_refs": [{}],
+  "abstraction_mapping_refs": [{}],
+  "abstraction_assumptions": [],
+  "omitted_states": [],
+  "bounds": [],
+  "fairness_time_assumptions": [],
+  "execution_conformance_evidence_refs": [{}],
+  "scope": "<bounded implementation scope>",
+  "assessment_input_history_cut": "<exact assigned history_cut>",
+  "result": "QUALIFIED|BOUNDED|INSUFFICIENT|INVALIDATED",
+  "reason_codes": []
+}
+A model result cannot qualify implementation work without non-empty
+implementation_anchor_refs, abstraction_mapping_refs and
+execution_conformance_evidence_refs. INSUFFICIENT or INVALIDATED fidelity
+blocks E4 completion. BOUNDED requires at least one explicit bound/assumption.
+
+FAIL means a completed assessment found a defect and must be accompanied by
+findings[]. INCONCLUSIVE, BLOCKED, or unsupported NOT_APPLICABLE on a required
+E4 assessment blocks StageCompletion. Do not claim model conclusions beyond
+the stated bounds/environment and do not convert absence of findings into
+evidence of correctness.
 """
 
     elif stage_id == "E5" and phase_id == "E5A-ATTACK":

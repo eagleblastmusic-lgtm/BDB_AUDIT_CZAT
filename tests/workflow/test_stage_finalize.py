@@ -27,7 +27,14 @@ E4_LANES = (
     StageLaneDefinition("E4-CAUSAL", "Causal-chain and sibling mechanism deepening", "CAUSAL_CHAIN_DEEPENING"),
 )
 
-def _write_result(path: Path, batch, slot: str, *, unresolved_kind: str | None = None) -> Path:
+def _write_result(
+    path: Path,
+    batch,
+    slot: str,
+    *,
+    unresolved_kind: str | None = None,
+    omit_fidelity: bool = False,
+) -> Path:
     job = batch.get_job(slot)
     assessments = [
         {
@@ -37,6 +44,40 @@ def _write_result(path: Path, batch, slot: str, *, unresolved_kind: str | None =
         }
         for kind in sorted(E4_REQUIRED_ASSESSMENTS[slot])
     ]
+    outputs = {"e4_assessments": assessments}
+    if slot == "E4-MODEL" and not omit_fidelity:
+        outputs["model_fidelity_assessment"] = {
+            "fidelity_assessment_id": "model_fidelity_assessment_e4_runtime",
+            "model_revision_ref": {
+                "model_id": "state_model_e4_runtime",
+                "revision": 1,
+                "digest": "a" * 64,
+            },
+            "source_generation_ref": {
+                "kind": "source_generation",
+                "revision_digest": "b" * 64,
+                "digest_profile": "BDB-OBJECT-DIGEST-1",
+                "schema_revision_ref": "BDB_SCHEMA_REGISTRY::source_generation/1",
+                "ref_class": "CONTENT_OR_PRIOR",
+            },
+            "implementation_anchor_refs": [
+                {"path": "src/runtime.py", "symbol": "Runtime"}
+            ],
+            "abstraction_mapping_refs": [
+                {"model_state": "READY", "source_anchor": "Runtime.ready"}
+            ],
+            "abstraction_assumptions": [],
+            "omitted_states": [],
+            "bounds": ["max_states=128"],
+            "fairness_time_assumptions": [],
+            "execution_conformance_evidence_refs": [
+                {"observation_id": "obs-e4-conformance"}
+            ],
+            "scope": "RUNTIME_STATE_MACHINE",
+            "assessment_input_history_cut": batch.frozen_history_cut,
+            "result": "BOUNDED",
+            "reason_codes": ["MODEL_BOUNDED_OR_ABSTRACTION_PRESENT"],
+        }
     body = {
         "kind": "bdb_audit_lane_result",
         "version": "1",
@@ -52,7 +93,7 @@ def _write_result(path: Path, batch, slot: str, *, unresolved_kind: str | None =
         "assignment_ref": job.assignment_ref,
         "attempt_ref": job.attempt_ref,
         "findings": [],
-        "outputs": {"e4_assessments": assessments},
+        "outputs": outputs,
     }
     with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("MANIFEST.json", json.dumps(body))
@@ -104,6 +145,25 @@ def test_e4_external_results_finalize_stage(e4_phase):
     assert summary.stage_id == "E4"
     assert summary.already_finalized is False
     assert summary.required_lane_completions == 3
+    cut = store.head()
+    assert cut is not None
+    accepted_cut = {
+        "variant": "ACCEPTED_HISTORY_CUT",
+        "campaign_id": cut.campaign_id,
+        "accepted_head_seq": cut.commit_seq,
+        "accepted_head_hash": cut.commit_hash,
+    }
+    fidelity_rows = store.accepted_records(
+        "model_fidelity_assessment", accepted_cut
+    )
+    assert len(fidelity_rows) == 1
+    completion_record = store.resolve_accepted(
+        summary.stage_completion_ref, accepted_cut
+    )
+    assert any(
+        ref.get("kind") == "model_fidelity_assessment"
+        for ref in completion_record["body"]["required_output_refs"]
+    )
     retry = E4FinalizationService(
         store,
         stage_id="E4",
@@ -128,9 +188,36 @@ def test_e4_inconclusive_required_assessment_blocks_completion(e4_phase):
             next_action="PREPARE_E5A_ATTACK",
         ).finalize()
 
+def test_e4_missing_model_fidelity_blocks_completion(e4_phase):
+    store, batch, inbox, tmp_path = e4_phase
+    paths = [
+        _write_result(
+            tmp_path / f"missing_fidelity_{slot}.zip",
+            batch,
+            slot,
+            omit_fidelity=(slot == "E4-MODEL"),
+        )
+        for slot in batch.lane_slots
+    ]
+    assert inbox.ingest_multiple_zips(paths).phase_complete is True
+    with pytest.raises(
+        ValidationError,
+        match="E4_MODEL_FIDELITY_REQUIRED",
+    ):
+        E4FinalizationService(
+            store,
+            stage_id="E4",
+            required_phase_slots={
+                "E4-DEEPEN": batch.lane_slots
+            },
+            next_action="PREPARE_E5A_ATTACK",
+        ).finalize()
+
+
 def test_e4_prompt_contains_structured_output_contract(e4_phase):
     _, batch, _, _ = e4_phase
     prompt = batch.get_job("E4-MODEL").prompt_text
     assert "E4 DEEPEN OUTPUT CONTRACT" in prompt
     assert "outputs.e4_assessments" in prompt
     assert "MODEL_IMPLEMENTATION_CONFORMANCE" in prompt
+    assert "outputs.model_fidelity_assessment" in prompt
