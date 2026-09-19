@@ -333,7 +333,10 @@ class ExternalStageFinalizationService:
             ]
         )
         extra_output_refs.extend(
-            dict(ref)
+            _with_ref_class(
+                dict(ref),
+                "CONTENT_OR_PRIOR",
+            )
             for ref in self.additional_required_output_refs(cut)
         )
         required_outputs = canonical_reference_set(
