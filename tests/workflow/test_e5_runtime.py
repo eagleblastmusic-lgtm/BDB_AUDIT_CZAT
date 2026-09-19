@@ -10,6 +10,7 @@ import pytest
 from bdb_audit.coordinator.operations import AuditOperationApi
 from bdb_audit.core.errors import ValidationError
 from bdb_audit.history.store import TransactionalHistoryStore
+from bdb_audit.stop.input_builder import StopInputBuilder
 from bdb_audit.workflow.e5_runtime import (
     CandidateAssuranceCaseService,
     E5A_LANES,
@@ -467,3 +468,85 @@ def test_e5a_rejects_oracle_implementation_status_alias(tmp_path: Path) -> None:
         match="E5A_ORACLE_CHALLENGE_STATUS_INVALID",
     ):
         CandidateAssuranceCaseService(store).freeze(batch, inbox)
+
+
+def test_candidate_pins_exact_current_adjudication_for_each_finding(
+    tmp_path: Path,
+) -> None:
+    _, store = _base_campaign(tmp_path)
+    batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp_path / "work",
+        source_info=_source(),
+        stage_id="E5",
+        phase_id="E5A-ATTACK",
+        lane_definitions=E5A_LANES,
+        all_stage_lane_slots=E5_ALL_LANE_SLOTS,
+    )
+    inbox = StageResultInbox(store, batch)
+    paths = []
+    for slot in batch.lane_slots:
+        outputs = _e5a_outputs(slot)
+        findings = (
+            [
+                {
+                    "title": "Candidate binding finding",
+                    "statement": (
+                        "candidate must pin exact current "
+                        "adjudication"
+                    ),
+                }
+            ]
+            if slot == "E5-A-INTERACTION"
+            else []
+        )
+        paths.append(
+            _write_stage_result(
+                tmp_path / f"binding_{slot}.zip",
+                batch,
+                slot,
+                outputs,
+                findings=findings,
+            )
+        )
+    assert inbox.ingest_multiple_zips(paths).phase_complete is True
+    frozen = CandidateAssuranceCaseService(store).freeze(
+        batch, inbox
+    )
+    assert len(
+        frozen.candidate.finding_claim_revision_refs
+    ) == len(
+        frozen.candidate.finding_adjudication_refs
+    )
+
+    claim_digests = {
+        ref["revision_digest"]
+        for ref in frozen.candidate.finding_claim_revision_refs
+    }
+    cut = current_accepted_cut(store)
+    pinned_targets = {
+        store.resolve_accepted(ref, cut)["body"][
+            "claim_revision_ref"
+        ]["revision_digest"]
+        for ref in frozen.candidate.finding_adjudication_refs
+    }
+    assert pinned_targets == claim_digests
+
+    e5b, e5b_inbox = _prepare_e5b(
+        tmp_path, store, frozen.candidate
+    )
+    E5ChallengerResultService(
+        store, e5b, e5b_inbox
+    ).materialize()
+    E5FinalizationService(store).finalize()
+
+    stop_input = StopInputBuilder.build_from_store(
+        store,
+        evaluation_context="FINAL_POST_E5",
+    )
+    assert (
+        stop_input.candidate_assurance_case_ref[
+            "revision_digest"
+        ]
+        == frozen.candidate.digest()
+    )

@@ -1276,14 +1276,44 @@ class CandidateAssuranceCaseService:
                 "claim_id", row["ref"]["revision_digest"]
             ),
         )
+        current_finding_digests = {
+            row["ref"]["revision_digest"]
+            for row in findings
+        }
         adjudications = _latest_by(
-            self.store.accepted_records(
-                "finding_adjudication_decision", cut
+            (
+                row
+                for row in self.store.accepted_records(
+                    "finding_adjudication_decision", cut
+                )
+                if row["body"].get(
+                    "claim_revision_ref", {}
+                ).get("revision_digest")
+                in current_finding_digests
             ),
             lambda row: row["body"].get(
                 "claim_revision_ref", {}
             ).get("revision_digest"),
         )
+        adjudicated_digests = {
+            row["body"]["claim_revision_ref"][
+                "revision_digest"
+            ]
+            for row in adjudications
+        }
+        if adjudicated_digests != current_finding_digests:
+            missing = sorted(
+                current_finding_digests
+                - adjudicated_digests
+            )
+            extra = sorted(
+                adjudicated_digests
+                - current_finding_digests
+            )
+            raise ValidationError(
+                "CANDIDATE_FINDING_ADJUDICATION_BINDING_INVALID",
+                f"missing={missing}; extra={extra}",
+            )
         contradictions = _latest_by(
             self.store.accepted_records(
                 "contradiction_revision", cut
