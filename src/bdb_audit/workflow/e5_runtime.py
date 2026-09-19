@@ -1187,6 +1187,21 @@ class E5ChallengeAuthorizationService:
                 prepared.knowledge_state_ref,
                 cut,
             )
+            stage_assignment = self.store.resolve_accepted(
+                prepared.assignment_ref,
+                cut,
+            )
+            attempt_ref = _with_ref_class(
+                prepared.attempt_ref,
+                "CONTENT_OR_PRIOR",
+            )
+            previous_knowledge_ref = _with_ref_class(
+                initial["ref"],
+                "PRIOR_ACCEPTED_ONLY",
+            )
+            delivery_profile_ref = dict(
+                stage_assignment["body"]["delivery_profile_ref"]
+            )
             grant = CanonicalObject(
                 "grant_body",
                 {
@@ -1194,11 +1209,18 @@ class E5ChallengeAuthorizationService:
                         "grant_body",
                         f"E5B:{candidate_digest}:{slot}",
                     ),
-                    "attempt_ref": dict(
-                        prepared.attempt_ref
+                    "attempt_ref": attempt_ref,
+                    "previous_knowledge_state_ref": (
+                        previous_knowledge_ref
                     ),
                     "view_manifest_ref": view.as_ref().as_dict(),
                     "grant_input_history_cut": cut,
+                    "delivery_profile_ref": delivery_profile_ref,
+                    "forbidden_knowledge_policy_ref": _external_ref(
+                        "external_profile_ref",
+                        "BDB_POLICY::E5B_FROZEN_CANDIDATE_NO_PRIOR_CHALLENGER",
+                        "HISTORY_CONTEXT_BINDING",
+                    ),
                     "forbidden_knowledge_classes": [
                         "PRIOR_CHALLENGER_RESULTS",
                         "FUTURE_STOP_OR_CONCLUSION",
@@ -1214,12 +1236,13 @@ class E5ChallengeAuthorizationService:
                             f"E5B:{candidate_digest}:{slot}",
                         )
                     ),
-                    "attempt_ref": dict(
-                        prepared.attempt_ref
-                    ),
+                    "attempt_ref": attempt_ref,
                     "view_manifest_ref": view.as_ref().as_dict(),
                     "grant_ref": grant.as_ref().as_dict(),
                     "exposure_input_history_cut": cut,
+                    "previous_knowledge_state_ref": (
+                        previous_knowledge_ref
+                    ),
                     "exposure_class": (
                         "FROZEN_CANDIDATE_ASSURANCE_CASE"
                     ),
@@ -1232,9 +1255,7 @@ class E5ChallengeAuthorizationService:
                         "knowledge_state",
                         f"E5B:{candidate_digest}:{slot}",
                     ),
-                    "attempt_ref": dict(
-                        prepared.attempt_ref
-                    ),
+                    "attempt_ref": attempt_ref,
                     "basis_history_cut": cut,
                     "isolation_qualification_ref": dict(
                         initial["body"][
@@ -1341,6 +1362,7 @@ class E5ChallengerResultService:
             str(ref["revision_digest"]): dict(ref)
             for ref in refs
             if isinstance(ref, dict)
+            and ref.get("kind") == "typed_scope_ref"
             and isinstance(
                 ref.get("revision_digest"), str
             )
@@ -1570,18 +1592,21 @@ class E5ChallengerResultService:
                     allowed_refs[digest]
                     for digest in challenged_digests
                 ),
-                counterclaim_refs=(
-                    (
-                        _with_ref_class(
-                            proposal["ref"],
-                            "CONTENT_OR_PRIOR",
+                counterclaim_refs=(),
+                reason_codes=tuple(
+                    [
+                        *reason_codes,
+                        *(
+                            (
+                                "EXTERNAL_COUNTEREVIDENCE_PROPOSAL:"
+                                + proposal["ref"]["revision_digest"],
+                            )
+                            if status
+                            == "MATERIAL_COUNTEREVIDENCE_FOUND"
+                            else ()
                         ),
-                    )
-                    if status
-                    == "MATERIAL_COUNTEREVIDENCE_FOUND"
-                    else ()
+                    ]
                 ),
-                reason_codes=reason_codes,
             )
             obj = CanonicalObject(
                 "challenger_result",
