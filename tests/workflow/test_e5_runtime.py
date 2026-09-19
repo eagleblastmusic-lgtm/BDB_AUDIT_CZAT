@@ -330,9 +330,26 @@ def test_material_challenger_counterevidence_blocks_e5_completion(
         frozen.candidate,
         skeptic_status="MATERIAL_COUNTEREVIDENCE_FOUND",
     )
-    E5ChallengerResultService(
+    summary = E5ChallengerResultService(
         store, e5b, e5b_inbox
     ).materialize()
+    cut = current_accepted_cut(store)
+    canonical_results = [
+        store.resolve_accepted(ref, cut)
+        for ref in summary.challenger_result_refs
+    ]
+    material = [
+        row
+        for row in canonical_results
+        if row["body"]["status"]
+        == "MATERIAL_COUNTEREVIDENCE_FOUND"
+    ]
+    assert len(material) == 1
+    assert material[0]["body"]["counterclaim_refs"]
+    assert all(
+        ref["kind"] == "finding_claim_revision"
+        for ref in material[0]["body"]["counterclaim_refs"]
+    )
     with pytest.raises(
         ValidationError,
         match="E5_CHALLENGER_ADJUDICATION_REQUIRED",
@@ -340,7 +357,7 @@ def test_material_challenger_counterevidence_blocks_e5_completion(
         E5FinalizationService(store).finalize()
 
 
-def test_e5a_pending_findings_block_candidate_freeze(
+def test_e5a_findings_are_open_adjudicated_before_candidate_freeze(
     tmp_path: Path,
 ) -> None:
     _, store = _base_campaign(tmp_path)
@@ -358,7 +375,12 @@ def test_e5a_pending_findings_block_candidate_freeze(
     for slot in batch.lane_slots:
         outputs = _e5a_outputs(slot)
         findings = (
-            [{"statement": "pending E5A finding"}]
+            [
+                {
+                    "title": "E5A finding",
+                    "statement": "new material E5A observation",
+                }
+            ]
             if slot == "E5-A-INTERACTION"
             else []
         )
@@ -372,13 +394,33 @@ def test_e5a_pending_findings_block_candidate_freeze(
             )
         )
     assert inbox.ingest_multiple_zips(paths).phase_complete is True
-    with pytest.raises(
-        ValidationError,
-        match="E5A_FINDINGS_REQUIRE_ADJUDICATION",
-    ):
-        CandidateAssuranceCaseService(store).freeze(
-            batch, inbox
-        )
+
+    frozen = CandidateAssuranceCaseService(store).freeze(
+        batch, inbox
+    )
+    assert len(
+        frozen.candidate.finding_claim_revision_refs
+    ) >= 1
+    assert len(
+        frozen.candidate.finding_adjudication_refs
+    ) >= 1
+
+    cut = current_accepted_cut(store)
+    claims = store.accepted_records(
+        "finding_claim_revision", cut
+    )
+    decisions = store.accepted_records(
+        "finding_adjudication_decision", cut
+    )
+    assert any(
+        row["body"]["statement"]
+        == "new material E5A observation"
+        for row in claims
+    )
+    assert any(
+        row["body"]["lifecycle_status"] == "OPEN"
+        for row in decisions
+    )
 
 
 def test_e5a_rejects_oracle_implementation_status_alias(tmp_path: Path) -> None:

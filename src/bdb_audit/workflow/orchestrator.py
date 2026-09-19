@@ -1142,20 +1142,17 @@ class FullAuditOrchestrator:
                     self.stage_inbox,
                 )
             except ValidationError as exc:
-                if exc.code in {
-                    "E5A_FINDINGS_REQUIRE_ADJUDICATION",
-                    "CANDIDATE_SCOPE_INVENTORY_REQUIRED",
-                }:
+                if (
+                    exc.code
+                    == "CANDIDATE_SCOPE_INVENTORY_REQUIRED"
+                ):
                     return {
                         "status": "BLOCKED",
                         "current_stage": "E5",
                         "current_phase": "E5A-ATTACK",
                         "reason": str(exc),
                         "next_action": (
-                            "ADJUDICATE_E5A_FINDINGS"
-                            if exc.code
-                            == "E5A_FINDINGS_REQUIRE_ADJUDICATION"
-                            else "BUILD_OR_QUALIFY_SCOPE_INVENTORY"
+                            "BUILD_OR_QUALIFY_SCOPE_INVENTORY"
                         ),
                     }
                 raise

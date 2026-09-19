@@ -15,6 +15,11 @@ from dataclasses import dataclass
 import hashlib
 from typing import Any, Iterable, Mapping, Sequence
 
+from ..adjudication.models import (
+    FindingAdjudicationDecision,
+    FindingAxisAssessment,
+    FindingClaimRevision,
+)
 from ..assurance.candidate_case import (
     CandidateAssuranceCase,
     sort_refs_by_digest,
@@ -335,6 +340,492 @@ def _challenger_result_from_record(
             for value in body.get("reason_codes", ())
         ),
     )
+
+
+@dataclass(frozen=True)
+class E5FindingCanonicalizationSummary:
+    finding_claim_refs: tuple[dict[str, Any], ...]
+    adjudication_refs: tuple[dict[str, Any], ...]
+    claim_refs_by_proposal_digest: dict[
+        str, tuple[dict[str, Any], ...]
+    ]
+    newly_materialized_count: int
+
+
+class E5FindingCanonicalizationService:
+    """Turn external E5 finding proposals into conservative canonical truth.
+
+    External findings are never auto-confirmed.  Each proposal becomes a
+    DiscoveryRecord, FindingClaimRevision, four INCONCLUSIVE axis assessments,
+    and an OPEN adjudication decision.  This provides exact provenance while
+    preserving fail-closed epistemic status.
+    """
+
+    _AXES = ("MECHANISM", "REACHABILITY", "IMPACT", "SEVERITY")
+
+    def __init__(
+        self,
+        store: TransactionalHistoryStore,
+        batch: StageBatch,
+    ):
+        if batch.stage_id != "E5":
+            raise ValidationError("E5_BATCH_REQUIRED")
+        self.store = store
+        self.batch = batch
+
+    @staticmethod
+    def _typed_refs(
+        values: Any,
+        *,
+        allowed_kinds: set[str],
+    ) -> tuple[dict[str, Any], ...]:
+        if isinstance(values, Mapping):
+            values = [values]
+        if not isinstance(values, (list, tuple)):
+            return ()
+        refs = []
+        for value in values:
+            if (
+                isinstance(value, Mapping)
+                and value.get("kind") in allowed_kinds
+                and isinstance(
+                    value.get("revision_digest"), str
+                )
+                and isinstance(
+                    value.get("schema_revision_ref"), str
+                )
+            ):
+                refs.append(
+                    _with_ref_class(
+                        dict(value), "CONTENT_OR_PRIOR"
+                    )
+                )
+        return tuple(canonical_reference_set(refs))
+
+    def _existing_for_discovery(
+        self,
+        cut: dict[str, Any],
+        discovery_id: str,
+    ) -> tuple[
+        dict[str, Any], dict[str, Any], dict[str, Any]
+    ] | None:
+        discoveries = [
+            row
+            for row in self.store.accepted_records(
+                "discovery_record", cut
+            )
+            if row["body"].get("discovery_id")
+            == discovery_id
+        ]
+        if not discoveries:
+            return None
+        if len(discoveries) != 1:
+            raise ValidationError(
+                "E5_DISCOVERY_BINDING_AMBIGUOUS",
+                discovery_id,
+            )
+        discovery = discoveries[0]
+        claims = [
+            row
+            for row in self.store.accepted_records(
+                "finding_claim_revision", cut
+            )
+            if any(
+                isinstance(ref, Mapping)
+                and ref.get("revision_digest")
+                == discovery["ref"]["revision_digest"]
+                for ref in row["body"].get(
+                    "discovery_relation_refs", ()
+                )
+            )
+        ]
+        if len(claims) != 1:
+            raise ValidationError(
+                "E5_FINDING_CLAIM_BINDING_AMBIGUOUS",
+                discovery_id,
+            )
+        claim = claims[0]
+        decisions = [
+            row
+            for row in self.store.accepted_records(
+                "finding_adjudication_decision", cut
+            )
+            if row["body"].get(
+                "claim_revision_ref", {}
+            ).get("revision_digest")
+            == claim["ref"]["revision_digest"]
+        ]
+        if len(decisions) != 1:
+            raise ValidationError(
+                "E5_FINDING_ADJUDICATION_BINDING_AMBIGUOUS",
+                discovery_id,
+            )
+        return discovery, claim, decisions[0]
+
+    def materialize(
+        self,
+    ) -> E5FindingCanonicalizationSummary:
+        cut, prior_commit = _current_cut(self.store)
+        claim_refs: list[dict[str, Any]] = []
+        adjudication_refs: list[dict[str, Any]] = []
+        by_proposal: dict[
+            str, list[dict[str, Any]]
+        ] = {}
+        objects: list[CanonicalObject] = []
+        new_count = 0
+
+        for slot in self.batch.lane_slots:
+            proposal = _accepted_result_for_job(
+                self.store,
+                self.batch,
+                slot,
+                cut,
+            )
+            proposal_digest = proposal["ref"][
+                "revision_digest"
+            ]
+            findings = proposal["body"].get(
+                "findings", ()
+            )
+            if not isinstance(findings, list):
+                raise ValidationError(
+                    "INVALID_FINDING_STRUCTURE", slot
+                )
+            if not findings:
+                continue
+
+            job = self.batch.get_job(slot)
+            assignment = self.store.resolve_accepted(
+                job.assignment_ref, cut
+            )
+            attempt = self.store.resolve_accepted(
+                assignment["body"]["attempt_ref"], cut
+            )
+            lane_run = self.store.resolve_accepted(
+                attempt["body"]["lane_run_ref"], cut
+            )
+            source = self.store.resolve_accepted(
+                assignment["body"]["source_generation_ref"],
+                cut,
+            )
+            knowledge_ref = (
+                job.authorized_knowledge_state_ref
+                if job.authorized_knowledge_state_ref
+                else assignment["body"]["knowledge_state_ref"]
+            )
+            knowledge = self.store.resolve_accepted(
+                knowledge_ref, cut
+            )
+            proposal_ref = _with_ref_class(
+                proposal["ref"], "CONTENT_OR_PRIOR"
+            )
+
+            for index, finding in enumerate(findings):
+                if not isinstance(finding, Mapping):
+                    raise ValidationError(
+                        "INVALID_FINDING_STRUCTURE", slot
+                    )
+                statement = next(
+                    (
+                        str(finding[key]).strip()
+                        for key in (
+                            "statement",
+                            "claim",
+                            "title",
+                            "summary",
+                        )
+                        if isinstance(
+                            finding.get(key), str
+                        )
+                        and str(finding[key]).strip()
+                    ),
+                    "",
+                )
+                if not statement:
+                    raise ValidationError(
+                        "E5_FINDING_STATEMENT_REQUIRED",
+                        f"{slot}:{index}",
+                    )
+                discovery_id = deterministic_id(
+                    "discovery_record",
+                    (
+                        f"e5:{self.batch.phase_id}:"
+                        f"{proposal_digest}:{index}"
+                    ),
+                )
+                existing = self._existing_for_discovery(
+                    cut, discovery_id
+                )
+                if existing is not None:
+                    _, claim_row, decision_row = existing
+                    claim_ref = _with_ref_class(
+                        claim_row["ref"],
+                        "CONTENT_OR_PRIOR",
+                    )
+                    decision_ref = _with_ref_class(
+                        decision_row["ref"],
+                        "CONTENT_OR_PRIOR",
+                    )
+                    claim_refs.append(claim_ref)
+                    adjudication_refs.append(decision_ref)
+                    by_proposal.setdefault(
+                        proposal_digest, []
+                    ).append(claim_ref)
+                    continue
+
+                discovery = CanonicalObject(
+                    "discovery_record",
+                    {
+                        "discovery_id": discovery_id,
+                        "lane_run_ref": _with_ref_class(
+                            lane_run["ref"],
+                            "PRIOR_ACCEPTED_ONLY",
+                        ),
+                        "attempt_ref": _with_ref_class(
+                            attempt["ref"],
+                            "PRIOR_ACCEPTED_ONLY",
+                        ),
+                        "source_generation_ref": (
+                            _with_ref_class(
+                                source["ref"],
+                                "PRIOR_ACCEPTED_ONLY",
+                            )
+                        ),
+                        "discovery_input_history_cut": cut,
+                        "knowledge_state_ref": (
+                            _with_ref_class(
+                                knowledge["ref"],
+                                "PRIOR_ACCEPTED_ONLY",
+                            )
+                        ),
+                        "method_ref": _external_ref(
+                            "external_profile_ref",
+                            (
+                                "E5_EXTERNAL_FINDING_PROPOSAL:"
+                                + self.batch.phase_id
+                            ),
+                            "HISTORY_CONTEXT_BINDING",
+                        ),
+                        "producer_ref": _external_ref(
+                            "actor_or_authority_ref",
+                            f"external_auditor_{slot}",
+                            "PRIOR_ACCEPTED_ONLY",
+                        ),
+                        "surface_location_refs": list(
+                            self._typed_refs(
+                                finding.get(
+                                    "scope_refs",
+                                    finding.get(
+                                        "scope_ref", ()
+                                    ),
+                                ),
+                                allowed_kinds={
+                                    "typed_scope_ref"
+                                },
+                            )
+                        ),
+                        "own_observation_refs": [],
+                    },
+                    logical_id=discovery_id,
+                )
+                discovery_ref = discovery.as_ref(
+                    ref_class="CONTENT_OR_PRIOR"
+                ).as_dict()
+
+                claim = FindingClaimRevision(
+                    statement=statement,
+                    source_generation_ref=_with_ref_class(
+                        source["ref"], "CONTENT_OR_PRIOR"
+                    ),
+                    scope_refs=self._typed_refs(
+                        finding.get(
+                            "scope_refs",
+                            finding.get("scope_ref", ()),
+                        ),
+                        allowed_kinds={
+                            "typed_scope_ref"
+                        },
+                    ),
+                    violated_invariant_refs=self._typed_refs(
+                        finding.get(
+                            "violated_invariant_refs",
+                            finding.get(
+                                "invariant_ref", ()
+                            ),
+                        ),
+                        allowed_kinds={
+                            "invariant_revision"
+                        },
+                    ),
+                    discovery_relation_refs=[
+                        discovery_ref
+                    ],
+                    claim_id=deterministic_id(
+                        "finding_claim_revision",
+                        (
+                            f"e5:{self.batch.phase_id}:"
+                            f"{proposal_digest}:{index}"
+                        ),
+                    ),
+                )
+                claim_obj = claim.as_object()
+                claim_ref = claim_obj.as_ref(
+                    ref_class="CONTENT_OR_PRIOR"
+                ).as_dict()
+
+                axis_objects: dict[str, CanonicalObject] = {}
+                for axis in self._AXES:
+                    assessment = FindingAxisAssessment(
+                        claim_revision_ref=claim_ref,
+                        assessment_input_history_cut=cut,
+                        assessment_policy_ref=_external_ref(
+                            "external_profile_ref",
+                            "E5_EXTERNAL_FINDING_ADJUDICATION_R5_3",
+                            "HISTORY_CONTEXT_BINDING",
+                        ),
+                        axis=axis,
+                        epistemic_outcome="INCONCLUSIVE",
+                        method=(
+                            "EXTERNAL_PROPOSAL_NO_QUALIFIED_"
+                            "CANONICAL_EVIDENCE"
+                        ),
+                        evidence_qualification_refs=(),
+                        method_or_characterization_refs=[
+                            proposal_ref
+                        ],
+                        assessment_id=deterministic_id(
+                            "finding_axis_assessment",
+                            (
+                                f"e5:{self.batch.phase_id}:"
+                                f"{proposal_digest}:{index}:{axis}"
+                            ),
+                        ),
+                    )
+                    axis_objects[axis] = (
+                        assessment.as_object()
+                    )
+
+                decision = FindingAdjudicationDecision(
+                    claim_revision_ref=claim_ref,
+                    input_history_cut=cut,
+                    adjudicator_ref=_external_ref(
+                        "actor_or_authority_ref",
+                        "trusted_coordinator_e5",
+                        "CONTENT_OR_PRIOR",
+                    ),
+                    mechanism_assessment_ref=axis_objects[
+                        "MECHANISM"
+                    ].as_ref().as_dict(),
+                    reachability_assessment_ref=axis_objects[
+                        "REACHABILITY"
+                    ].as_ref().as_dict(),
+                    impact_assessment_ref=axis_objects[
+                        "IMPACT"
+                    ].as_ref().as_dict(),
+                    severity_assessment_ref=axis_objects[
+                        "SEVERITY"
+                    ].as_ref().as_dict(),
+                    lifecycle_status="OPEN",
+                    evidence_qualification_refs=(),
+                    knowledge_state_refs=[
+                        _with_ref_class(
+                            knowledge["ref"],
+                            "CONTENT_OR_PRIOR",
+                        )
+                    ],
+                    decision_id=deterministic_id(
+                        "finding_adjudication_decision",
+                        (
+                            f"e5:{self.batch.phase_id}:"
+                            f"{proposal_digest}:{index}"
+                        ),
+                    ),
+                )
+                decision_obj = decision.as_object()
+
+                objects.extend(
+                    [
+                        discovery,
+                        claim_obj,
+                        *(
+                            axis_objects[axis]
+                            for axis in self._AXES
+                        ),
+                        decision_obj,
+                    ]
+                )
+                claim_refs.append(claim_ref)
+                adjudication_refs.append(
+                    decision_obj.as_ref(
+                        ref_class="CONTENT_OR_PRIOR"
+                    ).as_dict()
+                )
+                by_proposal.setdefault(
+                    proposal_digest, []
+                ).append(claim_ref)
+                new_count += 1
+
+        if objects:
+            head = self.store.head()
+            if head is None:
+                raise ValidationError(
+                    "CAMPAIGN_NOT_INITIALIZED"
+                )
+            material = canonical_bytes(
+                {
+                    "phase": self.batch.phase_id,
+                    "object_digests": [
+                        obj.digest for obj in objects
+                    ],
+                }
+            )
+            token = hashlib.sha256(material).hexdigest()
+            command = CommandEnvelope(
+                command_id=_command_id(
+                    "e5_findings:" + token
+                ),
+                command_kind="RECORD_ASSURANCE_DECISION",
+                actor_ref=prior_commit.get(
+                    "actor_ref", "installation-owner"
+                ),
+                expected_parent_head={
+                    "tag": "ACCEPTED_HEAD_REF",
+                    **head.as_dict(),
+                },
+                governing_policy_ref=prior_commit[
+                    "governing_policy_ref"
+                ],
+                governing_spec_refs=tuple(
+                    prior_commit.get(
+                        "governing_spec_refs", ()
+                    )
+                ),
+                idempotency_scope="e5_findings:" + token,
+                campaign_ref=head.campaign_id,
+            )
+            Coordinator(self.store).accept(
+                command,
+                immutable_objects=objects,
+                expected_head=head,
+            )
+
+        return E5FindingCanonicalizationSummary(
+            finding_claim_refs=tuple(
+                canonical_reference_set(claim_refs)
+            ),
+            adjudication_refs=tuple(
+                canonical_reference_set(
+                    adjudication_refs
+                )
+            ),
+            claim_refs_by_proposal_digest={
+                digest: tuple(
+                    canonical_reference_set(refs)
+                )
+                for digest, refs in by_proposal.items()
+            },
+            newly_materialized_count=new_count,
+        )
 
 
 @dataclass(frozen=True)
@@ -692,19 +1183,21 @@ class CandidateAssuranceCaseService:
         batch: StageBatch,
         inbox: StageResultInbox | None = None,
     ) -> CandidateFreezeSummary:
+        canonicalized = E5FindingCanonicalizationService(
+            self.store,
+            batch,
+        ).materialize()
         validation = E5AValidationService(
             self.store,
             batch,
             inbox,
         ).validate()
-        if validation.pending_findings_count:
+        if (
+            validation.pending_findings_count
+            != len(canonicalized.finding_claim_refs)
+        ):
             raise ValidationError(
-                "E5A_FINDINGS_REQUIRE_ADJUDICATION",
-                (
-                    f"{validation.pending_findings_count} E5A "
-                    "finding proposal(s) must be canonicalized and "
-                    "adjudicated before candidate freeze"
-                ),
+                "E5A_FINDING_CANONICALIZATION_INCOMPLETE"
             )
 
         cut, _ = _current_cut(self.store)
@@ -1553,6 +2046,10 @@ class E5ChallengerResultService:
                     ",".join(incomplete),
                 )
 
+        canonicalized_findings = E5FindingCanonicalizationService(
+            self.store,
+            self.batch,
+        ).materialize()
         cut, _ = _current_cut(self.store)
         candidate_record = _latest(
             self.store.accepted_records(
@@ -1690,7 +2187,16 @@ class E5ChallengerResultService:
                     allowed_refs[digest]
                     for digest in challenged_digests
                 ),
-                counterclaim_refs=(),
+                counterclaim_refs=(
+                    canonicalized_findings
+                    .claim_refs_by_proposal_digest.get(
+                        proposal["ref"]["revision_digest"],
+                        (),
+                    )
+                    if status
+                    == "MATERIAL_COUNTEREVIDENCE_FOUND"
+                    else ()
+                ),
                 reason_codes=tuple(
                     [
                         *reason_codes,
@@ -1940,6 +2446,8 @@ __all__ = [
     "E5A_LANES",
     "E5B_LANES",
     "E5_ALL_LANE_SLOTS",
+    "E5FindingCanonicalizationSummary",
+    "E5FindingCanonicalizationService",
     "E5AValidationSummary",
     "E5AValidationService",
     "CandidateFreezeSummary",
