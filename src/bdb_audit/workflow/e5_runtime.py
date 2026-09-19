@@ -1206,19 +1206,6 @@ class CandidateAssuranceCaseService:
                 "candidate_assurance_case", cut
             )
         )
-        if (
-            existing is not None
-            and int(existing["accepted_seq"])
-            > validation.accepted_result_seq
-        ):
-            return CandidateFreezeSummary(
-                candidate=_candidate_from_record(existing),
-                candidate_ref=_with_ref_class(
-                    existing["ref"], "PRIOR_ACCEPTED_ONLY"
-                ),
-                accepted_commit_seq=int(existing["accepted_seq"]),
-                already_frozen=True,
-            )
 
         source = _latest(
             self.store.accepted_records(
@@ -1354,6 +1341,98 @@ class CandidateAssuranceCaseService:
                 ]
             )
 
+        current_material = {
+            "source_generation_ref": _with_ref_class(
+                source["ref"], "CONTENT_OR_PRIOR"
+            ),
+            "scope_inventory_ref": _with_ref_class(
+                inventory["ref"], "CONTENT_OR_PRIOR"
+            ),
+            "coverage_obligation_refs": refs(obligations),
+            "coverage_obligation_qualification_refs": refs(
+                qualifications
+            ),
+            "finding_claim_revision_refs": refs(findings),
+            "finding_adjudication_refs": refs(adjudications),
+            "contradiction_refs": refs(contradictions),
+            "evidence_qualification_refs": refs(evidence),
+            "residual_risk_refs": refs(risks),
+        }
+
+        def _ref_digest(value: Any) -> str | None:
+            return (
+                value.get("revision_digest")
+                if isinstance(value, Mapping)
+                else None
+            )
+
+        def _ref_set(
+            values: Sequence[dict[str, Any]],
+        ) -> set[str]:
+            return {
+                str(ref["revision_digest"])
+                for ref in values
+                if isinstance(
+                    ref.get("revision_digest"), str
+                )
+            }
+
+        if existing is not None:
+            body = existing["body"]
+            same_foundation = (
+                _ref_digest(
+                    body.get("source_generation_ref")
+                )
+                == _ref_digest(
+                    current_material[
+                        "source_generation_ref"
+                    ]
+                )
+                and _ref_digest(
+                    body.get("scope_inventory_ref")
+                )
+                == _ref_digest(
+                    current_material[
+                        "scope_inventory_ref"
+                    ]
+                )
+            )
+            same_sets = all(
+                _ref_set(
+                    tuple(
+                        ref
+                        for ref in body.get(field, ())
+                        if isinstance(ref, dict)
+                    )
+                )
+                == _ref_set(
+                    current_material[field]
+                )
+                for field in (
+                    "coverage_obligation_refs",
+                    "coverage_obligation_qualification_refs",
+                    "finding_claim_revision_refs",
+                    "finding_adjudication_refs",
+                    "contradiction_refs",
+                    "evidence_qualification_refs",
+                    "residual_risk_refs",
+                )
+            )
+            if same_foundation and same_sets:
+                return CandidateFreezeSummary(
+                    candidate=_candidate_from_record(
+                        existing
+                    ),
+                    candidate_ref=_with_ref_class(
+                        existing["ref"],
+                        "PRIOR_ACCEPTED_ONLY",
+                    ),
+                    accepted_commit_seq=int(
+                        existing["accepted_seq"]
+                    ),
+                    already_frozen=True,
+                )
+
         e5a_refs = tuple(validation.result_refs)
         basis_payload = {
             "input_history_cut": cut,
@@ -1388,22 +1467,36 @@ class CandidateAssuranceCaseService:
                 cut["campaign_id"],
                 "PRIOR_ACCEPTED_ONLY",
             ),
-            source_generation_ref=_with_ref_class(
-                source["ref"], "CONTENT_OR_PRIOR"
-            ),
+            source_generation_ref=current_material[
+                "source_generation_ref"
+            ],
             candidate_input_history_cut=cut,
-            scope_inventory_ref=_with_ref_class(
-                inventory["ref"], "CONTENT_OR_PRIOR"
+            scope_inventory_ref=current_material[
+                "scope_inventory_ref"
+            ],
+            coverage_obligation_refs=current_material[
+                "coverage_obligation_refs"
+            ],
+            coverage_obligation_qualification_refs=(
+                current_material[
+                    "coverage_obligation_qualification_refs"
+                ]
             ),
-            coverage_obligation_refs=refs(obligations),
-            coverage_obligation_qualification_refs=refs(
-                qualifications
-            ),
-            finding_claim_revision_refs=refs(findings),
-            finding_adjudication_refs=refs(adjudications),
-            contradiction_refs=refs(contradictions),
-            evidence_qualification_refs=refs(evidence),
-            residual_risk_refs=refs(risks),
+            finding_claim_revision_refs=current_material[
+                "finding_claim_revision_refs"
+            ],
+            finding_adjudication_refs=current_material[
+                "finding_adjudication_refs"
+            ],
+            contradiction_refs=current_material[
+                "contradiction_refs"
+            ],
+            evidence_qualification_refs=current_material[
+                "evidence_qualification_refs"
+            ],
+            residual_risk_refs=current_material[
+                "residual_risk_refs"
+            ],
             assurance_claim_set_ref=_external_ref(
                 "assurance_claim_set_ref",
                 claim_set_digest,

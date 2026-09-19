@@ -550,3 +550,60 @@ def test_candidate_pins_exact_current_adjudication_for_each_finding(
         ]
         == frozen.candidate.digest()
     )
+
+
+def test_material_counterevidence_forces_new_candidate_and_new_challengers(
+    tmp_path: Path,
+) -> None:
+    _, store = _base_campaign(tmp_path)
+    e5a, e5a_inbox = _prepare_e5a(tmp_path, store)
+    first = CandidateAssuranceCaseService(store).freeze(
+        e5a, e5a_inbox
+    )
+    e5b, e5b_inbox = _prepare_e5b(
+        tmp_path,
+        store,
+        first.candidate,
+        skeptic_status="MATERIAL_COUNTEREVIDENCE_FOUND",
+    )
+    E5ChallengerResultService(
+        store, e5b, e5b_inbox
+    ).materialize()
+
+    second = CandidateAssuranceCaseService(store).freeze(
+        e5a, e5a_inbox
+    )
+    assert (
+        second.candidate.digest()
+        != first.candidate.digest()
+    )
+    assert len(
+        second.candidate.finding_claim_revision_refs
+    ) > len(
+        first.candidate.finding_claim_revision_refs
+    )
+
+    E5ChallengeAuthorizationService(
+        store,
+        candidate=second.candidate,
+        executor_profile="ChatGPT / GitHub",
+        model="Sol 5.6",
+    ).authorize()
+    cut = current_accepted_cut(store)
+    second_assignments = [
+        row
+        for row in store.accepted_records(
+            "challenger_assignment", cut
+        )
+        if row["body"].get(
+            "candidate_assurance_case_ref", {}
+        ).get("revision_digest")
+        == second.candidate.digest()
+    ]
+    assert {
+        row["body"]["challenger_type"]
+        for row in second_assignments
+    } == {
+        "FALSE_POSITIVE_SKEPTIC",
+        "FALSE_NEGATIVE_HUNTER",
+    }
