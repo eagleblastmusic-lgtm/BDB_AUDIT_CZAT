@@ -88,24 +88,33 @@ _INTERACTION_STATUSES = {
     "INCONCLUSIVE",
     "BLOCKED",
 }
-_MUTATION_CLASSES = {
-    "IMPLEMENTATION",
-    "ORACLE",
-    "SPECIFICATION",
-}
-_MUTATION_STATUSES = {
+_IMPLEMENTATION_MUTATION_STATUSES = {
     "MUTANT_KILLED",
     "MUTANT_SURVIVED",
     "MUTATION_NOT_ACTIVATED",
-    "REDUNDANT_OBSERVER",
-    "HARNESS_FAILURE",
     "INVALID_MUTATION",
-    "INCONCLUSIVE",
+    "HARNESS_FAILURE",
+    "BLOCKED",
 }
-_MUTATION_UNRESOLVED = {
+_ORACLE_CHALLENGE_STATUSES = {
+    "WEAKENING_DETECTED",
+    "REDUNDANT_OBSERVER_FOR_CASE",
     "MUTATION_NOT_ACTIVATED",
-    "HARNESS_FAILURE",
     "INVALID_MUTATION",
+    "HARNESS_FAILURE",
+    "INCONCLUSIVE",
+    "BASELINE_ORACLE_MISSED_DEFECT",
+}
+_IMPLEMENTATION_MUTATION_UNRESOLVED = {
+    "MUTATION_NOT_ACTIVATED",
+    "INVALID_MUTATION",
+    "HARNESS_FAILURE",
+    "BLOCKED",
+}
+_ORACLE_CHALLENGE_UNRESOLVED = {
+    "MUTATION_NOT_ACTIVATED",
+    "INVALID_MUTATION",
+    "HARNESS_FAILURE",
     "INCONCLUSIVE",
 }
 
@@ -406,34 +415,42 @@ class E5AValidationService:
             return
 
         if slot == "E5-A-MUTATION":
-            rows = outputs.get("e5a_mutation_results")
-            if not isinstance(rows, list) or not rows:
+            implementation_rows = outputs.get(
+                "implementation_mutation_results"
+            )
+            oracle_rows = outputs.get(
+                "oracle_challenge_results"
+            )
+            if (
+                not isinstance(implementation_rows, list)
+                or not implementation_rows
+            ):
                 raise ValidationError(
-                    "E5A_MUTATION_RESULTS_REQUIRED"
+                    "E5A_IMPLEMENTATION_MUTATION_RESULTS_REQUIRED"
                 )
-            classes: set[str] = set()
+            if (
+                not isinstance(oracle_rows, list)
+                or not oracle_rows
+            ):
+                raise ValidationError(
+                    "E5A_ORACLE_CHALLENGE_RESULTS_REQUIRED"
+                )
+
             unresolved: list[str] = []
             survived = False
-            for item in rows:
+            for item in implementation_rows:
                 if not isinstance(item, Mapping):
                     raise ValidationError(
-                        "E5A_MUTATION_RESULT_INVALID"
+                        "E5A_IMPLEMENTATION_MUTATION_RESULT_INVALID"
                     )
-                mutation_class = item.get("mutation_class")
-                status = item.get("status")
-                if mutation_class not in _MUTATION_CLASSES:
+                outcome = item.get("outcome")
+                if outcome not in _IMPLEMENTATION_MUTATION_STATUSES:
                     raise ValidationError(
-                        "E5A_MUTATION_CLASS_INVALID",
-                        str(mutation_class),
-                    )
-                if status not in _MUTATION_STATUSES:
-                    raise ValidationError(
-                        "E5A_MUTATION_STATUS_INVALID",
-                        str(status),
+                        "E5A_IMPLEMENTATION_MUTATION_STATUS_INVALID",
+                        str(outcome),
                     )
                 cls._require_rationale(item)
-                classes.add(str(mutation_class))
-                if status in {
+                if outcome in {
                     "MUTANT_KILLED",
                     "MUTANT_SURVIVED",
                 }:
@@ -444,26 +461,107 @@ class E5AValidationService:
                     ):
                         raise ValidationError(
                             "E5A_MUTATION_ACTIVATION_WITNESS_REQUIRED",
-                            str(mutation_class),
+                            str(outcome),
                         )
-                if status in _MUTATION_UNRESOLVED:
+                if outcome in _IMPLEMENTATION_MUTATION_UNRESOLVED:
                     unresolved.append(
-                        f"{mutation_class}:{status}"
+                        f"IMPLEMENTATION:{outcome}"
                     )
-                if status == "MUTANT_SURVIVED":
+                if outcome == "MUTANT_SURVIVED":
                     survived = True
-            missing = sorted(_MUTATION_CLASSES - classes)
-            if missing:
-                raise ValidationError(
-                    "E5A_MUTATION_CLASS_SET_INCOMPLETE",
-                    ",".join(missing),
+
+            oracle_defect = False
+            for item in oracle_rows:
+                if not isinstance(item, Mapping):
+                    raise ValidationError(
+                        "E5A_ORACLE_CHALLENGE_RESULT_INVALID"
+                    )
+                outcome = item.get("outcome")
+                if outcome not in _ORACLE_CHALLENGE_STATUSES:
+                    raise ValidationError(
+                        "E5A_ORACLE_CHALLENGE_STATUS_INVALID",
+                        str(outcome),
+                    )
+                cls._require_rationale(item)
+                contrast = item.get("contrast_2x2")
+                if not isinstance(contrast, Mapping):
+                    raise ValidationError(
+                        "E5A_ORACLE_2X2_CONTRAST_REQUIRED"
+                    )
+                contrast_keys = (
+                    "clean_strong_detected",
+                    "clean_weakened_detected",
+                    "defective_strong_detected",
+                    "defective_weakened_detected",
                 )
+                if any(
+                    type(contrast.get(key)) is not bool
+                    for key in contrast_keys
+                ):
+                    raise ValidationError(
+                        "E5A_ORACLE_2X2_CONTRAST_INVALID"
+                    )
+                if outcome in {
+                    "WEAKENING_DETECTED",
+                    "REDUNDANT_OBSERVER_FOR_CASE",
+                    "BASELINE_ORACLE_MISSED_DEFECT",
+                }:
+                    witness = item.get("activation_witness")
+                    if (
+                        not isinstance(witness, str)
+                        or not witness.strip()
+                    ):
+                        raise ValidationError(
+                            "E5A_ORACLE_ACTIVATION_WITNESS_REQUIRED",
+                            str(outcome),
+                        )
+                if (
+                    outcome == "WEAKENING_DETECTED"
+                    and (
+                        contrast["clean_strong_detected"]
+                        or contrast["clean_weakened_detected"]
+                        or not contrast["defective_strong_detected"]
+                        or contrast["defective_weakened_detected"]
+                    )
+                ):
+                    raise ValidationError(
+                        "E5A_ORACLE_OUTCOME_CONTRAST_MISMATCH",
+                        str(outcome),
+                    )
+                if (
+                    outcome == "REDUNDANT_OBSERVER_FOR_CASE"
+                    and (
+                        contrast["clean_strong_detected"]
+                        or contrast["clean_weakened_detected"]
+                        or not contrast["defective_strong_detected"]
+                        or not contrast["defective_weakened_detected"]
+                    )
+                ):
+                    raise ValidationError(
+                        "E5A_ORACLE_OUTCOME_CONTRAST_MISMATCH",
+                        str(outcome),
+                    )
+                if (
+                    outcome == "BASELINE_ORACLE_MISSED_DEFECT"
+                    and contrast["defective_strong_detected"]
+                ):
+                    raise ValidationError(
+                        "E5A_ORACLE_OUTCOME_CONTRAST_MISMATCH",
+                        str(outcome),
+                    )
+                if outcome in _ORACLE_CHALLENGE_UNRESOLVED:
+                    unresolved.append(f"ORACLE:{outcome}")
+                if outcome == "BASELINE_ORACLE_MISSED_DEFECT":
+                    oracle_defect = True
+
             if unresolved:
                 raise ValidationError(
                     "E5A_MUTATION_UNRESOLVED",
                     ",".join(unresolved),
                 )
-            if survived and not body.get("findings"):
+            if (
+                survived or oracle_defect
+            ) and not body.get("findings"):
                 raise ValidationError(
                     "E5A_FAILURE_FINDING_REQUIRED",
                     slot,

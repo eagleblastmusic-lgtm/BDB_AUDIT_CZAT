@@ -124,23 +124,26 @@ def _e5a_outputs(slot: str) -> dict:
         }
     if slot == "E5-A-MUTATION":
         return {
-            "e5a_mutation_results": [
+            "implementation_mutation_results": [
                 {
-                    "mutation_class": mutation_class,
-                    "status": "MUTANT_KILLED",
-                    "activation_witness": (
-                        f"activated-{mutation_class.lower()}"
-                    ),
-                    "rationale": (
-                        f"qualified oracle killed {mutation_class}"
-                    ),
+                    "outcome": "MUTANT_KILLED",
+                    "activation_witness": "implementation-mutant-activated",
+                    "rationale": "activated implementation mutant was detected",
                 }
-                for mutation_class in (
-                    "IMPLEMENTATION",
-                    "ORACLE",
-                    "SPECIFICATION",
-                )
-            ]
+            ],
+            "oracle_challenge_results": [
+                {
+                    "outcome": "WEAKENING_DETECTED",
+                    "activation_witness": "oracle-weakening-activated",
+                    "contrast_2x2": {
+                        "clean_strong_detected": False,
+                        "clean_weakened_detected": False,
+                        "defective_strong_detected": True,
+                        "defective_weakened_detected": False,
+                    },
+                    "rationale": "2x2 contrast proves the weakened observer was material",
+                }
+            ],
         }
     if slot == "E5-A-CALIBRATION":
         return {

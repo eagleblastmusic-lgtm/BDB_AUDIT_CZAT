@@ -1093,12 +1093,29 @@ For E5-A-INTERACTION return outputs.e5a_interaction_results as a non-empty
 list. Each item requires status PASS|FAIL|INCONCLUSIVE|BLOCKED and a bounded
 rationale. A FAIL must also be represented in findings[].
 
-For E5-A-MUTATION return outputs.e5a_mutation_results covering all three
-mutation_class values IMPLEMENTATION, ORACLE, SPECIFICATION. Each item requires
-status MUTANT_KILLED|MUTANT_SURVIVED|MUTATION_NOT_ACTIVATED|
-REDUNDANT_OBSERVER|HARNESS_FAILURE|INVALID_MUTATION|INCONCLUSIVE, rationale,
-and activation_witness for MUTANT_KILLED or MUTANT_SURVIVED. A survived mutant
-must also be represented in findings[].
+For E5-A-MUTATION return TWO separate result families.
+
+outputs.implementation_mutation_results is non-empty. Each item requires:
+- outcome = MUTANT_KILLED|MUTANT_SURVIVED|MUTATION_NOT_ACTIVATED|
+  INVALID_MUTATION|HARNESS_FAILURE|BLOCKED,
+- rationale,
+- activation_witness for MUTANT_KILLED or MUTANT_SURVIVED.
+MUTANT_SURVIVED must also be represented in findings[].
+
+outputs.oracle_challenge_results is non-empty and MUST use the distinct
+OracleChallengeOutcome vocabulary:
+WEAKENING_DETECTED|REDUNDANT_OBSERVER_FOR_CASE|MUTATION_NOT_ACTIVATED|
+INVALID_MUTATION|HARNESS_FAILURE|INCONCLUSIVE|BASELINE_ORACLE_MISSED_DEFECT.
+Never report MUTANT_KILLED/MUTANT_SURVIVED for an oracle challenge.
+
+Every oracle item includes rationale and contrast_2x2 with exactly the boolean
+observations clean_strong_detected, clean_weakened_detected,
+defective_strong_detected, defective_weakened_detected. Qualified/diagnostic
+oracle outcomes require activation_witness. The strong oracle missing the known
+defect is BASELINE_ORACLE_MISSED_DEFECT, not INVALID_MUTATION. A clean-target
+trigger makes the contrast inconclusive. Specification mutation, when policy
+enables it, is a separate policy-pinned traceability exercise and must not
+reuse the implementation or oracle outcome vocabulary as a shortcut.
 
 For E5-A-CALIBRATION return outputs.e5a_calibration with status
 QUALIFIED|INCONCLUSIVE|BLOCKED, profile_ref, per_class_metrics, unknown_count,

@@ -98,23 +98,26 @@ def _e5a_outputs(slot: str) -> dict:
         }
     if slot == "E5-A-MUTATION":
         return {
-            "e5a_mutation_results": [
+            "implementation_mutation_results": [
                 {
-                    "mutation_class": mutation_class,
-                    "status": "MUTANT_KILLED",
-                    "activation_witness": (
-                        f"activated-{mutation_class.lower()}"
-                    ),
-                    "rationale": (
-                        f"qualified oracle killed {mutation_class}"
-                    ),
+                    "outcome": "MUTANT_KILLED",
+                    "activation_witness": "implementation-mutant-activated",
+                    "rationale": "activated implementation mutant was detected",
                 }
-                for mutation_class in (
-                    "IMPLEMENTATION",
-                    "ORACLE",
-                    "SPECIFICATION",
-                )
-            ]
+            ],
+            "oracle_challenge_results": [
+                {
+                    "outcome": "WEAKENING_DETECTED",
+                    "activation_witness": "oracle-weakening-activated",
+                    "contrast_2x2": {
+                        "clean_strong_detected": False,
+                        "clean_weakened_detected": False,
+                        "defective_strong_detected": True,
+                        "defective_weakened_detected": False,
+                    },
+                    "rationale": "2x2 contrast proves the weakened observer was material",
+                }
+            ],
         }
     if slot == "E5-A-CALIBRATION":
         return {
@@ -376,3 +379,49 @@ def test_e5a_pending_findings_block_candidate_freeze(
         CandidateAssuranceCaseService(store).freeze(
             batch, inbox
         )
+
+
+def test_e5a_rejects_oracle_implementation_status_alias(tmp_path: Path) -> None:
+    _, store = _base_campaign(tmp_path)
+    batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp_path / "work",
+        source_info=_source(),
+        stage_id="E5",
+        phase_id="E5A-ATTACK",
+        lane_definitions=E5A_LANES,
+        all_stage_lane_slots=E5_ALL_LANE_SLOTS,
+    )
+    inbox = StageResultInbox(store, batch)
+    paths = []
+    for slot in batch.lane_slots:
+        outputs = _e5a_outputs(slot)
+        if slot == "E5-A-MUTATION":
+            outputs = dict(outputs)
+            outputs["oracle_challenge_results"] = [
+                {
+                    "outcome": "MUTANT_KILLED",
+                    "activation_witness": "oracle-activated",
+                    "contrast_2x2": {
+                        "clean_strong_detected": False,
+                        "clean_weakened_detected": False,
+                        "defective_strong_detected": True,
+                        "defective_weakened_detected": False,
+                    },
+                    "rationale": "invalid alias",
+                }
+            ]
+        paths.append(
+            _write_stage_result(
+                tmp_path / f"alias_{slot}.zip",
+                batch,
+                slot,
+                outputs,
+            )
+        )
+    assert inbox.ingest_multiple_zips(paths).phase_complete is True
+    with pytest.raises(
+        ValidationError,
+        match="E5A_ORACLE_CHALLENGE_STATUS_INVALID",
+    ):
+        CandidateAssuranceCaseService(store).freeze(batch, inbox)

@@ -7,6 +7,8 @@ from bdb_audit.attack.mutation import (
     MutationEngine,
     MUTATION_CLASSES,
     MUTATION_OUTCOMES,
+    IMPLEMENTATION_MUTATION_OUTCOMES,
+    ORACLE_CHALLENGE_OUTCOMES,
 )
 from bdb_audit.core.errors import ValidationError
 
@@ -124,7 +126,7 @@ def test_mutation_not_activated(mock_refs):
 
 def test_mutation_without_activation_proof_fail_closed(mock_refs):
     """Direct invariant check: constructing MUTANT_KILLED without activation_proven=True must fail closed."""
-    with pytest.raises(ValidationError, match="MUTANT_KILLED_WITHOUT_ACTIVATION"):
+    with pytest.raises(ValidationError, match="MUTATION_OUTCOME_WITHOUT_ACTIVATION"):
         MutationResult(
             result_id="res_illegal",
             mutation_case_ref={"mutation_id": "m1"},
@@ -201,26 +203,40 @@ def test_oracle_mutation_clean_target_insufficient_and_2x2_contrast(mock_refs):
         clean_strong_detected=False, clean_weak_detected=False,
         defective_strong_detected=False, defective_weak_detected=False,
     )
-    assert res_miss.outcome == "INVALID_MUTATION"
+    assert res_miss.outcome == "BASELINE_ORACLE_MISSED_DEFECT"
     assert "BASELINE_ORACLE_MISSED_DEFECT" in res_miss.reason_codes
 
-    # 2. Strong oracle caught it, weakened oracle missed it -> WEAKENING_DETECTED -> MUTANT_KILLED
+    # 2. Strong oracle caught it, weakened oracle missed it -> WEAKENING_DETECTED
     res_killed = MutationEngine.evaluate_oracle_mutation(
         "res_killed", valid_case, proof,
         clean_strong_detected=False, clean_weak_detected=False,
         defective_strong_detected=True, defective_weak_detected=False,
     )
-    assert res_killed.outcome == "MUTANT_KILLED"
+    assert res_killed.outcome == "WEAKENING_DETECTED"
     assert "WEAKENING_DETECTED" in res_killed.reason_codes
 
-    # 3. Strong caught it, weakened STILL caught it -> REDUNDANT_OBSERVER
+    # 3. Strong caught it, weakened STILL caught it -> REDUNDANT_OBSERVER_FOR_CASE
     res_redundant = MutationEngine.evaluate_oracle_mutation(
         "res_red", valid_case, proof,
         clean_strong_detected=False, clean_weak_detected=False,
         defective_strong_detected=True, defective_weak_detected=True,
     )
-    assert res_redundant.outcome == "REDUNDANT_OBSERVER"
+    assert res_redundant.outcome == "REDUNDANT_OBSERVER_FOR_CASE"
     assert "REDUNDANT_OBSERVER_FOR_CASE" in res_redundant.reason_codes
+
+    # Oracle outcomes must never be silently aliased to implementation mutation.
+    with pytest.raises(ValidationError, match="INVALID_MUTATION_OUTCOME"):
+        MutationResult(
+            "oracle_bad",
+            {"mutation_id": "oracle_mut_02"},
+            "ORACLE_MUTATION",
+            "MUTANT_KILLED",
+            activation_proven=True,
+        )
+
+    assert "MUTANT_KILLED" in IMPLEMENTATION_MUTATION_OUTCOMES
+    assert "MUTANT_KILLED" not in ORACLE_CHALLENGE_OUTCOMES
+    assert "WEAKENING_DETECTED" in ORACLE_CHALLENGE_OUTCOMES
 
 
 def test_d5_depth_filtering():
