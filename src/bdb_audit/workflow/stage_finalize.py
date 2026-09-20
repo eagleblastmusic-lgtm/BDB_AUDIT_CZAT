@@ -470,7 +470,6 @@ class E4FinalizationService(ExternalStageFinalizationService):
 
     _FIDELITY_REQUIRED_FIELDS = frozenset(
         {
-            "fidelity_assessment_id",
             "model_revision_ref",
             "implementation_anchor_refs",
             "abstraction_mapping_refs",
@@ -698,11 +697,13 @@ class E4FinalizationService(ExternalStageFinalizationService):
             raise ValidationError(
                 "E4_MODEL_FIDELITY_REQUIRED"
             )
-        fidelity_id = fidelity.get("fidelity_assessment_id")
-        if not isinstance(fidelity_id, str) or not fidelity_id:
-            raise ValidationError(
-                "E4_MODEL_FIDELITY_ID_REQUIRED"
-            )
+        fidelity_id = deterministic_id(
+            "model_fidelity_assessment",
+            (
+                "e4-model-fidelity:"
+                + result["ref"]["revision_digest"]
+            ),
+        )
         existing = [
             row
             for row in self.store.accepted_records(
@@ -722,10 +723,11 @@ class E4FinalizationService(ExternalStageFinalizationService):
 
         self.validate_result("E4-DEEPEN", "E4-MODEL", result)
         body = self._fidelity_body(result)
+        body["fidelity_assessment_id"] = fidelity_id
         obj = CanonicalObject(
             "model_fidelity_assessment",
             body,
-            logical_id=str(body["fidelity_assessment_id"]),
+            logical_id=fidelity_id,
         )
 
         head = self.store.head()
@@ -772,15 +774,17 @@ class E4FinalizationService(ExternalStageFinalizationService):
             if isinstance(outputs, Mapping)
             else None
         )
-        fidelity_id = (
-            fidelity.get("fidelity_assessment_id")
-            if isinstance(fidelity, Mapping)
-            else None
-        )
-        if not isinstance(fidelity_id, str) or not fidelity_id:
+        if not isinstance(fidelity, Mapping):
             raise ValidationError(
-                "E4_MODEL_FIDELITY_ID_REQUIRED"
+                "E4_MODEL_FIDELITY_REQUIRED"
             )
+        fidelity_id = deterministic_id(
+            "model_fidelity_assessment",
+            (
+                "e4-model-fidelity:"
+                + result["ref"]["revision_digest"]
+            ),
+        )
         rows = [
             row
             for row in self.store.accepted_records(

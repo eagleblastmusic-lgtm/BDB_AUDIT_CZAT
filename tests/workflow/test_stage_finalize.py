@@ -47,7 +47,6 @@ def _write_result(
     outputs = {"e4_assessments": assessments}
     if slot == "E4-MODEL" and not omit_fidelity:
         outputs["model_fidelity_assessment"] = {
-            "fidelity_assessment_id": "model_fidelity_assessment_e4_runtime",
             "model_revision_ref": {
                 "model_id": "state_model_e4_runtime",
                 "revision": 1,

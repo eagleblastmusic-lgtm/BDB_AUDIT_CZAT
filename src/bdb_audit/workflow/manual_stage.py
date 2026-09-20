@@ -1079,7 +1079,6 @@ Required assessment_kind values by lane:
 E4-MODEL additionally MUST return outputs.model_fidelity_assessment using the
 canonical ModelFidelityAssessment body:
 {
-  "fidelity_assessment_id": "<stable id>",
   "model_revision_ref": {},
   "implementation_anchor_refs": [{}],
   "abstraction_mapping_refs": [{}],
@@ -1092,10 +1091,12 @@ canonical ModelFidelityAssessment body:
   "result": "QUALIFIED|BOUNDED|INSUFFICIENT|INVALIDATED",
   "reason_codes": []
 }
-The external lane MUST NOT invent canonical source identity or history-cut
-refs inside this proposal. The coordinator injects source_generation_ref and
-assessment_input_history_cut from the accepted assignment/result binding when
-materializing the canonical ModelFidelityAssessment.
+The external lane MUST NOT invent the canonical fidelity_assessment_id,
+source identity, or history-cut refs inside this proposal. The coordinator
+derives the typed fidelity_assessment_id deterministically from the accepted
+E4-MODEL result and injects source_generation_ref plus
+assessment_input_history_cut from accepted history when materializing the
+canonical ModelFidelityAssessment.
 
 A model result cannot qualify implementation work without non-empty
 implementation_anchor_refs, abstraction_mapping_refs and

@@ -166,13 +166,16 @@ class MutationResult:
                 if self.outcome == "MUTANT_KILLED"
                 else "MUTATION_OUTCOME_WITHOUT_ACTIVATION"
             )
-            raise ValidationError(
-                code,
-                (
-                    f"Cannot classify {self.outcome} without "
-                    "verified activation proof"
-                ),
+            detail = (
+                f"Cannot classify {self.outcome} without "
+                "verified activation proof"
             )
+            if code == "MUTANT_KILLED_WITHOUT_ACTIVATION":
+                detail = (
+                    "MUTATION_OUTCOME_WITHOUT_ACTIVATION: "
+                    + detail
+                )
+            raise ValidationError(code, detail)
 
     def body(self) -> dict[str, Any]:
         return {
