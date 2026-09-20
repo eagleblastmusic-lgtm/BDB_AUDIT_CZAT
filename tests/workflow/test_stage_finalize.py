@@ -16,6 +16,7 @@ from bdb_audit.workflow.manual_stage import (
     prepare_stage_phase_batch,
 )
 from bdb_audit.workflow.source_target import ResolvedSource
+from bdb_audit.workflow.read_models import current_accepted_cut
 from bdb_audit.workflow.stage_finalize import (
     E4FinalizationService,
     E4_REQUIRED_ASSESSMENTS,
@@ -136,14 +137,7 @@ def test_e4_external_results_finalize_stage(e4_phase):
     assert summary.stage_id == "E4"
     assert summary.already_finalized is False
     assert summary.required_lane_completions == 3
-    cut = store.head()
-    assert cut is not None
-    accepted_cut = {
-        "variant": "ACCEPTED_HISTORY_CUT",
-        "campaign_id": cut.campaign_id,
-        "accepted_head_seq": cut.commit_seq,
-        "accepted_head_hash": cut.commit_hash,
-    }
+    accepted_cut = current_accepted_cut(store)
     fidelity_rows = store.accepted_records(
         "model_fidelity_assessment", accepted_cut
     )
