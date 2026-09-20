@@ -161,8 +161,13 @@ class MutationResult:
             "BASELINE_ORACLE_MISSED_DEFECT",
         }
         if self.outcome in activation_required and not self.activation_proven:
+            code = (
+                "MUTANT_KILLED_WITHOUT_ACTIVATION"
+                if self.outcome == "MUTANT_KILLED"
+                else "MUTATION_OUTCOME_WITHOUT_ACTIVATION"
+            )
             raise ValidationError(
-                "MUTATION_OUTCOME_WITHOUT_ACTIVATION",
+                code,
                 (
                     f"Cannot classify {self.outcome} without "
                     "verified activation proof"

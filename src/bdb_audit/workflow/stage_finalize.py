@@ -472,7 +472,6 @@ class E4FinalizationService(ExternalStageFinalizationService):
         {
             "fidelity_assessment_id",
             "model_revision_ref",
-            "source_generation_ref",
             "implementation_anchor_refs",
             "abstraction_mapping_refs",
             "abstraction_assumptions",
@@ -481,7 +480,6 @@ class E4FinalizationService(ExternalStageFinalizationService):
             "fairness_time_assumptions",
             "execution_conformance_evidence_refs",
             "scope",
-            "assessment_input_history_cut",
             "result",
             "reason_codes",
         }
@@ -522,6 +520,28 @@ class E4FinalizationService(ExternalStageFinalizationService):
                 "E4_MODEL_FIDELITY_REQUIRED"
             )
         body = dict(fidelity)
+        # Source identity and input cut are coordinator-owned facts. They are
+        # derived from the accepted assignment/result binding rather than
+        # trusted from external proposal bytes.
+        cut, _ = _current_cut(self.store)
+        assignment_ref = result["body"].get("assignment_ref")
+        if not isinstance(assignment_ref, dict):
+            raise ValidationError(
+                "E4_MODEL_ASSIGNMENT_REF_REQUIRED"
+            )
+        assignment = self.store.resolve_accepted(
+            assignment_ref, cut
+        )
+        source = self.store.resolve_accepted(
+            assignment["body"]["source_generation_ref"],
+            cut,
+        )
+        body["source_generation_ref"] = _with_ref_class(
+            source["ref"], "CONTENT_OR_PRIOR"
+        )
+        body["assessment_input_history_cut"] = dict(
+            result["body"]["history_cut"]
+        )
         missing = sorted(
             self._FIDELITY_REQUIRED_FIELDS - set(body)
         )
@@ -529,13 +549,6 @@ class E4FinalizationService(ExternalStageFinalizationService):
             raise ValidationError(
                 "E4_MODEL_FIDELITY_INCOMPLETE",
                 ",".join(missing),
-            )
-        if (
-            body.get("assessment_input_history_cut")
-            != result["body"].get("history_cut")
-        ):
-            raise ValidationError(
-                "E4_MODEL_FIDELITY_HISTORY_CUT_MISMATCH"
             )
         fidelity_result = body.get("result")
         if fidelity_result not in {

@@ -2411,14 +2411,14 @@ class E5FinalizationService(ExternalStageFinalizationService):
         result: dict[str, Any],
     ) -> None:
         if phase_id == "E5A-ATTACK":
+            # Findings are proposal material here. Candidate freeze must have
+            # canonicalized every one into claim + exact OPEN adjudication
+            # before E5B authorization; finalization re-validates the result
+            # contract but must not resurrect the retired pre-canonicalization
+            # blocker.
             E5AValidationService.validate_result_body(
                 slot, result["body"]
             )
-            if result["body"].get("findings"):
-                raise ValidationError(
-                    "E5A_FINDINGS_REQUIRE_ADJUDICATION",
-                    slot,
-                )
             return
         if phase_id == "E5B-CHALLENGE":
             return

@@ -53,13 +53,6 @@ def _write_result(
                 "revision": 1,
                 "digest": "a" * 64,
             },
-            "source_generation_ref": {
-                "kind": "source_generation",
-                "revision_digest": "b" * 64,
-                "digest_profile": "BDB-OBJECT-DIGEST-1",
-                "schema_revision_ref": "BDB_SCHEMA_REGISTRY::source_generation/1",
-                "ref_class": "CONTENT_OR_PRIOR",
-            },
             "implementation_anchor_refs": [
                 {"path": "src/runtime.py", "symbol": "Runtime"}
             ],
@@ -74,7 +67,6 @@ def _write_result(
                 {"observation_id": "obs-e4-conformance"}
             ],
             "scope": "RUNTIME_STATE_MACHINE",
-            "assessment_input_history_cut": batch.frozen_history_cut,
             "result": "BOUNDED",
             "reason_codes": ["MODEL_BOUNDED_OR_ABSTRACTION_PRESENT"],
         }

@@ -1081,7 +1081,6 @@ canonical ModelFidelityAssessment body:
 {
   "fidelity_assessment_id": "<stable id>",
   "model_revision_ref": {},
-  "source_generation_ref": {},
   "implementation_anchor_refs": [{}],
   "abstraction_mapping_refs": [{}],
   "abstraction_assumptions": [],
@@ -1090,10 +1089,14 @@ canonical ModelFidelityAssessment body:
   "fairness_time_assumptions": [],
   "execution_conformance_evidence_refs": [{}],
   "scope": "<bounded implementation scope>",
-  "assessment_input_history_cut": "<exact assigned history_cut>",
   "result": "QUALIFIED|BOUNDED|INSUFFICIENT|INVALIDATED",
   "reason_codes": []
 }
+The external lane MUST NOT invent canonical source identity or history-cut
+refs inside this proposal. The coordinator injects source_generation_ref and
+assessment_input_history_cut from the accepted assignment/result binding when
+materializing the canonical ModelFidelityAssessment.
+
 A model result cannot qualify implementation work without non-empty
 implementation_anchor_refs, abstraction_mapping_refs and
 execution_conformance_evidence_refs. INSUFFICIENT or INVALIDATED fidelity
