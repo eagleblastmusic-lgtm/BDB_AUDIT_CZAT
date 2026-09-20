@@ -539,9 +539,11 @@ class E4FinalizationService(ExternalStageFinalizationService):
         body["source_generation_ref"] = _with_ref_class(
             source["ref"], "CONTENT_OR_PRIOR"
         )
-        body["assessment_input_history_cut"] = dict(
-            result["body"]["history_cut"]
-        )
+        # This canonical assessment is a coordinator decision over the
+        # accepted external result. Its HISTORY_INPUT is therefore the exact
+        # accepted cut at materialization time. The external runner's older
+        # frozen input remains preserved on bdb_audit_lane_result.history_cut.
+        body["assessment_input_history_cut"] = dict(cut)
         missing = sorted(
             self._FIDELITY_REQUIRED_FIELDS - set(body)
         )
@@ -686,19 +688,28 @@ class E4FinalizationService(ExternalStageFinalizationService):
     ) -> dict[str, Any]:
         cut, prior_commit = _current_cut(self.store)
         result = self._model_result(cut)
-        self.validate_result("E4-DEEPEN", "E4-MODEL", result)
-        body = self._fidelity_body(result)
-        obj = CanonicalObject(
-            "model_fidelity_assessment",
-            body,
-            logical_id=str(body["fidelity_assessment_id"]),
+        outputs = result["body"].get("outputs", {})
+        fidelity = (
+            outputs.get("model_fidelity_assessment")
+            if isinstance(outputs, Mapping)
+            else None
         )
+        if not isinstance(fidelity, Mapping):
+            raise ValidationError(
+                "E4_MODEL_FIDELITY_REQUIRED"
+            )
+        fidelity_id = fidelity.get("fidelity_assessment_id")
+        if not isinstance(fidelity_id, str) or not fidelity_id:
+            raise ValidationError(
+                "E4_MODEL_FIDELITY_ID_REQUIRED"
+            )
         existing = [
             row
             for row in self.store.accepted_records(
                 "model_fidelity_assessment", cut
             )
-            if row["ref"]["revision_digest"] == obj.digest
+            if row["body"].get("fidelity_assessment_id")
+            == fidelity_id
         ]
         if len(existing) > 1:
             raise ValidationError(
@@ -708,6 +719,14 @@ class E4FinalizationService(ExternalStageFinalizationService):
             return _with_ref_class(
                 existing[0]["ref"], "CONTENT_OR_PRIOR"
             )
+
+        self.validate_result("E4-DEEPEN", "E4-MODEL", result)
+        body = self._fidelity_body(result)
+        obj = CanonicalObject(
+            "model_fidelity_assessment",
+            body,
+            logical_id=str(body["fidelity_assessment_id"]),
+        )
 
         head = self.store.head()
         if head is None:
@@ -747,21 +766,28 @@ class E4FinalizationService(ExternalStageFinalizationService):
         cut: dict[str, Any],
     ) -> Sequence[dict[str, Any]]:
         result = self._model_result(cut)
-        obj = CanonicalObject(
-            "model_fidelity_assessment",
-            self._fidelity_body(result),
-            logical_id=str(
-                self._fidelity_body(result)[
-                    "fidelity_assessment_id"
-                ]
-            ),
+        outputs = result["body"].get("outputs", {})
+        fidelity = (
+            outputs.get("model_fidelity_assessment")
+            if isinstance(outputs, Mapping)
+            else None
         )
+        fidelity_id = (
+            fidelity.get("fidelity_assessment_id")
+            if isinstance(fidelity, Mapping)
+            else None
+        )
+        if not isinstance(fidelity_id, str) or not fidelity_id:
+            raise ValidationError(
+                "E4_MODEL_FIDELITY_ID_REQUIRED"
+            )
         rows = [
             row
             for row in self.store.accepted_records(
                 "model_fidelity_assessment", cut
             )
-            if row["ref"]["revision_digest"] == obj.digest
+            if row["body"].get("fidelity_assessment_id")
+            == fidelity_id
         ]
         if len(rows) != 1:
             raise ValidationError(
