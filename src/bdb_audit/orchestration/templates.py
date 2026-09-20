@@ -66,6 +66,16 @@ CANONICAL_PROMPT_TEMPLATES: dict[str, PromptTemplate] = {
         required_variables=("slot", "predecessor_cut"),
         body_pattern="BDB E2 Cross Review Lane {slot} | Prior Head: {predecessor_cut}",
     ),
+    "manual_stage_phase": PromptTemplate(
+        template_id="manual_stage_phase",
+        version="1.0.0",
+        target_stage="EXTERNAL_STAGE_PHASE",
+        required_variables=("stage_id", "phase_id", "lane_slot"),
+        body_pattern=(
+            "BDB External Stage {stage_id} | "
+            "Phase: {phase_id} | Lane: {lane_slot}"
+        ),
+    ),
     "e3_blind": PromptTemplate(
         template_id="e3_blind",
         version="1.0.0",

@@ -140,31 +140,43 @@ def test_finding_adjudication_flow():
 
 def test_contradiction_and_majority_vote_forbidden():
     cut = {"tag": "EMPTY_HISTORY"}
-    claim_ref = ref("finding_claim_revision", "c1")
+    claim_a = ref("finding_claim_revision", "c1")
+    claim_b = ref("finding_claim_revision", "c2")
     ev1 = ref("evidence_qualification_assessment", "e1")
     ev2 = ref("evidence_qualification_assessment", "e2")
 
     contra = ContradictionRevision(
         contradiction_id=new_id("contradiction_revision"),
-        claim_revision_ref=claim_ref,
-        contradicting_evidence_refs=[ev1, ev2],
-        input_history_cut=cut,
-        status="UNRESOLVED",
+        claim_revision_refs=[claim_a, claim_b],
+        scope={"surface": "auth"},
+        positions=[
+            {"side": "SUPPORTING"},
+            {"side": "OPPOSING"},
+        ],
+        supporting_evidence_qualification_refs=[ev1],
+        opposing_evidence_qualification_refs=[ev2],
+        failure_assumption_differences=[],
+        environment_input_model_differences=[],
+        required_falsifier="SCOPE_MATCHED_REPRODUCTION",
+        status="OPEN",
     )
     assert len(contra.digest) == 64
 
-    # Majority vote resolution is strictly forbidden
+    # Majority vote resolution is strictly forbidden.
     with pytest.raises(ValidationError, match="MAJORITY_VOTE_FORBIDDEN"):
         ContradictionResolutionDecision(
-            resolution_id=new_id("contradiction_resolution_decision"),
-            contradiction_revision_ref=contra.as_object().as_ref().as_dict(),
-            adjudicator_ref=ref("actor_or_authority_ref", "lead_auditor"),
-            resolution_status="RESOLVED",
-            rationale="3 support votes beat 1 refute vote",
-            input_history_cut=cut,
-            support_count=3,
-            refute_count=1,
-            resolved_by_majority_vote=True,  # Forbidden!
+            resolution_decision_id=new_id(
+                "contradiction_resolution_decision"
+            ),
+            contradiction_prior_revision_ref=contra.as_object().as_ref(
+                ref_class="PRIOR_ACCEPTED_ONLY"
+            ).as_dict(),
+            resolution_input_history_cut=cut,
+            resolved_scope={"surface": "auth"},
+            resolution_kind="REFUTED",
+            basis_refs=[ev1],
+            resulting_status="RESOLVED_FULL",
+            resolved_by_majority_vote=True,
         )
 
 

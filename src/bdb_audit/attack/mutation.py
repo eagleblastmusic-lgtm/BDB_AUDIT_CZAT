@@ -10,9 +10,8 @@ Normative requirements:
 - A test/detector PASS without activation proof NEVER means MUTANT_KILLED (fail-closed).
 - Oracle mutation requires a 2x2 contrast experiment with known-defective target / control.
   Weakening observer on a clean target alone CANNOT prove oracle efficacy.
-- Normative outcome statuses strictly limited to:
-  MUTANT_KILLED, MUTANT_SURVIVED, MUTATION_NOT_ACTIVATED, REDUNDANT_OBSERVER,
-  HARNESS_FAILURE, INVALID_MUTATION.
+- Implementation mutation and oracle challenge use distinct normative outcome sets.
+- Oracle challenge never aliases WEAKENING_DETECTED to MUTANT_KILLED.
 - D5 depth accounts only for applicable, activated, and policy-relevant mutation obligations.
 """
 from __future__ import annotations
@@ -31,14 +30,31 @@ MUTATION_CLASSES = {
     "SPEC_ASSUMPTION_MUTATION",
 }
 
-MUTATION_OUTCOMES = {
+IMPLEMENTATION_MUTATION_OUTCOMES = {
     "MUTANT_KILLED",
     "MUTANT_SURVIVED",
     "MUTATION_NOT_ACTIVATED",
-    "REDUNDANT_OBSERVER",
-    "HARNESS_FAILURE",
     "INVALID_MUTATION",
+    "HARNESS_FAILURE",
+    "BLOCKED",
 }
+
+ORACLE_CHALLENGE_OUTCOMES = {
+    "WEAKENING_DETECTED",
+    "REDUNDANT_OBSERVER_FOR_CASE",
+    "MUTATION_NOT_ACTIVATED",
+    "INVALID_MUTATION",
+    "HARNESS_FAILURE",
+    "INCONCLUSIVE",
+    "BASELINE_ORACLE_MISSED_DEFECT",
+}
+
+SPEC_MUTATION_OUTCOMES = IMPLEMENTATION_MUTATION_OUTCOMES
+
+MUTATION_OUTCOMES = (
+    IMPLEMENTATION_MUTATION_OUTCOMES
+    | ORACLE_CHALLENGE_OUTCOMES
+)
 
 
 @dataclass(frozen=True)
@@ -118,17 +134,48 @@ class MutationResult:
     reason_codes: tuple[str, ...] = ()
 
     def __post_init__(self):
-        if self.outcome not in MUTATION_OUTCOMES:
+        if self.mutation_class == "ORACLE_MUTATION":
+            allowed = ORACLE_CHALLENGE_OUTCOMES
+        elif self.mutation_class == "IMPLEMENTATION_MUTATION":
+            allowed = IMPLEMENTATION_MUTATION_OUTCOMES
+        elif self.mutation_class == "SPEC_ASSUMPTION_MUTATION":
+            allowed = SPEC_MUTATION_OUTCOMES
+        else:
+            raise ValidationError(
+                "INVALID_MUTATION_CLASS",
+                self.mutation_class,
+            )
+        if self.outcome not in allowed:
             raise ValidationError(
                 "INVALID_MUTATION_OUTCOME",
-                f"outcome {self.outcome} must be one of {sorted(MUTATION_OUTCOMES)}",
+                (
+                    f"{self.mutation_class} outcome {self.outcome} "
+                    f"must be one of {sorted(allowed)}"
+                ),
             )
-        # Fail-closed invariant: MUTANT_KILLED strictly requires activation_proven=True
-        if self.outcome == "MUTANT_KILLED" and not self.activation_proven:
-            raise ValidationError(
-                "MUTANT_KILLED_WITHOUT_ACTIVATION",
-                "Cannot classify outcome as MUTANT_KILLED without verified activation proof",
+        activation_required = {
+            "MUTANT_KILLED",
+            "MUTANT_SURVIVED",
+            "WEAKENING_DETECTED",
+            "REDUNDANT_OBSERVER_FOR_CASE",
+            "BASELINE_ORACLE_MISSED_DEFECT",
+        }
+        if self.outcome in activation_required and not self.activation_proven:
+            code = (
+                "MUTANT_KILLED_WITHOUT_ACTIVATION"
+                if self.outcome == "MUTANT_KILLED"
+                else "MUTATION_OUTCOME_WITHOUT_ACTIVATION"
             )
+            detail = (
+                f"Cannot classify {self.outcome} without "
+                "verified activation proof"
+            )
+            if code == "MUTANT_KILLED_WITHOUT_ACTIVATION":
+                detail = (
+                    "MUTATION_OUTCOME_WITHOUT_ACTIVATION: "
+                    + detail
+                )
+            raise ValidationError(code, detail)
 
     def body(self) -> dict[str, Any]:
         return {
@@ -270,38 +317,51 @@ class MutationEngine:
             "defective_weak_detected": defective_weak_detected,
         }
 
-        # Step 1: Strong oracle must detect the known defect; if not -> BASELINE_ORACLE_MISSED_DEFECT
+        # A detector firing on the clean control makes the contrast inconclusive.
+        if clean_strong_detected or clean_weak_detected:
+            return MutationResult(
+                result_id=result_id,
+                mutation_case_ref=case_ref,
+                mutation_class=case.mutation_class,
+                outcome="INCONCLUSIVE",
+                activation_proven=True,
+                activation_proof=activation_proof,
+                contrast_2x2_results=contrast,
+                reason_codes=("CLEAN_TARGET_TRIGGERED_ORACLE",),
+            )
+
+        # Strong oracle missing the known defect is its own normative outcome.
         if not defective_strong_detected:
             return MutationResult(
                 result_id=result_id,
                 mutation_case_ref=case_ref,
                 mutation_class=case.mutation_class,
-                outcome="INVALID_MUTATION",
+                outcome="BASELINE_ORACLE_MISSED_DEFECT",
                 activation_proven=True,
                 activation_proof=activation_proof,
                 contrast_2x2_results=contrast,
                 reason_codes=("BASELINE_ORACLE_MISSED_DEFECT",),
             )
 
-        # Step 2: Weakened oracle misses the defect -> WEAKENING_DETECTED -> MUTANT_KILLED
+        # Strong detects and weakened misses: weakening was materially detected.
         if not defective_weak_detected:
             return MutationResult(
                 result_id=result_id,
                 mutation_case_ref=case_ref,
                 mutation_class=case.mutation_class,
-                outcome="MUTANT_KILLED",
+                outcome="WEAKENING_DETECTED",
                 activation_proven=True,
                 activation_proof=activation_proof,
                 contrast_2x2_results=contrast,
                 reason_codes=("WEAKENING_DETECTED",),
             )
 
-        # Step 3: Weakened oracle STILL detects the defect -> REDUNDANT_OBSERVER
+        # Both detect the known defect after confirmed activation.
         return MutationResult(
             result_id=result_id,
             mutation_case_ref=case_ref,
             mutation_class=case.mutation_class,
-            outcome="REDUNDANT_OBSERVER",
+            outcome="REDUNDANT_OBSERVER_FOR_CASE",
             activation_proven=True,
             activation_proof=activation_proof,
             contrast_2x2_results=contrast,
@@ -376,7 +436,12 @@ class MutationEngine:
         for r in results:
             if not r.activation_proven:
                 continue
-            if r.outcome not in ("MUTANT_KILLED", "MUTANT_SURVIVED", "REDUNDANT_OBSERVER"):
+            if r.outcome not in (
+                "MUTANT_KILLED",
+                "MUTANT_SURVIVED",
+                "WEAKENING_DETECTED",
+                "REDUNDANT_OBSERVER_FOR_CASE",
+            ):
                 continue
             case_id = r.mutation_case_ref.get("mutation_id", "")
             if policy_relevant_ids is not None and case_id not in policy_relevant_ids:

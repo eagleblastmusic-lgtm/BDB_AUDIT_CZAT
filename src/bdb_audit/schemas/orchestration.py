@@ -13,8 +13,9 @@ OPTIONAL = {
     "stage_run": ("successor_of_stage_run_ref",), "lane_run": ("successor_of_lane_run_ref",),
     "attempt": ("retry_of_attempt_ref", "retry_reason_ref"),
     "bdb_audit_lane_result": (
-        "findings_count", "notes", "evidence_files", "assignment_ref", "attempt_ref",
-        "raw_result_digest", "raw_result_byte_length",
+        "phase_id", "outputs", "findings_count", "notes", "evidence_files",
+        "assignment_ref", "attempt_ref", "raw_result_digest",
+        "raw_result_byte_length",
     ),
 }
 ARRAYS = set("predecessor_requirements required_lane_slots optional_lane_slots allowed_corpus_roles forbidden_corpus_roles required_stage_completion_outputs scope_selectors allowed_view_classes forbidden_knowledge_classes required_outputs executor_capability_requirements predecessor_stage_completion_refs required_lane_slot_contract_refs required_result_slots result_slot_contracts findings evidence_files".split())
@@ -50,8 +51,10 @@ def orchestration_schema(kind):
     if kind == "bdb_audit_lane_result":
         properties["findings"] = {"type": "array"}
         properties["history_cut"] = {"type": "object"}
-        properties["lane_slot"] = {"enum": ["E1-A", "E1-B", "E1-C", "E1-D", "E1-E"]}
-        properties["stage_id"] = {"const": "E1"}
+        properties["lane_slot"] = {"type": "string", "minLength": 1}
+        properties["stage_id"] = {"enum": ["E1", "E2", "E3", "E4", "E5", "E6"]}
+        properties["phase_id"] = {"type": "string", "minLength": 1}
+        properties["outputs"] = {"type": "object"}
         properties["kind"] = {"const": "bdb_audit_lane_result"}
         properties["version"] = {"const": "1"}
         properties["raw_result_digest"] = {"type": "string", "format": "bdb-sha256"}

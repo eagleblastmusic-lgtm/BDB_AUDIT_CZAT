@@ -18,12 +18,183 @@ from ..history.store import TransactionalHistoryStore
 from ..orchestration.native_ensemble import E1_LANE_SLOTS
 from ..orchestration.templates import TemplateRegistry
 from .executors import get_executor_profile
+from .e2_checkpoint import E2BlindCheckpointService
+from .e2_reveal import E2ControlledRevealService
+from .e2_synthesis import E2MainSynthesisService
+from .e2_shadow import E2ShadowAuthorizationService
+from .e2_finalize import E2FinalizationService
+from .e2_contradiction import E2ContradictionAuthorizationService
+from .e2_contradiction_resolution import E2ContradictionResolutionService
+from .e3_checkpoint import E3BlindCheckpointService
+from .e3_gap import E3PositiveGapAuthorizationService
+from .e3_gap_result import E3GapResultValidationService
+from .e3_cumulative import E3CumulativeAuthorizationService
+from .e3_cumulative_result import E3CumulativeResultValidationService
+from .e3_holdout import E3HoldoutAuthorizationService
+from .e3_holdout_result import E3HoldoutResultValidationService
 from .inbox import E1ResultInbox, ImportedResultSummary
+from .manual_stage import (
+    ImportedStagePhaseSummary,
+    StageAuthorizedContext,
+    StageBatch,
+    StageIsolationProof,
+    StageLaneDefinition,
+    StageResultInbox,
+    prepare_stage_phase_batch,
+)
 from .package_resume import load_e1_batch
 from .packaging import E1Batch, prepare_e1_batch
+from .stage_resume import load_stage_phase_batch
+from .stage_finalize import (
+    ExternalStageFinalizationService,
+    E4FinalizationService,
+)
+from .e5_runtime import (
+    CandidateAssuranceCaseService,
+    E5A_LANES,
+    E5B_LANES,
+    E5_ALL_LANE_SLOTS,
+    E5ChallengeAuthorizationService,
+    E5ChallengerResultService,
+    E5FinalizationService,
+)
 from .platform import DefaultPlatformAdapter, PlatformAdapter
 from .settings import SettingsManager, UserSettings
 from .source_target import ResolvedSource, resolve_source_identity
+
+
+E2_BLIND_LANES = (
+    StageLaneDefinition(
+        "E2-CONVERGENCE",
+        "Blind verification and convergence precursor",
+        "BLIND_VERIFY_AND_CONVERGE",
+    ),
+    StageLaneDefinition(
+        "E2-ADJUDICATION",
+        "Blind falsification and adjudication precursor",
+        "BLIND_FALSIFY_AND_ADJUDICATE",
+    ),
+)
+
+E2_REVEAL_LANES = (
+    StageLaneDefinition(
+        "E2-CONVERGENCE",
+        "Controlled E1 claim-card convergence review",
+        "CONTROLLED_REVEAL_CONVERGENCE",
+    ),
+    StageLaneDefinition(
+        "E2-ADJUDICATION",
+        "Controlled E1 claim-card falsification and adjudication",
+        "CONTROLLED_REVEAL_ADJUDICATION",
+    ),
+)
+
+E2_SHADOW_LANES = (
+    StageLaneDefinition(
+        "E2-ADJUDICATION",
+        "Independent bounded shadow adjudicator",
+        "INDEPENDENT_SHADOW_ADJUDICATION",
+    ),
+)
+
+E2_CONTRADICTION_LANES = (
+    StageLaneDefinition(
+        "E2-ADJUDICATION",
+        "Scoped contradiction protocol adjudicator",
+        "CONTRADICTION_PROTOCOL",
+    ),
+)
+
+E3_BLIND_LANES = (
+    StageLaneDefinition(
+        "E3-X",
+        "Security, authority and trust blind novelty",
+        "AUTHORITY_TRUST_NOVELTY_SEARCH",
+    ),
+    StageLaneDefinition(
+        "E3-Y",
+        "State, data, catalog and recovery blind novelty",
+        "STATE_CATALOG_RECOVERY_SEARCH",
+    ),
+    StageLaneDefinition(
+        "E3-Z",
+        "Frontend, concurrency, resources and cross-layer blind novelty",
+        "CROSS_LAYER_CONCURRENCY_SEARCH",
+    ),
+)
+
+E3_GAP_LANES = (
+    StageLaneDefinition(
+        "E3-X",
+        "Security, authority and trust gap-directed exploration",
+        "AUTHORITY_TRUST_GAP_DIRECTED_SEARCH",
+    ),
+    StageLaneDefinition(
+        "E3-Y",
+        "State, data, catalog and recovery gap-directed exploration",
+        "STATE_CATALOG_RECOVERY_GAP_DIRECTED_SEARCH",
+    ),
+    StageLaneDefinition(
+        "E3-Z",
+        "Frontend, concurrency, resources and cross-layer gap-directed exploration",
+        "CROSS_LAYER_CONCURRENCY_GAP_DIRECTED_SEARCH",
+    ),
+)
+
+E3_CUMULATIVE_LANES = (
+    StageLaneDefinition(
+        "E3-X",
+        "Security, authority and trust cumulative-corpus comparison",
+        "AUTHORITY_TRUST_CUMULATIVE_COMPARISON",
+    ),
+    StageLaneDefinition(
+        "E3-Y",
+        "State, data, catalog and recovery cumulative-corpus comparison",
+        "STATE_CATALOG_RECOVERY_CUMULATIVE_COMPARISON",
+    ),
+    StageLaneDefinition(
+        "E3-Z",
+        "Frontend, concurrency, resources and cross-layer cumulative-corpus comparison",
+        "CROSS_LAYER_CONCURRENCY_CUMULATIVE_COMPARISON",
+    ),
+)
+
+E3_HOLDOUT_LANES = (
+    StageLaneDefinition(
+        "E3-X",
+        "Security, authority and trust external holdout comparison",
+        "AUTHORITY_TRUST_HOLDOUT_COMPARISON",
+    ),
+    StageLaneDefinition(
+        "E3-Y",
+        "State, data, catalog and recovery external holdout comparison",
+        "STATE_CATALOG_RECOVERY_HOLDOUT_COMPARISON",
+    ),
+    StageLaneDefinition(
+        "E3-Z",
+        "Frontend, concurrency, resources and cross-layer external holdout comparison",
+        "CROSS_LAYER_CONCURRENCY_HOLDOUT_COMPARISON",
+    ),
+)
+
+
+E4_DEEPEN_LANES = (
+    StageLaneDefinition(
+        "E4-MODEL",
+        "State, temporal and bounded model deepening",
+        "STATE_TEMPORAL_MODEL_DEEPENING",
+    ),
+    StageLaneDefinition(
+        "E4-RESILIENCE",
+        "Fault, concurrency, crash and endurance deepening",
+        "RESILIENCE_FAILURE_LAB",
+    ),
+    StageLaneDefinition(
+        "E4-CAUSAL",
+        "Causal-chain and sibling mechanism deepening",
+        "CAUSAL_CHAIN_DEEPENING",
+    ),
+)
 
 
 @dataclass(frozen=True)
@@ -60,6 +231,8 @@ class FullAuditOrchestrator:
         self.resolved_source: ResolvedSource | None = None
         self.e1_batch: E1Batch | None = None
         self.e1_inbox: E1ResultInbox | None = None
+        self.stage_batch: StageBatch | None = None
+        self.stage_inbox: StageResultInbox | None = None
 
     def _artifact_root(self) -> Path:
         if self.active_store_path is None:
@@ -242,6 +415,867 @@ class FullAuditOrchestrator:
         self.e1_inbox = E1ResultInbox(store, batch)
         return batch
 
+    def prepare_e2_blind_orchestration(self) -> StageBatch:
+        """Prepare the first real E2 external phase without revealing E1 claims."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        status = self.api.get_campaign_status(self.active_store_path)
+        if "E1" not in status.get("stages_completed", []):
+            raise ValidationError(
+                "PREDECESSOR_STAGE_NOT_COMPLETED",
+                "E1 must be completed before E2 blind work",
+            )
+        if "E2" not in status.get("stages_prepared", []):
+            self.api.prepare_stage(self.active_store_path, "E2")
+
+        status = self.api.get_campaign_status(self.active_store_path)
+        lanes_prepared = set(status.get("lanes_prepared", []))
+        for definition in E2_BLIND_LANES:
+            lane_key = f"lane_E2_{definition.lane_slot}"
+            if lane_key not in lanes_prepared:
+                self.api.prepare_lane(
+                    self.active_store_path,
+                    "E2",
+                    definition.lane_slot,
+                )
+
+        store = TransactionalHistoryStore(self.active_store_path)
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E2",
+            phase_id="E2-BLIND",
+            lane_definitions=E2_BLIND_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_BLIND_LANES
+            ),
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(store, batch)
+        return batch
+
+    def prepare_e2_reveal_orchestration(self) -> StageBatch:
+        """Authorize and publish the controlled E1 claim-card reveal."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        store = TransactionalHistoryStore(self.active_store_path)
+        authorization = E2ControlledRevealService(
+            store,
+            lane_definitions=E2_REVEAL_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_REVEAL_LANES
+            ),
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+        ).authorize()
+        authorized_context = StageAuthorizedContext(
+            campaign_id=authorization.campaign_id,
+            stage_id=authorization.stage_id,
+            phase_id=authorization.phase_id,
+            context_members=dict(
+                authorization.context_members
+            ),
+            context_manifest=dict(
+                authorization.context_manifest
+            ),
+            view_manifest_ref=dict(
+                authorization.view_manifest_ref
+            ),
+            grant_refs_by_slot=dict(
+                authorization.grant_refs_by_slot
+            ),
+            knowledge_state_refs_by_slot=dict(
+                authorization.knowledge_state_refs_by_slot
+            ),
+            authorization_history_cut=dict(
+                authorization.authorization_history_cut
+            ),
+            assignments=dict(
+                authorization.assignments
+            ),
+            already_authorized=(
+                authorization.already_authorized
+            ),
+        )
+
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E2",
+            phase_id="E2-REVEAL",
+            lane_definitions=E2_REVEAL_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_REVEAL_LANES
+            ),
+            authorized_context=authorized_context,
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(store, batch)
+        return batch
+
+    def prepare_e2_shadow_orchestration(self) -> StageBatch:
+        """Publish a fresh, grant-bound independent E2 shadow package."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        store = TransactionalHistoryStore(self.active_store_path)
+        authorization = E2ShadowAuthorizationService(
+            store,
+            lane_definition=E2_SHADOW_LANES[0],
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_BLIND_LANES
+            ),
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+        ).authorize()
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E2",
+            phase_id="E2-SHADOW",
+            lane_definitions=E2_SHADOW_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_BLIND_LANES
+            ),
+            authorized_context=authorization,
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(store, batch)
+        return batch
+
+    def prepare_e2_contradiction_orchestration(
+        self,
+        contradiction_refs: Sequence[dict[str, Any]],
+    ) -> StageBatch:
+        """Authorize and publish the bounded E2 contradiction protocol."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+        if not contradiction_refs:
+            raise ValidationError("E2_CONTRADICTION_CASE_REQUIRED")
+
+        store = TransactionalHistoryStore(self.active_store_path)
+        authorization = E2ContradictionAuthorizationService(
+            store,
+            contradiction_refs=contradiction_refs,
+            lane_definition=E2_CONTRADICTION_LANES[0],
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_BLIND_LANES
+            ),
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+        ).authorize()
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E2",
+            phase_id="E2-CONTRADICTION",
+            lane_definitions=E2_CONTRADICTION_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E2_BLIND_LANES
+            ),
+            authorized_context=authorization,
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(store, batch)
+        return batch
+
+    def prepare_e3_blind_orchestration(self) -> StageBatch:
+        """Prepare the real E3-X/Y/Z blind novelty phase."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        status = self.api.get_campaign_status(self.active_store_path)
+        if "E2" not in status.get("stages_completed", []):
+            raise ValidationError(
+                "PREDECESSOR_STAGE_NOT_COMPLETED",
+                "E2 must be completed before E3 blind novelty",
+            )
+
+        profile = get_executor_profile(
+            self.settings.execution_mode
+        )
+        if profile.max_isolation_assurance != "ENFORCED":
+            raise ValidationError(
+                "E3_ENFORCED_ISOLATION_BACKEND_REQUIRED",
+                (
+                    f"{profile.display_name} / "
+                    f"{profile.delivery_profile} currently proves at most "
+                    f"{profile.max_isolation_assurance}; E3-X/Y/Z require "
+                    "ENFORCED isolation. Do not publish blind packages "
+                    "until a controlled backend can emit accepted boundary "
+                    "receipts."
+                ),
+            )
+        if "E3" not in status.get("stages_prepared", []):
+            self.api.prepare_stage(
+                self.active_store_path,
+                "E3",
+            )
+            status = self.api.get_campaign_status(
+                self.active_store_path
+            )
+
+        lanes_prepared = set(
+            status.get("lanes_prepared", [])
+        )
+        for definition in E3_BLIND_LANES:
+            lane_key = (
+                f"lane_E3_{definition.lane_slot}"
+            )
+            if lane_key not in lanes_prepared:
+                self.api.prepare_lane(
+                    self.active_store_path,
+                    "E3",
+                    definition.lane_slot,
+                )
+
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E3",
+            phase_id="E3-BLIND",
+            lane_definitions=E3_BLIND_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            execution_mode=(
+                self.settings.execution_mode
+            ),
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(
+            store,
+            batch,
+        )
+        return batch
+
+    def prepare_e3_gap_orchestration(
+        self,
+        isolation_proofs_by_slot: dict[
+            str, StageIsolationProof
+        ],
+    ) -> StageBatch:
+        """Authorize and publish fresh E3 gap-directed attempts."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        authorization = E3PositiveGapAuthorizationService(
+            store,
+            lane_definitions=E3_GAP_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+            isolation_proofs_by_slot=(
+                isolation_proofs_by_slot
+            ),
+        ).authorize()
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E3",
+            phase_id="E3-GAP",
+            lane_definitions=E3_GAP_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            authorized_context=authorization,
+            isolation_proofs_by_slot=(
+                isolation_proofs_by_slot
+            ),
+            execution_mode=(
+                self.settings.execution_mode
+            ),
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(
+            store,
+            batch,
+        )
+        return batch
+
+    def prepare_e3_cumulative_orchestration(
+        self,
+        isolation_proofs_by_slot: dict[
+            str, StageIsolationProof
+        ],
+    ) -> StageBatch:
+        """Authorize and publish late E3 cumulative-corpus comparison."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        authorization = E3CumulativeAuthorizationService(
+            store,
+            lane_definitions=E3_CUMULATIVE_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+            isolation_proofs_by_slot=(
+                isolation_proofs_by_slot
+            ),
+        ).authorize()
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E3",
+            phase_id="E3-CUMULATIVE",
+            lane_definitions=E3_CUMULATIVE_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            authorized_context=authorization,
+            isolation_proofs_by_slot=(
+                isolation_proofs_by_slot
+            ),
+            execution_mode=(
+                self.settings.execution_mode
+            ),
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(
+            store,
+            batch,
+        )
+        return batch
+
+    def prepare_e3_holdout_orchestration(
+        self,
+        holdout_corpus_manifest_ref: dict[
+            str, Any
+        ],
+        isolation_proofs_by_slot: dict[
+            str, StageIsolationProof
+        ],
+    ) -> StageBatch:
+        """Authorize and publish optional E3 auxiliary holdout comparison."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        authorization = E3HoldoutAuthorizationService(
+            store,
+            holdout_corpus_manifest_ref=(
+                holdout_corpus_manifest_ref
+            ),
+            lane_definitions=E3_HOLDOUT_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+            isolation_proofs_by_slot=(
+                isolation_proofs_by_slot
+            ),
+        ).authorize()
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E3",
+            phase_id="E3-HOLDOUT",
+            lane_definitions=E3_HOLDOUT_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot
+                for item in E3_BLIND_LANES
+            ),
+            authorized_context=authorization,
+            isolation_proofs_by_slot=(
+                isolation_proofs_by_slot
+            ),
+            execution_mode=(
+                self.settings.execution_mode
+            ),
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(
+            store,
+            batch,
+        )
+        return batch
+
+    def finalize_e3_orchestration(self):
+        """Accept E3 StageCompletion only from completed external phases."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        slots = tuple(item.lane_slot for item in E3_BLIND_LANES)
+        return ExternalStageFinalizationService(
+            TransactionalHistoryStore(self.active_store_path),
+            stage_id="E3",
+            required_phase_slots={
+                "E3-BLIND": slots,
+                "E3-GAP": slots,
+                "E3-CUMULATIVE": slots,
+            },
+            optional_phase_slots={"E3-HOLDOUT": slots},
+            next_action="PREPARE_E4_EXTERNAL_PHASE",
+        ).finalize()
+
+    def prepare_e4_orchestration(self) -> StageBatch:
+        """Prepare the real external E4 deepen/model phase."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+        status = self.api.get_campaign_status(self.active_store_path)
+        if "E3" not in status.get("stages_completed", []):
+            raise ValidationError(
+                "PREDECESSOR_STAGE_NOT_COMPLETED",
+                "E3 must be completed before E4 deepening",
+            )
+        if "E4" not in status.get("stages_prepared", []):
+            self.api.prepare_stage(self.active_store_path, "E4")
+            status = self.api.get_campaign_status(self.active_store_path)
+        lanes_prepared = set(status.get("lanes_prepared", []))
+        for definition in E4_DEEPEN_LANES:
+            lane_key = f"lane_E4_{definition.lane_slot}"
+            if lane_key not in lanes_prepared:
+                self.api.prepare_lane(
+                    self.active_store_path,
+                    "E4",
+                    definition.lane_slot,
+                )
+        store = TransactionalHistoryStore(self.active_store_path)
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E4",
+            phase_id="E4-DEEPEN",
+            lane_definitions=E4_DEEPEN_LANES,
+            all_stage_lane_slots=tuple(
+                item.lane_slot for item in E4_DEEPEN_LANES
+            ),
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(store, batch)
+        return batch
+
+    def finalize_e4_orchestration(self):
+        """Validate E4 result contracts and accept evidence-backed completion."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        return E4FinalizationService(
+            TransactionalHistoryStore(self.active_store_path),
+            stage_id="E4",
+            required_phase_slots={
+                "E4-DEEPEN": tuple(
+                    item.lane_slot for item in E4_DEEPEN_LANES
+                )
+            },
+            next_action="PREPARE_E5A_ATTACK",
+        ).finalize()
+
+    def _advance_e4_external(self) -> dict[str, Any]:
+        if (
+            self.active_store_path is None
+            or not self.active_store_path.exists()
+        ):
+            raise ValidationError(
+                "CAMPAIGN_NOT_INITIALIZED"
+            )
+        status = self.api.get_campaign_status(
+            self.active_store_path
+        )
+        if "E4" in status.get("stages_completed", []):
+            return self._advance_e5_external()
+        if self.stage_batch is None or self.stage_batch.stage_id != "E4":
+            self.prepare_e4_orchestration()
+        assert self.stage_batch is not None
+        assert self.stage_inbox is not None
+        missing = [
+            slot for slot, lane in self.stage_inbox.lane_statuses.items()
+            if lane.status != "ACCEPTED"
+        ]
+        blocked = [
+            slot for slot, lane in self.stage_inbox.lane_statuses.items()
+            if lane.status == "ACCEPTED"
+            and lane.completion_status != "LANE_COMPLETED"
+        ]
+        if missing or blocked:
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E4",
+                "current_phase": "E4-DEEPEN",
+                "missing_lanes": missing,
+                "blocked_lanes": blocked,
+                "next_action": "DELIVER_OR_IMPORT_E4_DEEPEN_RESULTS",
+                "packages": {
+                    slot: str(job.package_zip_path)
+                    for slot, job in self.stage_batch.jobs.items()
+                },
+            }
+        finalized = self.finalize_e4_orchestration()
+        return {
+            "status": "E4_COMPLETED",
+            "current_stage": "E4",
+            "next_stage": "E5",
+            "stage_completion_ref": finalized.stage_completion_ref,
+            "completion_commit_seq": finalized.accepted_commit_seq,
+            "already_finalized": finalized.already_finalized,
+            "next_action": finalized.next_action,
+        }
+
+    def _prepare_e5_lane_specs(self) -> None:
+        assert self.active_store_path is not None
+        status = self.api.get_campaign_status(
+            self.active_store_path
+        )
+        if "E5" not in status.get("stages_prepared", []):
+            self.api.prepare_stage(
+                self.active_store_path, "E5"
+            )
+            status = self.api.get_campaign_status(
+                self.active_store_path
+            )
+        lanes_prepared = set(
+            status.get("lanes_prepared", [])
+        )
+        for definition in (*E5A_LANES, *E5B_LANES):
+            lane_key = (
+                f"lane_E5_{definition.lane_slot}"
+            )
+            if lane_key not in lanes_prepared:
+                self.api.prepare_lane(
+                    self.active_store_path,
+                    "E5",
+                    definition.lane_slot,
+                )
+
+    def prepare_e5a_orchestration(self) -> StageBatch:
+        """Prepare pre-candidate E5A attack/mutation/calibration work."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+        status = self.api.get_campaign_status(
+            self.active_store_path
+        )
+        if "E4" not in status.get("stages_completed", []):
+            raise ValidationError(
+                "PREDECESSOR_STAGE_NOT_COMPLETED",
+                "E4 must be completed before E5A",
+            )
+        self._prepare_e5_lane_specs()
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E5",
+            phase_id="E5A-ATTACK",
+            lane_definitions=E5A_LANES,
+            all_stage_lane_slots=E5_ALL_LANE_SLOTS,
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(
+            store, batch
+        )
+        return batch
+
+    def prepare_e5b_orchestration(
+        self,
+        candidate=None,
+    ) -> StageBatch:
+        """Accept challenger assignments and publish exact-candidate E5B packages."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        if self.resolved_source is None:
+            raise ValidationError("SOURCE_IDENTITY_REQUIRED")
+        self._prepare_e5_lane_specs()
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        candidate_service = CandidateAssuranceCaseService(
+            store
+        )
+        if candidate is None:
+            candidate = (
+                candidate_service.current_candidate().candidate
+            )
+        authorization = E5ChallengeAuthorizationService(
+            store,
+            candidate=candidate,
+            executor_profile=self.settings.execution_mode,
+            model=self.settings.model,
+        ).authorize()
+        batch = prepare_stage_phase_batch(
+            store=store,
+            output_dir=self._artifact_root(),
+            source_info=self.resolved_source,
+            stage_id="E5",
+            phase_id="E5B-CHALLENGE",
+            lane_definitions=E5B_LANES,
+            all_stage_lane_slots=E5_ALL_LANE_SLOTS,
+            authorized_context=authorization,
+            execution_mode=self.settings.execution_mode,
+            model=self.settings.model,
+        )
+        self.stage_batch = batch
+        self.stage_inbox = StageResultInbox(
+            store, batch
+        )
+        return batch
+
+    def _advance_e5_external(self) -> dict[str, Any]:
+        assert self.active_store_path is not None
+        status = self.api.get_campaign_status(
+            self.active_store_path
+        )
+        if "E5" in status.get("stages_completed", []):
+            return {
+                "status": "READY_FOR_FINAL_STOP",
+                "current_stage": "E5",
+                "next_action": (
+                    "EVALUATE_FINAL_POST_E5_STOP"
+                ),
+            }
+
+        if (
+            self.stage_batch is None
+            or self.stage_batch.stage_id != "E5"
+        ):
+            self.prepare_e5a_orchestration()
+
+        assert self.stage_batch is not None
+        assert self.stage_inbox is not None
+
+        missing = [
+            slot
+            for slot, lane in (
+                self.stage_inbox.lane_statuses.items()
+            )
+            if lane.status != "ACCEPTED"
+        ]
+        blocked = [
+            slot
+            for slot, lane in (
+                self.stage_inbox.lane_statuses.items()
+            )
+            if lane.status == "ACCEPTED"
+            and lane.completion_status
+            != "LANE_COMPLETED"
+        ]
+        if missing or blocked:
+            phase = self.stage_batch.phase_id
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E5",
+                "current_phase": phase,
+                "missing_lanes": missing,
+                "blocked_lanes": blocked,
+                "next_action": (
+                    "DELIVER_OR_IMPORT_E5A_RESULTS"
+                    if phase == "E5A-ATTACK"
+                    else "DELIVER_OR_IMPORT_E5B_RESULTS"
+                ),
+                "packages": {
+                    slot: str(job.package_zip_path)
+                    for slot, job in (
+                        self.stage_batch.jobs.items()
+                    )
+                },
+            }
+
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        if self.stage_batch.phase_id == "E5A-ATTACK":
+            try:
+                frozen = CandidateAssuranceCaseService(
+                    store
+                ).freeze(
+                    self.stage_batch,
+                    self.stage_inbox,
+                )
+            except ValidationError as exc:
+                if (
+                    exc.code
+                    == "CANDIDATE_SCOPE_INVENTORY_REQUIRED"
+                ):
+                    return {
+                        "status": "BLOCKED",
+                        "current_stage": "E5",
+                        "current_phase": "E5A-ATTACK",
+                        "reason": str(exc),
+                        "next_action": (
+                            "BUILD_OR_QUALIFY_SCOPE_INVENTORY"
+                        ),
+                    }
+                raise
+            e5b = self.prepare_e5b_orchestration(
+                frozen.candidate
+            )
+            return {
+                "status": "E5A_CANDIDATE_FROZEN",
+                "current_stage": "E5",
+                "current_phase": "E5B-CHALLENGE",
+                "candidate_ref": frozen.candidate_ref,
+                "candidate_commit_seq": (
+                    frozen.accepted_commit_seq
+                ),
+                "candidate_already_frozen": (
+                    frozen.already_frozen
+                ),
+                "next_action": (
+                    "DELIVER_OR_IMPORT_E5B_RESULTS"
+                ),
+                "packages": {
+                    slot: str(job.package_zip_path)
+                    for slot, job in e5b.jobs.items()
+                },
+            }
+
+        if (
+            self.stage_batch.phase_id
+            == "E5B-CHALLENGE"
+        ):
+            challenger_summary = (
+                E5ChallengerResultService(
+                    store,
+                    self.stage_batch,
+                    self.stage_inbox,
+                ).materialize()
+            )
+            try:
+                completion = E5FinalizationService(
+                    store
+                ).finalize()
+            except ValidationError as exc:
+                if (
+                    exc.code
+                    == "E5_CHALLENGER_ADJUDICATION_REQUIRED"
+                ):
+                    return {
+                        "status": "BLOCKED",
+                        "current_stage": "E5",
+                        "current_phase": "E5B-CHALLENGE",
+                        "reason": str(exc),
+                        "challenger_statuses": (
+                            challenger_summary.statuses
+                        ),
+                        "next_action": (
+                            "ADJUDICATE_OR_REVISE_CANDIDATE"
+                        ),
+                    }
+                raise
+            return {
+                "status": "E5_COMPLETED",
+                "current_stage": "E5",
+                "stage_completion_ref": (
+                    completion.stage_completion_ref
+                ),
+                "completion_commit_seq": (
+                    completion.accepted_commit_seq
+                ),
+                "challenger_statuses": (
+                    challenger_summary.statuses
+                ),
+                "next_action": completion.next_action,
+            }
+
+        raise ValidationError(
+            "UNSUPPORTED_E5_PHASE",
+            self.stage_batch.phase_id,
+        )
+
+    def deliver_stage_lane_to_user(self, slot: str) -> dict[str, Any]:
+        """Deliver one already accepted E2+ stage assignment/package."""
+        if self.stage_batch is None:
+            raise ValidationError("STAGE_BATCH_NOT_PREPARED")
+        job = self.stage_batch.get_job(slot)
+        clipboard_ok = False
+        explorer_ok = False
+        if self.settings.auto_copy_clipboard:
+            clipboard_ok = self.platform.copy_to_clipboard(job.prompt_text)
+        if self.settings.auto_open_explorer:
+            explorer_ok = self.platform.open_and_select(job.package_zip_path)
+        return {
+            "stage_id": job.stage_id,
+            "phase_id": job.phase_id,
+            "lane_slot": slot,
+            "package_zip_path": str(job.package_zip_path),
+            "package_zip_name": job.package_zip_path.name,
+            "assignment_ref": dict(job.assignment_ref),
+            "attempt_ref": dict(job.attempt_ref),
+            "prompt_copied": (
+                clipboard_ok if self.settings.auto_copy_clipboard else None
+            ),
+            "explorer_selected": (
+                explorer_ok if self.settings.auto_open_explorer else None
+            ),
+        }
+
+    def import_stage_results(
+        self,
+        zip_paths: Sequence[Path | str],
+    ) -> ImportedStagePhaseSummary:
+        if self.stage_inbox is None:
+            raise ValidationError("STAGE_RESULT_INBOX_NOT_INITIALIZED")
+        return self.stage_inbox.ingest_multiple_zips(zip_paths)
+
     def deliver_lane_to_user(self, slot: str) -> dict[str, Any]:
         """Deliver one already accepted assignment/package through the UI adapter."""
         if not self.e1_batch:
@@ -299,6 +1333,8 @@ class FullAuditOrchestrator:
         except ValidationError as exc:
             self.e1_batch = None
             self.e1_inbox = None
+            self.stage_batch = None
+            self.stage_inbox = None
             return {
                 "status": "ERROR",
                 "error": exc.code,
@@ -307,124 +1343,681 @@ class FullAuditOrchestrator:
             }
 
         accepted_count = sum(
-            1 for lane in self.e1_inbox.lane_statuses.values() if lane.status == "ACCEPTED"
+            1
+            for lane in self.e1_inbox.lane_statuses.values()
+            if lane.status == "ACCEPTED"
         )
         missing = [
-            slot for slot, lane in self.e1_inbox.lane_statuses.items() if lane.status != "ACCEPTED"
+            slot
+            for slot, lane in self.e1_inbox.lane_statuses.items()
+            if lane.status != "ACCEPTED"
         ]
+
+        active_stage = "E1"
+        active_phase: str | None = None
+        active_inbox = "E1"
+        if self.e1_inbox.stage_complete:
+            loaded_stage = None
+            resume_error = None
+            completed_stages = set(
+                status.get("stages_completed", [])
+            )
+            candidate_stage_phases: tuple[
+                tuple[str, str], ...
+            ]
+            if "E5" in completed_stages:
+                candidate_stage_phases = ()
+                active_stage = "E5"
+            elif "E4" in completed_stages:
+                candidate_stage_phases = (
+                    ("E5", "E5B-CHALLENGE"),
+                    ("E5", "E5A-ATTACK"),
+                )
+                active_stage = "E5"
+            elif "E3" in completed_stages:
+                candidate_stage_phases = (("E4", "E4-DEEPEN"),)
+                active_stage = "E4"
+            elif "E2" in completed_stages:
+                candidate_stage_phases = (
+                    ("E3", "E3-HOLDOUT"),
+                    ("E3", "E3-CUMULATIVE"),
+                    ("E3", "E3-GAP"),
+                    ("E3", "E3-BLIND"),
+                )
+                active_stage = "E3"
+            else:
+                candidate_stage_phases = (
+                    ("E2", "E2-CONTRADICTION"),
+                    ("E2", "E2-SHADOW"),
+                    ("E2", "E2-REVEAL"),
+                    ("E2", "E2-BLIND"),
+                )
+            for candidate_stage, candidate_phase in (
+                candidate_stage_phases
+            ):
+                try:
+                    loaded_stage = load_stage_phase_batch(
+                        store,
+                        self._artifact_root(),
+                        stage_id=candidate_stage,
+                        phase_id=candidate_phase,
+                    )
+                    active_phase = candidate_phase
+                    break
+                except ValidationError as exc:
+                    if exc.code != "RESUME_STAGE_ASSIGNMENTS_NOT_FOUND":
+                        resume_error = exc
+                        break
+
+            if resume_error is not None:
+                return {
+                    "status": "ERROR",
+                    "error": resume_error.code,
+                    "details": str(resume_error),
+                    "store_path": str(path),
+                }
+            if loaded_stage is not None:
+                stage_batch, stage_source = loaded_stage
+                self.stage_batch = stage_batch
+                self.stage_inbox = StageResultInbox(store, stage_batch)
+                self.resolved_source = stage_source
+                active_stage = stage_batch.stage_id
+                active_inbox = "STAGE"
+                accepted_count = sum(
+                    1
+                    for lane in self.stage_inbox.lane_statuses.values()
+                    if lane.status == "ACCEPTED"
+                )
+                missing = [
+                    slot
+                    for slot, lane in self.stage_inbox.lane_statuses.items()
+                    if lane.status != "ACCEPTED"
+                ]
+
         return {
             "status": "SUCCESS",
             "campaign_id": campaign_id,
             "store_path": str(path),
-            "current_stage": status.get("current_stage", "E1"),
+            "current_stage": active_stage,
+            "current_phase": active_phase,
+            "active_inbox": active_inbox,
             "accepted_lanes_count": accepted_count,
-            "total_required_lanes": len(E1_LANE_SLOTS),
+            "total_required_lanes": (
+                len(self.stage_batch.jobs)
+                if self.stage_batch is not None
+                else len(E1_LANE_SLOTS)
+            ),
             "missing_lanes": missing,
-            "stage_complete": self.e1_inbox.stage_complete,
-            "source_commit_sha": durable_source.exact_commit_sha,
-            "source_tree_sha": durable_source.exact_tree_sha,
-            "executor_profile": batch.executor_profile,
-            "executor_model": batch.model,
+            "stage_complete": (
+                self.e1_inbox.stage_complete
+                if self.stage_inbox is None
+                else False
+            ),
+            "phase_complete": (
+                self.stage_inbox is not None
+                and all(
+                    lane.status == "ACCEPTED"
+                    and lane.completion_status == "LANE_COMPLETED"
+                    for lane in self.stage_inbox.lane_statuses.values()
+                )
+            ),
+            "source_commit_sha": self.resolved_source.exact_commit_sha,
+            "source_tree_sha": self.resolved_source.exact_tree_sha,
+            "executor_profile": (
+                self.stage_batch.get_job(
+                    next(iter(self.stage_batch.jobs))
+                ).executor_profile
+                if self.stage_batch is not None
+                else batch.executor_profile
+            ),
+            "executor_model": (
+                self.stage_batch.get_job(
+                    next(iter(self.stage_batch.jobs))
+                ).model
+                if self.stage_batch is not None
+                else batch.model
+            ),
         }
 
     def advance_to_next_stage(self) -> dict[str, Any]:
-        """Fail closed at E2 until its real orchestration path exists."""
-        if not self.e1_inbox or not self.e1_inbox.stage_complete:
+        """Advance from completed E1 into the real external E2 blind phase."""
+        if not self.active_store_path or not self.active_store_path.exists():
+            raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+        status = self.api.get_campaign_status(self.active_store_path)
+        if "E1" not in status.get("stages_completed", []):
             return {
                 "status": "BLOCKED",
                 "current_stage": "E1",
                 "reason": "E1 is not yet complete",
                 "next_action": "IMPORT_MISSING_E1_RESULTS",
             }
-        return {
-            "status": "HALTED",
-            "current_stage": "E1",
-            "next_stage": "E2",
-            "reason": "E2 automated external delivery pipeline not configured in v2.0.3",
-            "next_action": "NEEDS_IMPLEMENTATION",
-        }
+
+        if "E2" in status.get("stages_completed", []):
+            if "E3" in status.get("stages_completed", []):
+                return self._advance_e4_external()
+            if (
+                self.stage_batch is None
+                or self.stage_batch.stage_id != "E3"
+            ):
+                try:
+                    self.prepare_e3_blind_orchestration()
+                except ValidationError as exc:
+                    if (
+                        exc.code
+                        != "E3_ENFORCED_ISOLATION_BACKEND_REQUIRED"
+                    ):
+                        raise
+                    return {
+                        "status": "BLOCKED",
+                        "current_stage": "E3",
+                        "current_phase": "E3-BLIND",
+                        "reason": str(exc),
+                        "next_action": (
+                            "CONFIGURE_ENFORCED_ISOLATION_BACKEND"
+                        ),
+                    }
+            assert self.stage_batch is not None
+            assert self.stage_inbox is not None
+
+            missing = [
+                slot
+                for slot, lane in (
+                    self.stage_inbox.lane_statuses.items()
+                )
+                if lane.status != "ACCEPTED"
+            ]
+            blocked = [
+                slot
+                for slot, lane in (
+                    self.stage_inbox.lane_statuses.items()
+                )
+                if lane.status == "ACCEPTED"
+                and lane.completion_status
+                != "LANE_COMPLETED"
+            ]
+            if missing or blocked:
+                phase = self.stage_batch.phase_id
+                next_action_by_phase = {
+                    "E3-BLIND": (
+                        "DELIVER_OR_IMPORT_E3_BLIND_RESULTS"
+                    ),
+                    "E3-GAP": (
+                        "DELIVER_OR_IMPORT_E3_GAP_RESULTS"
+                    ),
+                    "E3-CUMULATIVE": (
+                        "DELIVER_OR_IMPORT_E3_CUMULATIVE_RESULTS"
+                    ),
+                    "E3-HOLDOUT": (
+                        "DELIVER_OR_IMPORT_E3_HOLDOUT_RESULTS"
+                    ),
+                }
+                if phase not in next_action_by_phase:
+                    raise ValidationError(
+                        "UNSUPPORTED_E3_PHASE",
+                        phase,
+                    )
+                return {
+                    "status": "WAITING_EXTERNAL_RESULTS",
+                    "current_stage": "E3",
+                    "current_phase": phase,
+                    "missing_lanes": missing,
+                    "blocked_lanes": blocked,
+                    "next_action": (
+                        next_action_by_phase[phase]
+                    ),
+                    "packages": {
+                        slot: str(
+                            job.package_zip_path
+                        )
+                        for slot, job in (
+                            self.stage_batch.jobs.items()
+                        )
+                    },
+                }
+
+            if (
+                self.stage_batch.phase_id
+                == "E3-BLIND"
+            ):
+                e3_checkpoint = (
+                    E3BlindCheckpointService(
+                        TransactionalHistoryStore(
+                            self.active_store_path
+                        ),
+                        self.stage_batch,
+                        self.stage_inbox,
+                    ).seal()
+                )
+                return {
+                    "status": "E3_BLIND_CHECKPOINTED",
+                    "current_stage": "E3",
+                    "current_phase": "E3-BLIND",
+                    "checkpoint_commit_seq": (
+                        e3_checkpoint.accepted_commit_seq
+                    ),
+                    "checkpoint_refs": (
+                        e3_checkpoint.checkpoint_refs
+                    ),
+                    "already_sealed": (
+                        e3_checkpoint.already_sealed
+                    ),
+                    "next_action": (
+                        "PREPARE_E3_POSITIVE_GAP_REVEAL"
+                    ),
+                }
+
+            if (
+                self.stage_batch.phase_id
+                == "E3-GAP"
+            ):
+                gap_validation = (
+                    E3GapResultValidationService(
+                        TransactionalHistoryStore(
+                            self.active_store_path
+                        ),
+                        self.stage_batch,
+                        self.stage_inbox,
+                    ).validate()
+                )
+                return {
+                    "status": "E3_GAP_DIRECTED_COMPLETE",
+                    "current_stage": "E3",
+                    "current_phase": "E3-GAP",
+                    "authorized_targets_count": len(
+                        gap_validation.authorized_target_digests
+                    ),
+                    "covered_targets_count": len(
+                        gap_validation.covered_target_digests
+                    ),
+                    "findings_count": (
+                        gap_validation.findings_count
+                    ),
+                    "next_action": (
+                        gap_validation.next_action
+                    ),
+                }
+
+            if (
+                self.stage_batch.phase_id
+                == "E3-CUMULATIVE"
+            ):
+                cumulative_validation = (
+                    E3CumulativeResultValidationService(
+                        TransactionalHistoryStore(
+                            self.active_store_path
+                        ),
+                        self.stage_batch,
+                        self.stage_inbox,
+                    ).validate()
+                )
+                finalization = self.finalize_e3_orchestration()
+                return {
+                    "status": "E3_COMPLETED",
+                    "current_stage": "E3",
+                    "current_phase": "E3-CUMULATIVE",
+                    "comparison_count": cumulative_validation.comparison_count,
+                    "matched_discoveries_count": len(
+                        cumulative_validation.matched_discovery_ids
+                    ),
+                    "no_prior_match_count": len(
+                        cumulative_validation.no_prior_match_discovery_ids
+                    ),
+                    "post_reveal_discoveries_count": len(
+                        cumulative_validation.post_reveal_discovery_refs
+                    ),
+                    "stage_completion_ref": finalization.stage_completion_ref,
+                    "completion_commit_seq": finalization.accepted_commit_seq,
+                    "next_stage": "E4",
+                    "next_action": finalization.next_action,
+                }
+
+            if (
+                self.stage_batch.phase_id
+                == "E3-HOLDOUT"
+            ):
+                holdout_validation = (
+                    E3HoldoutResultValidationService(
+                        TransactionalHistoryStore(
+                            self.active_store_path
+                        ),
+                        self.stage_batch,
+                        self.stage_inbox,
+                    ).validate()
+                )
+                finalization = self.finalize_e3_orchestration()
+                return {
+                    "status": "E3_COMPLETED",
+                    "current_stage": "E3",
+                    "current_phase": "E3-HOLDOUT",
+                    "comparison_count": holdout_validation.comparison_count,
+                    "matched_holdout_count": len(
+                        holdout_validation.matched_discovery_ids
+                    ),
+                    "no_holdout_match_count": len(
+                        holdout_validation.no_holdout_match_discovery_ids
+                    ),
+                    "post_reveal_discoveries_count": len(
+                        holdout_validation.post_reveal_discovery_refs
+                    ),
+                    "holdout_corpus_manifest_ref": (
+                        holdout_validation.holdout_corpus_manifest_ref
+                    ),
+                    "stage_completion_ref": finalization.stage_completion_ref,
+                    "completion_commit_seq": finalization.accepted_commit_seq,
+                    "next_stage": "E4",
+                    "next_action": finalization.next_action,
+                }
+
+            raise ValidationError(
+                "UNSUPPORTED_E3_PHASE",
+                self.stage_batch.phase_id,
+            )
+
+        if (
+            self.stage_batch is None
+            or self.stage_batch.stage_id != "E2"
+        ):
+            self.prepare_e2_blind_orchestration()
+
+        assert self.stage_batch is not None
+        assert self.stage_inbox is not None
+        missing = [
+            slot
+            for slot, lane in self.stage_inbox.lane_statuses.items()
+            if lane.status != "ACCEPTED"
+        ]
+        blocked = [
+            slot
+            for slot, lane in self.stage_inbox.lane_statuses.items()
+            if lane.status == "ACCEPTED"
+            and lane.completion_status != "LANE_COMPLETED"
+        ]
+        if missing or blocked:
+            phase = self.stage_batch.phase_id
+            next_action_by_phase = {
+                "E2-BLIND": "DELIVER_OR_IMPORT_E2_BLIND_RESULTS",
+                "E2-REVEAL": "DELIVER_OR_IMPORT_E2_REVEAL_RESULTS",
+                "E2-SHADOW": "DELIVER_OR_IMPORT_E2_SHADOW_RESULTS",
+                "E2-CONTRADICTION": (
+                    "DELIVER_OR_IMPORT_E2_CONTRADICTION_RESULTS"
+                ),
+            }
+            if phase not in next_action_by_phase:
+                raise ValidationError(
+                    "UNSUPPORTED_E2_PHASE",
+                    phase,
+                )
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E2",
+                "current_phase": phase,
+                "missing_lanes": missing,
+                "blocked_lanes": blocked,
+                "next_action": next_action_by_phase[phase],
+                "packages": {
+                    slot: str(job.package_zip_path)
+                    for slot, job in self.stage_batch.jobs.items()
+                },
+            }
+
+        if self.stage_batch.phase_id == "E2-BLIND":
+            e2_checkpoint = E2BlindCheckpointService(
+                TransactionalHistoryStore(self.active_store_path),
+                self.stage_batch,
+                self.stage_inbox,
+            ).seal()
+            reveal_batch = self.prepare_e2_reveal_orchestration()
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E2",
+                "current_phase": "E2-REVEAL",
+                "checkpoint_commit_seq": e2_checkpoint.accepted_commit_seq,
+                "checkpoint_refs": e2_checkpoint.checkpoint_refs,
+                "already_sealed": e2_checkpoint.already_sealed,
+                "missing_lanes": list(reveal_batch.lane_slots),
+                "next_action": "DELIVER_OR_IMPORT_E2_REVEAL_RESULTS",
+                "packages": {
+                    slot: str(job.package_zip_path)
+                    for slot, job in reveal_batch.jobs.items()
+                },
+            }
+
+        if self.stage_batch.phase_id == "E2-REVEAL":
+            synthesis = E2MainSynthesisService(
+                TransactionalHistoryStore(self.active_store_path),
+                self.stage_batch,
+                self.stage_inbox,
+            ).synthesize()
+            shadow_batch = self.prepare_e2_shadow_orchestration()
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E2",
+                "current_phase": "E2-SHADOW",
+                "synthesis_commit_seq": synthesis.accepted_commit_seq,
+                "claims_count": len(synthesis.claim_refs),
+                "decisions_count": len(
+                    synthesis.adjudication_decision_refs
+                ),
+                "proposal_disagreement_claim_ids": list(
+                    synthesis.proposal_disagreement_claim_ids
+                ),
+                "missing_lanes": list(shadow_batch.lane_slots),
+                "next_action": "DELIVER_OR_IMPORT_E2_SHADOW_RESULTS",
+                "packages": {
+                    slot: str(job.package_zip_path)
+                    for slot, job in shadow_batch.jobs.items()
+                },
+            }
+
+        if self.stage_batch.phase_id == "E2-SHADOW":
+            finalization = E2FinalizationService(
+                TransactionalHistoryStore(self.active_store_path),
+                self.stage_batch,
+                self.stage_inbox,
+            ).finalize()
+            if not finalization.stage_completed:
+                contradiction_batch = (
+                    self.prepare_e2_contradiction_orchestration(
+                        finalization.contradiction_refs
+                    )
+                )
+                return {
+                    "status": "WAITING_EXTERNAL_RESULTS",
+                    "current_stage": "E2",
+                    "current_phase": "E2-CONTRADICTION",
+                    "shadow_conflict_claim_digests": list(
+                        finalization.shadow_conflict_claim_digests
+                    ),
+                    "contradiction_refs": list(
+                        finalization.contradiction_refs
+                    ),
+                    "contradiction_commit_seq": (
+                        finalization.accepted_commit_seq
+                    ),
+                    "missing_lanes": list(
+                        contradiction_batch.lane_slots
+                    ),
+                    "next_action": (
+                        "DELIVER_OR_IMPORT_E2_CONTRADICTION_RESULTS"
+                    ),
+                    "packages": {
+                        slot: str(job.package_zip_path)
+                        for slot, job in (
+                            contradiction_batch.jobs.items()
+                        )
+                    },
+                }
+            return {
+                "status": "E2_COMPLETED",
+                "current_stage": "E2",
+                "next_stage": "E3",
+                "stage_completion_ref": (
+                    finalization.stage_completion_ref
+                ),
+                "completion_commit_seq": (
+                    finalization.accepted_commit_seq
+                ),
+                "already_finalized": (
+                    finalization.already_finalized
+                ),
+                "next_action": "PREPARE_E3_BLIND_NOVELTY",
+            }
+
+        if self.stage_batch.phase_id == "E2-CONTRADICTION":
+            resolution = E2ContradictionResolutionService(
+                TransactionalHistoryStore(self.active_store_path),
+                self.stage_batch,
+                self.stage_inbox,
+            ).resolve()
+            if not resolution.stage_completed:
+                return {
+                    "status": "E2_BLOCKED_BY_CONTRADICTION",
+                    "current_stage": "E2",
+                    "current_phase": "E2-CONTRADICTION",
+                    "resulting_status_by_prior_digest": (
+                        resolution.resulting_status_by_prior_digest
+                    ),
+                    "successor_contradiction_refs": list(
+                        resolution.successor_contradiction_refs
+                    ),
+                    "next_action": resolution.next_action,
+                }
+            return {
+                "status": "E2_COMPLETED",
+                "current_stage": "E2",
+                "next_stage": "E3",
+                "stage_completion_ref": (
+                    resolution.stage_completion_ref
+                ),
+                "completion_commit_seq": (
+                    resolution.stage_completion_commit_seq
+                ),
+                "already_finalized": (
+                    resolution.already_resolved
+                ),
+                "next_action": "PREPARE_E3_BLIND_NOVELTY",
+            }
+
+        raise ValidationError(
+            "UNSUPPORTED_E2_PHASE",
+            self.stage_batch.phase_id,
+        )
 
     # Compatibility name retained for tests/UI.
     def advance_after_e1(self) -> dict[str, Any]:
-        result = self.advance_to_next_stage()
-        if result.get("status") == "HALTED" and result.get("next_action") == "NEEDS_IMPLEMENTATION":
-            return {**result, "status": "NEEDS_IMPLEMENTATION"}
-        return result
+        return self.advance_to_next_stage()
 
     def advance_stage(self, stage_id: str | None = None) -> dict[str, Any]:
-        """Advance a specific or next incomplete stage via StageService."""
+        """Advance only through the evidence-backed user workflow.
+
+        This compatibility entry point never calls the synthetic
+        ``qualify_stage`` helper. Stage completion for E1-E5 is owned by the
+        durable assignment/package/result/synthesis path.
+        """
         if not self.active_store_path or not self.active_store_path.exists():
             raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
 
         status = self.api.get_campaign_status(self.active_store_path)
         completed = set(status.get("stages_completed", []))
-        prepared = set(status.get("stages_prepared", []))
+        order = ("E1", "E2", "E3", "E4", "E5")
+        next_incomplete = next(
+            (stage for stage in order if stage not in completed),
+            None,
+        )
+        if next_incomplete is None:
+            return {
+                "status": "ALL_STAGES_COMPLETED",
+                "next_action": "EVALUATE_STOP_GATE",
+            }
 
-        target_stage: str | None
         if stage_id is not None:
-            target_stage = stage_id.upper()
-        else:
-            target_stage = next((s for s in ("E1", "E2", "E3", "E4", "E5") if s not in completed), None)
-            if target_stage is None:
-                return {"status": "ALL_STAGES_COMPLETED", "next_action": "EVALUATE_STOP_GATE"}
+            requested = stage_id.upper()
+            if requested != next_incomplete:
+                raise ValidationError(
+                    "INVALID_STAGE_TRANSITION",
+                    (
+                        f"Current evidence-backed stage is {next_incomplete}; "
+                        f"requested {requested}"
+                    ),
+                )
 
-        if target_stage not in prepared:
-            self.api.prepare_stage(self.active_store_path, target_stage)
+        if next_incomplete == "E1":
+            if self.e1_inbox is None:
+                return {
+                    "status": "BLOCKED",
+                    "current_stage": "E1",
+                    "next_action": "PREPARE_OR_RESUME_E1",
+                }
+            missing = [
+                slot
+                for slot, lane in self.e1_inbox.lane_statuses.items()
+                if lane.status != "ACCEPTED"
+            ]
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E1",
+                "missing_lanes": missing,
+                "next_action": "DELIVER_OR_IMPORT_E1_RESULTS",
+            }
 
-        res = self.api.qualify_stage(self.active_store_path, target_stage)
-        return {
-            "status": "SUCCESS",
-            "stage": target_stage,
-            "stage_completion_digest": res.get("stage_completion_digest"),
-            "commit_seq": res.get("commit_seq"),
-            "commit_hash": res.get("commit_hash"),
-        }
+        return self.advance_to_next_stage()
 
     def run_full_audit_workflow(self) -> dict[str, Any]:
-        """Execute complete resumable E1 -> E2 -> E3 -> E4 -> E5 -> STOP -> Conclusion workflow."""
+        """Drive the user workflow only as far as current external evidence permits.
+
+        This method must never synthesize E2-E5 completion in place of the
+        user-visible package -> external audit -> result ZIP workflow.
+        """
         if not self.active_store_path or not self.active_store_path.exists():
             raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
 
         status = self.api.get_campaign_status(self.active_store_path)
         if "E1" not in status.get("stages_prepared", []):
-            self.prepare_e1_orchestration()
-
-        for st in ("E1", "E2", "E3", "E4", "E5"):
-            status = self.api.get_campaign_status(self.active_store_path)
-            if st not in status.get("stages_completed", []):
-                self.advance_stage(st)
-
-        store = TransactionalHistoryStore(self.active_store_path)
-        stop_records = store.accepted_records("stop_evaluation", store.head().as_dict())
-        if not stop_records:
-            stop_res = self.api.evaluate_stop_gate(self.active_store_path)
-        else:
-            stop_res = {"continuation_decision": stop_records[-1]["body"].get("continuation_decision")}
-
-        concl_records = store.accepted_records("campaign_conclusion", store.head().as_dict())
-        if not concl_records:
-            concl_res = self.api.conclude_campaign(self.active_store_path)
-        else:
-            concl_res = {
-                "termination_state": concl_records[-1]["body"].get("termination_state"),
-                "assurance_level": concl_records[-1]["body"].get("assurance_level"),
+            batch = self.prepare_e1_orchestration()
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E1",
+                "missing_lanes": list(batch.lane_slots),
+                "next_action": "DELIVER_OR_IMPORT_E1_RESULTS",
             }
 
-        final_status = self.api.get_campaign_status(self.active_store_path)
-        return {
-            "status": "SUCCESS",
-            "campaign_id": final_status["campaign_id"],
-            "stages_completed": final_status["stages_completed"],
-            "stop_decision": stop_res.get("continuation_decision"),
-            "termination_state": concl_res.get("termination_state"),
-            "campaign_completed": final_status.get("campaign_completed", False),
-        }
+        if self.e1_batch is None or self.e1_inbox is None:
+            store = TransactionalHistoryStore(self.active_store_path)
+            self.e1_batch, durable_source = load_e1_batch(
+                store,
+                self._artifact_root(),
+            )
+            self.resolved_source = durable_source
+            self.e1_inbox = E1ResultInbox(store, self.e1_batch)
+
+        if not self.e1_inbox.stage_complete:
+            return {
+                "status": "WAITING_EXTERNAL_RESULTS",
+                "current_stage": "E1",
+                "missing_lanes": [
+                    slot
+                    for slot, lane in self.e1_inbox.lane_statuses.items()
+                    if lane.status != "ACCEPTED"
+                ],
+                "next_action": "DELIVER_OR_IMPORT_E1_RESULTS",
+            }
+
+        return self.advance_to_next_stage()
 
     def get_status(self) -> dict[str, Any]:
         if not self.active_store_path:
             return {"status": "NO_ACTIVE_CAMPAIGN"}
+        canonical = self.api.get_campaign_status(
+            self.active_store_path
+        )
         summary = self.get_dashboard_summary()
-        return {"status": "ACTIVE", "stage": "E1", **summary}
+        return {
+            "status": "ACTIVE",
+            "stage": canonical.get("current_stage"),
+            "accepted_head_seq": canonical.get("accepted_head_seq"),
+            "stages_completed": canonical.get("stages_completed", []),
+            **summary,
+        }
 
     def get_dashboard_summary(self) -> dict[str, Any]:
         target = self.resolved_source.display_name if self.resolved_source else (
@@ -444,10 +2037,47 @@ class FullAuditOrchestrator:
             "STOP": "PENDING",
         }
         lanes_detail: dict[str, str] = {}
+        if (
+            self.active_store_path
+            and self.active_store_path.exists()
+        ):
+            canonical = self.api.get_campaign_status(
+                self.active_store_path
+            )
+            completed = set(
+                canonical.get("stages_completed", [])
+            )
+            prepared = set(
+                canonical.get("stages_prepared", [])
+            )
+            for stage in ("E1", "E2", "E3", "E4", "E5"):
+                if stage in completed:
+                    stage_status[stage] = "COMPLETE"
+                elif stage in prepared:
+                    stage_status[stage] = "IN_PROGRESS"
         if self.e1_inbox:
-            stage_status["E1"] = "COMPLETE" if self.e1_inbox.stage_complete else "IN_PROGRESS"
+            stage_status["E1"] = (
+                "COMPLETE"
+                if self.e1_inbox.stage_complete
+                else "IN_PROGRESS"
+            )
             for slot, lane in self.e1_inbox.lane_statuses.items():
                 lanes_detail[slot] = lane.status
+        if (
+            self.stage_batch is not None
+            and self.stage_inbox is not None
+        ):
+            if (
+                stage_status[self.stage_batch.stage_id]
+                != "COMPLETE"
+            ):
+                stage_status[
+                    self.stage_batch.stage_id
+                ] = "IN_PROGRESS"
+            for slot, lane in self.stage_inbox.lane_statuses.items():
+                lanes_detail[
+                    f"{self.stage_batch.phase_id}:{slot}"
+                ] = lane.status
 
         if self.e1_batch:
             execution_profile = f"{self.e1_batch.executor_profile} ({self.e1_batch.model})"

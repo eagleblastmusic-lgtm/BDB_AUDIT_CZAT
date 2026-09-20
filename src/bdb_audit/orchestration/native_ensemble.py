@@ -6,7 +6,7 @@ import hashlib
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
 from ..core.hashing import object_digest
-from ..core.ids import new_id
+from ..core.ids import deterministic_id, new_id
 from ..history.objects import CanonicalObject, ObjectRef
 from .stages import StageSpec
 from .runs import LaneSpec, Attempt
@@ -377,21 +377,122 @@ def execute_e2_convergence(
             violated_invariant_refs=[inv_by_digest[key] for key in sorted(inv_by_digest)],
         )
 
-        # Contradiction requires both an explicit supported/refuted outcome and
-        # typed evidence on both sides. Missing evidence is merely inconclusive.
-        evidence_by_outcome: dict[str, list[dict]] = {"SUPPORTED": [], "REFUTED": []}
-        for item in items:
+        # Contradiction requires explicit, evidence-bearing positions on both
+        # sides.  Each side remains an exact FindingClaimRevision; the canonical
+        # contradiction contract does not collapse opposing positions into one
+        # claim plus an untyped "contradicting evidence" bag.
+        evidence_by_outcome: dict[str, list[dict]] = {
+            "SUPPORTED": [],
+            "REFUTED": [],
+        }
+        position_claim_refs: dict[str, list[dict]] = {
+            "SUPPORTED": [],
+            "REFUTED": [],
+        }
+        for item_index, item in enumerate(items):
             outcome = _claim_outcome_with_evidence(item)
-            if outcome in evidence_by_outcome:
-                evidence_by_outcome[outcome].extend(_generic_evidence(item))
-        if evidence_by_outcome["SUPPORTED"] and evidence_by_outcome["REFUTED"]:
-            refs = evidence_by_outcome["SUPPORTED"] + evidence_by_outcome["REFUTED"]
-            unique_refs = {ref["revision_digest"]: ref for ref in refs}
+            if outcome not in evidence_by_outcome:
+                continue
+            evidence_by_outcome[outcome].extend(
+                _generic_evidence(item)
+            )
+            item_statement = str(
+                item.get("statement", statement)
+            ).strip() or statement
+            position_claim = FindingClaimRevision(
+                statement=item_statement,
+                source_generation_ref=_ref_dict(
+                    source_generation_ref
+                ),
+                scope_refs=[
+                    scope_by_digest[key]
+                    for key in sorted(scope_by_digest)
+                ],
+                violated_invariant_refs=[
+                    inv_by_digest[key]
+                    for key in sorted(inv_by_digest)
+                ],
+                claim_id=deterministic_id(
+                    "finding_claim_revision",
+                    canonical_bytes(
+                        {
+                            "group_key": hashlib.sha256(
+                                group_key
+                            ).hexdigest(),
+                            "outcome": outcome,
+                            "item_index": item_index,
+                            "item": item,
+                        }
+                    ),
+                ),
+            )
+            position_claim_refs[outcome].append(
+                position_claim.as_object().as_ref().as_dict()
+            )
+
+        if (
+            evidence_by_outcome["SUPPORTED"]
+            and evidence_by_outcome["REFUTED"]
+            and position_claim_refs["SUPPORTED"]
+            and position_claim_refs["REFUTED"]
+        ):
+            supporting = {
+                ref["revision_digest"]: ref
+                for ref in evidence_by_outcome["SUPPORTED"]
+            }
+            opposing = {
+                ref["revision_digest"]: ref
+                for ref in evidence_by_outcome["REFUTED"]
+            }
+            claim_refs = [
+                *position_claim_refs["SUPPORTED"],
+                *position_claim_refs["REFUTED"],
+            ]
             contra = ContradictionRevision(
-                claim_revision_ref=claim.as_object().as_ref().as_dict(),
-                contradicting_evidence_refs=[unique_refs[key] for key in sorted(unique_refs)],
-                input_history_cut=input_history_cut,
+                claim_revision_refs=claim_refs,
+                scope={
+                    "convergence_key_sha256": hashlib.sha256(
+                        group_key
+                    ).hexdigest()
+                },
+                positions=[
+                    {
+                        "side": "SUPPORTING",
+                        "claim_revision_digests": sorted(
+                            ref["revision_digest"]
+                            for ref in position_claim_refs[
+                                "SUPPORTED"
+                            ]
+                        ),
+                    },
+                    {
+                        "side": "OPPOSING",
+                        "claim_revision_digests": sorted(
+                            ref["revision_digest"]
+                            for ref in position_claim_refs[
+                                "REFUTED"
+                            ]
+                        ),
+                    },
+                ],
+                supporting_evidence_qualification_refs=[
+                    supporting[key]
+                    for key in sorted(supporting)
+                ],
+                opposing_evidence_qualification_refs=[
+                    opposing[key]
+                    for key in sorted(opposing)
+                ],
+                failure_assumption_differences=[],
+                environment_input_model_differences=[],
+                required_falsifier=(
+                    "SCOPE_MATCHED_FALSIFIER_OR_SCOPE_SPLIT"
+                ),
                 status="OPEN",
+                contradiction_id=deterministic_id(
+                    "contradiction_revision",
+                    hashlib.sha256(group_key).hexdigest(),
+                ),
             )
             contradictions.append(contra)
             contradiction_digests.append(contra.digest)

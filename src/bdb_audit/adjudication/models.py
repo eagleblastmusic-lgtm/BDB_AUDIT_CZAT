@@ -1,11 +1,9 @@
 """R5.3.1 Finding, Root Cause, and Contradiction domain models (M21/M22)."""
-from dataclasses import dataclass, field
-import hashlib
+from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
-from ..core.hashing import DIGEST_PROFILE, object_digest
 from ..core.ids import new_id, validate_id
 from ..core.registry import canonical_reference_set
 from ..history.objects import CanonicalObject, ObjectRef
@@ -18,16 +16,16 @@ FINDING_LIFECYCLE_STATUSES = {
     "FIXED_ON_NEW_SOURCE", "PARTIALLY_FIXED", "REOPENED"
 }
 CONTRADICTION_STATUSES = {
-    "UNRESOLVED", "RESOLVED",
     "OPEN", "TESTING", "RESOLVED_SCOPED", "RESOLVED_FULL", "REOPENED", "BLOCKED"
 }
+CONTRADICTION_RESOLUTION_KINDS = {
+    "REFUTED", "SCOPES_SEPARATED", "HARNESS_INVALIDATED",
+    "CONTRACT_CHANGED", "BLOCKED"
+}
+CONTRADICTION_RESOLUTION_RESULTS = {
+    "RESOLVED_SCOPED", "RESOLVED_FULL", "BLOCKED"
+}
 
-
-def _canonical_strings(values: Sequence[str], name: str = "strings") -> list[str]:
-    vals = list(values)
-    if len(vals) != len(set(vals)):
-        raise ValidationError(f"DUPLICATE_{name.upper()}")
-    return sorted(vals)
 
 
 def _ref_dict(ref_or_obj: Any) -> dict:
@@ -282,41 +280,185 @@ class RootCauseRevision:
 
 @dataclass(frozen=True)
 class ContradictionRevision:
-    claim_revision_ref: Any
-    contradicting_evidence_refs: Sequence[Any]
-    input_history_cut: dict
-    status: str = "UNRESOLVED"
+    """Versioned, scope-aware contradiction state.
+
+    R5.3 canonical contract:
+    - exact claim revisions on both/all sides (2..N);
+    - supporting/opposing qualified evidence kept separate;
+    - predecessor and resolution references are backward-only;
+    - resolution_decision_ref is legal only on a successor revision.
+    """
+    claim_revision_refs: Sequence[Any]
+    scope: Mapping[str, Any]
+    positions: Sequence[Any]
+    supporting_evidence_qualification_refs: Sequence[Any]
+    opposing_evidence_qualification_refs: Sequence[Any]
+    failure_assumption_differences: Sequence[Any]
+    environment_input_model_differences: Sequence[Any]
+    required_falsifier: Any
+    status: str = "OPEN"
+    predecessor_contradiction_revision_ref: Any = None
+    resolution_decision_ref: Any = None
     contradiction_id: str | None = None
     contradiction_revision: str = "1"
 
     def __post_init__(self):
         if self.contradiction_id is None:
-            object.__setattr__(self, "contradiction_id", new_id("contradiction_revision"))
+            object.__setattr__(
+                self,
+                "contradiction_id",
+                new_id("contradiction_revision"),
+            )
         elif self.contradiction_id.startswith("contradiction_revision_"):
-            validate_id(self.contradiction_id, "contradiction_revision")
+            validate_id(
+                self.contradiction_id,
+                "contradiction_revision",
+            )
 
         if self.status not in CONTRADICTION_STATUSES:
-            raise ValidationError("INVALID_CONTRADICTION_STATUS", str(self.status))
+            raise ValidationError(
+                "INVALID_CONTRADICTION_STATUS",
+                str(self.status),
+            )
+        if not isinstance(self.scope, Mapping):
+            raise ValidationError("CONTRADICTION_SCOPE_REQUIRED")
+        if not isinstance(self.positions, (list, tuple)):
+            raise ValidationError("CONTRADICTION_POSITIONS_REQUIRED")
+        if not isinstance(
+            self.failure_assumption_differences,
+            (list, tuple),
+        ):
+            raise ValidationError(
+                "CONTRADICTION_FAILURE_ASSUMPTIONS_REQUIRED"
+            )
+        if not isinstance(
+            self.environment_input_model_differences,
+            (list, tuple),
+        ):
+            raise ValidationError(
+                "CONTRADICTION_ENVIRONMENT_DIFFERENCES_REQUIRED"
+            )
+        if self.required_falsifier is None:
+            raise ValidationError(
+                "CONTRADICTION_REQUIRED_FALSIFIER_REQUIRED"
+            )
 
+        claims = tuple(
+            canonical_reference_set(
+                [_ref_dict(r) for r in self.claim_revision_refs]
+            )
+        )
+        if len(claims) < 2:
+            raise ValidationError(
+                "CONTRADICTION_REQUIRES_TWO_CLAIMS"
+            )
+        if any(
+            ref.get("kind") != "finding_claim_revision"
+            for ref in claims
+        ):
+            raise ValidationError(
+                "CONTRADICTION_CLAIM_REF_KIND_INVALID"
+            )
         object.__setattr__(
-            self, "contradicting_evidence_refs",
-            tuple(canonical_reference_set([_ref_dict(r) for r in self.contradicting_evidence_refs]))
+            self,
+            "claim_revision_refs",
+            claims,
+        )
+        object.__setattr__(
+            self,
+            "supporting_evidence_qualification_refs",
+            tuple(
+                canonical_reference_set(
+                    [
+                        _ref_dict(r)
+                        for r in self.supporting_evidence_qualification_refs
+                    ]
+                )
+            ),
+        )
+        object.__setattr__(
+            self,
+            "opposing_evidence_qualification_refs",
+            tuple(
+                canonical_reference_set(
+                    [
+                        _ref_dict(r)
+                        for r in self.opposing_evidence_qualification_refs
+                    ]
+                )
+            ),
         )
 
+        if self.resolution_decision_ref is not None:
+            if self.predecessor_contradiction_revision_ref is None:
+                raise ValidationError(
+                    "CONTRADICTION_RESOLUTION_SUCCESSOR_REQUIRED"
+                )
+            if self.status not in {
+                "RESOLVED_SCOPED",
+                "RESOLVED_FULL",
+                "BLOCKED",
+            }:
+                raise ValidationError(
+                    "CONTRADICTION_RESOLUTION_STATUS_INVALID"
+                )
+
     def body(self) -> dict:
-        return {
-            "contradiction_id": self.contradiction_id or "contradiction_default",
-            "contradiction_revision": str(self.contradiction_revision),
-            "claim_revision_ref": _ref_dict(self.claim_revision_ref),
-            "contradicting_evidence_refs": list(self.contradicting_evidence_refs),
-            "input_history_cut": dict(self.input_history_cut),
+        data = {
+            "contradiction_id": (
+                self.contradiction_id
+                or "contradiction_default"
+            ),
+            "contradiction_revision": str(
+                self.contradiction_revision
+            ),
+            "claim_revision_refs": list(
+                self.claim_revision_refs
+            ),
+            "scope": dict(self.scope),
+            "positions": list(self.positions),
+            "supporting_evidence_qualification_refs": list(
+                self.supporting_evidence_qualification_refs
+            ),
+            "opposing_evidence_qualification_refs": list(
+                self.opposing_evidence_qualification_refs
+            ),
+            "failure_assumption_differences": list(
+                self.failure_assumption_differences
+            ),
+            "environment_input_model_differences": list(
+                self.environment_input_model_differences
+            ),
+            "required_falsifier": self.required_falsifier,
             "status": self.status,
         }
+        if self.predecessor_contradiction_revision_ref is not None:
+            data[
+                "predecessor_contradiction_revision_ref"
+            ] = _ref_dict(
+                self.predecessor_contradiction_revision_ref
+            )
+        if self.resolution_decision_ref is not None:
+            data["resolution_decision_ref"] = _ref_dict(
+                self.resolution_decision_ref
+            )
+        return data
 
     def as_object(self) -> CanonicalObject:
-        lid = self.contradiction_id if (self.contradiction_id and self.contradiction_id.startswith("contradiction_revision_")) else None
+        lid = (
+            self.contradiction_id
+            if (
+                self.contradiction_id
+                and self.contradiction_id.startswith(
+                    "contradiction_revision_"
+                )
+            )
+            else None
+        )
         return CanonicalObject(
-            "contradiction_revision", self.body(), logical_id=lid
+            "contradiction_revision",
+            self.body(),
+            logical_id=lid,
         )
 
     @property
@@ -326,42 +468,110 @@ class ContradictionRevision:
 
 @dataclass(frozen=True)
 class ContradictionResolutionDecision:
-    contradiction_revision_ref: Any
-    adjudicator_ref: Any
-    resolution_status: str
-    rationale: str
-    input_history_cut: dict
-    support_count: int = 0
-    refute_count: int = 0
+    """Resolution decision over one already-accepted contradiction revision."""
+    contradiction_prior_revision_ref: Any
+    resolution_input_history_cut: dict
+    resolved_scope: Mapping[str, Any]
+    resolution_kind: str
+    basis_refs: Sequence[Any]
+    resulting_status: str
+    resolution_decision_id: str | None = None
     resolved_by_majority_vote: bool = False
-    resolution_id: str | None = None
 
     def __post_init__(self):
-        if self.resolution_id is None:
-            object.__setattr__(self, "resolution_id", new_id("contradiction_resolution_decision"))
-        elif self.resolution_id.startswith("contradiction_resolution_decision_"):
-            validate_id(self.resolution_id, "contradiction_resolution_decision")
-
-        # Roadmap §67: Majority vote forbidden: 3 support + 1 reject cannot automatically resolve claim
         if self.resolved_by_majority_vote:
-            raise ValidationError("MAJORITY_VOTE_FORBIDDEN", "Contradiction cannot be resolved by majority voting")
+            raise ValidationError(
+                "MAJORITY_VOTE_FORBIDDEN",
+                "Contradiction cannot be resolved by majority voting",
+            )
+        if self.resolution_decision_id is None:
+            object.__setattr__(
+                self,
+                "resolution_decision_id",
+                new_id(
+                    "contradiction_resolution_decision"
+                ),
+            )
+        elif self.resolution_decision_id.startswith(
+            "contradiction_resolution_decision_"
+        ):
+            validate_id(
+                self.resolution_decision_id,
+                "contradiction_resolution_decision",
+            )
+        if self.resolution_kind not in (
+            CONTRADICTION_RESOLUTION_KINDS
+        ):
+            raise ValidationError(
+                "INVALID_CONTRADICTION_RESOLUTION_KIND",
+                self.resolution_kind,
+            )
+        if self.resulting_status not in (
+            CONTRADICTION_RESOLUTION_RESULTS
+        ):
+            raise ValidationError(
+                "INVALID_CONTRADICTION_RESOLUTION_STATUS",
+                self.resulting_status,
+            )
+        if not isinstance(
+            self.resolution_input_history_cut,
+            dict,
+        ):
+            raise ValidationError(
+                "CONTRADICTION_RESOLUTION_CUT_REQUIRED"
+            )
+        if not isinstance(self.resolved_scope, Mapping):
+            raise ValidationError(
+                "CONTRADICTION_RESOLVED_SCOPE_REQUIRED"
+            )
+
+        basis = tuple(
+            canonical_reference_set(
+                [_ref_dict(r) for r in self.basis_refs]
+            )
+        )
+        if not basis:
+            raise ValidationError(
+                "CONTRADICTION_RESOLUTION_BASIS_REQUIRED"
+            )
+        object.__setattr__(self, "basis_refs", basis)
 
     def body(self) -> dict:
         return {
-            "resolution_id": self.resolution_id or "resolution_default",
-            "contradiction_revision_ref": _ref_dict(self.contradiction_revision_ref),
-            "adjudicator_ref": _ref_dict(self.adjudicator_ref),
-            "resolution_status": self.resolution_status,
-            "rationale": self.rationale,
-            "input_history_cut": dict(self.input_history_cut),
+            "resolution_decision_id": (
+                self.resolution_decision_id
+                or "resolution_default"
+            ),
+            "contradiction_prior_revision_ref": _ref_dict(
+                self.contradiction_prior_revision_ref
+            ),
+            "resolution_input_history_cut": dict(
+                self.resolution_input_history_cut
+            ),
+            "resolved_scope": dict(self.resolved_scope),
+            "resolution_kind": self.resolution_kind,
+            "basis_refs": list(self.basis_refs),
+            "resulting_status": self.resulting_status,
         }
 
     def as_object(self) -> CanonicalObject:
-        lid = self.resolution_id if (self.resolution_id and self.resolution_id.startswith("contradiction_resolution_decision_")) else None
+        lid = (
+            self.resolution_decision_id
+            if (
+                self.resolution_decision_id
+                and self.resolution_decision_id.startswith(
+                    "contradiction_resolution_decision_"
+                )
+            )
+            else None
+        )
         return CanonicalObject(
-            "contradiction_resolution_decision", self.body(), logical_id=lid
+            "contradiction_resolution_decision",
+            self.body(),
+            logical_id=lid,
         )
 
     @property
     def digest(self) -> str:
         return self.as_object().digest
+

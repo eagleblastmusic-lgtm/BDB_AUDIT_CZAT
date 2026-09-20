@@ -6,10 +6,12 @@ from pathlib import Path
 import zipfile
 import pytest
 
+from bdb_audit.core.errors import ValidationError
 from bdb_audit.workflow.settings import SettingsManager
 from bdb_audit.workflow.platform import MockPlatformAdapter
 from bdb_audit.workflow.source_target import ResolvedSource
 from bdb_audit.workflow.orchestrator import FullAuditOrchestrator
+from bdb_audit.workflow.executors import EXECUTION_MODES
 from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
 
 
@@ -154,7 +156,7 @@ def test_import_all_5_results_completes_e1(orchestrator_setup):
     assert summary.stage_complete is True
 
 
-def test_advance_after_e1_is_fail_closed_needs_implementation(orchestrator_setup):
+def test_advance_after_e1_prepares_real_e2_blind_phase(orchestrator_setup):
     orch, mgr, mock_platform, tmp = orchestrator_setup
     orch.initialize_campaign()
     batch = orch.prepare_e1_orchestration()
@@ -166,8 +168,16 @@ def test_advance_after_e1_is_fail_closed_needs_implementation(orchestrator_setup
     orch.import_results(paths)
 
     res = orch.advance_after_e1()
-    assert res["status"] == "NEEDS_IMPLEMENTATION"
-    assert res["next_stage"] == "E2"
+    assert res["status"] == "WAITING_EXTERNAL_RESULTS"
+    assert res["current_stage"] == "E2"
+    assert res["current_phase"] == "E2-BLIND"
+    assert set(res["missing_lanes"]) == {
+        "E2-CONVERGENCE",
+        "E2-ADJUDICATION",
+    }
+    assert res["next_action"] == "DELIVER_OR_IMPORT_E2_BLIND_RESULTS"
+    assert orch.stage_batch is not None
+    assert orch.stage_batch.phase_id == "E2-BLIND"
 
 
 def test_advance_before_e1_complete_is_blocked(orchestrator_setup):
@@ -213,4 +223,175 @@ def test_status_after_initialization(orchestrator_setup):
     orch.initialize_campaign()
     result = orch.get_status()
     assert result["status"] == "ACTIVE"
-    assert result["stage"] in ("E0", "E1")
+    assert result["stage"] in ("GENESIS", "E0", "E1")
+
+
+def test_advance_does_not_reset_existing_e2_phase_to_blind(
+    orchestrator_setup,
+    monkeypatch,
+):
+    """Regression: an active E2 phase must never be silently regenerated as BLIND."""
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    e1_batch = orch.prepare_e1_orchestration()
+    orch.import_results(
+        [
+            _create_lane_result_zip(
+                tmp / f"result_{slot}.zip",
+                e1_batch,
+                slot,
+            )
+            for slot in E1_LANE_SLOTS
+        ]
+    )
+    first = orch.advance_to_next_stage()
+    assert first["current_phase"] == "E2-BLIND"
+
+    # Use the already accepted E2 batch as a state carrier and relabel only the
+    # in-memory phase for this guard regression. The call must inspect current
+    # phase state rather than invoking prepare_e2_blind_orchestration.
+    assert orch.stage_batch is not None
+    original_batch = orch.stage_batch
+    from dataclasses import replace
+    orch.stage_batch = replace(
+        original_batch,
+        phase_id="E2-REVEAL",
+    )
+
+    called = {"blind": False}
+    def forbidden_blind_prepare():
+        called["blind"] = True
+        raise AssertionError("active E2 phase was reset to blind")
+
+    monkeypatch.setattr(
+        orch,
+        "prepare_e2_blind_orchestration",
+        forbidden_blind_prepare,
+    )
+    # Existing inbox still has missing lanes, so the orchestrator should return
+    # the current phase as waiting rather than replace it with E2-BLIND.
+    result = orch.advance_to_next_stage()
+    assert called["blind"] is False
+    assert result["status"] == "WAITING_EXTERNAL_RESULTS"
+    assert result["current_phase"] == "E2-REVEAL"
+    assert result["next_action"] == "DELIVER_OR_IMPORT_E2_REVEAL_RESULTS"
+
+
+def test_advance_stage_never_uses_synthetic_qualify_stage(
+    orchestrator_setup,
+    monkeypatch,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    orch.prepare_e1_orchestration()
+
+    called = {"qualify": False}
+
+    def forbidden_qualify(*args, **kwargs):
+        called["qualify"] = True
+        raise AssertionError("synthetic StageCompletion backdoor used")
+
+    monkeypatch.setattr(
+        orch.api,
+        "qualify_stage",
+        forbidden_qualify,
+    )
+    result = orch.advance_stage("E1")
+    assert called["qualify"] is False
+    assert result["status"] == "WAITING_EXTERNAL_RESULTS"
+    assert result["current_stage"] == "E1"
+
+
+def test_current_executor_profiles_do_not_overclaim_enforced_isolation():
+    assert EXECUTION_MODES
+    for profile in EXECUTION_MODES.values():
+        assert profile.max_isolation_assurance in {
+            "UNKNOWN",
+            "DECLARED",
+            "ENFORCED",
+        }
+        # No current transport adapter records the material boundary receipts
+        # required to truthfully claim ENFORCED isolation.
+        assert profile.max_isolation_assurance != "ENFORCED"
+
+
+def test_e3_blind_preparation_fails_before_package_publication_without_enforced_backend(
+    orchestrator_setup,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    assert orch.active_store_path is not None
+    # Build only the predecessor acceptance needed to reach the capability
+    # check. This test is not exercising the user workflow itself.
+    orch.api.prepare_stage(orch.active_store_path, "E1")
+    orch.api.qualify_stage(orch.active_store_path, "E1")
+    orch.api.prepare_stage(orch.active_store_path, "E2")
+    orch.api.qualify_stage(orch.active_store_path, "E2")
+    artifacts = orch._artifact_root()
+
+    with pytest.raises(
+        ValidationError,
+        match="E3_ENFORCED_ISOLATION_BACKEND_REQUIRED",
+    ):
+        orch.prepare_e3_blind_orchestration()
+
+    # Capability refusal happens before E3 assignment/package publication.
+    campaign_id = orch.api.get_campaign_status(
+        orch.active_store_path
+    )["campaign_id"]
+    e3_root = artifacts / campaign_id / "E3"
+    assert not e3_root.exists()
+
+def test_resume_does_not_resurrect_completed_e2_phase(
+    orchestrator_setup,
+    monkeypatch,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    init = orch.initialize_campaign()
+    e1 = orch.prepare_e1_orchestration()
+    orch.import_results(
+        [
+            _create_lane_result_zip(
+                tmp / f"resume_{slot}.zip",
+                e1,
+                slot,
+            )
+            for slot in E1_LANE_SLOTS
+        ]
+    )
+    # Prepare E2 via real workflow so durable E2 packages exist, then mark E2
+    # complete only for this resume authority regression.
+    orch.advance_to_next_stage()
+    assert orch.active_store_path is not None
+    orch.api.qualify_stage(orch.active_store_path, "E2")
+
+    resumed = FullAuditOrchestrator(
+        settings_mgr=mgr,
+        platform_adapter=MockPlatformAdapter(),
+    )
+    result = resumed.resume_campaign(init["store_path"])
+    assert result["status"] == "SUCCESS", result
+    assert result["current_stage"] == "E3"
+    assert result["current_phase"] is None
+    assert resumed.stage_batch is None
+
+def test_advance_surfaces_e3_isolation_backend_blocker(
+    orchestrator_setup,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    assert orch.active_store_path is not None
+    orch.api.prepare_stage(orch.active_store_path, "E1")
+    orch.api.qualify_stage(orch.active_store_path, "E1")
+    orch.api.prepare_stage(orch.active_store_path, "E2")
+    orch.api.qualify_stage(orch.active_store_path, "E2")
+
+    result = orch.advance_to_next_stage()
+    assert result["status"] == "BLOCKED"
+    assert result["current_stage"] == "E3"
+    assert result["current_phase"] == "E3-BLIND"
+    assert (
+        result["next_action"]
+        == "CONFIGURE_ENFORCED_ISOLATION_BACKEND"
+    )
+    assert "E3_ENFORCED_ISOLATION_BACKEND_REQUIRED" in result["reason"]

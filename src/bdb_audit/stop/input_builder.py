@@ -202,15 +202,147 @@ class StopInputBuilder:
 
         # Current CandidateAssuranceCase is acceptance-time latest. A supplied ref
         # is only an assertion to verify, never an override.
-        candidate_record = _latest(store.accepted_records("candidate_assurance_case", cut))
-        accepted_candidate_ref = candidate_record["ref"] if candidate_record is not None else None
+        candidate_record = _latest(
+            store.accepted_records(
+                "candidate_assurance_case", cut
+            )
+        )
+        accepted_candidate_ref = (
+            candidate_record["ref"]
+            if candidate_record is not None
+            else None
+        )
         if candidate_assurance_case_ref is not None:
-            supplied = candidate_assurance_case_ref.get("revision_digest")
-            accepted = accepted_candidate_ref.get("revision_digest") if accepted_candidate_ref else None
+            supplied = candidate_assurance_case_ref.get(
+                "revision_digest"
+            )
+            accepted = (
+                accepted_candidate_ref.get("revision_digest")
+                if accepted_candidate_ref
+                else None
+            )
             if supplied != accepted:
-                raise ValidationError("STOP_CANDIDATE_BINDING_MISMATCH")
-        candidate_assurance_case_ref = accepted_candidate_ref
-        candidate_digest = accepted_candidate_ref.get("revision_digest") if accepted_candidate_ref else None
+                raise ValidationError(
+                    "STOP_CANDIDATE_BINDING_MISMATCH"
+                )
+
+        if candidate_record is not None:
+            candidate_body = candidate_record["body"]
+            candidate_cut = candidate_body.get(
+                "candidate_input_history_cut"
+            )
+            if not isinstance(candidate_cut, dict):
+                raise ValidationError(
+                    "STOP_CANDIDATE_HISTORY_CUT_REQUIRED"
+                )
+
+            finding_refs = [
+                ref
+                for ref in candidate_body.get(
+                    "finding_claim_revision_refs", ()
+                )
+                if isinstance(ref, dict)
+            ]
+            adjudication_refs = [
+                ref
+                for ref in candidate_body.get(
+                    "finding_adjudication_refs", ()
+                )
+                if isinstance(ref, dict)
+            ]
+            finding_digests = _digest_set(finding_refs)
+            if len(finding_digests) != len(finding_refs):
+                raise ValidationError(
+                    "STOP_CANDIDATE_FINDING_SET_INVALID"
+                )
+
+            candidate_adjudication_by_claim: dict[
+                str, dict[str, Any]
+            ] = {}
+            for ref in adjudication_refs:
+                row = store.resolve_accepted(
+                    ref, candidate_cut
+                )
+                target = row["body"].get(
+                    "claim_revision_ref", {}
+                )
+                target_digest = (
+                    target.get("revision_digest")
+                    if isinstance(target, dict)
+                    else None
+                )
+                if (
+                    not isinstance(target_digest, str)
+                    or target_digest not in finding_digests
+                    or target_digest
+                    in candidate_adjudication_by_claim
+                ):
+                    raise ValidationError(
+                        "STOP_CANDIDATE_FINDING_ADJUDICATION_MISMATCH"
+                    )
+                candidate_adjudication_by_claim[
+                    target_digest
+                ] = row
+
+            if set(
+                candidate_adjudication_by_claim
+            ) != finding_digests:
+                raise ValidationError(
+                    "STOP_CANDIDATE_FINDING_ADJUDICATION_MISMATCH"
+                )
+
+            # The candidate must pin the latest applicable adjudication
+            # for every included exact claim on its own frozen input cut.
+            latest_by_claim: dict[str, dict[str, Any]] = {}
+            for row in store.accepted_records(
+                "finding_adjudication_decision",
+                candidate_cut,
+            ):
+                target = row["body"].get(
+                    "claim_revision_ref", {}
+                )
+                target_digest = (
+                    target.get("revision_digest")
+                    if isinstance(target, dict)
+                    else None
+                )
+                if target_digest not in finding_digests:
+                    continue
+                prior = latest_by_claim.get(
+                    str(target_digest)
+                )
+                if (
+                    prior is None
+                    or int(row["accepted_seq"])
+                    > int(prior["accepted_seq"])
+                ):
+                    latest_by_claim[
+                        str(target_digest)
+                    ] = row
+
+            for digest in finding_digests:
+                pinned = candidate_adjudication_by_claim[
+                    digest
+                ]
+                latest = latest_by_claim.get(digest)
+                if (
+                    latest is None
+                    or pinned["ref"]["revision_digest"]
+                    != latest["ref"]["revision_digest"]
+                ):
+                    raise ValidationError(
+                        "STOP_CANDIDATE_STALE_FINDING_ADJUDICATION",
+                        digest,
+                    )
+
+        candidate_assurance_case_ref = (
+            accepted_candidate_ref
+        )
+        candidate_digest = (
+            accepted_candidate_ref.get("revision_digest")
+            if accepted_candidate_ref
+            else None
+        )
 
         roles = {"FALSE_POSITIVE_SKEPTIC", "FALSE_NEGATIVE_HUNTER"}
         latest_result_by_role: dict[str, dict[str, Any]] = {}

@@ -165,7 +165,7 @@ class InteractiveAuditUI:
         input_func: Callable[[str], str],
         output_func: Callable[[str], None],
     ) -> None:
-        """Collect ZIP files and process via E1ResultInbox."""
+        """Collect ZIP files and route them to the active durable result inbox."""
         settings = self.settings_mgr.settings
         files: list[Path] = []
 
@@ -186,16 +186,37 @@ class InteractiveAuditUI:
             return
 
         output_func(f"\nProcessing {len(files)} result file(s)...")
-        summary = self.orchestrator.import_results(files)
+        is_stage_phase = getattr(
+            self.orchestrator,
+            "stage_batch",
+            None,
+        ) is not None
+        summary: Any
+        if is_stage_phase:
+            summary = self.orchestrator.import_stage_results(files)
+            active_batch = self.orchestrator.stage_batch
+            assert active_batch is not None
+            slots = active_batch.lane_slots
+            inbox_title = (
+                f"{active_batch.stage_id} / {active_batch.phase_id} RESULT INBOX"
+            )
+        else:
+            summary = self.orchestrator.import_results(files)
+            slots = E1_LANE_SLOTS
+            inbox_title = "E1 RESULT INBOX"
 
         output_func("\n==================================================")
-        output_func("E1 RESULT INBOX")
+        output_func(inbox_title)
         output_func("==================================================")
-        for slot in E1_LANE_SLOTS:
+        for slot in slots:
             st = summary.lane_statuses.get(slot)
             status_text = st.status if st else "MISSING"
             dots = "." * max(2, 30 - len(slot))
-            reason = f" ({st.rejection_reason})" if st and st.rejection_reason else ""
+            reason = (
+                f" ({st.rejection_reason})"
+                if st and st.rejection_reason
+                else ""
+            )
             output_func(f"{slot} {dots} {status_text}{reason}")
 
         if summary.file_results:
@@ -210,23 +231,118 @@ class InteractiveAuditUI:
                     f"- {name}: {item.status} [{item.code}] lane={lane}{digest}{reason}{next_action}"
                 )
 
-        output_func(f"\n{summary.accepted_count} / {summary.total_required_lanes} required results accepted.")
+        output_func(
+            f"\n{summary.accepted_count} / "
+            f"{summary.total_required_lanes} required results accepted."
+        )
         if summary.missing_lanes:
-            output_func(f"Waiting for: {', '.join(summary.missing_lanes)}")
-        else:
-            output_func("\nE1 COMPLETE")
-            output_func(f"Required lanes ........ {summary.total_required_lanes}/{summary.total_required_lanes}")
-            output_func(f"Accepted results ....... {summary.accepted_count}/{summary.total_required_lanes}")
-            output_func("Blocked lanes .......... 0")
-            output_func(f"Completion Digest ...... {summary.completion_digest[:16]}..." if summary.completion_digest else "")
-            output_func("\nNext: E2")
-            output_func("[ENTER] Continue")
+            output_func(
+                f"Waiting for: {', '.join(summary.missing_lanes)}"
+            )
+            return
+
+        if is_stage_phase:
+            if not summary.phase_complete:
+                output_func(
+                    f"\nPHASE BLOCKED: {summary.error or 'completion predicate not satisfied'}"
+                )
+                return
+            output_func(
+                f"\n{summary.stage_id} / {summary.phase_id} PHASE COMPLETE"
+            )
+            output_func(
+                f"Accepted results ....... "
+                f"{summary.accepted_count}/{summary.total_required_lanes}"
+            )
+            output_func("\n[ENTER] Continue")
             output_func("[S] Save and exit")
-            c = input_func("Choice: ").strip().lower()
-            if c != "s":
+            choice = input_func("Choice: ").strip().lower()
+            if choice != "s":
                 adv = self.orchestrator.advance_to_next_stage()
                 output_func(f"\nStage Transition: {adv['status']}")
-                output_func(f"Next Action: {adv['next_action']} ({adv.get('reason', '')})")
+                output_func(f"Next Action: {adv.get('next_action', '')}")
+                if (
+                    adv.get("status") == "WAITING_EXTERNAL_RESULTS"
+                    and self.orchestrator.stage_batch is not None
+                ):
+                    self._deliver_current_stage_packages(
+                        input_func,
+                        output_func,
+                    )
+            return
+
+        output_func("\nE1 COMPLETE")
+        output_func(
+            f"Required lanes ........ "
+            f"{summary.total_required_lanes}/{summary.total_required_lanes}"
+        )
+        output_func(
+            f"Accepted results ....... "
+            f"{summary.accepted_count}/{summary.total_required_lanes}"
+        )
+        output_func("Blocked lanes .......... 0")
+        output_func(
+            f"Completion Digest ...... {summary.completion_digest[:16]}..."
+            if summary.completion_digest
+            else ""
+        )
+        output_func("\nNext: E2")
+        output_func("[ENTER] Continue")
+        output_func("[S] Save and exit")
+        choice = input_func("Choice: ").strip().lower()
+        if choice != "s":
+            adv = self.orchestrator.advance_to_next_stage()
+            output_func(f"\nStage Transition: {adv['status']}")
+            output_func(f"Next Action: {adv.get('next_action', '')}")
+            if (
+                adv.get("status") == "WAITING_EXTERNAL_RESULTS"
+                and self.orchestrator.stage_batch is not None
+            ):
+                self._deliver_current_stage_packages(
+                    input_func,
+                    output_func,
+                )
+
+    def _deliver_current_stage_packages(
+        self,
+        input_func: Callable[[str], str],
+        output_func: Callable[[str], None],
+    ) -> None:
+        """Show/deliver all missing packages for the active E2+ phase."""
+        batch = self.orchestrator.stage_batch
+        inbox = self.orchestrator.stage_inbox
+        if batch is None or inbox is None:
+            output_func("No active E2+ external phase is prepared.")
+            return
+
+        for slot in batch.lane_slots:
+            state = inbox.lane_statuses.get(slot)
+            if state is not None and state.status == "ACCEPTED":
+                continue
+            job = batch.get_job(slot)
+            delivery = self.orchestrator.deliver_stage_lane_to_user(slot)
+            output_func("\n--------------------------------------------------")
+            output_func(
+                f"{job.stage_id} / {job.phase_id} / {slot} — READY"
+            )
+            output_func("--------------------------------------------------")
+            output_func(
+                f"Package generated: {delivery['package_zip_name']}"
+            )
+            output_func(
+                "Prompt copied to clipboard: "
+                + ("YES" if delivery["prompt_copied"] else "NO")
+            )
+            output_func(
+                "Package selected in Explorer: "
+                + ("YES" if delivery["explorer_selected"] else "NO")
+            )
+            output_func("Open a NEW chat, attach this ZIP, paste the prompt,")
+            output_func("run the lane, then return the result ZIP to BDB.")
+            output_func("[ENTER] Show next lane")
+            output_func("[S] Save and exit")
+            if input_func("Choice: ").strip().lower() == "s":
+                return
 
     def handle_continue_audit(
         self,
@@ -260,16 +376,64 @@ class InteractiveAuditUI:
             output_func("\n--------------------------------------------------")
             output_func("RESUMED AUDIT CAMPAIGN")
             output_func("--------------------------------------------------")
+            if res_info.get("status") != "SUCCESS":
+                output_func(
+                    f"Resume blocked: {res_info.get('error')} "
+                    f"{res_info.get('details', '')}"
+                )
+                return
             output_func(f"Campaign ID: {res_info['campaign_id']}")
             output_func(f"Store Path:  {res_info['store_path']}")
-            output_func(f"Accepted:    {res_info['accepted_lanes_count']}/{res_info['total_required_lanes']} lanes accepted")
+            output_func(
+                f"Stage:       {res_info['current_stage']}"
+                + (
+                    f" / {res_info['current_phase']}"
+                    if res_info.get("current_phase")
+                    else ""
+                )
+            )
+            output_func(
+                f"Accepted:    {res_info['accepted_lanes_count']}/"
+                f"{res_info['total_required_lanes']} lanes accepted"
+            )
             if res_info["missing_lanes"]:
-                output_func(f"Waiting for: {', '.join(res_info['missing_lanes'])}")
-            else:
-                output_func("All E1 lanes completed.")
+                output_func(
+                    f"Waiting for: {', '.join(res_info['missing_lanes'])}"
+                )
+
+            if res_info.get("active_inbox") == "STAGE":
+                if res_info.get("phase_complete"):
+                    adv = self.orchestrator.advance_to_next_stage()
+                    output_func(f"\nPhase complete. Transition: {adv['status']}")
+                    output_func(
+                        f"Next Action: {adv.get('next_action', '')}"
+                    )
+                    return
+                output_func("\n[I] Import results now")
+                output_func("[D] Deliver/show missing lane")
+                output_func("[N] Back to menu")
+                action = input_func("Choice [I/d/n]: ").strip().lower()
+                if action == "d":
+                    self._deliver_current_stage_packages(
+                        input_func,
+                        output_func,
+                    )
+                elif action != "n":
+                    self._execute_result_import(input_func, output_func)
+                return
 
             if res_info["stage_complete"]:
                 output_func("\nE1 stage is already completed.")
+                adv = self.orchestrator.advance_to_next_stage()
+                output_func(f"Stage Transition: {adv['status']}")
+                output_func(
+                    f"Next Action: {adv.get('next_action', '')}"
+                )
+                if adv.get("status") == "WAITING_EXTERNAL_RESULTS":
+                    self._deliver_current_stage_packages(
+                        input_func,
+                        output_func,
+                    )
                 return
 
             output_func("\n[I] Import results now")

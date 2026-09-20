@@ -24,6 +24,7 @@ from bdb_audit.adjudication import (
     adjudicate_finding,
     transition_finding_lifecycle,
     resolve_contradiction,
+    apply_contradiction_resolution,
     reopen_contradiction,
     cluster_findings_into_root_cause,
     validate_root_cause_authority,
@@ -245,47 +246,75 @@ def test_root_cause_clustering_and_duplicate_rejection():
 
 def test_contradiction_resolution_and_majority_vote_forbidden():
     cut = {"tag": "TEST_CUT"}
-    claim_ref = make_ref("finding_claim_revision", "c_contra")
+    claim_a = make_ref("finding_claim_revision", "c_contra_support")
+    claim_b = make_ref("finding_claim_revision", "c_contra_refute")
     ev1 = make_ref("evidence_qualification_assessment", "ev_supports")
     ev2 = make_ref("evidence_qualification_assessment", "ev_refutes")
 
     contra = ContradictionRevision(
-        claim_revision_ref=claim_ref,
-        contradicting_evidence_refs=[ev1, ev2],
-        input_history_cut=cut,
+        claim_revision_refs=[claim_a, claim_b],
+        scope={"surface": "auth", "environment": "prod-like"},
+        positions=[
+            {"side": "SUPPORTING"},
+            {"side": "OPPOSING"},
+        ],
+        supporting_evidence_qualification_refs=[ev1],
+        opposing_evidence_qualification_refs=[ev2],
+        failure_assumption_differences=["auth-mode"],
+        environment_input_model_differences=["fixture-set"],
+        required_falsifier="SAME_SCOPE_CONTROLLED_REPRODUCTION",
         status="OPEN",
     )
     assert contra.status == "OPEN"
 
-    # Majority vote must fail closed
+    # Majority vote must fail closed.
     with pytest.raises(ValidationError, match="MAJORITY_VOTE_FORBIDDEN"):
         resolve_contradiction(
             contradiction=contra,
-            adjudicator_ref=make_ref("actor_or_authority_ref", "adjudicator_1"),
-            resolution_status="RESOLVED_FULL",
-            rationale="2 votes against 1",
+            resolved_scope={"surface": "auth"},
+            resolution_kind="REFUTED",
+            basis_refs=[ev1],
             input_history_cut=cut,
+            resulting_status="RESOLVED_FULL",
             resolved_by_majority_vote=True,
         )
 
-    # Proper resolution
+    # Proper decision points only backward to the prior revision.
     res = resolve_contradiction(
         contradiction=contra,
-        adjudicator_ref=make_ref("actor_or_authority_ref", "adjudicator_1"),
-        resolution_status="RESOLVED_FULL",
-        rationale="Controlled isolation proof verified vulnerability is unreproducible in production config",
+        resolved_scope={"surface": "auth"},
+        resolution_kind="REFUTED",
+        basis_refs=[ev1, ev2],
         input_history_cut=cut,
+        resulting_status="RESOLVED_FULL",
     )
-    assert res.resolution_status == "RESOLVED_FULL"
+    assert res.resulting_status == "RESOLVED_FULL"
     assert len(res.digest) == 64
+    assert (
+        res.contradiction_prior_revision_ref["revision_digest"]
+        == contra.digest
+    )
 
-    # Reopening upon new counterevidence
+    resolved = apply_contradiction_resolution(contra, res)
+    assert resolved.status == "RESOLVED_FULL"
+    assert (
+        resolved.predecessor_contradiction_revision_ref["revision_digest"]
+        == contra.digest
+    )
+    assert (
+        resolved.resolution_decision_ref["revision_digest"]
+        == res.digest
+    )
+
+    # Reopening on new counterevidence preserves the accepted lineage.
     ev3 = make_ref("evidence_qualification_assessment", "ev_new_exploit")
     reopened = reopen_contradiction(
-        prior_resolution=res,
-        new_evidence_refs=[ev3],
-        claim_revision_ref=claim_ref,
-        input_history_cut=cut,
+        resolved,
+        new_opposing_evidence_refs=[ev3],
     )
     assert reopened.status == "REOPENED"
+    assert (
+        reopened.predecessor_contradiction_revision_ref["revision_digest"]
+        == resolved.digest
+    )
     assert len(reopened.digest) == 64

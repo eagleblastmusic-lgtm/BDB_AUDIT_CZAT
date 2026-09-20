@@ -183,7 +183,9 @@ def test_d11_req_e_multiple_outcomes_conflict_handling():
     assert len(e2.contradiction_revisions) == 1
     contra = e2.contradiction_revisions[0]
     assert contra.status == "OPEN"
-    assert len(contra.contradicting_evidence_refs) == 2
+    assert len(contra.supporting_evidence_qualification_refs) == 1
+    assert len(contra.opposing_evidence_qualification_refs) == 1
+    assert len(contra.claim_revision_refs) >= 2
 
 
 def test_d11_req_f_mechanism_evidence_absent_mechanism_unknown():

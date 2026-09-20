@@ -10,8 +10,10 @@ Validates:
 7. E2 claim without evidence remains UNKNOWN.
 8. Real small target integration.
 """
+import json
 from pathlib import Path
 import tempfile
+import zipfile
 import pytest
 
 from bdb_audit.cli import run_cli
@@ -19,9 +21,26 @@ from bdb_audit.coordinator.operations import AuditOperationApi
 from bdb_audit.core.errors import ValidationError
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.workflow.continuation_service import ContinuationService
+from bdb_audit.workflow.e5_runtime import (
+    CandidateAssuranceCaseService,
+    E5A_LANES,
+    E5B_LANES,
+    E5_ALL_LANE_SLOTS,
+    E5ChallengeAuthorizationService,
+    E5ChallengerResultService,
+    E5FinalizationService,
+)
+from bdb_audit.workflow.manual_stage import (
+    StageResultInbox,
+    prepare_stage_phase_batch,
+)
 from bdb_audit.workflow.orchestrator import FullAuditOrchestrator
-from bdb_audit.workflow.read_models import campaign_status
+from bdb_audit.workflow.read_models import (
+    campaign_status,
+    current_accepted_cut,
+)
 from bdb_audit.workflow.settings import SettingsManager, UserSettings
+from bdb_audit.workflow.source_target import ResolvedSource
 
 
 @pytest.fixture
@@ -49,6 +68,220 @@ def workflow_env():
         }
 
 
+def _e5_source() -> ResolvedSource:
+    return ResolvedSource(
+        target_type="github",
+        location="https://github.com/example/f8-e5",
+        display_name="example/f8-e5",
+        ref="main",
+        exact_commit_sha="f" * 40,
+    )
+
+
+def _write_e5_result(
+    path: Path,
+    batch,
+    slot: str,
+    outputs: dict,
+) -> Path:
+    job = batch.get_job(slot)
+    body = {
+        "kind": "bdb_audit_lane_result",
+        "version": "1",
+        "campaign_id": batch.campaign_id,
+        "stage_id": batch.stage_id,
+        "phase_id": batch.phase_id,
+        "lane_slot": slot,
+        "executor_profile": job.executor_profile,
+        "executor_model": job.model,
+        "input_package_digest": job.package_digest,
+        "source_commit_sha": job.source_commit_sha,
+        "history_cut": batch.frozen_history_cut,
+        "assignment_ref": job.assignment_ref,
+        "attempt_ref": job.attempt_ref,
+        "findings": [],
+        "outputs": outputs,
+    }
+    with zipfile.ZipFile(
+        path,
+        "w",
+        compression=zipfile.ZIP_DEFLATED,
+    ) as archive:
+        archive.writestr("MANIFEST.json", json.dumps(body))
+    return path
+
+
+def _e5a_outputs(slot: str) -> dict:
+    if slot == "E5-A-INTERACTION":
+        return {
+            "e5a_interaction_results": [
+                {
+                    "combination": ["state", "retry"],
+                    "status": "PASS",
+                    "rationale": "bounded interaction held",
+                }
+            ]
+        }
+    if slot == "E5-A-MUTATION":
+        return {
+            "implementation_mutation_results": [
+                {
+                    "outcome": "MUTANT_KILLED",
+                    "activation_witness": "implementation-mutant-activated",
+                    "rationale": "activated implementation mutant was detected",
+                }
+            ],
+            "oracle_challenge_results": [
+                {
+                    "outcome": "WEAKENING_DETECTED",
+                    "activation_witness": "oracle-weakening-activated",
+                    "contrast_2x2": {
+                        "clean_strong_detected": False,
+                        "clean_weakened_detected": False,
+                        "defective_strong_detected": True,
+                        "defective_weakened_detected": False,
+                    },
+                    "rationale": "2x2 contrast proves the weakened observer was material",
+                }
+            ],
+        }
+    if slot == "E5-A-CALIBRATION":
+        return {
+            "e5a_calibration": {
+                "status": "QUALIFIED",
+                "profile_ref": {
+                    "kind": "external_profile_ref",
+                    "revision_digest": "8" * 64,
+                    "digest_profile": "BDB-OBJECT-DIGEST-1",
+                    "schema_revision_ref": (
+                        "BDB_TARGET/external_profile_ref"
+                    ),
+                    "ref_class": "HISTORY_CONTEXT_BINDING",
+                },
+                "per_class_metrics": {
+                    "seeded": {"detected": 1}
+                },
+                "unknown_count": 0,
+                "rationale": "qualified calibration profile",
+            }
+        }
+    raise AssertionError(slot)
+
+
+def _complete_real_e5(
+    store_path: Path,
+    root: Path,
+) -> None:
+    api = AuditOperationApi()
+    api.prepare_stage(store_path, "E5")
+    for lane in (*E5A_LANES, *E5B_LANES):
+        api.prepare_lane(
+            store_path,
+            "E5",
+            lane.lane_slot,
+        )
+
+    store = TransactionalHistoryStore(store_path)
+    e5a = prepare_stage_phase_batch(
+        store=store,
+        output_dir=root / "e5-work",
+        source_info=_e5_source(),
+        stage_id="E5",
+        phase_id="E5A-ATTACK",
+        lane_definitions=E5A_LANES,
+        all_stage_lane_slots=E5_ALL_LANE_SLOTS,
+    )
+    e5a_inbox = StageResultInbox(store, e5a)
+    e5a_paths = [
+        _write_e5_result(
+            root / f"{slot}.zip",
+            e5a,
+            slot,
+            _e5a_outputs(slot),
+        )
+        for slot in e5a.lane_slots
+    ]
+    assert (
+        e5a_inbox.ingest_multiple_zips(
+            e5a_paths
+        ).phase_complete
+        is True
+    )
+
+    frozen = CandidateAssuranceCaseService(
+        store
+    ).freeze(e5a, e5a_inbox)
+    auth = E5ChallengeAuthorizationService(
+        store,
+        candidate=frozen.candidate,
+        executor_profile="ChatGPT / GitHub",
+        model="Sol 5.6",
+    ).authorize()
+    e5b = prepare_stage_phase_batch(
+        store=store,
+        output_dir=root / "e5-work",
+        source_info=_e5_source(),
+        stage_id="E5",
+        phase_id="E5B-CHALLENGE",
+        lane_definitions=E5B_LANES,
+        all_stage_lane_slots=E5_ALL_LANE_SLOTS,
+        authorized_context=auth,
+    )
+    e5b_inbox = StageResultInbox(store, e5b)
+    cut = current_accepted_cut(store)
+    assignments = {
+        row["body"]["challenger_type"]: row
+        for row in store.accepted_records(
+            "challenger_assignment", cut
+        )
+        if row["body"].get(
+            "candidate_assurance_case_ref", {}
+        ).get("revision_digest")
+        == frozen.candidate.digest()
+    }
+    paths = []
+    for slot, role in (
+        ("E5-B1", "FALSE_POSITIVE_SKEPTIC"),
+        ("E5-B2", "FALSE_NEGATIVE_HUNTER"),
+    ):
+        assignment = assignments[role]
+        paths.append(
+            _write_e5_result(
+                root / f"{slot}.zip",
+                e5b,
+                slot,
+                {
+                    "challenger_result": {
+                        "status": (
+                            "NO_MATERIAL_COUNTEREVIDENCE"
+                        ),
+                        "candidate_revision_digest": (
+                            frozen.candidate.digest()
+                        ),
+                        "challenge_assignment_revision_digest": (
+                            assignment["ref"][
+                                "revision_digest"
+                            ]
+                        ),
+                        "challenged_revision_digests": [],
+                        "reason_codes": [],
+                    }
+                },
+            )
+        )
+    assert (
+        e5b_inbox.ingest_multiple_zips(paths).phase_complete
+        is True
+    )
+    E5ChallengerResultService(
+        store, e5b, e5b_inbox
+    ).materialize()
+    completion = E5FinalizationService(
+        store
+    ).finalize()
+    assert completion.stage_id == "E5"
+
+
 def test_core_acceptance_1_complete_scenario_without_e6(workflow_env):
     """1. Complete scenario without E6: E1 -> E2 -> E3 -> E4 -> E5 -> STOP -> Conclusion."""
     store_path = workflow_env["store_path"]
@@ -57,12 +290,17 @@ def test_core_acceptance_1_complete_scenario_without_e6(workflow_env):
     # Genesis
     api.create_campaign(store_path, seed="full_audit_test", target_repo=str(workflow_env["target_dir"]))
 
-    # Advance through E1..E5
-    for stage in ("E1", "E2", "E3", "E4", "E5"):
+    # E1-E4 use the compact legacy test scaffold; E5 must execute the
+    # real external candidate/challenger runtime.
+    for stage in ("E1", "E2", "E3", "E4"):
         api.prepare_stage(store_path, stage)
         res = api.qualify_stage(store_path, stage)
         assert res["status"] == "SUCCESS"
         assert res["stage"] == stage
+    _complete_real_e5(
+        store_path,
+        workflow_env["root"],
+    )
 
     # Status shows all 5 stages completed
     status = api.get_campaign_status(store_path)
@@ -93,9 +331,13 @@ def test_core_acceptance_2_material_e6_fresh_challenger(workflow_env):
 
     api.create_campaign(store_path, seed="e6_test", target_repo=str(workflow_env["target_dir"]))
 
-    for stage in ("E1", "E2", "E3", "E4", "E5"):
+    for stage in ("E1", "E2", "E3", "E4"):
         api.prepare_stage(store_path, stage)
         api.qualify_stage(store_path, stage)
+    _complete_real_e5(
+        store_path,
+        workflow_env["root"],
+    )
 
     # Simulate STOP evaluation with approved E6 plan
     stop_res = api.evaluate_stop_gate(store_path, evaluation_context="FINAL_POST_E5", e6_plan_approved=True)

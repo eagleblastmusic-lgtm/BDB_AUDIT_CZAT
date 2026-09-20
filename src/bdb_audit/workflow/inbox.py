@@ -208,13 +208,47 @@ class E1ResultInbox:
                 completion_status=completion_status,
             )
 
-        stage_rows = tuple(self.store.accepted_records("stage_completion", cut))
-        completed = [row for row in stage_rows if row["body"].get("completion_predicate_result") == "STAGE_COMPLETED"]
+        stage_rows = tuple(
+            self.store.accepted_records(
+                "stage_completion",
+                cut,
+            )
+        )
+        completed: list[dict[str, Any]] = []
+        for row in stage_rows:
+            if (
+                row["body"].get(
+                    "completion_predicate_result"
+                )
+                != "STAGE_COMPLETED"
+            ):
+                continue
+            spec_ref = row["body"].get(
+                "stage_spec_ref"
+            )
+            if not isinstance(spec_ref, dict):
+                raise ValidationError(
+                    "STAGE_COMPLETION_PROJECTION_INVALID",
+                    "stage_completion missing stage_spec_ref",
+                )
+            spec = self.store.resolve_accepted(
+                spec_ref,
+                cut,
+            )
+            if spec["body"].get("stage_key") == "E1":
+                completed.append(row)
+
         if len(completed) > 1:
-            raise ValidationError("MULTIPLE_STAGE_COMPLETIONS")
+            raise ValidationError(
+                "MULTIPLE_E1_STAGE_COMPLETIONS"
+            )
         if completed:
             self.stage_complete = True
-            self.stage_completion_digest = completed[0]["ref"]["revision_digest"]
+            self.stage_completion_digest = (
+                completed[0]["ref"][
+                    "revision_digest"
+                ]
+            )
 
     def _record_file_result(
         self,

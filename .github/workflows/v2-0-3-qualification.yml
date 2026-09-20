@@ -3,7 +3,9 @@ name: BDB Audit v2.0.3 Qualification
 on:
   push:
     branches:
+      - main
       - feature/v2.0.3-user-orchestration
+      - fix/complete-runtime-e2-e5
   pull_request:
     branches:
       - main
@@ -25,7 +27,7 @@ env:
   CANDIDATE_REPOSITORY: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
 
 concurrency:
-  group: v2-0-3-qualification-${{ github.event_name }}-${{ github.ref }}
+  group: v2-0-3-qualification-r2-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -178,7 +180,7 @@ jobs:
         if: github.event_name == 'push'
         shell: pwsh
         run: |
-          $remoteLine = git ls-remote origin "refs/heads/feature/v2.0.3-user-orchestration"
+          $remoteLine = git ls-remote origin "${{ github.ref }}"
           $remote = ($remoteLine -split "`t")[0]
           $declared = "${{ env.CANDIDATE_SHA }}"
           Write-Host "REMOTE_HEAD=$remote"
