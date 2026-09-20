@@ -64,3 +64,42 @@ All planned RU07-RU17 functional milestones are closed and remotely qualified. T
 The ledger-bearing release commit itself MUST pass the same exact-SHA v2.0.3 candidate gate and the independent clean-room/raw-identity rebuild before publication to `main`. The release commit SHA is intentionally not embedded inside this file because a commit cannot truthfully self-embed its own Git object ID without changing that ID. The authoritative published release identity is therefore the exact `main` ref plus the corresponding GitHub Actions qualification receipt.
 
 Publication is fast-forward only: `main` must be moved to the exact qualified ledger-bearing release SHA. Creating an additional unqualified merge commit is forbidden for this closure.
+
+---
+
+## 4. Post-RU Runtime Closure — E3→E5 External Execution Remediation (2026-09-20)
+
+Status: **IMPLEMENTATION QUALIFIED; LEDGER-BEARING RELEASE COMMIT REQUIRES ITS OWN EXACT-SHA QUALIFICATION BEFORE PUBLICATION**.
+
+This closure records the post-RU implementation work that replaced synthetic/placeholder continuation paths with evidence-backed external runtime behavior while preserving the R5.3/R5.3.1 authority hierarchy.
+
+Implemented closure invariants:
+
+- E3 external execution now has evidence-backed phase completion for blind/cumulative work plus bounded auxiliary holdout consumption; accepted external lane results and LaneCompletion records are required before stage completion.
+- E4 executes real MODEL / RESILIENCE / CAUSAL lanes and requires the full required assessment set. Required INCONCLUSIVE, BLOCKED, or unsupported NOT_APPLICABLE outcomes fail closed.
+- E4-MODEL materializes a canonical `model_fidelity_assessment`; canonical identity, source binding, and assessment history cut are coordinator-owned and derived from accepted history, never trusted from external proposal bytes.
+- E5A executes real interaction, implementation-mutation/oracle-challenge, and calibration lanes. Implementation mutation and oracle challenge use distinct normative outcome vocabularies; oracle weakening is not aliased to `MUTANT_KILLED`.
+- External E5 finding proposals are canonicalized into discovery → finding claim → four INCONCLUSIVE axis assessments → OPEN adjudication before candidate freeze. The Candidate Assurance Case pins exact current finding/adjudication pairs.
+- Candidate reuse is material-set exact: material counterevidence produces a new Candidate revision and therefore requires a fresh exact pair of challenger assignments.
+- E5B uses separate FALSE_POSITIVE_SKEPTIC and FALSE_NEGATIVE_HUNTER assignments/views/results bound to the exact frozen Candidate. Material counterevidence is bound through canonical `finding_claim_revision` counterclaims.
+- Synthetic E5 self-certification through `StageService` is forbidden; E5 completion requires the real external challenger runtime and fails closed for counterevidence, inconclusive, or blocked challenger outcomes.
+- StageCompletion required-output refs are normalized to the Registry-required `CONTENT_OR_PRIOR` reference class.
+
+Implementation precursor qualification evidence:
+
+- exact qualified implementation SHA: `24db047f2e908b5c437026b69365d21650b869be`
+- GitHub Actions qualification: run **#401**, run ID `35517203389`
+- full pytest: **1017 passed, 1 skipped, 3 warnings**
+- Ruff: **PASS**
+- Mypy: **PASS — 46 source files**
+- release validator / standalone version / payload verification / self-test / deep self-test / capability matrix / controlled build-capability failure / help: **PASS**
+- candidate standalone SHA256: `97b0771ca6bfa6c929c6ee9262036a2ba836b6cc5f0f5e3a17468b750aeaa85f`
+- candidate standalone size: **1,446,602 bytes**
+- independent clean-room rebuild SHA256: `97b0771ca6bfa6c929c6ee9262036a2ba836b6cc5f0f5e3a17468b750aeaa85f`
+- independent clean-room rebuild size: **1,446,602 bytes**
+- raw artifact identity: **PASS**
+
+Unresolved functional blockers for this remediation closure: **None**.
+
+Per Section 3, the commit that contains this ledger entry is not qualified merely because its implementation precursor is qualified. The ledger-bearing commit itself MUST pass the exact-SHA v2.0.3 candidate gate and independent clean-room/raw-identity rebuild. Its own SHA is intentionally not self-embedded here. Final publication authority is the fast-forwarded exact `main` ref plus the corresponding successful GitHub Actions qualification receipt.
+
