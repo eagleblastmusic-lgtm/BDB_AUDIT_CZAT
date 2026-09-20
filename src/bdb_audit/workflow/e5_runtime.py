@@ -927,7 +927,7 @@ class E5AValidationService:
                     "E5A_ORACLE_CHALLENGE_RESULTS_REQUIRED"
                 )
 
-            unresolved: list[str] = []
+            mutation_unresolved: list[str] = []
             survived = False
             for item in implementation_rows:
                 if not isinstance(item, Mapping):
@@ -955,7 +955,7 @@ class E5AValidationService:
                             str(outcome),
                         )
                 if outcome in _IMPLEMENTATION_MUTATION_UNRESOLVED:
-                    unresolved.append(
+                    mutation_unresolved.append(
                         f"IMPLEMENTATION:{outcome}"
                     )
                 if outcome == "MUTANT_SURVIVED":
@@ -1041,14 +1041,16 @@ class E5AValidationService:
                         str(outcome),
                     )
                 if outcome in _ORACLE_CHALLENGE_UNRESOLVED:
-                    unresolved.append(f"ORACLE:{outcome}")
+                    mutation_unresolved.append(
+                        f"ORACLE:{outcome}"
+                    )
                 if outcome == "BASELINE_ORACLE_MISSED_DEFECT":
                     oracle_defect = True
 
-            if unresolved:
+            if mutation_unresolved:
                 raise ValidationError(
                     "E5A_MUTATION_UNRESOLVED",
-                    ",".join(unresolved),
+                    ",".join(mutation_unresolved),
                 )
             if (
                 survived or oracle_defect
@@ -1341,7 +1343,7 @@ class CandidateAssuranceCaseService:
                 ]
             )
 
-        current_material = {
+        current_material: dict[str, Any] = {
             "source_generation_ref": _with_ref_class(
                 source["ref"], "CONTENT_OR_PRIOR"
             ),
@@ -1759,7 +1761,7 @@ class E5ChallengeAuthorizationService:
             for slot, prepared in (
                 stage_assignments.assignments.items()
             ):
-                grants = [
+                grant_rows = [
                     row
                     for row in self.store.accepted_records(
                         "grant_body", cut
@@ -1775,7 +1777,7 @@ class E5ChallengeAuthorizationService:
                         view["ref"],
                     )
                 ]
-                states = [
+                state_rows = [
                     row
                     for row in self.store.accepted_records(
                         "knowledge_state", cut
@@ -1792,16 +1794,21 @@ class E5ChallengeAuthorizationService:
                         if isinstance(ref, dict)
                     )
                 ]
-                if len(grants) != 1 or len(states) != 1:
+                if (
+                    len(grant_rows) != 1
+                    or len(state_rows) != 1
+                ):
                     raise ValidationError(
                         "PARTIAL_E5B_AUTHORIZATION",
                         slot,
                     )
                 grant_refs[slot] = _with_ref_class(
-                    grants[0]["ref"], "CONTENT_OR_PRIOR"
+                    grant_rows[0]["ref"],
+                    "CONTENT_OR_PRIOR",
                 )
                 knowledge_refs[slot] = _with_ref_class(
-                    states[0]["ref"], "CONTENT_OR_PRIOR"
+                    state_rows[0]["ref"],
+                    "CONTENT_OR_PRIOR",
                 )
             return StageAuthorizedContext(
                 campaign_id=stage_assignments.campaign_id,

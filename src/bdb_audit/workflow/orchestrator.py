@@ -925,7 +925,16 @@ class FullAuditOrchestrator:
         ).finalize()
 
     def _advance_e4_external(self) -> dict[str, Any]:
-        status = self.api.get_campaign_status(self.active_store_path)
+        if (
+            self.active_store_path is None
+            or not self.active_store_path.exists()
+        ):
+            raise ValidationError(
+                "CAMPAIGN_NOT_INITIALIZED"
+            )
+        status = self.api.get_campaign_status(
+            self.active_store_path
+        )
         if "E4" in status.get("stages_completed", []):
             return self._advance_e5_external()
         if self.stage_batch is None or self.stage_batch.stage_id != "E4":
