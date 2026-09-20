@@ -3,6 +3,7 @@ name: BDB Audit v2.0.3 Qualification
 on:
   push:
     branches:
+      - main
       - feature/v2.0.3-user-orchestration
       - fix/complete-runtime-e2-e5
   pull_request:

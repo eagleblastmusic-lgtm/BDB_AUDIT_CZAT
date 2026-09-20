@@ -63,7 +63,16 @@ All planned RU07-RU17 functional milestones are closed and remotely qualified. T
 
 The ledger-bearing release commit itself MUST pass the same exact-SHA v2.0.3 candidate gate and the independent clean-room/raw-identity rebuild before publication to `main`. The release commit SHA is intentionally not embedded inside this file because a commit cannot truthfully self-embed its own Git object ID without changing that ID. The authoritative published release identity is therefore the exact `main` ref plus the corresponding GitHub Actions qualification receipt.
 
-Publication is fast-forward only: `main` must be moved to the exact qualified ledger-bearing release SHA. Creating an additional unqualified merge commit is forbidden for this closure.
+Publication normally remains fast-forward only. If an active protected-`main` repository ruleset makes direct fast-forward impossible, has no bypass actor, requires a Pull Request, and permits only GitHub's `merge` method, the following narrow exception applies:
+
+1. the PR head MUST itself be the exact ledger-bearing release SHA and MUST pass the same candidate + independent clean-room qualification;
+2. the PR MUST target the current `main` with no behind/divergent commits and no content changes beyond the already-qualified head;
+3. GitHub may create the mandatory merge commit solely to satisfy the repository ruleset;
+4. the release is NOT considered published/closed merely because the PR merged;
+5. the resulting exact `main` merge SHA MUST itself pass the full exact-SHA v2.0.3 candidate gate and independent clean-room/raw-identity rebuild on a `push: main` workflow run;
+6. only that successful exact-`main` receipt becomes the authoritative published release identity.
+
+Any other unqualified merge/squash/rebase publication path remains forbidden.
 
 ---
 
@@ -101,5 +110,5 @@ Implementation precursor qualification evidence:
 
 Unresolved functional blockers for this remediation closure: **None**.
 
-Per Section 3, the commit that contains this ledger entry is not qualified merely because its implementation precursor is qualified. The ledger-bearing commit itself MUST pass the exact-SHA v2.0.3 candidate gate and independent clean-room/raw-identity rebuild. Its own SHA is intentionally not self-embedded here. Final publication authority is the fast-forwarded exact `main` ref plus the corresponding successful GitHub Actions qualification receipt.
+Per Section 3, the commit that contains this ledger entry is not qualified merely because its implementation precursor is qualified. The ledger-bearing commit itself MUST pass the exact-SHA v2.0.3 candidate gate and independent clean-room/raw-identity rebuild. Its own SHA is intentionally not self-embedded here. Final publication authority is the exact `main` ref plus the corresponding successful GitHub Actions qualification receipt. Where the active protected-`main` ruleset mandates a PR merge commit, the narrow Section 3 exception applies and that resulting exact `main` SHA must independently qualify before closure is complete.
 
