@@ -40,6 +40,105 @@ _CONFLICT_TYPES = {
     "PREVIOUS_FALSE_NEGATIVE_MISCLASSIFICATION",
 }
 
+_E2_EXTERNAL_PHASES = {
+    "E2-BLIND",
+    "E2-REVEAL",
+    "E2-SHADOW",
+}
+_E2_EXTERNAL_OBLIGATION_FLAGS = (
+    "blind_phase_required",
+    "controlled_reveal_required",
+    "shadow_adjudicator_required",
+)
+
+
+def is_external_e2_stage_completion(
+    store: TransactionalHistoryStore,
+    row: dict[str, Any],
+    cut: dict[str, Any] | None = None,
+) -> bool:
+    """Return True only for an E2 completion backed by the external E2 workflow.
+
+    Legacy/synthetic StageService completions are deliberately rejected.  The
+    classifier requires the explicit E2 finalization obligations plus accepted
+    lane results spanning BLIND, REVEAL, and SHADOW.
+    """
+    body = row.get("body")
+    if not isinstance(body, dict):
+        return False
+    if body.get("completion_predicate_result") != "STAGE_COMPLETED":
+        return False
+
+    if cut is None:
+        cut, _ = _current_cut(store)
+
+    spec_ref = body.get("stage_spec_ref")
+    if not isinstance(spec_ref, dict):
+        return False
+    try:
+        spec = store.resolve_accepted(spec_ref, cut)
+    except ValidationError:
+        return False
+    if spec["body"].get("stage_key") != "E2":
+        return False
+
+    obligations = body.get("mandatory_obligation_summary")
+    if not isinstance(obligations, dict):
+        return False
+    if any(obligations.get(key) is not True for key in _E2_EXTERNAL_OBLIGATION_FLAGS):
+        return False
+
+    phases: set[str] = set()
+    lane_refs = body.get("required_lane_slot_results", [])
+    if not isinstance(lane_refs, list):
+        return False
+    for lane_ref in lane_refs:
+        if not isinstance(lane_ref, dict):
+            return False
+        try:
+            lane_completion = store.resolve_accepted(lane_ref, cut)
+        except ValidationError:
+            return False
+        if lane_completion["ref"].get("kind") != "lane_completion":
+            return False
+        outputs = lane_completion["body"].get("required_output_refs", [])
+        if not isinstance(outputs, list):
+            return False
+        for output_ref in outputs:
+            if not isinstance(output_ref, dict):
+                continue
+            try:
+                output = store.resolve_accepted(output_ref, cut)
+            except ValidationError:
+                continue
+            if (
+                output["ref"].get("kind") == "bdb_audit_lane_result"
+                and output["body"].get("stage_id") == "E2"
+            ):
+                phase = output["body"].get("phase_id")
+                if isinstance(phase, str):
+                    phases.add(phase)
+
+    return _E2_EXTERNAL_PHASES.issubset(phases)
+
+
+def has_external_e2_stage_completion(
+    store: TransactionalHistoryStore,
+) -> bool:
+    """Project whether E2 has real external-workflow completion authority."""
+    cut, _ = _current_cut(store)
+    matches = [
+        row
+        for row in store.accepted_records("stage_completion", cut)
+        if is_external_e2_stage_completion(store, row, cut)
+    ]
+    if len(matches) > 1:
+        raise ValidationError(
+            "MULTIPLE_EXTERNAL_E2_STAGE_COMPLETIONS",
+            str(len(matches)),
+        )
+    return bool(matches)
+
 
 @dataclass(frozen=True)
 class E2FinalizationSummary:
@@ -562,10 +661,11 @@ class E2FinalizationService:
             )
             if (
                 spec["body"].get("stage_key") == "E2"
-                and row["body"].get(
-                    "completion_predicate_result"
+                and is_external_e2_stage_completion(
+                    self.store,
+                    row,
+                    cut,
                 )
-                == "STAGE_COMPLETED"
             ):
                 rows.append(row)
         if len(rows) > 1:
@@ -840,4 +940,6 @@ class E2FinalizationService:
 __all__ = [
     "E2FinalizationSummary",
     "E2FinalizationService",
+    "is_external_e2_stage_completion",
+    "has_external_e2_stage_completion",
 ]
