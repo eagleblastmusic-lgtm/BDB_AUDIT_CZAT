@@ -342,9 +342,8 @@ def test_e3_blind_preparation_fails_before_package_publication_without_enforced_
     e3_root = artifacts / campaign_id / "E3"
     assert not e3_root.exists()
 
-def test_resume_does_not_resurrect_completed_e2_phase(
+def test_resume_ignores_synthetic_e2_completion_and_restores_real_e2_phase(
     orchestrator_setup,
-    monkeypatch,
 ):
     orch, mgr, mock_platform, tmp = orchestrator_setup
     init = orch.initialize_campaign()
@@ -359,9 +358,11 @@ def test_resume_does_not_resurrect_completed_e2_phase(
             for slot in E1_LANE_SLOTS
         ]
     )
-    # Prepare E2 via real workflow so durable E2 packages exist, then mark E2
-    # complete only for this resume authority regression.
-    orch.advance_to_next_stage()
+    # Prepare real E2-BLIND packages, then inject the legacy synthetic E2
+    # StageCompletion that used to make resume skip straight to E3.
+    first = orch.advance_to_next_stage()
+    assert first["current_stage"] == "E2"
+    assert first["current_phase"] == "E2-BLIND"
     assert orch.active_store_path is not None
     orch.api.qualify_stage(orch.active_store_path, "E2")
 
@@ -371,27 +372,42 @@ def test_resume_does_not_resurrect_completed_e2_phase(
     )
     result = resumed.resume_campaign(init["store_path"])
     assert result["status"] == "SUCCESS", result
-    assert result["current_stage"] == "E3"
-    assert result["current_phase"] is None
-    assert resumed.stage_batch is None
+    assert result["current_stage"] == "E2"
+    assert result["current_phase"] == "E2-BLIND"
+    assert result["active_inbox"] == "STAGE"
+    assert resumed.stage_batch is not None
+    assert resumed.stage_batch.stage_id == "E2"
+    assert resumed.stage_batch.phase_id == "E2-BLIND"
 
-def test_advance_surfaces_e3_isolation_backend_blocker(
+def test_advance_ignores_synthetic_e2_completion_and_starts_real_e2(
     orchestrator_setup,
 ):
     orch, mgr, mock_platform, tmp = orchestrator_setup
     orch.initialize_campaign()
     assert orch.active_store_path is not None
-    orch.api.prepare_stage(orch.active_store_path, "E1")
-    orch.api.qualify_stage(orch.active_store_path, "E1")
+    e1 = orch.prepare_e1_orchestration()
+    orch.import_results(
+        [
+            _create_lane_result_zip(
+                tmp / f"advance_{slot}.zip",
+                e1,
+                slot,
+            )
+            for slot in E1_LANE_SLOTS
+        ]
+    )
+
+    # Legacy compatibility helper records an accepted E2 StageCompletion
+    # without the external E2 BLIND/REVEAL/SHADOW workflow.
     orch.api.prepare_stage(orch.active_store_path, "E2")
     orch.api.qualify_stage(orch.active_store_path, "E2")
 
     result = orch.advance_to_next_stage()
-    assert result["status"] == "BLOCKED"
-    assert result["current_stage"] == "E3"
-    assert result["current_phase"] == "E3-BLIND"
-    assert (
-        result["next_action"]
-        == "CONFIGURE_ENFORCED_ISOLATION_BACKEND"
-    )
-    assert "E3_ENFORCED_ISOLATION_BACKEND_REQUIRED" in result["reason"]
+    assert result["status"] == "WAITING_EXTERNAL_RESULTS"
+    assert result["current_stage"] == "E2"
+    assert result["current_phase"] == "E2-BLIND"
+    assert set(result["missing_lanes"]) == {
+        "E2-CONVERGENCE",
+        "E2-ADJUDICATION",
+    }
+    assert result["next_action"] == "DELIVER_OR_IMPORT_E2_BLIND_RESULTS"
