@@ -426,8 +426,6 @@ class FullAuditOrchestrator:
             raise ValidationError("SOURCE_IDENTITY_REQUIRED")
 
         status = self.api.get_campaign_status(self.active_store_path)
-        store = TransactionalHistoryStore(self.active_store_path)
-        external_e2_completed = has_external_e2_stage_completion(store)
         if "E1" not in status.get("stages_completed", []):
             raise ValidationError(
                 "PREDECESSOR_STAGE_NOT_COMPLETED",
@@ -1492,6 +1490,8 @@ class FullAuditOrchestrator:
         if not self.active_store_path or not self.active_store_path.exists():
             raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
         status = self.api.get_campaign_status(self.active_store_path)
+        store = TransactionalHistoryStore(self.active_store_path)
+        external_e2_completed = has_external_e2_stage_completion(store)
         if "E1" not in status.get("stages_completed", []):
             return {
                 "status": "BLOCKED",
