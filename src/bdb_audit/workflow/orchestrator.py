@@ -22,7 +22,10 @@ from .e2_checkpoint import E2BlindCheckpointService
 from .e2_reveal import E2ControlledRevealService
 from .e2_synthesis import E2MainSynthesisService
 from .e2_shadow import E2ShadowAuthorizationService
-from .e2_finalize import E2FinalizationService
+from .e2_finalize import (
+    E2FinalizationService,
+    has_external_e2_stage_completion,
+)
 from .e2_contradiction import E2ContradictionAuthorizationService
 from .e2_contradiction_resolution import E2ContradictionResolutionService
 from .e3_checkpoint import E3BlindCheckpointService
@@ -1362,6 +1365,9 @@ class FullAuditOrchestrator:
             completed_stages = set(
                 status.get("stages_completed", [])
             )
+            external_e2_completed = (
+                has_external_e2_stage_completion(store)
+            )
             candidate_stage_phases: tuple[
                 tuple[str, str], ...
             ]
@@ -1377,7 +1383,7 @@ class FullAuditOrchestrator:
             elif "E3" in completed_stages:
                 candidate_stage_phases = (("E4", "E4-DEEPEN"),)
                 active_stage = "E4"
-            elif "E2" in completed_stages:
+            elif external_e2_completed:
                 candidate_stage_phases = (
                     ("E3", "E3-HOLDOUT"),
                     ("E3", "E3-CUMULATIVE"),
@@ -1484,6 +1490,8 @@ class FullAuditOrchestrator:
         if not self.active_store_path or not self.active_store_path.exists():
             raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
         status = self.api.get_campaign_status(self.active_store_path)
+        store = TransactionalHistoryStore(self.active_store_path)
+        external_e2_completed = has_external_e2_stage_completion(store)
         if "E1" not in status.get("stages_completed", []):
             return {
                 "status": "BLOCKED",
@@ -1492,7 +1500,7 @@ class FullAuditOrchestrator:
                 "next_action": "IMPORT_MISSING_E1_RESULTS",
             }
 
-        if "E2" in status.get("stages_completed", []):
+        if external_e2_completed:
             if "E3" in status.get("stages_completed", []):
                 return self._advance_e4_external()
             if (
@@ -2050,8 +2058,21 @@ class FullAuditOrchestrator:
             prepared = set(
                 canonical.get("stages_prepared", [])
             )
+            external_e2_completed = (
+                has_external_e2_stage_completion(
+                    TransactionalHistoryStore(
+                        self.active_store_path
+                    )
+                )
+            )
             for stage in ("E1", "E2", "E3", "E4", "E5"):
-                if stage in completed:
+                if stage == "E2" and not external_e2_completed:
+                    stage_status[stage] = (
+                        "IN_PROGRESS"
+                        if stage in prepared
+                        else "NOT_STARTED"
+                    )
+                elif stage in completed:
                     stage_status[stage] = "COMPLETE"
                 elif stage in prepared:
                     stage_status[stage] = "IN_PROGRESS"

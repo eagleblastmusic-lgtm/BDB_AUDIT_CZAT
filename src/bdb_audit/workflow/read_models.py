@@ -169,6 +169,17 @@ class VerifiedCampaignReadModel:
         completion_rows = self.store.accepted_records("stage_completion", cut)
         completed_stages: list[str] = []
         completed_by_stage: dict[str, str] = {}  # stage_key -> completion_digest
+        completion_record_by_stage: dict[str, dict[str, Any]] = {}
+
+        def _e2_external_marker(candidate: dict[str, Any]) -> bool:
+            body = candidate.get("body", {})
+            obligations = body.get("mandatory_obligation_summary")
+            return (
+                isinstance(obligations, dict)
+                and obligations.get("blind_phase_required") is True
+                and obligations.get("controlled_reveal_required") is True
+                and obligations.get("shadow_adjudicator_required") is True
+            )
 
         for row in completion_rows:
             doc = row["body"]
@@ -191,12 +202,22 @@ class VerifiedCampaignReadModel:
                 existing_digest = completed_by_stage[canonical_sk]
                 new_digest = row["ref"]["revision_digest"]
                 if existing_digest != new_digest:
+                    existing_row = completion_record_by_stage[canonical_sk]
+                    if canonical_sk == "E2":
+                        existing_external = _e2_external_marker(existing_row)
+                        new_external = _e2_external_marker(row)
+                        if existing_external != new_external:
+                            if new_external:
+                                completed_by_stage[canonical_sk] = new_digest
+                                completion_record_by_stage[canonical_sk] = row
+                            continue
                     raise ValidationError(
                         "MULTIPLE_STAGE_COMPLETIONS",
                         f"Ambiguous conflicting completions for stage {canonical_sk}",
                     )
             else:
                 completed_by_stage[canonical_sk] = row["ref"]["revision_digest"]
+                completion_record_by_stage[canonical_sk] = row
                 completed_stages.append(canonical_sk)
 
         # Preserve the accepted StageSpec ordering in the projection.  This keeps the
