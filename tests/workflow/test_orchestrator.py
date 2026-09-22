@@ -498,15 +498,13 @@ def test_completed_e5_invokes_authoritative_stop_evaluation(
     orch.initialize_campaign()
     assert orch.active_store_path is not None
 
-    for stage in ("E1", "E2", "E3", "E4", "E5"):
-        orch.api.prepare_stage(
-            orch.active_store_path,
-            stage,
-        )
-        orch.api.qualify_stage(
-            orch.active_store_path,
-            stage,
-        )
+    monkeypatch.setattr(
+        orch.api,
+        "get_campaign_status",
+        lambda store_path: {
+            "stages_completed": ["E1", "E2", "E3", "E4", "E5"],
+        },
+    )
 
     calls = []
     def fake_stop(
