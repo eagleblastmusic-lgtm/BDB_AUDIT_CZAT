@@ -37,6 +37,47 @@ def _create_lane_result_zip(path: Path, batch, slot: str) -> Path:
     return path
 
 
+def _create_stage_result_zip(
+    path: Path,
+    batch,
+    slot: str,
+    *,
+    findings=None,
+    outputs=None,
+) -> Path:
+    job = batch.get_job(slot)
+    manifest = {
+        "kind": "bdb_audit_lane_result",
+        "version": "1",
+        "campaign_id": batch.campaign_id,
+        "stage_id": batch.stage_id,
+        "phase_id": batch.phase_id,
+        "lane_slot": slot,
+        "source_commit_sha": job.source_commit_sha,
+        "executor_profile": job.executor_profile,
+        "executor_model": job.model,
+        "input_package_digest": job.package_digest,
+        "history_cut": batch.frozen_history_cut,
+        "assignment_ref": job.assignment_ref,
+        "attempt_ref": job.attempt_ref,
+        "findings": list(findings or []),
+        "outputs": dict(
+            outputs or {"verdict": "INCONCLUSIVE"}
+        ),
+    }
+    with zipfile.ZipFile(
+        path,
+        "w",
+        compression=zipfile.ZIP_DEFLATED,
+    ) as zf:
+        zf.writestr(
+            "MANIFEST.json",
+            json.dumps(manifest, indent=2),
+        )
+        zf.writestr("REPORT.md", "bounded external result")
+    return path
+
+
 @pytest.fixture
 def orchestrator_setup(tmp_path: Path):
     cfg_file = tmp_path / "user_settings.json"
@@ -387,6 +428,67 @@ def test_e3_blind_preparation_uses_declared_manual_isolation_without_overclaim(
     assert len(inventories) == 1
     assert len(scopes) == 1
     assert scopes[0]["body"]["state"] == "KNOWN_UNOBSERVED_SCOPE"
+
+
+def test_e3_blind_completion_automatically_prepares_positive_gap_phase(
+    orchestrator_setup,
+    monkeypatch,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    assert orch.active_store_path is not None
+    orch.api.prepare_stage(orch.active_store_path, "E1")
+    orch.api.qualify_stage(orch.active_store_path, "E1")
+    orch.api.prepare_stage(orch.active_store_path, "E2")
+    orch.api.qualify_stage(orch.active_store_path, "E2")
+
+    blind = orch.prepare_e3_blind_orchestration()
+    imported = orch.import_stage_results(
+        [
+            _create_stage_result_zip(
+                tmp / f"e3_blind_{slot}.zip",
+                blind,
+                slot,
+                findings=[
+                    {
+                        "statement": (
+                            f"bounded blind observation {slot}"
+                        )
+                    }
+                ],
+            )
+            for slot in blind.lane_slots
+        ]
+    )
+    assert imported.phase_complete is True
+
+    # This regression isolates E3 transition behavior. Real E2 completion is
+    # proven elsewhere; here the accepted E2 StageCompletion is sufficient
+    # preparation and the external-E2 predicate is fixed at its boundary.
+    monkeypatch.setattr(
+        "bdb_audit.workflow.orchestrator.has_external_e2_stage_completion",
+        lambda store: True,
+    )
+
+    result = orch.advance_to_next_stage()
+    assert result["status"] == "E3_GAP_PREPARED"
+    assert result["current_stage"] == "E3"
+    assert result["current_phase"] == "E3-GAP"
+    assert result["next_action"] == (
+        "DELIVER_OR_IMPORT_E3_GAP_RESULTS"
+    )
+    assert set(result["packages"]) == {
+        "E3-X",
+        "E3-Y",
+        "E3-Z",
+    }
+    assert orch.stage_batch is not None
+    assert orch.stage_batch.phase_id == "E3-GAP"
+
+    for job in orch.stage_batch.jobs.values():
+        with zipfile.ZipFile(job.package_zip_path, "r") as zf:
+            names = set(zf.namelist())
+        assert "CONTEXT/E3_POSITIVE_GAP_VIEW.json" in names
 
 def test_resume_ignores_synthetic_e2_completion_and_restores_real_e2_phase(
     orchestrator_setup,
