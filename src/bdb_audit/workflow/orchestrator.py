@@ -17,6 +17,7 @@ from ..core.registry import ContractRegistry
 from ..history.store import TransactionalHistoryStore
 from ..orchestration.native_ensemble import E1_LANE_SLOTS
 from ..orchestration.templates import TemplateRegistry
+from ..stop.operation import evaluate_stop_gate as evaluate_accepted_stop_gate
 from .executors import get_executor_profile
 from .e2_checkpoint import E2BlindCheckpointService
 from .e2_reveal import E2ControlledRevealService
@@ -1116,37 +1117,35 @@ class FullAuditOrchestrator:
                 "BLOCKED": "RESOLVE_STOP_BLOCKERS",
             }
             if evaluations:
-                latest = max(
-                    evaluations,
-                    key=lambda row: int(
-                        row.get("accepted_seq", 0)
-                    ),
-                )
-                body = latest["body"]
-                decision = body.get(
-                    "continuation_decision", "BLOCKED"
-                )
-                return {
-                    "status": "STOP_EVALUATED",
-                    "current_stage": "STOP",
-                    "continuation_decision": decision,
-                    "assurance_level": body.get(
-                        "assurance_level"
-                    ),
-                    "release_readiness": body.get(
-                        "release_readiness"
-                    ),
-                    "reason_codes": list(
-                        body.get("reason_codes", ())
-                    ),
-                    "stop_evaluation_ref": latest["ref"],
-                    "next_action": (
-                        next_action_by_decision.get(
-                            decision,
-                            "REVIEW_STOP_RESULT",
-                        )
-                    ),
-                }
+                try:
+                    verified = evaluate_accepted_stop_gate(
+                        self.active_store_path
+                    )
+                except ValidationError as exc:
+                    if exc.code != "STOP_INPUT_CUT_MISMATCH":
+                        raise
+                else:
+                    decision = verified.get(
+                        "continuation_decision", "BLOCKED"
+                    )
+                    latest = max(
+                        evaluations,
+                        key=lambda row: int(
+                            row.get("accepted_seq", 0)
+                        ),
+                    )
+                    return {
+                        "status": "STOP_EVALUATED",
+                        "current_stage": "STOP",
+                        **verified,
+                        "stop_evaluation_ref": latest["ref"],
+                        "next_action": (
+                            next_action_by_decision.get(
+                                decision,
+                                "REVIEW_STOP_RESULT",
+                            )
+                        ),
+                    }
 
             stop = self.api.evaluate_stop_gate(
                 self.active_store_path,
