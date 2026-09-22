@@ -13,6 +13,8 @@ from bdb_audit.workflow.source_target import ResolvedSource
 from bdb_audit.workflow.orchestrator import FullAuditOrchestrator
 from bdb_audit.workflow.executors import EXECUTION_MODES
 from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
+from bdb_audit.history.store import TransactionalHistoryStore
+from bdb_audit.workflow.read_models import current_accepted_cut
 
 
 def _create_lane_result_zip(path: Path, batch, slot: str) -> Path:
@@ -315,32 +317,76 @@ def test_current_executor_profiles_do_not_overclaim_enforced_isolation():
         assert profile.max_isolation_assurance != "ENFORCED"
 
 
-def test_e3_blind_preparation_fails_before_package_publication_without_enforced_backend(
+def test_e3_blind_preparation_uses_declared_manual_isolation_without_overclaim(
     orchestrator_setup,
 ):
     orch, mgr, mock_platform, tmp = orchestrator_setup
     orch.initialize_campaign()
     assert orch.active_store_path is not None
-    # Build only the predecessor acceptance needed to reach the capability
-    # check. This test is not exercising the user workflow itself.
+    # Build only the predecessor acceptance needed to reach E3. The public
+    # ChatGPT/GitHub transport can honestly prove DECLARED, not ENFORCED,
+    # isolation and must preserve that weaker assurance in accepted history.
     orch.api.prepare_stage(orch.active_store_path, "E1")
     orch.api.qualify_stage(orch.active_store_path, "E1")
     orch.api.prepare_stage(orch.active_store_path, "E2")
     orch.api.qualify_stage(orch.active_store_path, "E2")
-    artifacts = orch._artifact_root()
 
-    with pytest.raises(
-        ValidationError,
-        match="E3_ENFORCED_ISOLATION_BACKEND_REQUIRED",
-    ):
-        orch.prepare_e3_blind_orchestration()
+    batch = orch.prepare_e3_blind_orchestration()
+    assert batch.stage_id == "E3"
+    assert batch.phase_id == "E3-BLIND"
+    assert set(batch.jobs) == {"E3-X", "E3-Y", "E3-Z"}
 
-    # Capability refusal happens before E3 assignment/package publication.
-    campaign_id = orch.api.get_campaign_status(
+    store = TransactionalHistoryStore(
         orch.active_store_path
-    )["campaign_id"]
-    e3_root = artifacts / campaign_id / "E3"
-    assert not e3_root.exists()
+    )
+    cut = current_accepted_cut(store)
+    lane_rows = [
+        row
+        for row in store.accepted_records("lane_spec", cut)
+        if str(row["body"].get("lane_key", "")).startswith(
+            "lane_E3_"
+        )
+    ]
+    assert len(lane_rows) == 3
+    assert {
+        row["body"]["required_isolation_assurance"]
+        for row in lane_rows
+    } == {"DECLARED"}
+
+    assignments = [
+        row
+        for row in store.accepted_records(
+            "assignment_manifest", cut
+        )
+        if row["body"].get("phase_id") == "E3-BLIND"
+    ]
+    assert len(assignments) == 3
+    for assignment in assignments:
+        knowledge = store.resolve_accepted(
+            assignment["body"]["knowledge_state_ref"],
+            cut,
+        )
+        isolation = store.resolve_accepted(
+            knowledge["body"][
+                "isolation_qualification_ref"
+            ],
+            cut,
+        )
+        body = isolation["body"]
+        assert body["required_isolation_assurance"] == "DECLARED"
+        assert body["result"] == "DECLARED"
+        assert body["enforcement_receipt_refs"] == []
+        assert body["session_boundary_evidence_refs"] == []
+
+    inventories = tuple(
+        store.accepted_records("inventory_revision", cut)
+    )
+    scopes = tuple(
+        store.accepted_records("scope_state_record", cut)
+    )
+    assert len(inventories) == 1
+    assert len(scopes) == 1
+    assert scopes[0]["body"]["state"] == "KNOWN_UNOBSERVED_SCOPE"
 
 def test_resume_ignores_synthetic_e2_completion_and_restores_real_e2_phase(
     orchestrator_setup,
