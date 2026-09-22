@@ -490,6 +490,64 @@ def test_e3_blind_completion_automatically_prepares_positive_gap_phase(
             names = set(zf.namelist())
         assert "CONTEXT/E3_POSITIVE_GAP_VIEW.json" in names
 
+def test_completed_e5_invokes_authoritative_stop_evaluation(
+    orchestrator_setup,
+    monkeypatch,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    assert orch.active_store_path is not None
+
+    for stage in ("E1", "E2", "E3", "E4", "E5"):
+        orch.api.prepare_stage(
+            orch.active_store_path,
+            stage,
+        )
+        orch.api.qualify_stage(
+            orch.active_store_path,
+            stage,
+        )
+
+    calls = []
+    def fake_stop(
+        store_path,
+        evaluation_context="FINAL_POST_E5",
+        **kwargs,
+    ):
+        calls.append((Path(store_path), evaluation_context))
+        return {
+            "status": "SUCCESS",
+            "continuation_decision": "CONTINUE_REQUIRED",
+            "assurance_level": "INSUFFICIENT",
+            "release_readiness": "QUALIFICATION_BLOCKED",
+            "stop_evaluation_digest": "a" * 64,
+            "commit_seq": 99,
+            "commit_hash": "b" * 64,
+        }
+
+    monkeypatch.setattr(
+        orch.api,
+        "evaluate_stop_gate",
+        fake_stop,
+    )
+    result = orch._advance_e5_external()
+    assert calls == [
+        (
+            Path(orch.active_store_path),
+            "FINAL_POST_E5",
+        )
+    ]
+    assert result["status"] == "STOP_EVALUATED"
+    assert result["current_stage"] == "STOP"
+    assert (
+        result["continuation_decision"]
+        == "CONTINUE_REQUIRED"
+    )
+    assert result["next_action"] == (
+        "CONTINUE_REQUIRED_WORK"
+    )
+
+
 def test_resume_ignores_synthetic_e2_completion_and_restores_real_e2_phase(
     orchestrator_setup,
 ):
