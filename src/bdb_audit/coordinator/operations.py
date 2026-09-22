@@ -368,6 +368,7 @@ class AuditOperationApi:
         stage_id: str,
         slot: str,
         lane_spec_revision: str = "1",
+        required_isolation_assurance: str | None = None,
     ) -> dict[str, Any]:
         """Validate parent stage and accept lane preparation."""
         path = Path(store_path).resolve()
@@ -380,13 +381,27 @@ class AuditOperationApi:
         if stage_key not in status["stages_prepared"]:
             raise ValidationError("STAGE_NOT_PREPARED", f"Prepare stage {stage_key} before adding lanes")
 
+        if required_isolation_assurance is None:
+            required_isolation_assurance = (
+                "ENFORCED" if stage_key == "E3" else "DECLARED"
+            )
+        if required_isolation_assurance not in {
+            "UNKNOWN",
+            "DECLARED",
+            "ENFORCED",
+        }:
+            raise ValidationError(
+                "INVALID_ISOLATION_ASSURANCE",
+                str(required_isolation_assurance),
+            )
+
         lane_spec = LaneSpec(
             lane_key=f"lane_{stage_key}_{slot}",
             lane_spec_revision=lane_spec_revision,
             stage_spec_revision="1",
             purpose=f"{stage_key} operational lane {slot}",
             primary_strategy="DIRECT_ANALYSIS",
-            required_isolation_assurance="ENFORCED" if stage_key == "E3" else "DECLARED",
+            required_isolation_assurance=required_isolation_assurance,
         )
         lane_obj = lane_spec.as_object()
 
