@@ -1135,9 +1135,9 @@ class FullAuditOrchestrator:
                         ),
                     )
                     return {
+                        **verified,
                         "status": "STOP_EVALUATED",
                         "current_stage": "STOP",
-                        **verified,
                         "stop_evaluation_ref": latest["ref"],
                         "next_action": (
                             next_action_by_decision.get(
@@ -1155,9 +1155,9 @@ class FullAuditOrchestrator:
                 "continuation_decision", "BLOCKED"
             )
             return {
+                **stop,
                 "status": "STOP_EVALUATED",
                 "current_stage": "STOP",
-                **stop,
                 "next_action": (
                     next_action_by_decision.get(
                         decision,
