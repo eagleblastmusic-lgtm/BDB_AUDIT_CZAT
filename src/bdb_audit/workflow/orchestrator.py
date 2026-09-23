@@ -1294,19 +1294,18 @@ class FullAuditOrchestrator:
                         ),
                     }
                 raise
+            stop_result = self._advance_e5_external()
             return {
-                "status": "E5_COMPLETED",
-                "current_stage": "E5",
-                "stage_completion_ref": (
+                **stop_result,
+                "e5_stage_completion_ref": (
                     completion.stage_completion_ref
                 ),
-                "completion_commit_seq": (
+                "e5_completion_commit_seq": (
                     completion.accepted_commit_seq
                 ),
                 "challenger_statuses": (
                     challenger_summary.statuses
                 ),
-                "next_action": completion.next_action,
             }
 
         raise ValidationError(
