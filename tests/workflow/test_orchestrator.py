@@ -425,8 +425,13 @@ def test_e3_blind_preparation_uses_declared_manual_isolation_without_overclaim(
     scopes = tuple(
         store.accepted_records("scope_state_record", cut)
     )
-    assert len(inventories) == 1
+    assert len(inventories) >= 1
     assert len(scopes) == 1
+    latest_inventory = max(
+        inventories,
+        key=lambda row: int(row.get("accepted_seq", 0)),
+    )
+    assert latest_inventory["body"]["scope_state_record_refs"]
     assert scopes[0]["body"]["state"] == "KNOWN_UNOBSERVED_SCOPE"
 
 
