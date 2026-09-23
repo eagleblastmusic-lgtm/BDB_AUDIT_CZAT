@@ -53,3 +53,53 @@ def test_scope_baseline_is_conservative_and_idempotent(
     )
     assert second_head.commit_seq == first_head.commit_seq
     assert second_head.commit_hash == first_head.commit_hash
+
+
+def test_scope_baseline_augments_existing_inventory_without_losing_surfaces(
+    tmp_path: Path,
+):
+    store_path = tmp_path / "scope_existing.sqlite"
+    api = AuditOperationApi()
+    api.create_campaign(
+        store_path,
+        seed="scope-existing",
+    )
+    api.prepare_stage(store_path, "E1")
+    api.qualify_stage(store_path, "E1")
+
+    store = TransactionalHistoryStore(store_path)
+    before_cut = current_accepted_cut(store)
+    before = tuple(
+        store.accepted_records("inventory_revision", before_cut)
+    )
+    assert len(before) == 1
+    original_surfaces = tuple(
+        before[0]["body"].get("surface_refs", ())
+    )
+    assert original_surfaces
+    assert not before[0]["body"].get(
+        "scope_state_record_refs", ()
+    )
+
+    summary = ensure_pre_e3_scope_baseline(store)
+    assert summary.already_present is False
+
+    after_cut = current_accepted_cut(store)
+    inventories = tuple(
+        store.accepted_records("inventory_revision", after_cut)
+    )
+    assert len(inventories) == 2
+    latest = max(
+        inventories,
+        key=lambda row: int(row.get("accepted_seq", 0)),
+    )
+    assert tuple(latest["body"]["surface_refs"]) == (
+        original_surfaces
+    )
+    assert latest["body"]["scope_state_record_refs"]
+    scopes = tuple(
+        store.accepted_records("scope_state_record", after_cut)
+    )
+    assert len(scopes) == 1
+    assert scopes[0]["body"]["state"] == "KNOWN_UNOBSERVED_SCOPE"
+
