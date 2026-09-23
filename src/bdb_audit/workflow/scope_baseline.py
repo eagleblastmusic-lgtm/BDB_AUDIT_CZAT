@@ -65,29 +65,30 @@ def ensure_pre_e3_scope_baseline(
         ).get("revision_digest")
         == source_digest
     ]
-    if inventories:
-        inventory = max(
+    inventory = (
+        max(
             inventories,
             key=lambda row: int(row.get("accepted_seq", 0)),
         )
+        if inventories
+        else None
+    )
+    if inventory is not None:
         scope_refs = inventory["body"].get(
             "scope_state_record_refs", []
         )
-        if not scope_refs:
-            raise ValidationError(
-                "INVENTORY_SCOPE_DENOMINATOR_REQUIRED"
+        if scope_refs:
+            scope_ref = dict(scope_refs[0])
+            return ScopeBaselineSummary(
+                inventory_ref=_with_ref_class(
+                    inventory["ref"], "CONTENT_OR_PRIOR"
+                ),
+                scope_state_ref=scope_ref,
+                accepted_commit_seq=int(
+                    inventory.get("accepted_seq", 0)
+                ),
+                already_present=True,
             )
-        scope_ref = dict(scope_refs[0])
-        return ScopeBaselineSummary(
-            inventory_ref=_with_ref_class(
-                inventory["ref"], "CONTENT_OR_PRIOR"
-            ),
-            scope_state_ref=scope_ref,
-            accepted_commit_seq=int(
-                inventory.get("accepted_seq", 0)
-            ),
-            already_present=True,
-        )
 
     head = store.head()
     if head is None:
@@ -115,6 +116,11 @@ def ensure_pre_e3_scope_baseline(
     )
     scope_obj = scope.as_object()
 
+    prior_body = (
+        inventory["body"]
+        if inventory is not None
+        else {}
+    )
     inventory = InventoryRevision(
         inventory_id=deterministic_id(
             "inventory_revision", seed
@@ -124,17 +130,29 @@ def ensure_pre_e3_scope_baseline(
             source["ref"], "PRIOR_ACCEPTED_ONLY"
         ),
         basis_history_cut=cut,
-        collector_profile_refs=(),
-        assigned_input_refs=(),
-        input_disposition_refs=(),
-        surface_refs=(),
+        collector_profile_refs=tuple(
+            prior_body.get("collector_profile_refs", ())
+        ),
+        assigned_input_refs=tuple(
+            prior_body.get("assigned_input_refs", ())
+        ),
+        input_disposition_refs=tuple(
+            prior_body.get("input_disposition_refs", ())
+        ),
+        surface_refs=tuple(
+            prior_body.get("surface_refs", ())
+        ),
         scope_state_record_refs=(
             scope_obj.as_ref(
                 ref_class="CONTENT_OR_PRIOR"
             ).as_dict(),
         ),
-        manual_runtime_additions=(),
-        unresolved_scope_refs=(),
+        manual_runtime_additions=tuple(
+            prior_body.get("manual_runtime_additions", ())
+        ),
+        unresolved_scope_refs=tuple(
+            prior_body.get("unresolved_scope_refs", ())
+        ),
     )
     inventory_obj = inventory.as_object()
 
