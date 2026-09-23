@@ -421,10 +421,10 @@ def _prior_corpus_view(
             )
         ] = contradiction
 
-    if not cards:
-        raise ValidationError(
-            "E3_CUMULATIVE_E1_E2_CORPUS_REQUIRED"
-        )
+    # An honestly empty E1/E2 adjudicated corpus is still a valid
+    # cumulative reveal state.  E3 must be able to record NO_PRIOR_MATCH
+    # (or simply compare zero own discoveries) instead of blocking solely
+    # because earlier stages produced no findings.
     return (
         cards,
         contradiction_cards,
