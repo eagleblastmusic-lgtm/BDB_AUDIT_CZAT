@@ -598,7 +598,7 @@ def test_e3_blind_completion_automatically_prepares_positive_gap_phase(
     assert e4["current_stage"] == "E4"
     assert e4["current_phase"] == "E4-DEEPEN"
     assert e4["next_action"] == (
-        "DELIVER_OR_IMPORT_E4_RESULTS"
+        "DELIVER_OR_IMPORT_E4_DEEPEN_RESULTS"
     )
 
 
