@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from types import SimpleNamespace
 from pathlib import Path
 import zipfile
 import pytest
@@ -600,6 +601,122 @@ def test_e3_blind_completion_automatically_prepares_positive_gap_phase(
     assert e4["next_action"] == (
         "DELIVER_OR_IMPORT_E4_DEEPEN_RESULTS"
     )
+
+
+def test_e5b_completion_immediately_enters_final_stop(
+    orchestrator_setup,
+    monkeypatch,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    assert orch.active_store_path is not None
+
+    status_calls = 0
+
+    def fake_status(store_path):
+        nonlocal status_calls
+        status_calls += 1
+        return {
+            "stages_completed": (
+                []
+                if status_calls == 1
+                else ["E5"]
+            )
+        }
+
+    class FakeChallengerService:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def materialize(self):
+            return SimpleNamespace(
+                statuses={
+                    "E5-B1": "NO_MATERIAL_COUNTEREVIDENCE",
+                    "E5-B2": "NO_MATERIAL_COUNTEREVIDENCE",
+                }
+            )
+
+    class FakeFinalizationService:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def finalize(self):
+            return SimpleNamespace(
+                stage_completion_ref={
+                    "kind": "stage_completion",
+                    "revision_digest": "c" * 64,
+                },
+                accepted_commit_seq=42,
+            )
+
+    stop_calls = []
+
+    def fake_stop(
+        store_path,
+        evaluation_context="FINAL_POST_E5",
+        **kwargs,
+    ):
+        stop_calls.append(
+            (Path(store_path), evaluation_context)
+        )
+        return {
+            "status": "SUCCESS",
+            "continuation_decision": "CONTINUE_REQUIRED",
+            "assurance_level": "INSUFFICIENT",
+            "release_readiness": "QUALIFICATION_BLOCKED",
+            "stop_evaluation_digest": "a" * 64,
+            "commit_seq": 43,
+            "commit_hash": "b" * 64,
+        }
+
+    monkeypatch.setattr(
+        orch.api,
+        "get_campaign_status",
+        fake_status,
+    )
+    monkeypatch.setattr(
+        orch.api,
+        "evaluate_stop_gate",
+        fake_stop,
+    )
+    monkeypatch.setattr(
+        "bdb_audit.workflow.orchestrator."
+        "E5ChallengerResultService",
+        FakeChallengerService,
+    )
+    monkeypatch.setattr(
+        "bdb_audit.workflow.orchestrator."
+        "E5FinalizationService",
+        FakeFinalizationService,
+    )
+
+    orch.stage_batch = SimpleNamespace(
+        stage_id="E5",
+        phase_id="E5B-CHALLENGE",
+    )
+    orch.stage_inbox = SimpleNamespace(
+        lane_statuses={}
+    )
+
+    result = orch._advance_e5_external()
+
+    assert status_calls == 2
+    assert stop_calls == [
+        (
+            Path(orch.active_store_path),
+            "FINAL_POST_E5",
+        )
+    ]
+    assert result["status"] == "STOP_EVALUATED"
+    assert result["current_stage"] == "STOP"
+    assert result["e5_completion_commit_seq"] == 42
+    assert result["e5_stage_completion_ref"][
+        "revision_digest"
+    ] == "c" * 64
+    assert result["challenger_statuses"] == {
+        "E5-B1": "NO_MATERIAL_COUNTEREVIDENCE",
+        "E5-B2": "NO_MATERIAL_COUNTEREVIDENCE",
+    }
 
 
 def test_completed_e5_invokes_authoritative_stop_evaluation(
