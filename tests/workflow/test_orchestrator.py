@@ -495,6 +495,61 @@ def test_e3_blind_completion_automatically_prepares_positive_gap_phase(
             names = set(zf.namelist())
         assert "CONTEXT/E3_POSITIVE_GAP_VIEW.json" in names
 
+    # Complete the authorized positive-gap phase with an explicit negative
+    # result for the conservative scope target, then verify the orchestrator
+    # advances directly into the late cumulative reveal.  This fixture has no
+    # E1/E2 finding corpus, so an empty prior corpus must remain a valid state.
+    store = TransactionalHistoryStore(
+        orch.active_store_path
+    )
+    cut = current_accepted_cut(store)
+    scopes = tuple(
+        store.accepted_records("scope_state_record", cut)
+    )
+    assert len(scopes) == 1
+    target_digest = scopes[0]["ref"]["revision_digest"]
+    gap_batch = orch.stage_batch
+    imported_gap = orch.import_stage_results(
+        [
+            _create_stage_result_zip(
+                tmp / f"e3_gap_{slot}.zip",
+                gap_batch,
+                slot,
+                findings=[],
+                outputs={
+                    "gap_target_results": [
+                        {
+                            "target_ref_digest": target_digest,
+                            "target_kind": "SCOPE_GAP",
+                            "status": "NO_MATERIAL_DISCOVERY",
+                            "rationale": (
+                                "conservative scope target inspected"
+                            ),
+                            "discovery_indexes": [],
+                        }
+                    ]
+                },
+            )
+            for slot in gap_batch.lane_slots
+        ]
+    )
+    assert imported_gap.phase_complete is True
+
+    cumulative = orch.advance_to_next_stage()
+    assert cumulative["status"] == "E3_CUMULATIVE_PREPARED"
+    assert cumulative["current_stage"] == "E3"
+    assert cumulative["current_phase"] == "E3-CUMULATIVE"
+    assert cumulative["next_action"] == (
+        "DELIVER_OR_IMPORT_E3_CUMULATIVE_RESULTS"
+    )
+    assert orch.stage_batch is not None
+    assert orch.stage_batch.phase_id == "E3-CUMULATIVE"
+    for job in orch.stage_batch.jobs.values():
+        with zipfile.ZipFile(job.package_zip_path, "r") as zf:
+            names = set(zf.namelist())
+        assert "CONTEXT/E3_CUMULATIVE_CORPUS_VIEW.json" in names
+
+
 def test_completed_e5_invokes_authoritative_stop_evaluation(
     orchestrator_setup,
     monkeypatch,
