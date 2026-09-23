@@ -65,7 +65,7 @@ def ensure_pre_e3_scope_baseline(
         ).get("revision_digest")
         == source_digest
     ]
-    inventory = (
+    latest_inventory = (
         max(
             inventories,
             key=lambda row: int(row.get("accepted_seq", 0)),
@@ -73,19 +73,19 @@ def ensure_pre_e3_scope_baseline(
         if inventories
         else None
     )
-    if inventory is not None:
-        scope_refs = inventory["body"].get(
+    if latest_inventory is not None:
+        scope_refs = latest_inventory["body"].get(
             "scope_state_record_refs", []
         )
         if scope_refs:
             scope_ref = dict(scope_refs[0])
             return ScopeBaselineSummary(
                 inventory_ref=_with_ref_class(
-                    inventory["ref"], "CONTENT_OR_PRIOR"
+                    latest_inventory["ref"], "CONTENT_OR_PRIOR"
                 ),
                 scope_state_ref=scope_ref,
                 accepted_commit_seq=int(
-                    inventory.get("accepted_seq", 0)
+                    latest_inventory.get("accepted_seq", 0)
                 ),
                 already_present=True,
             )
@@ -117,11 +117,11 @@ def ensure_pre_e3_scope_baseline(
     scope_obj = scope.as_object()
 
     prior_body = (
-        inventory["body"]
-        if inventory is not None
+        latest_inventory["body"]
+        if latest_inventory is not None
         else {}
     )
-    inventory = InventoryRevision(
+    baseline_inventory = InventoryRevision(
         inventory_id=deterministic_id(
             "inventory_revision", seed
         ),
@@ -154,7 +154,7 @@ def ensure_pre_e3_scope_baseline(
             prior_body.get("unresolved_scope_refs", ())
         ),
     )
-    inventory_obj = inventory.as_object()
+    inventory_obj = baseline_inventory.as_object()
 
     command = CommandEnvelope(
         command_id=_command_id(
