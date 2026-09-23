@@ -93,6 +93,10 @@ def test_scope_baseline_augments_existing_inventory_without_losing_surfaces(
         inventories,
         key=lambda row: int(row.get("accepted_seq", 0)),
     )
+    assert latest["body"]["inventory_id"] == (
+        before[0]["body"]["inventory_id"]
+    )
+    assert latest["body"]["inventory_revision"] == "2"
     assert tuple(latest["body"]["surface_refs"]) == (
         original_surfaces
     )
@@ -102,4 +106,3 @@ def test_scope_baseline_augments_existing_inventory_without_losing_surfaces(
     )
     assert len(scopes) == 1
     assert scopes[0]["body"]["state"] == "KNOWN_UNOBSERVED_SCOPE"
-
