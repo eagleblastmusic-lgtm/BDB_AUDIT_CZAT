@@ -121,11 +121,28 @@ def ensure_pre_e3_scope_baseline(
         if latest_inventory is not None
         else {}
     )
-    baseline_inventory = InventoryRevision(
-        inventory_id=deterministic_id(
+    if latest_inventory is not None:
+        inventory_id = str(prior_body["inventory_id"])
+        prior_revision = str(
+            prior_body.get("inventory_revision", "1")
+        )
+        try:
+            inventory_revision = str(
+                int(prior_revision) + 1
+            )
+        except ValueError:
+            inventory_revision = (
+                prior_revision + ".scope-baseline"
+            )
+    else:
+        inventory_id = deterministic_id(
             "inventory_revision", seed
-        ),
-        inventory_revision="1",
+        )
+        inventory_revision = "1"
+
+    baseline_inventory = InventoryRevision(
+        inventory_id=inventory_id,
+        inventory_revision=inventory_revision,
         source_generation_ref=_with_ref_class(
             source["ref"], "PRIOR_ACCEPTED_ONLY"
         ),
