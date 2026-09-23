@@ -549,6 +549,58 @@ def test_e3_blind_completion_automatically_prepares_positive_gap_phase(
             names = set(zf.namelist())
         assert "CONTEXT/E3_CUMULATIVE_CORPUS_VIEW.json" in names
 
+    cumulative_batch = orch.stage_batch
+    cumulative_paths = []
+    for slot, job in cumulative_batch.jobs.items():
+        with zipfile.ZipFile(job.package_zip_path, "r") as zf:
+            payload = json.loads(
+                zf.read(
+                    "CONTEXT/E3_CUMULATIVE_CORPUS_VIEW.json"
+                ).decode("utf-8")
+            )
+        own = [
+            item
+            for item in payload["own_e3_discoveries"]
+            if item.get("originating_lane") == slot
+        ]
+        rows = [
+            {
+                "discovery_id": item["discovery_id"],
+                "relation": "NO_PRIOR_MATCH",
+                "matched_prior_claim_revision_digests": [],
+                "rationale": (
+                    "empty prior corpus; no authorized prior match"
+                ),
+            }
+            for item in own
+        ]
+        result_path = _create_stage_result_zip(
+            tmp / f"e3_cumulative_{slot}.zip",
+            cumulative_batch,
+            slot,
+            findings=[],
+            outputs={"corpus_matches": rows},
+        )
+        cumulative_paths.append(result_path)
+
+    imported_cumulative = orch.import_stage_results(
+        cumulative_paths
+    )
+    assert imported_cumulative.phase_complete is True
+
+    e3_complete = orch.advance_to_next_stage()
+    assert e3_complete["status"] == "E3_COMPLETED"
+    assert e3_complete["current_stage"] == "E3"
+    assert e3_complete["next_stage"] == "E4"
+
+    e4 = orch.advance_to_next_stage()
+    assert e4["status"] == "WAITING_EXTERNAL_RESULTS"
+    assert e4["current_stage"] == "E4"
+    assert e4["current_phase"] == "E4-DEEPEN"
+    assert e4["next_action"] == (
+        "DELIVER_OR_IMPORT_E4_RESULTS"
+    )
+
 
 def test_completed_e5_invokes_authoritative_stop_evaluation(
     orchestrator_setup,
