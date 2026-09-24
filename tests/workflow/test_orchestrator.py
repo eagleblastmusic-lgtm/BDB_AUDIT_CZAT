@@ -817,36 +817,36 @@ def test_completed_e5_stop_pass_finalizes_campaign(
 
     finalization_calls = []
 
-    class FakePostE5FinalizationService:
-        def __init__(self, store):
-            finalization_calls.append(("init", store.path))
-
-        def conclude_campaign(
-            self,
-            termination_state=None,
-            bounded_statement=(
-                "Campaign concluded via post-E5 finalization"
-            ),
-        ):
-            finalization_calls.append(
-                ("conclude", termination_state, bounded_statement)
+    def fake_conclude_campaign(
+        store_path,
+        termination_state=None,
+        bounded_statement=(
+            "Campaign concluded via post-E5 finalization"
+        ),
+    ):
+        finalization_calls.append(
+            (
+                Path(store_path),
+                termination_state,
+                bounded_statement,
             )
-            return {
-                "status": "SUCCESS",
-                "termination_state": "COMPLETED",
-                "assurance_level": "ADEQUATE_FOR_DECLARED_SCOPE",
-                "release_readiness": "READY",
-                "campaign_conclusion_digest": "c" * 64,
-                "final_assurance_case_digest": "d" * 64,
-                "release_qualification_digest": "e" * 64,
-                "commit_seq": 102,
-                "commit_hash": "f" * 64,
-            }
+        )
+        return {
+            "status": "SUCCESS",
+            "termination_state": "COMPLETED",
+            "assurance_level": "ADEQUATE_FOR_DECLARED_SCOPE",
+            "release_readiness": "READY",
+            "campaign_conclusion_digest": "c" * 64,
+            "final_assurance_case_digest": "d" * 64,
+            "release_qualification_digest": "e" * 64,
+            "commit_seq": 102,
+            "commit_hash": "f" * 64,
+        }
 
     monkeypatch.setattr(
-        "bdb_audit.workflow.orchestrator."
-        "PostE5FinalizationService",
-        FakePostE5FinalizationService,
+        orch.api,
+        "conclude_campaign",
+        fake_conclude_campaign,
     )
 
     result = orch._advance_e5_external()
@@ -857,12 +857,13 @@ def test_completed_e5_stop_pass_finalizes_campaign(
             "FINAL_POST_E5",
         )
     ]
-    assert finalization_calls[0][0] == "init"
-    assert finalization_calls[1] == (
-        "conclude",
-        "COMPLETED",
-        "Campaign concluded via post-E5 finalization",
-    )
+    assert finalization_calls == [
+        (
+            Path(orch.active_store_path),
+            "COMPLETED",
+            "Campaign concluded via post-E5 finalization",
+        )
+    ]
     assert result["status"] == "STOP_EVALUATED"
     assert result["current_stage"] == "STOP"
     assert result["continuation_decision"] == "PASS"
