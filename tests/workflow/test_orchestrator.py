@@ -874,7 +874,7 @@ def test_completed_e5_stop_pass_finalizes_campaign(
     assert result["release_qualification_digest"] == "e" * 64
     assert result["finalization_commit_seq"] == 102
     assert result["finalization_commit_hash"] == "f" * 64
-    assert result["next_action"] == ""
+    assert result["next_action"] == "CAMPAIGN_FINISHED"
 
 
 def test_advance_stage_all_completed_runs_stop_and_finalization_path(
