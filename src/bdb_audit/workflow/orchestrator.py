@@ -1119,7 +1119,7 @@ class FullAuditOrchestrator:
             ],
             "finalization_commit_seq": finalization["commit_seq"],
             "finalization_commit_hash": finalization["commit_hash"],
-            "next_action": "",
+            "next_action": "CAMPAIGN_FINISHED",
         }
 
     def _advance_e5_external(self) -> dict[str, Any]:
