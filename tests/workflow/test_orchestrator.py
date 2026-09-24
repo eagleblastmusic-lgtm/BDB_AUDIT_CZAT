@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from types import SimpleNamespace
 from pathlib import Path
 import zipfile
 import pytest
@@ -13,6 +14,8 @@ from bdb_audit.workflow.source_target import ResolvedSource
 from bdb_audit.workflow.orchestrator import FullAuditOrchestrator
 from bdb_audit.workflow.executors import EXECUTION_MODES
 from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
+from bdb_audit.history.store import TransactionalHistoryStore
+from bdb_audit.workflow.read_models import current_accepted_cut
 
 
 def _create_lane_result_zip(path: Path, batch, slot: str) -> Path:
@@ -32,6 +35,47 @@ def _create_lane_result_zip(path: Path, batch, slot: str) -> Path:
     }
     with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         zf.writestr("MANIFEST.json", json.dumps(manifest, indent=2))
+    return path
+
+
+def _create_stage_result_zip(
+    path: Path,
+    batch,
+    slot: str,
+    *,
+    findings=None,
+    outputs=None,
+) -> Path:
+    job = batch.get_job(slot)
+    manifest = {
+        "kind": "bdb_audit_lane_result",
+        "version": "1",
+        "campaign_id": batch.campaign_id,
+        "stage_id": batch.stage_id,
+        "phase_id": batch.phase_id,
+        "lane_slot": slot,
+        "source_commit_sha": job.source_commit_sha,
+        "executor_profile": job.executor_profile,
+        "executor_model": job.model,
+        "input_package_digest": job.package_digest,
+        "history_cut": batch.frozen_history_cut,
+        "assignment_ref": job.assignment_ref,
+        "attempt_ref": job.attempt_ref,
+        "findings": list(findings or []),
+        "outputs": dict(
+            outputs or {"verdict": "INCONCLUSIVE"}
+        ),
+    }
+    with zipfile.ZipFile(
+        path,
+        "w",
+        compression=zipfile.ZIP_DEFLATED,
+    ) as zf:
+        zf.writestr(
+            "MANIFEST.json",
+            json.dumps(manifest, indent=2),
+        )
+        zf.writestr("REPORT.md", "bounded external result")
     return path
 
 
@@ -315,32 +359,421 @@ def test_current_executor_profiles_do_not_overclaim_enforced_isolation():
         assert profile.max_isolation_assurance != "ENFORCED"
 
 
-def test_e3_blind_preparation_fails_before_package_publication_without_enforced_backend(
+def test_e3_blind_preparation_uses_declared_manual_isolation_without_overclaim(
     orchestrator_setup,
 ):
     orch, mgr, mock_platform, tmp = orchestrator_setup
     orch.initialize_campaign()
     assert orch.active_store_path is not None
-    # Build only the predecessor acceptance needed to reach the capability
-    # check. This test is not exercising the user workflow itself.
+    # Build only the predecessor acceptance needed to reach E3. The public
+    # ChatGPT/GitHub transport can honestly prove DECLARED, not ENFORCED,
+    # isolation and must preserve that weaker assurance in accepted history.
     orch.api.prepare_stage(orch.active_store_path, "E1")
     orch.api.qualify_stage(orch.active_store_path, "E1")
     orch.api.prepare_stage(orch.active_store_path, "E2")
     orch.api.qualify_stage(orch.active_store_path, "E2")
-    artifacts = orch._artifact_root()
 
-    with pytest.raises(
-        ValidationError,
-        match="E3_ENFORCED_ISOLATION_BACKEND_REQUIRED",
-    ):
-        orch.prepare_e3_blind_orchestration()
+    batch = orch.prepare_e3_blind_orchestration()
+    assert batch.stage_id == "E3"
+    assert batch.phase_id == "E3-BLIND"
+    assert set(batch.jobs) == {"E3-X", "E3-Y", "E3-Z"}
 
-    # Capability refusal happens before E3 assignment/package publication.
-    campaign_id = orch.api.get_campaign_status(
+    store = TransactionalHistoryStore(
         orch.active_store_path
-    )["campaign_id"]
-    e3_root = artifacts / campaign_id / "E3"
-    assert not e3_root.exists()
+    )
+    cut = current_accepted_cut(store)
+    lane_rows = [
+        row
+        for row in store.accepted_records("lane_spec", cut)
+        if str(row["body"].get("lane_key", "")).startswith(
+            "lane_E3_"
+        )
+    ]
+    assert len(lane_rows) == 3
+    assert {
+        row["body"]["required_isolation_assurance"]
+        for row in lane_rows
+    } == {"DECLARED"}
+
+    assignments = [
+        row
+        for row in store.accepted_records(
+            "assignment_manifest", cut
+        )
+        if row["body"].get("phase_id") == "E3-BLIND"
+    ]
+    assert len(assignments) == 3
+    for assignment in assignments:
+        knowledge = store.resolve_accepted(
+            assignment["body"]["knowledge_state_ref"],
+            cut,
+        )
+        isolation = store.resolve_accepted(
+            knowledge["body"][
+                "isolation_qualification_ref"
+            ],
+            cut,
+        )
+        body = isolation["body"]
+        assert body["required_isolation_assurance"] == "DECLARED"
+        assert body["result"] == "DECLARED"
+        assert body["enforcement_receipt_refs"] == []
+        assert body["session_boundary_evidence_refs"] == []
+
+    inventories = tuple(
+        store.accepted_records("inventory_revision", cut)
+    )
+    scopes = tuple(
+        store.accepted_records("scope_state_record", cut)
+    )
+    assert len(inventories) >= 1
+    assert len(scopes) == 1
+    latest_inventory = max(
+        inventories,
+        key=lambda row: int(row.get("accepted_seq", 0)),
+    )
+    assert latest_inventory["body"]["scope_state_record_refs"]
+    assert scopes[0]["body"]["state"] == "KNOWN_UNOBSERVED_SCOPE"
+
+
+def test_e3_blind_completion_automatically_prepares_positive_gap_phase(
+    orchestrator_setup,
+    monkeypatch,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    assert orch.active_store_path is not None
+    orch.api.prepare_stage(orch.active_store_path, "E1")
+    orch.api.qualify_stage(orch.active_store_path, "E1")
+    orch.api.prepare_stage(orch.active_store_path, "E2")
+    orch.api.qualify_stage(orch.active_store_path, "E2")
+
+    blind = orch.prepare_e3_blind_orchestration()
+    imported = orch.import_stage_results(
+        [
+            _create_stage_result_zip(
+                tmp / f"e3_blind_{slot}.zip",
+                blind,
+                slot,
+                findings=[
+                    {
+                        "statement": (
+                            f"bounded blind observation {slot}"
+                        )
+                    }
+                ],
+            )
+            for slot in blind.lane_slots
+        ]
+    )
+    assert imported.phase_complete is True
+
+    # This regression isolates E3 transition behavior. Real E2 completion is
+    # proven elsewhere; here the accepted E2 StageCompletion is sufficient
+    # preparation and the external-E2 predicate is fixed at its boundary.
+    monkeypatch.setattr(
+        "bdb_audit.workflow.orchestrator.has_external_e2_stage_completion",
+        lambda store: True,
+    )
+
+    result = orch.advance_to_next_stage()
+    assert result["status"] == "E3_GAP_PREPARED"
+    assert result["current_stage"] == "E3"
+    assert result["current_phase"] == "E3-GAP"
+    assert result["next_action"] == (
+        "DELIVER_OR_IMPORT_E3_GAP_RESULTS"
+    )
+    assert set(result["packages"]) == {
+        "E3-X",
+        "E3-Y",
+        "E3-Z",
+    }
+    assert orch.stage_batch is not None
+    assert orch.stage_batch.phase_id == "E3-GAP"
+
+    for job in orch.stage_batch.jobs.values():
+        with zipfile.ZipFile(job.package_zip_path, "r") as zf:
+            names = set(zf.namelist())
+        assert "CONTEXT/E3_POSITIVE_GAP_VIEW.json" in names
+
+    # Complete the authorized positive-gap phase with an explicit negative
+    # result for the conservative scope target, then verify the orchestrator
+    # advances directly into the late cumulative reveal.  This fixture has no
+    # E1/E2 finding corpus, so an empty prior corpus must remain a valid state.
+    store = TransactionalHistoryStore(
+        orch.active_store_path
+    )
+    cut = current_accepted_cut(store)
+    scopes = tuple(
+        store.accepted_records("scope_state_record", cut)
+    )
+    assert len(scopes) == 1
+    target_digest = scopes[0]["ref"]["revision_digest"]
+    gap_batch = orch.stage_batch
+    imported_gap = orch.import_stage_results(
+        [
+            _create_stage_result_zip(
+                tmp / f"e3_gap_{slot}.zip",
+                gap_batch,
+                slot,
+                findings=[],
+                outputs={
+                    "gap_target_results": [
+                        {
+                            "target_ref_digest": target_digest,
+                            "target_kind": "SCOPE_GAP",
+                            "status": "NO_MATERIAL_DISCOVERY",
+                            "rationale": (
+                                "conservative scope target inspected"
+                            ),
+                            "discovery_indexes": [],
+                        }
+                    ]
+                },
+            )
+            for slot in gap_batch.lane_slots
+        ]
+    )
+    assert imported_gap.phase_complete is True
+
+    cumulative = orch.advance_to_next_stage()
+    assert cumulative["status"] == "E3_CUMULATIVE_PREPARED"
+    assert cumulative["current_stage"] == "E3"
+    assert cumulative["current_phase"] == "E3-CUMULATIVE"
+    assert cumulative["next_action"] == (
+        "DELIVER_OR_IMPORT_E3_CUMULATIVE_RESULTS"
+    )
+    assert orch.stage_batch is not None
+    assert orch.stage_batch.phase_id == "E3-CUMULATIVE"
+    for job in orch.stage_batch.jobs.values():
+        with zipfile.ZipFile(job.package_zip_path, "r") as zf:
+            names = set(zf.namelist())
+        assert "CONTEXT/E3_CUMULATIVE_CORPUS_VIEW.json" in names
+
+    cumulative_batch = orch.stage_batch
+    cumulative_paths = []
+    for slot, job in cumulative_batch.jobs.items():
+        with zipfile.ZipFile(job.package_zip_path, "r") as zf:
+            payload = json.loads(
+                zf.read(
+                    "CONTEXT/E3_CUMULATIVE_CORPUS_VIEW.json"
+                ).decode("utf-8")
+            )
+        own = [
+            item
+            for item in payload["own_e3_discoveries"]
+            if item.get("originating_lane") == slot
+        ]
+        rows = [
+            {
+                "discovery_id": item["discovery_id"],
+                "relation": "NO_PRIOR_MATCH",
+                "matched_prior_claim_revision_digests": [],
+                "rationale": (
+                    "empty prior corpus; no authorized prior match"
+                ),
+            }
+            for item in own
+        ]
+        result_path = _create_stage_result_zip(
+            tmp / f"e3_cumulative_{slot}.zip",
+            cumulative_batch,
+            slot,
+            findings=[],
+            outputs={"corpus_matches": rows},
+        )
+        cumulative_paths.append(result_path)
+
+    imported_cumulative = orch.import_stage_results(
+        cumulative_paths
+    )
+    assert imported_cumulative.phase_complete is True
+
+    e3_complete = orch.advance_to_next_stage()
+    assert e3_complete["status"] == "E3_COMPLETED"
+    assert e3_complete["current_stage"] == "E3"
+    assert e3_complete["next_stage"] == "E4"
+
+    e4 = orch.advance_to_next_stage()
+    assert e4["status"] == "WAITING_EXTERNAL_RESULTS"
+    assert e4["current_stage"] == "E4"
+    assert e4["current_phase"] == "E4-DEEPEN"
+    assert e4["next_action"] == (
+        "DELIVER_OR_IMPORT_E4_DEEPEN_RESULTS"
+    )
+
+
+def test_e5b_completion_immediately_enters_final_stop(
+    orchestrator_setup,
+    monkeypatch,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    assert orch.active_store_path is not None
+
+    status_calls = 0
+
+    def fake_status(store_path):
+        nonlocal status_calls
+        status_calls += 1
+        return {
+            "stages_completed": (
+                []
+                if status_calls == 1
+                else ["E5"]
+            )
+        }
+
+    class FakeChallengerService:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def materialize(self):
+            return SimpleNamespace(
+                statuses={
+                    "E5-B1": "NO_MATERIAL_COUNTEREVIDENCE",
+                    "E5-B2": "NO_MATERIAL_COUNTEREVIDENCE",
+                }
+            )
+
+    class FakeFinalizationService:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def finalize(self):
+            return SimpleNamespace(
+                stage_completion_ref={
+                    "kind": "stage_completion",
+                    "revision_digest": "c" * 64,
+                },
+                accepted_commit_seq=42,
+            )
+
+    stop_calls = []
+
+    def fake_stop(
+        store_path,
+        evaluation_context="FINAL_POST_E5",
+        **kwargs,
+    ):
+        stop_calls.append(
+            (Path(store_path), evaluation_context)
+        )
+        return {
+            "status": "SUCCESS",
+            "continuation_decision": "CONTINUE_REQUIRED",
+            "assurance_level": "INSUFFICIENT",
+            "release_readiness": "QUALIFICATION_BLOCKED",
+            "stop_evaluation_digest": "a" * 64,
+            "commit_seq": 43,
+            "commit_hash": "b" * 64,
+        }
+
+    monkeypatch.setattr(
+        orch.api,
+        "get_campaign_status",
+        fake_status,
+    )
+    monkeypatch.setattr(
+        orch.api,
+        "evaluate_stop_gate",
+        fake_stop,
+    )
+    monkeypatch.setattr(
+        "bdb_audit.workflow.orchestrator."
+        "E5ChallengerResultService",
+        FakeChallengerService,
+    )
+    monkeypatch.setattr(
+        "bdb_audit.workflow.orchestrator."
+        "E5FinalizationService",
+        FakeFinalizationService,
+    )
+
+    orch.stage_batch = SimpleNamespace(
+        stage_id="E5",
+        phase_id="E5B-CHALLENGE",
+    )
+    orch.stage_inbox = SimpleNamespace(
+        lane_statuses={}
+    )
+
+    result = orch._advance_e5_external()
+
+    assert status_calls == 2
+    assert stop_calls == [
+        (
+            Path(orch.active_store_path),
+            "FINAL_POST_E5",
+        )
+    ]
+    assert result["status"] == "STOP_EVALUATED"
+    assert result["current_stage"] == "STOP"
+    assert result["e5_completion_commit_seq"] == 42
+    assert result["e5_stage_completion_ref"][
+        "revision_digest"
+    ] == "c" * 64
+    assert result["challenger_statuses"] == {
+        "E5-B1": "NO_MATERIAL_COUNTEREVIDENCE",
+        "E5-B2": "NO_MATERIAL_COUNTEREVIDENCE",
+    }
+
+
+def test_completed_e5_invokes_authoritative_stop_evaluation(
+    orchestrator_setup,
+    monkeypatch,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    assert orch.active_store_path is not None
+
+    monkeypatch.setattr(
+        orch.api,
+        "get_campaign_status",
+        lambda store_path: {
+            "stages_completed": ["E1", "E2", "E3", "E4", "E5"],
+        },
+    )
+
+    calls = []
+    def fake_stop(
+        store_path,
+        evaluation_context="FINAL_POST_E5",
+        **kwargs,
+    ):
+        calls.append((Path(store_path), evaluation_context))
+        return {
+            "status": "SUCCESS",
+            "continuation_decision": "CONTINUE_REQUIRED",
+            "assurance_level": "INSUFFICIENT",
+            "release_readiness": "QUALIFICATION_BLOCKED",
+            "stop_evaluation_digest": "a" * 64,
+            "commit_seq": 99,
+            "commit_hash": "b" * 64,
+        }
+
+    monkeypatch.setattr(
+        orch.api,
+        "evaluate_stop_gate",
+        fake_stop,
+    )
+    result = orch._advance_e5_external()
+    assert calls == [
+        (
+            Path(orch.active_store_path),
+            "FINAL_POST_E5",
+        )
+    ]
+    assert result["status"] == "STOP_EVALUATED"
+    assert result["current_stage"] == "STOP"
+    assert (
+        result["continuation_decision"]
+        == "CONTINUE_REQUIRED"
+    )
+    assert result["next_action"] == (
+        "CONTINUE_REQUIRED_WORK"
+    )
+
 
 def test_resume_ignores_synthetic_e2_completion_and_restores_real_e2_phase(
     orchestrator_setup,

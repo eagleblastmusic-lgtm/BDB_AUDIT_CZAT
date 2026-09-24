@@ -371,10 +371,26 @@ class E3PositiveGapAuthorizationService:
         self.isolation_proofs_by_slot = dict(
             isolation_proofs_by_slot or {}
         )
+        cut, _ = _current_cut(self.store)
+        _, _, lanes = StageAssignmentService(
+            self.store
+        )._prerequisites(
+            cut,
+            "E3",
+            tuple(
+                definition.lane_slot
+                for definition in self.lane_definitions
+            ),
+        )
         missing_proofs = [
             definition.lane_slot
             for definition in self.lane_definitions
-            if definition.lane_slot
+            if lanes[definition.lane_slot]["body"].get(
+                "required_isolation_assurance",
+                "DECLARED",
+            )
+            == "ENFORCED"
+            and definition.lane_slot
             not in self.isolation_proofs_by_slot
         ]
         if missing_proofs:

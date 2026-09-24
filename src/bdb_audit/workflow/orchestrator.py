@@ -17,6 +17,7 @@ from ..core.registry import ContractRegistry
 from ..history.store import TransactionalHistoryStore
 from ..orchestration.native_ensemble import E1_LANE_SLOTS
 from ..orchestration.templates import TemplateRegistry
+from ..stop.operation import evaluate_stop_gate as evaluate_accepted_stop_gate
 from .executors import get_executor_profile
 from .e2_checkpoint import E2BlindCheckpointService
 from .e2_reveal import E2ControlledRevealService
@@ -64,6 +65,8 @@ from .e5_runtime import (
 from .platform import DefaultPlatformAdapter, PlatformAdapter
 from .settings import SettingsManager, UserSettings
 from .source_target import ResolvedSource, resolve_source_identity
+from .scope_baseline import ensure_pre_e3_scope_baseline
+from .read_models import current_accepted_cut
 
 
 E2_BLIND_LANES = (
@@ -621,18 +624,25 @@ class FullAuditOrchestrator:
         profile = get_executor_profile(
             self.settings.execution_mode
         )
-        if profile.max_isolation_assurance != "ENFORCED":
+        required_assurance = (
+            profile.max_isolation_assurance
+        )
+        if required_assurance == "UNKNOWN":
             raise ValidationError(
-                "E3_ENFORCED_ISOLATION_BACKEND_REQUIRED",
+                "E3_ISOLATION_ASSURANCE_REQUIRED",
                 (
                     f"{profile.display_name} / "
-                    f"{profile.delivery_profile} currently proves at most "
-                    f"{profile.max_isolation_assurance}; E3-X/Y/Z require "
-                    "ENFORCED isolation. Do not publish blind packages "
-                    "until a controlled backend can emit accepted boundary "
-                    "receipts."
+                    f"{profile.delivery_profile} does not establish even "
+                    "DECLARED isolation. E3 cannot claim blind/declared "
+                    "novelty without an explicit isolation profile."
                 ),
             )
+
+        store = TransactionalHistoryStore(
+            self.active_store_path
+        )
+        ensure_pre_e3_scope_baseline(store)
+
         if "E3" not in status.get("stages_prepared", []):
             self.api.prepare_stage(
                 self.active_store_path,
@@ -654,11 +664,11 @@ class FullAuditOrchestrator:
                     self.active_store_path,
                     "E3",
                     definition.lane_slot,
+                    required_isolation_assurance=(
+                        required_assurance
+                    ),
                 )
 
-        store = TransactionalHistoryStore(
-            self.active_store_path
-        )
         batch = prepare_stage_phase_batch(
             store=store,
             output_dir=self._artifact_root(),
@@ -686,7 +696,7 @@ class FullAuditOrchestrator:
         self,
         isolation_proofs_by_slot: dict[
             str, StageIsolationProof
-        ],
+        ] | None = None,
     ) -> StageBatch:
         """Authorize and publish fresh E3 gap-directed attempts."""
         if not self.active_store_path or not self.active_store_path.exists():
@@ -741,7 +751,7 @@ class FullAuditOrchestrator:
         self,
         isolation_proofs_by_slot: dict[
             str, StageIsolationProof
-        ],
+        ] | None = None,
     ) -> StageBatch:
         """Authorize and publish late E3 cumulative-corpus comparison."""
         if not self.active_store_path or not self.active_store_path.exists():
@@ -1088,11 +1098,71 @@ class FullAuditOrchestrator:
             self.active_store_path
         )
         if "E5" in status.get("stages_completed", []):
+            store = TransactionalHistoryStore(
+                self.active_store_path
+            )
+            cut = current_accepted_cut(store)
+            evaluations = tuple(
+                store.accepted_records(
+                    "stop_evaluation",
+                    cut,
+                )
+            )
+            next_action_by_decision = {
+                "PASS": "COMPLETE_CAMPAIGN",
+                "E6_REQUIRED": "PREPARE_E6",
+                "CONTINUE_REQUIRED": (
+                    "CONTINUE_REQUIRED_WORK"
+                ),
+                "BLOCKED": "RESOLVE_STOP_BLOCKERS",
+            }
+            if evaluations:
+                try:
+                    verified = evaluate_accepted_stop_gate(
+                        self.active_store_path
+                    )
+                except ValidationError as exc:
+                    if exc.code != "STOP_INPUT_CUT_MISMATCH":
+                        raise
+                else:
+                    decision = verified.get(
+                        "continuation_decision", "BLOCKED"
+                    )
+                    latest = max(
+                        evaluations,
+                        key=lambda row: int(
+                            row.get("accepted_seq", 0)
+                        ),
+                    )
+                    return {
+                        **verified,
+                        "status": "STOP_EVALUATED",
+                        "current_stage": "STOP",
+                        "stop_evaluation_ref": latest["ref"],
+                        "next_action": (
+                            next_action_by_decision.get(
+                                decision,
+                                "REVIEW_STOP_RESULT",
+                            )
+                        ),
+                    }
+
+            stop = self.api.evaluate_stop_gate(
+                self.active_store_path,
+                evaluation_context="FINAL_POST_E5",
+            )
+            decision = stop.get(
+                "continuation_decision", "BLOCKED"
+            )
             return {
-                "status": "READY_FOR_FINAL_STOP",
-                "current_stage": "E5",
+                **stop,
+                "status": "STOP_EVALUATED",
+                "current_stage": "STOP",
                 "next_action": (
-                    "EVALUATE_FINAL_POST_E5_STOP"
+                    next_action_by_decision.get(
+                        decision,
+                        "REVIEW_STOP_RESULT",
+                    )
                 ),
             }
 
@@ -1224,19 +1294,18 @@ class FullAuditOrchestrator:
                         ),
                     }
                 raise
+            stop_result = self._advance_e5_external()
             return {
-                "status": "E5_COMPLETED",
-                "current_stage": "E5",
-                "stage_completion_ref": (
+                **stop_result,
+                "e5_stage_completion_ref": (
                     completion.stage_completion_ref
                 ),
-                "completion_commit_seq": (
+                "e5_completion_commit_seq": (
                     completion.accepted_commit_seq
                 ),
                 "challenger_statuses": (
                     challenger_summary.statuses
                 ),
-                "next_action": completion.next_action,
             }
 
         raise ValidationError(
@@ -1510,10 +1579,7 @@ class FullAuditOrchestrator:
                 try:
                     self.prepare_e3_blind_orchestration()
                 except ValidationError as exc:
-                    if (
-                        exc.code
-                        != "E3_ENFORCED_ISOLATION_BACKEND_REQUIRED"
-                    ):
+                    if exc.code != "E3_ISOLATION_ASSURANCE_REQUIRED":
                         raise
                     return {
                         "status": "BLOCKED",
@@ -1521,7 +1587,7 @@ class FullAuditOrchestrator:
                         "current_phase": "E3-BLIND",
                         "reason": str(exc),
                         "next_action": (
-                            "CONFIGURE_ENFORCED_ISOLATION_BACKEND"
+                            "CONFIGURE_ISOLATION_ASSURANCE"
                         ),
                     }
             assert self.stage_batch is not None
@@ -1596,10 +1662,13 @@ class FullAuditOrchestrator:
                         self.stage_inbox,
                     ).seal()
                 )
+                gap_batch = (
+                    self.prepare_e3_gap_orchestration()
+                )
                 return {
-                    "status": "E3_BLIND_CHECKPOINTED",
+                    "status": "E3_GAP_PREPARED",
                     "current_stage": "E3",
-                    "current_phase": "E3-BLIND",
+                    "current_phase": "E3-GAP",
                     "checkpoint_commit_seq": (
                         e3_checkpoint.accepted_commit_seq
                     ),
@@ -1610,8 +1679,12 @@ class FullAuditOrchestrator:
                         e3_checkpoint.already_sealed
                     ),
                     "next_action": (
-                        "PREPARE_E3_POSITIVE_GAP_REVEAL"
+                        "DELIVER_OR_IMPORT_E3_GAP_RESULTS"
                     ),
+                    "packages": {
+                        slot: str(job.package_zip_path)
+                        for slot, job in gap_batch.jobs.items()
+                    },
                 }
 
             if (
@@ -1627,10 +1700,13 @@ class FullAuditOrchestrator:
                         self.stage_inbox,
                     ).validate()
                 )
+                cumulative_batch = (
+                    self.prepare_e3_cumulative_orchestration()
+                )
                 return {
-                    "status": "E3_GAP_DIRECTED_COMPLETE",
+                    "status": "E3_CUMULATIVE_PREPARED",
                     "current_stage": "E3",
-                    "current_phase": "E3-GAP",
+                    "current_phase": "E3-CUMULATIVE",
                     "authorized_targets_count": len(
                         gap_validation.authorized_target_digests
                     ),
@@ -1641,8 +1717,14 @@ class FullAuditOrchestrator:
                         gap_validation.findings_count
                     ),
                     "next_action": (
-                        gap_validation.next_action
+                        "DELIVER_OR_IMPORT_E3_CUMULATIVE_RESULTS"
                     ),
+                    "packages": {
+                        slot: str(job.package_zip_path)
+                        for slot, job in (
+                            cumulative_batch.jobs.items()
+                        )
+                    },
                 }
 
             if (

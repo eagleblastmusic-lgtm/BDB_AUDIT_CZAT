@@ -421,10 +421,10 @@ def _prior_corpus_view(
             )
         ] = contradiction
 
-    if not cards:
-        raise ValidationError(
-            "E3_CUMULATIVE_E1_E2_CORPUS_REQUIRED"
-        )
+    # An honestly empty E1/E2 adjudicated corpus is still a valid
+    # cumulative reveal state.  E3 must be able to record NO_PRIOR_MATCH
+    # (or simply compare zero own discoveries) instead of blocking solely
+    # because earlier stages produced no findings.
     return (
         cards,
         contradiction_cards,
@@ -529,10 +529,26 @@ class E3CumulativeAuthorizationService:
         self.isolation_proofs_by_slot = dict(
             isolation_proofs_by_slot or {}
         )
+        cut, _ = _current_cut(self.store)
+        _, _, lanes = StageAssignmentService(
+            self.store
+        )._prerequisites(
+            cut,
+            "E3",
+            tuple(
+                definition.lane_slot
+                for definition in self.lane_definitions
+            ),
+        )
         missing = sorted(
             definition.lane_slot
             for definition in self.lane_definitions
-            if definition.lane_slot
+            if lanes[definition.lane_slot]["body"].get(
+                "required_isolation_assurance",
+                "DECLARED",
+            )
+            == "ENFORCED"
+            and definition.lane_slot
             not in self.isolation_proofs_by_slot
         )
         if missing:
