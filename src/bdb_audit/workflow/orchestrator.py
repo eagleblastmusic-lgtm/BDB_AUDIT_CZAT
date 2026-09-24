@@ -18,7 +18,6 @@ from ..history.store import TransactionalHistoryStore
 from ..orchestration.native_ensemble import E1_LANE_SLOTS
 from ..orchestration.templates import TemplateRegistry
 from ..stop.operation import evaluate_stop_gate as evaluate_accepted_stop_gate
-from ..assurance.finalization_service import FinalizationService as PostE5FinalizationService
 from .executors import get_executor_profile
 from .e2_checkpoint import E2BlindCheckpointService
 from .e2_reveal import E2ControlledRevealService
@@ -1101,9 +1100,8 @@ class FullAuditOrchestrator:
         if stop_result.get("continuation_decision") != "PASS":
             return stop_result
         assert self.active_store_path is not None
-        finalization = PostE5FinalizationService(
-            TransactionalHistoryStore(self.active_store_path)
-        ).conclude_campaign(
+        finalization = self.api.conclude_campaign(
+            self.active_store_path,
             termination_state="COMPLETED",
         )
         return {
