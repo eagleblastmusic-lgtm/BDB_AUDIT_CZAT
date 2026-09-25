@@ -357,6 +357,12 @@ def create_e3_blind_attempt(
     )
     attempt_ref = attempt.as_object().ref.as_dict()
 
+    if channel_inventory_ref is None:
+        raise ValidationError(
+            "E3_CHANNEL_INVENTORY_REQUIRED",
+            "E3 isolation qualification requires an explicit channel inventory",
+        )
+
     ev = boundary_evidence_refs or {}
     allowed_isolation = {"ENFORCED", "DECLARED", "UNKNOWN"}
     if isolation_assurance not in allowed_isolation:
