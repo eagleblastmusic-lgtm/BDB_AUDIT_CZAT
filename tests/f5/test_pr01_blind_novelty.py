@@ -46,6 +46,17 @@ def make_ref(kind: str, seed: str) -> dict:
     }
 
 
+def create_blind_attempt(*args, **kwargs):
+    kwargs.setdefault(
+        "channel_inventory_ref",
+        make_ref(
+            "registered_immutable_object",
+            "e3_test_channel_inventory",
+        ),
+    )
+    return create_e3_blind_attempt(*args, **kwargs)
+
+
 def make_history_cut(seq: int = 1) -> dict:
     return {
         "variant": "ACCEPTED_HISTORY_CUT",
@@ -85,7 +96,7 @@ def test_create_e3_blind_attempt_and_result_slot_contract():
     deliv_ref = make_ref("delivery_profile", "deliv_1")
     cut = make_history_cut(5)
 
-    ctx = create_e3_blind_attempt(
+    ctx = create_blind_attempt(
         lane_slot="E3-X",
         lane_run_ref=lane_run_ref,
         assigned_history_cut=cut,
@@ -120,7 +131,7 @@ def test_enforced_e3_attempt_requires_explicit_boundary_witnesses():
         ValidationError,
         match="E3_ENFORCED_BOUNDARY_EVIDENCE_REQUIRED",
     ):
-        create_e3_blind_attempt(
+        create_blind_attempt(
             "E3-X",
             lane_run_ref,
             cut,
@@ -138,7 +149,7 @@ def test_enforced_e3_attempt_requires_explicit_boundary_witnesses():
         "tool_boundary_evidence_refs": [witness],
         "session_boundary_evidence_refs": [witness],
     }
-    ctx = create_e3_blind_attempt(
+    ctx = create_blind_attempt(
         "E3-X",
         lane_run_ref,
         cut,
@@ -174,7 +185,7 @@ def test_declared_e3_isolation_is_accepted_but_unknown_is_rejected():
     exec_ref = make_ref("executor_profile", "exec_declared")
     deliv_ref = make_ref("delivery_profile", "deliv_declared")
 
-    declared = create_e3_blind_attempt(
+    declared = create_blind_attempt(
         "E3-X",
         lr_ref,
         cut,
@@ -186,7 +197,7 @@ def test_declared_e3_isolation_is_accepted_but_unknown_is_rejected():
         declared.isolation_qualification,
     )
 
-    unknown = create_e3_blind_attempt(
+    unknown = create_blind_attempt(
         "E3-Y",
         lr_ref,
         cut,
@@ -221,7 +232,7 @@ def test_declared_e3_isolation_is_accepted_but_unknown_is_rejected():
             missing_requirement,
         )
 
-    forbidden = create_e3_blind_attempt(
+    forbidden = create_blind_attempt(
         "E3-Z",
         lr_ref,
         cut,
@@ -246,9 +257,9 @@ def test_quarantine_broker_and_cross_lane_leak_prevention():
     exec_ref = make_ref("executor_profile", "exec")
     deliv_ref = make_ref("delivery_profile", "deliv")
 
-    ctx_x = create_e3_blind_attempt("E3-X", lr_ref, cut, exec_ref, deliv_ref)
-    ctx_y = create_e3_blind_attempt("E3-Y", lr_ref, cut, exec_ref, deliv_ref)
-    ctx_z = create_e3_blind_attempt("E3-Z", lr_ref, cut, exec_ref, deliv_ref)
+    ctx_x = create_blind_attempt("E3-X", lr_ref, cut, exec_ref, deliv_ref)
+    ctx_y = create_blind_attempt("E3-Y", lr_ref, cut, exec_ref, deliv_ref)
+    ctx_z = create_blind_attempt("E3-Z", lr_ref, cut, exec_ref, deliv_ref)
 
     broker.register_isolation_qualification("E3-X", ctx_x.isolation_qualification)
     broker.register_isolation_qualification("E3-Y", ctx_y.isolation_qualification)
@@ -277,7 +288,7 @@ def test_adversarial_forbidden_leak_detection():
     lr_ref = make_ref("lane_run", "lr")
     exec_ref = make_ref("executor_profile", "exec")
     deliv_ref = make_ref("delivery_profile", "deliv")
-    ctx_x = create_e3_blind_attempt("E3-X", lr_ref, cut, exec_ref, deliv_ref)
+    ctx_x = create_blind_attempt("E3-X", lr_ref, cut, exec_ref, deliv_ref)
     broker.register_isolation_qualification("E3-X", ctx_x.isolation_qualification)
 
     # 1. Finding ref leak
@@ -338,7 +349,7 @@ def test_adversarial_unqualified_or_contaminated_isolation_rejected():
     deliv_ref = make_ref("delivery_profile", "deliv")
 
     # Contaminated isolation
-    contaminated_ctx = create_e3_blind_attempt("E3-X", lr_ref, cut, exec_ref, deliv_ref)
+    contaminated_ctx = create_blind_attempt("E3-X", lr_ref, cut, exec_ref, deliv_ref)
     # Tamper with qualification to simulate contamination
     contaminated_qual = qualify_isolation(
         attempt_ref=contaminated_ctx.attempt.as_object().ref.as_dict(),
@@ -361,7 +372,7 @@ def test_execute_e3_blind_ensemble_success_and_digest_determinism():
     deliv_ref = make_ref("delivery_profile", "deliv")
 
     lane_contexts = {
-        slot: create_e3_blind_attempt(slot, lr_ref, cut, exec_ref, deliv_ref)
+        slot: create_blind_attempt(slot, lr_ref, cut, exec_ref, deliv_ref)
         for slot in E3_LANE_SLOTS
     }
 
@@ -395,7 +406,7 @@ def test_execute_e3_blind_missing_mandatory_lane_fails_closed():
     deliv_ref = make_ref("delivery_profile", "deliv")
 
     lane_contexts = {
-        slot: create_e3_blind_attempt(slot, lr_ref, cut, exec_ref, deliv_ref)
+        slot: create_blind_attempt(slot, lr_ref, cut, exec_ref, deliv_ref)
         for slot in E3_LANE_SLOTS
     }
 
