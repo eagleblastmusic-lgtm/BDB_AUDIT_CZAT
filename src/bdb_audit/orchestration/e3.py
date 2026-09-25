@@ -188,6 +188,14 @@ class E3QuarantineBroker:
             raise ValidationError("UNKNOWN_LANE_SLOT", f"Invalid lane slot: {lane_slot}")
         required = qualification.required_isolation_assurance
         actual = qualification.isolation_class
+        if required not in {"DECLARED", "ENFORCED"}:
+            raise ValidationError(
+                "BLIND_ORIGIN_ISOLATION_NOT_QUALIFIED",
+                (
+                    f"Lane {lane_slot} lacks an explicit qualified "
+                    f"isolation requirement: {required}"
+                ),
+            )
         if actual == "UNKNOWN":
             raise ValidationError(
                 "BLIND_ORIGIN_ISOLATION_NOT_QUALIFIED",
@@ -318,6 +326,7 @@ def create_e3_blind_attempt(
     executor_profile_ref: Mapping,
     delivery_profile_ref: Mapping,
     boundary_evidence_refs: Mapping[str, Sequence[Mapping]] | None = None,
+    channel_inventory_ref: Mapping | None = None,
     nonce: str | None = None,
     isolation_assurance: str = "DECLARED",
     fresh_session_boundary: bool = False,
@@ -370,12 +379,16 @@ def create_e3_blind_attempt(
             if not tuple(ev.get(key, ()))
         ]
         if (
-            not fresh_session_boundary
+            channel_inventory_ref is None
+            or not fresh_session_boundary
             or forbidden_channel_access
             or contaminated
             or missing_evidence
         ):
-            details = ", ".join(missing_evidence) or "boundary state"
+            missing = list(missing_evidence)
+            if channel_inventory_ref is None:
+                missing.append("channel_inventory_ref")
+            details = ", ".join(missing) or "boundary state"
             raise ValidationError(
                 "E3_ENFORCED_BOUNDARY_EVIDENCE_REQUIRED",
                 (
@@ -393,6 +406,11 @@ def create_e3_blind_attempt(
         contaminated=contaminated,
         fresh_session_boundary=fresh_session_boundary,
         forbidden_channel_access=forbidden_channel_access,
+        channel_inventory_ref=(
+            dict(channel_inventory_ref)
+            if channel_inventory_ref is not None
+            else None
+        ),
         enforcement_receipt_refs=tuple(ev.get("enforcement_receipt_refs", ())),
         filesystem_boundary_evidence_refs=tuple(ev.get("filesystem_boundary_evidence_refs", ())),
         network_boundary_evidence_refs=tuple(ev.get("network_boundary_evidence_refs", ())),
