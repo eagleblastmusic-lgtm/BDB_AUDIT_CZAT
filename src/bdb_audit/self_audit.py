@@ -403,19 +403,77 @@ class SelfAuditEngine:
     # I. CORPUS CONTAMINATION
     # -------------------------------------------------------------------------
     def audit_corpus_contamination(self) -> bool:
-        """Verify predecessor confusion rejection and blind holdout partition protection."""
-        # In E3, holdout partition is strictly segregated and cannot leak to blind lanes
+        """Verify E3 blind lanes fail closed on unknown isolation and corpus leakage."""
         from .orchestration.e3 import build_e3_lane_specs
+
         specs = build_e3_lane_specs()
+        required_forbidden = {
+            "CUMULATIVE_FINDING_CORPUS",
+            "PRIOR_STAGE_FINDINGS",
+            "OTHER_LANE_UNSEALED_FINDINGS",
+            "GAP_MAP",
+            "COVERAGE_OBLIGATIONS",
+        }
         for slot, spec in specs.items():
-            if spec.required_isolation_assurance != "ENFORCED":
-                self._record_finding("I", "E3 lane lacking enforced isolation", "HIGH", "OPEN", f"{slot} lacks ENFORCED isolation", "Set ENFORCED isolation")
+            if spec.required_isolation_assurance == "UNKNOWN":
+                self._record_finding(
+                    "I",
+                    "E3 lane has unknown isolation requirement",
+                    "HIGH",
+                    "OPEN",
+                    f"{slot} permits UNKNOWN isolation",
+                    "Require at least DECLARED isolation",
+                )
+                return False
+            missing_forbidden = sorted(
+                required_forbidden
+                - set(spec.forbidden_knowledge_classes)
+            )
+            if missing_forbidden:
+                self._record_finding(
+                    "I",
+                    "E3 blind corpus leakage boundary incomplete",
+                    "HIGH",
+                    "OPEN",
+                    (
+                        f"{slot} lacks forbidden knowledge classes: "
+                        f"{missing_forbidden}"
+                    ),
+                    "Restore positive-view corpus/reveal boundaries",
+                )
                 return False
 
+        enforced_specs = build_e3_lane_specs(
+            required_isolation_assurance="ENFORCED"
+        )
+        if any(
+            spec.required_isolation_assurance != "ENFORCED"
+            for spec in enforced_specs.values()
+        ):
+            self._record_finding(
+                "I",
+                "E3 enforced profile cannot be expressed",
+                "HIGH",
+                "OPEN",
+                "Explicit ENFORCED E3 LaneSpecs were not preserved",
+                "Keep ENFORCED available only for evidence-backed profiles",
+            )
+            return False
+
         self._record_finding(
-            "I", "Corpus contamination and holdout isolation defense", "INFO", "RESOLVED",
-            "Predecessor confusion and blind lane holdout leakage are strictly prevented.",
-            "Enforced via E3 LaneSpec isolation rules and capability brokers."
+            "I",
+            "Corpus contamination and holdout isolation defense",
+            "INFO",
+            "RESOLVED",
+            (
+                "E3 blind lanes require at least DECLARED isolation, "
+                "UNKNOWN fails closed, and forbidden corpus/reveal classes "
+                "remain excluded."
+            ),
+            (
+                "Enforced via truthful E3 LaneSpec isolation profiles and "
+                "positive-view capability boundaries."
+            ),
         )
         return True
 
