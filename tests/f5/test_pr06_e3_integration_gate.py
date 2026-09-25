@@ -79,6 +79,17 @@ def make_ref(kind: str, seed: str) -> dict:
     }
 
 
+def create_blind_attempt(*args, **kwargs):
+    kwargs.setdefault(
+        "channel_inventory_ref",
+        make_ref(
+            "registered_immutable_object",
+            "e3_test_channel_inventory",
+        ),
+    )
+    return create_e3_blind_attempt(*args, **kwargs)
+
+
 def make_history_cut(seq: int = 1) -> dict:
     return {
         "variant": "ACCEPTED_HISTORY_CUT",
@@ -103,7 +114,7 @@ def test_full_e3_integration_fixture_to_stage_completion():
     producer_ref = make_ref("coordinator", "coord_primary")
 
     lane_contexts = {
-        slot: create_e3_blind_attempt(slot, lr_ref, cut, exec_ref, deliv_ref)
+        slot: create_blind_attempt(slot, lr_ref, cut, exec_ref, deliv_ref)
         for slot in E3_LANE_SLOTS
     }
 
@@ -348,7 +359,7 @@ def test_adversarial_blind_lane_contamination_fails_closed():
     exec_ref = make_ref("executor_profile", "exec")
     deliv_ref = make_ref("delivery_profile", "deliv")
 
-    ctx = create_e3_blind_attempt("E3-X", lr_ref, cut, exec_ref, deliv_ref)
+    ctx = create_blind_attempt("E3-X", lr_ref, cut, exec_ref, deliv_ref)
     broker.register_isolation_qualification("E3-X", ctx.isolation_qualification)
 
     # Contamination via forbidden fields
@@ -365,7 +376,7 @@ def test_adversarial_premature_reveal_before_checkpoint_fails_closed():
 def test_adversarial_leaked_finding_corpus_in_positive_view_fails_closed():
     cut = make_history_cut(5)
     chk = E3BlindCheckpoint("chk_1", cut, "a" * 64, 3)
-    k_state = lane_contexts = create_e3_blind_attempt("E3-X", make_ref("lr", "l"), cut, make_ref("e", "e"), make_ref("d", "d")).knowledge_state
+    k_state = lane_contexts = create_blind_attempt("E3-X", make_ref("lr", "l"), cut, make_ref("e", "e"), make_ref("d", "d")).knowledge_state
 
     with pytest.raises(ValidationError, match="DISALLOWED_FINDING_CORPUS_REVEAL"):
         execute_positive_gap_reveal(
