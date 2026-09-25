@@ -241,6 +241,7 @@ def test_declared_e3_isolation_is_accepted_but_unknown_is_rejected():
         executor_profile_ref=exec_ref,
         delivery_profile_ref=deliv_ref,
         isolation_class="DECLARED",
+        channel_inventory_ref=declared.isolation_qualification.channel_inventory_ref,
     )
     with pytest.raises(
         ValidationError,
@@ -378,6 +379,9 @@ def test_adversarial_unqualified_or_contaminated_isolation_rejected():
         fresh_session_boundary=True,
         contaminated=True,
         requested="ENFORCED",
+        channel_inventory_ref=(
+            contaminated_ctx.isolation_qualification.channel_inventory_ref
+        ),
     )
     with pytest.raises(ValidationError, match="BLIND_ORIGIN_ISOLATION_NOT_QUALIFIED"):
         broker.register_isolation_qualification("E3-X", contaminated_qual)
