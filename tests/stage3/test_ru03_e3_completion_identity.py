@@ -42,6 +42,10 @@ def _contexts(cut: dict[str, object]):
             assigned_history_cut=cut,
             executor_profile_ref=executor_ref,
             delivery_profile_ref=delivery_ref,
+            channel_inventory_ref=_ref(
+                "registered_immutable_object",
+                "ru03_e3_channel_inventory",
+            ),
             nonce=f"ru03_{slot.lower().replace('-', '_')}",
         )
         for slot in E3_LANE_SLOTS
