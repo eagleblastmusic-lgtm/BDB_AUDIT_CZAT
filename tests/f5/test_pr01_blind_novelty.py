@@ -145,6 +145,10 @@ def test_enforced_e3_attempt_requires_explicit_boundary_witnesses():
         exec_ref,
         deliv_ref,
         boundary_evidence_refs=evidence,
+        channel_inventory_ref=make_ref(
+            "registered_immutable_object",
+            "e3_channel_inventory",
+        ),
         isolation_assurance="ENFORCED",
         fresh_session_boundary=True,
     )
@@ -153,6 +157,10 @@ def test_enforced_e3_attempt_requires_explicit_boundary_witnesses():
     assert (
         ctx.isolation_qualification.required_isolation_assurance
         == "ENFORCED"
+    )
+    assert ctx.isolation_qualification.channel_inventory_ref == make_ref(
+        "registered_immutable_object",
+        "e3_channel_inventory",
     )
     assert ctx.isolation_qualification.enforcement_receipt_refs == (
         witness,
@@ -193,6 +201,24 @@ def test_declared_e3_isolation_is_accepted_but_unknown_is_rejected():
         broker.register_isolation_qualification(
             "E3-Y",
             unknown.isolation_qualification,
+        )
+
+    from bdb_audit.orchestration.runs import IsolationQualification
+
+    missing_requirement = IsolationQualification(
+        attempt_ref=declared.attempt.as_object().ref.as_dict(),
+        assessment_input_history_cut=cut,
+        executor_profile_ref=exec_ref,
+        delivery_profile_ref=deliv_ref,
+        isolation_class="DECLARED",
+    )
+    with pytest.raises(
+        ValidationError,
+        match="BLIND_ORIGIN_ISOLATION_NOT_QUALIFIED",
+    ):
+        broker.register_isolation_qualification(
+            "E3-Y",
+            missing_requirement,
         )
 
     forbidden = create_e3_blind_attempt(
