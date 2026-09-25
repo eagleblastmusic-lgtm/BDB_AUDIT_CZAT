@@ -195,6 +195,23 @@ def test_declared_e3_isolation_is_accepted_but_unknown_is_rejected():
             unknown.isolation_qualification,
         )
 
+    forbidden = create_e3_blind_attempt(
+        "E3-Z",
+        lr_ref,
+        cut,
+        exec_ref,
+        deliv_ref,
+        forbidden_channel_access=True,
+    )
+    with pytest.raises(
+        ValidationError,
+        match="BLIND_ORIGIN_ISOLATION_NOT_QUALIFIED",
+    ):
+        broker.register_isolation_qualification(
+            "E3-Z",
+            forbidden.isolation_qualification,
+        )
+
 
 def test_quarantine_broker_and_cross_lane_leak_prevention():
     broker = E3QuarantineBroker()
