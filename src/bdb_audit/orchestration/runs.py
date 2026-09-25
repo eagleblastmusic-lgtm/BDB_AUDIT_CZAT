@@ -130,13 +130,40 @@ class IsolationQualification:
     def __post_init__(self):
         if self.isolation_class not in _ISOLATION:
             raise ValidationError("ISOLATION_CLASS_INVALID")
-        if self.isolation_class == "ENFORCED" and (not self.fresh_session_boundary or self.forbidden_channel_access or self.contaminated):
-            raise ValidationError("NO_FALSE_ENFORCED_FALLBACK")
+        if self.required_isolation_assurance not in _ISOLATION:
+            raise ValidationError("ISOLATION_CLASS_INVALID")
+        if not isinstance(self.channel_inventory_ref, Mapping):
+            raise ValidationError("ISOLATION_CHANNEL_INVENTORY_REQUIRED")
+
         object.__setattr__(self, "evidence_refs", tuple(self.evidence_refs))
-        for name in ("enforcement_receipt_refs", "filesystem_boundary_evidence_refs",
-                     "network_boundary_evidence_refs", "tool_boundary_evidence_refs",
-                     "session_boundary_evidence_refs", "contamination_assessment_refs"):
+        witness_fields = (
+            "enforcement_receipt_refs",
+            "filesystem_boundary_evidence_refs",
+            "network_boundary_evidence_refs",
+            "tool_boundary_evidence_refs",
+            "session_boundary_evidence_refs",
+        )
+        for name in (*witness_fields, "contamination_assessment_refs"):
             object.__setattr__(self, name, tuple(getattr(self, name)))
+
+        if self.isolation_class == "ENFORCED":
+            missing_witnesses = [
+                name for name in witness_fields if not getattr(self, name)
+            ]
+            if (
+                not self.fresh_session_boundary
+                or self.forbidden_channel_access
+                or self.contaminated
+                or missing_witnesses
+            ):
+                raise ValidationError(
+                    "NO_FALSE_ENFORCED_FALLBACK",
+                    (
+                        "ENFORCED isolation requires a fresh uncontaminated "
+                        "boundary and witnesses for every explicit material "
+                        f"channel group; missing={missing_witnesses}"
+                    ),
+                )
 
     def body(self):
         return {"attempt_ref": dict(self.attempt_ref), "assessment_input_history_cut": dict(self.assessment_input_history_cut),
@@ -158,20 +185,87 @@ class IsolationQualification:
         return CanonicalObject("isolation_qualification", self.body())
 
 
-def qualify_isolation(*, attempt_ref, history_cut, executor_profile_ref,
-                      delivery_profile_ref, fresh_session_boundary=False,
-                      forbidden_channel_access=False, contaminated=False,
-                      requested="ENFORCED", evidence_refs=(), channel_inventory_ref=None):
-    """Return an honest qualification; unavailable enforcement degrades to UNKNOWN."""
+def qualify_isolation(
+    *,
+    attempt_ref,
+    history_cut,
+    executor_profile_ref,
+    delivery_profile_ref,
+    fresh_session_boundary=False,
+    forbidden_channel_access=False,
+    contaminated=False,
+    requested="DECLARED",
+    evidence_refs=(),
+    channel_inventory_ref=None,
+    enforcement_receipt_refs=(),
+    filesystem_boundary_evidence_refs=(),
+    network_boundary_evidence_refs=(),
+    tool_boundary_evidence_refs=(),
+    session_boundary_evidence_refs=(),
+    contamination_assessment_refs=(),
+):
+    """Return a truthful isolation qualification without false ENFORCED fallback."""
     if requested not in _ISOLATION:
         raise ValidationError("ISOLATION_CLASS_INVALID")
+    if not isinstance(channel_inventory_ref, Mapping):
+        raise ValidationError("ISOLATION_CHANNEL_INVENTORY_REQUIRED")
+
+    witnesses = (
+        tuple(enforcement_receipt_refs),
+        tuple(filesystem_boundary_evidence_refs),
+        tuple(network_boundary_evidence_refs),
+        tuple(tool_boundary_evidence_refs),
+        tuple(session_boundary_evidence_refs),
+    )
+
     actual = requested
-    if requested == "ENFORCED" and (not fresh_session_boundary or forbidden_channel_access or contaminated):
+    limitations: tuple[str, ...] = ()
+    reason_codes: tuple[str, ...] = ()
+
+    if forbidden_channel_access:
         actual = "UNKNOWN"
-    return IsolationQualification(attempt_ref, history_cut, executor_profile_ref,
-                                  delivery_profile_ref, actual, contaminated,
-                                  fresh_session_boundary, forbidden_channel_access,
-                                  tuple(evidence_refs), channel_inventory_ref)
+        limitations = ("Known forbidden-channel access prevents isolation assurance",)
+        reason_codes = ("FORBIDDEN_CHANNEL_ACCESS",)
+    elif contaminated:
+        actual = "UNKNOWN"
+        limitations = ("Known contamination prevents isolation assurance",)
+        reason_codes = ("CONTAMINATED_EXECUTION_CONTEXT",)
+    elif requested == "ENFORCED":
+        if not fresh_session_boundary:
+            actual = "UNKNOWN"
+            limitations = ("Fresh isolated session boundary is not established",)
+            reason_codes = ("FRESH_SESSION_BOUNDARY_NOT_ESTABLISHED",)
+        elif not all(witnesses):
+            actual = "DECLARED"
+            limitations = (
+                "Isolation is declared but complete enforcement witnesses are unavailable",
+            )
+            reason_codes = ("ENFORCEMENT_WITNESSES_INCOMPLETE",)
+    elif requested == "DECLARED":
+        limitations = ("Isolation is declared; enforcement is not proven",)
+        reason_codes = ("DECLARED_ISOLATION_ONLY",)
+
+    return IsolationQualification(
+        attempt_ref=attempt_ref,
+        assessment_input_history_cut=history_cut,
+        executor_profile_ref=executor_profile_ref,
+        delivery_profile_ref=delivery_profile_ref,
+        isolation_class=actual,
+        contaminated=contaminated,
+        fresh_session_boundary=fresh_session_boundary,
+        forbidden_channel_access=forbidden_channel_access,
+        evidence_refs=tuple(evidence_refs),
+        channel_inventory_ref=channel_inventory_ref,
+        enforcement_receipt_refs=witnesses[0],
+        filesystem_boundary_evidence_refs=witnesses[1],
+        network_boundary_evidence_refs=witnesses[2],
+        tool_boundary_evidence_refs=witnesses[3],
+        session_boundary_evidence_refs=witnesses[4],
+        contamination_assessment_refs=tuple(contamination_assessment_refs),
+        required_isolation_assurance=requested,
+        limitations=limitations,
+        reason_codes=reason_codes,
+    )
 
 
 __all__ = ["LaneSpec", "Attempt", "IsolationQualification", "qualify_isolation"]
