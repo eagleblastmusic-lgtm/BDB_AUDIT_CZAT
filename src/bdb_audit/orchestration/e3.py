@@ -203,6 +203,11 @@ class E3QuarantineBroker:
                 "BLIND_ORIGIN_ISOLATION_NOT_QUALIFIED",
                 f"Lane {lane_slot} requires at least DECLARED isolation, got {actual}",
             )
+        if qualification.forbidden_channel_access:
+            raise ValidationError(
+                "BLIND_ORIGIN_ISOLATION_NOT_QUALIFIED",
+                f"Lane {lane_slot} has known forbidden-channel access",
+            )
         if qualification.contaminated:
             raise ValidationError(
                 "LANE_CONTAMINATED",
@@ -396,6 +401,16 @@ def create_e3_blind_attempt(
         isolation_qualification_id=f"iso_{attempt_id}",
         required_isolation_assurance=isolation_assurance,
         scope=f"E3 blind lane {lane_slot}",
+        limitations=(
+            ("Manual/declared isolation; enforcement is not proven",)
+            if isolation_assurance == "DECLARED"
+            else ()
+        ),
+        reason_codes=(
+            ("DECLARED_ISOLATION_ONLY",)
+            if isolation_assurance == "DECLARED"
+            else ()
+        ),
     )
     iso_ref = iso_qual.as_object().ref.as_dict()
 
