@@ -101,8 +101,9 @@ def build_e3_stage_spec(revision: str = "1") -> StageSpec:
 def build_e3_lane_specs(
     stage_spec_revision: str = "1",
     lane_revision: str = "1",
+    required_isolation_assurance: str = "DECLARED",
 ) -> dict[str, LaneSpec]:
-    """Construct normative LaneSpecs for all 3 E3 blind lanes with enforced isolation."""
+    """Construct E3 blind LaneSpecs without overstating executor isolation."""
     specs = {}
     for slot in E3_LANE_SLOTS:
         purpose, strategy = E3_LANE_STRATEGIES[slot]
@@ -112,7 +113,7 @@ def build_e3_lane_specs(
             stage_spec_revision=stage_spec_revision,
             purpose=purpose,
             primary_strategy=strategy,
-            required_isolation_assurance="ENFORCED",
+            required_isolation_assurance=required_isolation_assurance,
             forbidden_knowledge_classes=(
                 "CUMULATIVE_FINDING_CORPUS",
                 "PRIOR_STAGE_FINDINGS",
@@ -185,10 +186,35 @@ class E3QuarantineBroker:
     ) -> None:
         if lane_slot not in E3_LANE_SLOTS:
             raise ValidationError("UNKNOWN_LANE_SLOT", f"Invalid lane slot: {lane_slot}")
-        if qualification.isolation_class != "ENFORCED":
+        required = qualification.required_isolation_assurance
+        actual = qualification.isolation_class
+        if required not in {"DECLARED", "ENFORCED"}:
             raise ValidationError(
                 "BLIND_ORIGIN_ISOLATION_NOT_QUALIFIED",
-                f"Lane {lane_slot} requires ENFORCED isolation, got {qualification.isolation_class}",
+                (
+                    f"Lane {lane_slot} lacks an explicit qualified "
+                    f"isolation requirement: {required}"
+                ),
+            )
+        if actual == "UNKNOWN":
+            raise ValidationError(
+                "BLIND_ORIGIN_ISOLATION_NOT_QUALIFIED",
+                f"Lane {lane_slot} has UNKNOWN isolation assurance",
+            )
+        if required == "ENFORCED" and actual != "ENFORCED":
+            raise ValidationError(
+                "BLIND_ORIGIN_ISOLATION_NOT_QUALIFIED",
+                f"Lane {lane_slot} requires ENFORCED isolation, got {actual}",
+            )
+        if required == "DECLARED" and actual not in {"DECLARED", "ENFORCED"}:
+            raise ValidationError(
+                "BLIND_ORIGIN_ISOLATION_NOT_QUALIFIED",
+                f"Lane {lane_slot} requires at least DECLARED isolation, got {actual}",
+            )
+        if qualification.forbidden_channel_access:
+            raise ValidationError(
+                "BLIND_ORIGIN_ISOLATION_NOT_QUALIFIED",
+                f"Lane {lane_slot} has known forbidden-channel access",
             )
         if qualification.contaminated:
             raise ValidationError(
@@ -300,9 +326,14 @@ def create_e3_blind_attempt(
     executor_profile_ref: Mapping,
     delivery_profile_ref: Mapping,
     boundary_evidence_refs: Mapping[str, Sequence[Mapping]] | None = None,
+    channel_inventory_ref: Mapping | None = None,
     nonce: str | None = None,
+    isolation_assurance: str = "DECLARED",
+    fresh_session_boundary: bool = False,
+    forbidden_channel_access: bool = False,
+    contaminated: bool = False,
 ) -> E3BlindAttemptContext:
-    """Construct an Attempt with verified ENFORCED isolation qualification and KnowledgeState."""
+    """Construct a blind attempt with an honest, caller-supplied isolation class."""
     if lane_slot not in E3_LANE_SLOTS:
         raise ValidationError("UNKNOWN_LANE_SLOT", f"Invalid lane slot: {lane_slot}")
 
@@ -326,25 +357,84 @@ def create_e3_blind_attempt(
     )
     attempt_ref = attempt.as_object().ref.as_dict()
 
-    # Evidence refs for isolation boundaries
+    if channel_inventory_ref is None:
+        raise ValidationError(
+            "E3_CHANNEL_INVENTORY_REQUIRED",
+            "E3 isolation qualification requires an explicit channel inventory",
+        )
+
     ev = boundary_evidence_refs or {}
+    allowed_isolation = {"ENFORCED", "DECLARED", "UNKNOWN"}
+    if isolation_assurance not in allowed_isolation:
+        raise ValidationError(
+            "ISOLATION_CLASS_INVALID",
+            f"Unsupported E3 isolation class: {isolation_assurance}",
+        )
+
+    evidence_keys = (
+        "enforcement_receipt_refs",
+        "filesystem_boundary_evidence_refs",
+        "network_boundary_evidence_refs",
+        "tool_boundary_evidence_refs",
+        "session_boundary_evidence_refs",
+    )
+    if isolation_assurance == "ENFORCED":
+        missing_evidence = [
+            key
+            for key in evidence_keys
+            if not tuple(ev.get(key, ()))
+        ]
+        if (
+            channel_inventory_ref is None
+            or not fresh_session_boundary
+            or forbidden_channel_access
+            or contaminated
+            or missing_evidence
+        ):
+            missing = list(missing_evidence)
+            if channel_inventory_ref is None:
+                missing.append("channel_inventory_ref")
+            details = ", ".join(missing) or "boundary state"
+            raise ValidationError(
+                "E3_ENFORCED_BOUNDARY_EVIDENCE_REQUIRED",
+                (
+                    "ENFORCED E3 isolation requires a fresh uncontaminated "
+                    f"session and explicit material-channel witnesses; missing: {details}"
+                ),
+            )
+
     iso_qual = IsolationQualification(
         attempt_ref=attempt_ref,
         assessment_input_history_cut=assigned_history_cut,
         executor_profile_ref=executor_profile_ref,
         delivery_profile_ref=delivery_profile_ref,
-        isolation_class="ENFORCED",
-        contaminated=False,
-        fresh_session_boundary=True,
-        forbidden_channel_access=False,
-        enforcement_receipt_refs=tuple(ev.get("enforcement_receipt_refs", (_ref_dict(executor_profile_ref),))),
-        filesystem_boundary_evidence_refs=tuple(ev.get("filesystem_boundary_evidence_refs", (_ref_dict(executor_profile_ref),))),
-        network_boundary_evidence_refs=tuple(ev.get("network_boundary_evidence_refs", (_ref_dict(executor_profile_ref),))),
-        tool_boundary_evidence_refs=tuple(ev.get("tool_boundary_evidence_refs", (_ref_dict(executor_profile_ref),))),
-        session_boundary_evidence_refs=tuple(ev.get("session_boundary_evidence_refs", (_ref_dict(executor_profile_ref),))),
+        isolation_class=isolation_assurance,
+        contaminated=contaminated,
+        fresh_session_boundary=fresh_session_boundary,
+        forbidden_channel_access=forbidden_channel_access,
+        channel_inventory_ref=(
+            dict(channel_inventory_ref)
+            if channel_inventory_ref is not None
+            else None
+        ),
+        enforcement_receipt_refs=tuple(ev.get("enforcement_receipt_refs", ())),
+        filesystem_boundary_evidence_refs=tuple(ev.get("filesystem_boundary_evidence_refs", ())),
+        network_boundary_evidence_refs=tuple(ev.get("network_boundary_evidence_refs", ())),
+        tool_boundary_evidence_refs=tuple(ev.get("tool_boundary_evidence_refs", ())),
+        session_boundary_evidence_refs=tuple(ev.get("session_boundary_evidence_refs", ())),
         isolation_qualification_id=f"iso_{attempt_id}",
-        required_isolation_assurance="ENFORCED",
+        required_isolation_assurance=isolation_assurance,
         scope=f"E3 blind lane {lane_slot}",
+        limitations=(
+            ("Manual/declared isolation; enforcement is not proven",)
+            if isolation_assurance == "DECLARED"
+            else ()
+        ),
+        reason_codes=(
+            ("DECLARED_ISOLATION_ONLY",)
+            if isolation_assurance == "DECLARED"
+            else ()
+        ),
     )
     iso_ref = iso_qual.as_object().ref.as_dict()
 
@@ -401,7 +491,7 @@ def execute_e3_blind_ensemble(
 
     Fails closed if:
     - any mandatory lane is missing;
-    - any lane lacks verified ENFORCED isolation;
+    - any lane has UNKNOWN or insufficient isolation for its declared requirement;
     - any forbidden knowledge leakage is detected.
     """
     spec = stage_spec or build_e3_stage_spec()

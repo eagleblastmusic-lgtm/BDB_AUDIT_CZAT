@@ -52,6 +52,17 @@ def make_ref(kind: str, seed: str) -> dict:
     }
 
 
+def create_blind_attempt(*args, **kwargs):
+    kwargs.setdefault(
+        "channel_inventory_ref",
+        make_ref(
+            "registered_immutable_object",
+            "e3_test_channel_inventory",
+        ),
+    )
+    return create_e3_blind_attempt(*args, **kwargs)
+
+
 def make_history_cut(seq: int = 1) -> dict:
     return {
         "variant": "ACCEPTED_HISTORY_CUT",
@@ -71,7 +82,7 @@ def _setup_blind_result(cut_seq: int = 4):
     deliv_ref = make_ref("delivery_profile", "deliv")
 
     lane_contexts = {
-        slot: create_e3_blind_attempt(slot, lr_ref, cut, exec_ref, deliv_ref)
+        slot: create_blind_attempt(slot, lr_ref, cut, exec_ref, deliv_ref)
         for slot in E3_LANE_SLOTS
     }
 
