@@ -1092,6 +1092,36 @@ class FullAuditOrchestrator:
         )
         return batch
 
+    def _complete_campaign_after_stop_pass(
+        self,
+        stop_result: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Materialize the canonical post-STOP finalization chain after PASS."""
+        if stop_result.get("continuation_decision") != "PASS":
+            return stop_result
+        assert self.active_store_path is not None
+        finalization = self.api.conclude_campaign(
+            self.active_store_path,
+            termination_state="COMPLETED",
+        )
+        return {
+            **stop_result,
+            "campaign_finalized": True,
+            "termination_state": finalization["termination_state"],
+            "campaign_conclusion_digest": finalization[
+                "campaign_conclusion_digest"
+            ],
+            "final_assurance_case_digest": finalization[
+                "final_assurance_case_digest"
+            ],
+            "release_qualification_digest": finalization[
+                "release_qualification_digest"
+            ],
+            "finalization_commit_seq": finalization["commit_seq"],
+            "finalization_commit_hash": finalization["commit_hash"],
+            "next_action": "CAMPAIGN_FINISHED",
+        }
+
     def _advance_e5_external(self) -> dict[str, Any]:
         assert self.active_store_path is not None
         status = self.api.get_campaign_status(
@@ -1134,7 +1164,7 @@ class FullAuditOrchestrator:
                             row.get("accepted_seq", 0)
                         ),
                     )
-                    return {
+                    stop_result = {
                         **verified,
                         "status": "STOP_EVALUATED",
                         "current_stage": "STOP",
@@ -1146,6 +1176,9 @@ class FullAuditOrchestrator:
                             )
                         ),
                     }
+                    return self._complete_campaign_after_stop_pass(
+                        stop_result
+                    )
 
             stop = self.api.evaluate_stop_gate(
                 self.active_store_path,
@@ -1154,7 +1187,7 @@ class FullAuditOrchestrator:
             decision = stop.get(
                 "continuation_decision", "BLOCKED"
             )
-            return {
+            stop_result = {
                 **stop,
                 "status": "STOP_EVALUATED",
                 "current_stage": "STOP",
@@ -1165,6 +1198,9 @@ class FullAuditOrchestrator:
                     )
                 ),
             }
+            return self._complete_campaign_after_stop_pass(
+                stop_result
+            )
 
         if (
             self.stage_batch is None
@@ -2015,10 +2051,7 @@ class FullAuditOrchestrator:
             None,
         )
         if next_incomplete is None:
-            return {
-                "status": "ALL_STAGES_COMPLETED",
-                "next_action": "EVALUATE_STOP_GATE",
-            }
+            return self._advance_e5_external()
 
         if stage_id is not None:
             requested = stage_id.upper()

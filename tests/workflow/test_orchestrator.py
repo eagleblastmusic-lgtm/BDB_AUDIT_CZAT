@@ -775,6 +775,145 @@ def test_completed_e5_invokes_authoritative_stop_evaluation(
     )
 
 
+def test_completed_e5_stop_pass_finalizes_campaign(
+    orchestrator_setup,
+    monkeypatch,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    assert orch.active_store_path is not None
+
+    monkeypatch.setattr(
+        orch.api,
+        "get_campaign_status",
+        lambda store_path: {
+            "stages_completed": ["E1", "E2", "E3", "E4", "E5"],
+        },
+    )
+
+    stop_calls = []
+
+    def fake_stop(
+        store_path,
+        evaluation_context="FINAL_POST_E5",
+        **kwargs,
+    ):
+        stop_calls.append((Path(store_path), evaluation_context))
+        return {
+            "status": "SUCCESS",
+            "continuation_decision": "PASS",
+            "assurance_level": "ADEQUATE_FOR_DECLARED_SCOPE",
+            "release_readiness": "READY",
+            "stop_evaluation_digest": "a" * 64,
+            "commit_seq": 99,
+            "commit_hash": "b" * 64,
+        }
+
+    monkeypatch.setattr(
+        orch.api,
+        "evaluate_stop_gate",
+        fake_stop,
+    )
+
+    finalization_calls = []
+
+    def fake_conclude_campaign(
+        store_path,
+        termination_state=None,
+        bounded_statement=(
+            "Campaign concluded via post-E5 finalization"
+        ),
+    ):
+        finalization_calls.append(
+            (
+                Path(store_path),
+                termination_state,
+                bounded_statement,
+            )
+        )
+        return {
+            "status": "SUCCESS",
+            "termination_state": "COMPLETED",
+            "assurance_level": "ADEQUATE_FOR_DECLARED_SCOPE",
+            "release_readiness": "READY",
+            "campaign_conclusion_digest": "c" * 64,
+            "final_assurance_case_digest": "d" * 64,
+            "release_qualification_digest": "e" * 64,
+            "commit_seq": 102,
+            "commit_hash": "f" * 64,
+        }
+
+    monkeypatch.setattr(
+        orch.api,
+        "conclude_campaign",
+        fake_conclude_campaign,
+    )
+
+    result = orch._advance_e5_external()
+
+    assert stop_calls == [
+        (
+            Path(orch.active_store_path),
+            "FINAL_POST_E5",
+        )
+    ]
+    assert finalization_calls == [
+        (
+            Path(orch.active_store_path),
+            "COMPLETED",
+            "Campaign concluded via post-E5 finalization",
+        )
+    ]
+    assert result["status"] == "STOP_EVALUATED"
+    assert result["current_stage"] == "STOP"
+    assert result["continuation_decision"] == "PASS"
+    assert result["campaign_finalized"] is True
+    assert result["termination_state"] == "COMPLETED"
+    assert result["campaign_conclusion_digest"] == "c" * 64
+    assert result["final_assurance_case_digest"] == "d" * 64
+    assert result["release_qualification_digest"] == "e" * 64
+    assert result["finalization_commit_seq"] == 102
+    assert result["finalization_commit_hash"] == "f" * 64
+    assert result["next_action"] == "CAMPAIGN_FINISHED"
+
+
+def test_advance_stage_all_completed_runs_stop_and_finalization_path(
+    orchestrator_setup,
+    monkeypatch,
+):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    orch.initialize_campaign()
+    assert orch.active_store_path is not None
+
+    monkeypatch.setattr(
+        orch.api,
+        "get_campaign_status",
+        lambda store_path: {
+            "stages_completed": ["E1", "E2", "E3", "E4", "E5"],
+        },
+    )
+
+    expected = {
+        "status": "STOP_EVALUATED",
+        "current_stage": "STOP",
+        "campaign_finalized": True,
+    }
+    calls = []
+
+    def fake_advance_e5():
+        calls.append(True)
+        return expected
+
+    monkeypatch.setattr(
+        orch,
+        "_advance_e5_external",
+        fake_advance_e5,
+    )
+
+    assert orch.advance_stage() == expected
+    assert calls == [True]
+
+
 def test_resume_ignores_synthetic_e2_completion_and_restores_real_e2_phase(
     orchestrator_setup,
 ):
