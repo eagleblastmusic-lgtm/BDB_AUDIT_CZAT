@@ -121,6 +121,25 @@ def test_create_e3_blind_attempt_and_result_slot_contract():
     assert ctx.knowledge_state.contamination_assessment_refs == ()
 
 
+def test_e3_attempt_requires_explicit_channel_inventory():
+    lane_run_ref = make_ref("lane_run", "lr_inventory_required")
+    exec_ref = make_ref("executor_profile", "exec_inventory_required")
+    deliv_ref = make_ref("delivery_profile", "deliv_inventory_required")
+    cut = make_history_cut(5)
+
+    with pytest.raises(
+        ValidationError,
+        match="E3_CHANNEL_INVENTORY_REQUIRED",
+    ):
+        create_e3_blind_attempt(
+            "E3-X",
+            lane_run_ref,
+            cut,
+            exec_ref,
+            deliv_ref,
+        )
+
+
 def test_enforced_e3_attempt_requires_explicit_boundary_witnesses():
     lane_run_ref = make_ref("lane_run", "lr_enforced")
     exec_ref = make_ref("executor_profile", "exec_enforced")
