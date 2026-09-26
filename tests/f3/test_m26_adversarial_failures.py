@@ -22,7 +22,7 @@ from bdb_audit.history.objects import CanonicalObject, CommandEnvelope
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.coordinator import Coordinator, run_foundation_reference_slice
 from bdb_audit.coordinator.reference_slice import _external_ref, _ref_for
-from bdb_audit.orchestration.stages import StageSpec
+from bdb_audit.orchestration.stages import native_stage_spec
 from bdb_audit.evidence.models import (
     DependencyIndependenceAssessment,
     EvidenceQualificationAssessment,
@@ -263,17 +263,7 @@ def test_f4_crash_and_idempotent_retry_exactly_one_accepted_effect():
         "governing_policy_ref": commit_1.commit.governing_policy_ref,
         "governing_spec_refs": list(commit_1.commit.governing_spec_refs),
     }
-    stage_spec_valid = StageSpec(
-        stage_key="E3",
-        stage_spec_revision="1",
-        stage_role="E3",
-        stage_ordinal=3,
-        purpose="F4 Recovery test",
-        predecessor_requirements=("E2",),
-        required_lane_slots=("lane_1",),
-        blind_reveal_phase_model="CONTROLLED",
-        transition_policy_ref="TRANSITION_PROFILE_V1",
-    ).as_object()
+    stage_spec_valid = native_stage_spec("E3").as_object()
 
     # Retry cmd_2 -> accepted
     res_retry_1 = coordinator_recovered.accept(cmd_2, immutable_objects=(stage_spec_valid,), expected_head=head_1)
@@ -345,17 +335,7 @@ def test_steady_state_stale_parent_head_fails_closed():
     head_1 = commit_1.head
     head_1_ref = {"tag": "ACCEPTED_HEAD_REF", **head_1.as_dict()}
 
-    stage_spec_obj = StageSpec(
-        stage_key="E3",
-        stage_spec_revision="1",
-        stage_role="E3",
-        stage_ordinal=3,
-        purpose="Steady state stage spec",
-        predecessor_requirements=("E2",),
-        required_lane_slots=("lane_1",),
-        blind_reveal_phase_model="CONTROLLED",
-        transition_policy_ref="TRANSITION_PROFILE_V1",
-    ).as_object()
+    stage_spec_obj = native_stage_spec("E3").as_object()
 
     cmd_2 = replace(
         bootstrap_cmd,

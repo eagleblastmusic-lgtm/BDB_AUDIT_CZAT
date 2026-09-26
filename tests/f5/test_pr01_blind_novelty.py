@@ -54,6 +54,10 @@ def create_blind_attempt(*args, **kwargs):
             "e3_test_channel_inventory",
         ),
     )
+    kwargs.setdefault(
+        "source_generation_ref",
+        make_ref("source_generation", "gen_e3"),
+    )
     return create_e3_blind_attempt(*args, **kwargs)
 
 
@@ -116,7 +120,7 @@ def test_create_e3_blind_attempt_and_result_slot_contract():
     assert ctx.isolation_qualification.enforcement_receipt_refs == ()
     assert ctx.isolation_qualification.filesystem_boundary_evidence_refs == ()
 
-    assert ctx.knowledge_state.basis_history_cut == cut
+    assert ctx.knowledge_state.body()["basis_history_cut"] == cut
     assert ctx.knowledge_state.potential_exposure_refs == ()
     assert ctx.knowledge_state.contamination_assessment_refs == ()
 
@@ -137,6 +141,7 @@ def test_e3_attempt_requires_explicit_channel_inventory():
             cut,
             exec_ref,
             deliv_ref,
+            source_generation_ref=make_ref("source_generation", "inventory_required"),
         )
 
 
@@ -168,33 +173,24 @@ def test_enforced_e3_attempt_requires_explicit_boundary_witnesses():
         "tool_boundary_evidence_refs": [witness],
         "session_boundary_evidence_refs": [witness],
     }
-    ctx = create_blind_attempt(
-        "E3-X",
-        lane_run_ref,
-        cut,
-        exec_ref,
-        deliv_ref,
-        boundary_evidence_refs=evidence,
-        channel_inventory_ref=make_ref(
-            "registered_immutable_object",
-            "e3_channel_inventory",
-        ),
-        isolation_assurance="ENFORCED",
-        fresh_session_boundary=True,
-    )
-
-    assert ctx.isolation_qualification.isolation_class == "ENFORCED"
-    assert (
-        ctx.isolation_qualification.required_isolation_assurance
-        == "ENFORCED"
-    )
-    assert ctx.isolation_qualification.channel_inventory_ref == make_ref(
-        "registered_immutable_object",
-        "e3_channel_inventory",
-    )
-    assert ctx.isolation_qualification.enforcement_receipt_refs == (
-        witness,
-    )
+    with pytest.raises(
+        ValidationError,
+        match="ISOLATION_ADMISSION_CONTEXT_REQUIRED",
+    ):
+        create_blind_attempt(
+            "E3-X",
+            lane_run_ref,
+            cut,
+            exec_ref,
+            deliv_ref,
+            boundary_evidence_refs=evidence,
+            channel_inventory_ref=make_ref(
+                "registered_immutable_object",
+                "e3_channel_inventory",
+            ),
+            isolation_assurance="ENFORCED",
+            fresh_session_boundary=True,
+        )
 
 
 def test_declared_e3_isolation_is_accepted_but_unknown_is_rejected():
@@ -301,6 +297,40 @@ def test_quarantine_broker_and_cross_lane_leak_prevention():
         broker.query_finding_corpus("E3-X")
 
 
+def test_quarantine_seal_is_copy_safe_and_idempotent_for_exact_cut():
+    broker = E3QuarantineBroker()
+    cut = make_history_cut(3)
+    exec_ref = make_ref("executor_profile", "exec-seal")
+    deliv_ref = make_ref("delivery_profile", "deliv-seal")
+    for slot in E3_LANE_SLOTS:
+        ctx = create_blind_attempt(
+            slot,
+            make_ref("lane_run", f"seal-{slot}"),
+            cut,
+            exec_ref,
+            deliv_ref,
+        )
+        broker.register_isolation_qualification(slot, ctx.isolation_qualification)
+
+    caller_owned = {"statement": "sealed text", "nested": {"values": [1]}}
+    broker.record_lane_discovery("E3-X", caller_owned)
+    caller_owned["nested"]["values"][0] = 2
+    first = broker.seal_checkpoint(cut)
+    first_digest = first["checkpoint_digest"]
+    first["body"]["accepted_history_cut"]["accepted_head_hash"] = "0" * 64
+    first["sealed_findings"]["E3-X"][0]["nested"]["values"][0] = 3
+
+    repeated = broker.seal_checkpoint(cut)
+    assert repeated["checkpoint_digest"] == first_digest
+    assert repeated["body"]["accepted_history_cut"] == cut
+    assert repeated["sealed_findings"]["E3-X"][0]["nested"]["values"] == [1]
+    assert broker.get_lane_view("E3-X")[0]["nested"]["values"] == [1]
+
+    changed_same_seq = dict(cut, accepted_head_hash="f" * 64)
+    with pytest.raises(ValidationError, match="CHECKPOINT_SEAL_BASIS_MISMATCH"):
+        broker.seal_checkpoint(changed_same_seq)
+
+
 def test_adversarial_forbidden_leak_detection():
     broker = E3QuarantineBroker()
     cut = make_history_cut(3)
@@ -391,7 +421,14 @@ def test_execute_e3_blind_ensemble_success_and_digest_determinism():
     deliv_ref = make_ref("delivery_profile", "deliv")
 
     lane_contexts = {
-        slot: create_blind_attempt(slot, lr_ref, cut, exec_ref, deliv_ref)
+        slot: create_blind_attempt(
+            slot,
+            make_ref("lane_run", f"lr-{slot}"),
+            cut,
+            exec_ref,
+            deliv_ref,
+            source_generation_ref=src_gen,
+        )
         for slot in E3_LANE_SLOTS
     }
 
@@ -417,6 +454,48 @@ def test_execute_e3_blind_ensemble_success_and_digest_determinism():
     assert len(chk["sealed_findings"]) == 3
 
 
+def test_execute_e3_rejects_wrong_cut_source_and_reused_attempt_context():
+    src_gen = make_ref("source_generation", "context-source")
+    cut = make_history_cut(4)
+    exec_ref = make_ref("executor_profile", "context-exec")
+    deliv_ref = make_ref("delivery_profile", "context-deliv")
+    lane_contexts = {
+        slot: create_blind_attempt(
+            slot,
+            make_ref("lane_run", f"context-{slot}"),
+            cut,
+            exec_ref,
+            deliv_ref,
+            source_generation_ref=src_gen,
+        )
+        for slot in E3_LANE_SLOTS
+    }
+    discoveries = {slot: [] for slot in E3_LANE_SLOTS}
+
+    with pytest.raises(ValidationError, match="E3_ATTEMPT_CONTEXT_MISMATCH"):
+        execute_e3_blind_ensemble(
+            src_gen,
+            dict(cut, accepted_head_hash="e" * 64),
+            lane_contexts,
+            discoveries,
+        )
+
+    with pytest.raises(ValidationError, match="E3_ATTEMPT_CONTEXT_MISMATCH"):
+        execute_e3_blind_ensemble(
+            make_ref("source_generation", "other-source"),
+            cut,
+            lane_contexts,
+            discoveries,
+        )
+
+    from dataclasses import replace
+
+    reused = dict(lane_contexts)
+    reused["E3-Y"] = replace(lane_contexts["E3-X"], lane_slot="E3-Y", binding_digest="")
+    with pytest.raises(ValidationError, match="E3_LANE_ATTEMPT_REUSED"):
+        execute_e3_blind_ensemble(src_gen, cut, reused, discoveries)
+
+
 def test_execute_e3_blind_missing_mandatory_lane_fails_closed():
     src_gen = make_ref("source_generation", "gen_e3")
     cut = make_history_cut(4)
@@ -425,7 +504,14 @@ def test_execute_e3_blind_missing_mandatory_lane_fails_closed():
     deliv_ref = make_ref("delivery_profile", "deliv")
 
     lane_contexts = {
-        slot: create_blind_attempt(slot, lr_ref, cut, exec_ref, deliv_ref)
+        slot: create_blind_attempt(
+            slot,
+            make_ref("lane_run", f"lr-missing-{slot}"),
+            cut,
+            exec_ref,
+            deliv_ref,
+            source_generation_ref=src_gen,
+        )
         for slot in E3_LANE_SLOTS
     }
 

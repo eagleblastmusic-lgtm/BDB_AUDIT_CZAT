@@ -15,6 +15,7 @@ from bdb_audit.history.objects import CommandEnvelope
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.workflow.history_projection import CampaignHistoryService
 from bdb_audit.workflow.read_models import VerifiedCampaignReadModel, campaign_status, current_accepted_cut
+from tests.f7.test_adaptive_e6_canonical_authority import _append_raw_commit
 
 
 def _insert_orphan(
@@ -246,7 +247,6 @@ def test_adversarial_wrong_run_binding(tmp_path: Path) -> None:
     """D. WRONG RUN / STAGE BINDING: stage_completion pointing to unaccepted stage_spec fails closed."""
     slice_data = run_foundation_reference_slice(tmp_path / "ref.sqlite", stop_at_seq=9)
     store = slice_data["store"]
-    coord = slice_data["coordinator"]
     head = slice_data["head"]
     head_ref = slice_data["head_ref"]
     next_cmd = slice_data["next_cmd"]
@@ -275,9 +275,13 @@ def test_adversarial_wrong_run_binding(tmp_path: Path) -> None:
         completion_predicate_result="STAGE_COMPLETED",
     )
 
-    # Accept the bad stage_completion into history, but WITHOUT accepting foreign_obj
-    cmd = next_cmd(head_ref)
-    coord.accept(cmd, immutable_objects=[bad_completion.as_object()], expected_head=head)
+    # Simulate malformed historical bytes that predate the current admission
+    # gate. Current writers reject this object before durability.
+    _append_raw_commit(
+        store,
+        [bad_completion.as_object()],
+        index=store.head().commit_seq + 1,
+    )
 
     # VerifiedCampaignReadModel must fail closed when projecting status because foreign stage_spec is not in accepted closure
     with pytest.raises(ValidationError, match="OBJECT_NOT_ACCEPTED_AT_CUT"):
@@ -340,7 +344,6 @@ def test_adversarial_duplicate_conflicting_stage_completions(tmp_path: Path) -> 
     """G. DUPLICATE / AMBIGUOUS AUTHORITY: Conflicting stage completions fail closed."""
     slice_data = run_foundation_reference_slice(tmp_path / "ref.sqlite", stop_at_seq=9)
     store = slice_data["store"]
-    coord = slice_data["coordinator"]
     head = slice_data["head"]
     head_ref = slice_data["head_ref"]
     next_cmd = slice_data["next_cmd"]
@@ -348,21 +351,42 @@ def test_adversarial_duplicate_conflicting_stage_completions(tmp_path: Path) -> 
     stage_spec_obj = slice_data["stage_spec_obj"]
     stage_run_obj = slice_data["stage_comp"].stage_run_ref
 
-    # seq 9 already contains a stage_completion for E3.
-    # Accept a SECOND, conflicting stage_completion for E3 with a different ID and summary.
+    # The reference slice contains a blocked E3 completion. Inject two
+    # conflicting completed records behind canonical admission to exercise the
+    # read-model's defense against malformed persisted history.
     from bdb_audit.stop.models import StageCompletion
-    second_comp = StageCompletion(
-        stage_completion_id=f"stage_completion_{uuid4()}",
-        stage_run_ref=stage_run_obj,
-        stage_spec_ref=_ref_for("stage_completion", "stage_spec_ref", stage_spec_obj),
-        input_history_cut=head_cut,
-        required_lane_slot_results=list(slice_data["stage_comp"].required_lane_slot_results),
-        mandatory_obligation_summary={"total_mandatory": 2, "qualified": 2},
-        completion_predicate_result="STAGE_COMPLETED",
-    )
+    completed = []
+    for index, summary in enumerate(
+        ({"total_mandatory": 2, "qualified": 1},
+         {"total_mandatory": 2, "qualified": 2}),
+        start=1,
+    ):
+        completed.append(
+            StageCompletion(
+                stage_completion_id=f"stage_completion_{uuid4()}",
+                stage_run_ref=stage_run_obj,
+                stage_spec_ref=_ref_for(
+                    "stage_completion", "stage_spec_ref", stage_spec_obj
+                ),
+                input_history_cut=head_cut,
+                required_lane_slot_results=list(
+                    slice_data["stage_comp"].required_lane_slot_results
+                ),
+                mandatory_obligation_summary=summary,
+                completion_predicate_result="STAGE_COMPLETED",
+            )
+        )
 
-    cmd = next_cmd(head_ref)
-    coord.accept(cmd, immutable_objects=[second_comp.as_object()], expected_head=head)
+    _append_raw_commit(
+        store,
+        [completed[0].as_object()],
+        index=store.head().commit_seq + 1,
+    )
+    _append_raw_commit(
+        store,
+        [completed[1].as_object()],
+        index=store.head().commit_seq + 1,
+    )
 
     # Must fail closed with MULTIPLE_STAGE_COMPLETIONS
     with pytest.raises(ValidationError, match="MULTIPLE_STAGE_COMPLETIONS"):

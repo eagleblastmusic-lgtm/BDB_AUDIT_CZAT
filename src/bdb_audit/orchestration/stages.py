@@ -156,4 +156,70 @@ def initial_stage_specs():
     return tuple(specs)
 
 
-__all__ = ["StageSpec", "StageSpecRegistry", "initial_stage_specs"]
+def native_stage_spec(stage_key: str, revision: str = "1") -> StageSpec:
+    """Build the repository's governing native E1-E5 StageSpec revision.
+
+    Stage obligations are not caller-selected policy.  The coordinator and
+    durable admission validator share this producer so a newly accepted
+    revision may change its revision label while retaining the canonical
+    native stage contract.
+    """
+    key = stage_key.upper()
+    if key == "E1":
+        from .native_ensemble import build_e1_stage_spec
+
+        return build_e1_stage_spec(revision)
+    if key == "E2":
+        from .native_ensemble import build_e2_stage_spec
+
+        return build_e2_stage_spec(revision)
+    if key == "E3":
+        from .e3 import build_e3_stage_spec
+
+        return build_e3_stage_spec(revision)
+    if key == "E4":
+        # The workflow module owns the operational lane set used by both the
+        # runner and finalizer.  Import lazily to keep the orchestration model
+        # layer independent during package initialization.
+        from ..workflow.orchestrator import E4_DEEPEN_LANES
+
+        return StageSpec(
+            stage_key="E4",
+            stage_spec_revision=revision,
+            stage_role="E4",
+            stage_ordinal=4,
+            purpose="BDB E4 operational stage",
+            predecessor_requirements=("E3",),
+            required_lane_slots=tuple(lane.lane_slot for lane in E4_DEEPEN_LANES),
+            blind_reveal_phase_model="CONTROLLED",
+            required_stage_completion_outputs=(
+                "e4_assessments",
+                "model_fidelity_assessment",
+                "stage_completion_digest",
+            ),
+            transition_policy_ref="TRANSITION_PROFILE_V1",
+        )
+    if key == "E5":
+        from ..workflow.e5_runtime import E5_ALL_LANE_SLOTS
+
+        return StageSpec(
+            stage_key="E5",
+            stage_spec_revision=revision,
+            stage_role="E5",
+            stage_ordinal=5,
+            purpose="BDB E5 operational stage",
+            predecessor_requirements=("E4",),
+            required_lane_slots=E5_ALL_LANE_SLOTS,
+            blind_reveal_phase_model="CONTROLLED",
+            required_stage_completion_outputs=(
+                "candidate_assurance_case",
+                "challenger_assignments",
+                "challenger_results",
+                "stage_completion_digest",
+            ),
+            transition_policy_ref="TRANSITION_PROFILE_V1",
+        )
+    raise ValidationError("NATIVE_STAGE_SPEC_UNAVAILABLE", key)
+
+
+__all__ = ["StageSpec", "StageSpecRegistry", "initial_stage_specs", "native_stage_spec"]

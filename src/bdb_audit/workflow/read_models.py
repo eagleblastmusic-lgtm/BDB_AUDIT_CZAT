@@ -56,6 +56,149 @@ def _accepted_object_count(store: TransactionalHistoryStore, cut: dict[str, Any]
     return len(refs)
 
 
+def _ref_digest(body: dict[str, Any], name: str) -> str | None:
+    value = body.get(name)
+    if not isinstance(value, dict):
+        return None
+    digest = value.get("revision_digest")
+    return digest if isinstance(digest, str) else None
+
+
+def project_finalization_progress(
+    store: TransactionalHistoryStore,
+    cut: dict[str, Any],
+    conclusion_rows: tuple[dict[str, Any], ...] | None = None,
+) -> dict[str, Any]:
+    """Project the three accepted closure boundaries without changing termination."""
+    conclusions = tuple(
+        sorted(
+            conclusion_rows
+            if conclusion_rows is not None
+            else store.accepted_records("campaign_conclusion", cut),
+            key=lambda row: row["accepted_seq"],
+        )
+    )
+    terminal = [
+        row for row in conclusions
+        if row["body"].get("termination_state") in {"COMPLETED", "COMPLETED_LIMITED"}
+    ]
+    if not terminal:
+        return {
+            "state": "NOT_STARTED" if not conclusions else "NOT_TERMINAL",
+            "next_action": None,
+            "campaign_conclusion_count": len(conclusions),
+            "final_assurance_case_count": 0,
+            "release_qualification_count": 0,
+        }
+
+    if len({row["ref"]["revision_digest"] for row in terminal}) != 1:
+        return {
+            "state": "BLOCKED",
+            "next_action": "REVIEW_FINALIZATION_CHAIN",
+            "reason": "MULTIPLE_TERMINAL_CONCLUSIONS",
+            "campaign_conclusion_count": len(terminal),
+            "final_assurance_case_count": 0,
+            "release_qualification_count": 0,
+        }
+
+    conclusion = terminal[-1]
+    conclusion_digest = conclusion["ref"]["revision_digest"]
+    stop_digest = _ref_digest(conclusion["body"], "stop_evaluation_ref")
+    if stop_digest is None:
+        return {
+            "state": "BLOCKED",
+            "next_action": "REVIEW_FINALIZATION_CHAIN",
+            "reason": "CONCLUSION_STOP_BINDING_MISSING",
+            "campaign_conclusion_count": len(terminal),
+            "final_assurance_case_count": 0,
+            "release_qualification_count": 0,
+        }
+
+    final_rows = tuple(
+        row for row in store.accepted_records("final_assurance_case", cut)
+        if _ref_digest(row["body"], "campaign_conclusion_ref") == conclusion_digest
+    )
+    good_final_rows = tuple(
+        row for row in final_rows
+        if _ref_digest(row["body"], "stop_evaluation_ref") == stop_digest
+        and row["accepted_seq"] > conclusion["accepted_seq"]
+    )
+    if len(final_rows) > 1 or (final_rows and len(good_final_rows) != 1):
+        return {
+            "state": "BLOCKED",
+            "next_action": "REVIEW_FINALIZATION_CHAIN",
+            "reason": "FINAL_CASE_BINDING_CONFLICT",
+            "campaign_conclusion_count": len(terminal),
+            "final_assurance_case_count": len(final_rows),
+            "release_qualification_count": 0,
+        }
+    if not good_final_rows:
+        releases = tuple(
+            row for row in store.accepted_records("release_qualification", cut)
+            if _ref_digest(row["body"], "campaign_conclusion_ref") == conclusion_digest
+        )
+        if releases:
+            return {
+                "state": "BLOCKED",
+                "next_action": "REVIEW_FINALIZATION_CHAIN",
+                "reason": "RELEASE_WITHOUT_FINAL_CASE",
+                "campaign_conclusion_count": len(terminal),
+                "final_assurance_case_count": 0,
+                "release_qualification_count": len(releases),
+            }
+        return {
+            "state": "FINAL_CASE_PENDING",
+            "next_action": "RESUME_FINALIZATION",
+            "campaign_conclusion_count": len(terminal),
+            "final_assurance_case_count": 0,
+            "release_qualification_count": 0,
+            "campaign_conclusion_digest": conclusion_digest,
+        }
+
+    final_case = good_final_rows[0]
+    final_digest = final_case["ref"]["revision_digest"]
+    release_rows = tuple(
+        row for row in store.accepted_records("release_qualification", cut)
+        if _ref_digest(row["body"], "campaign_conclusion_ref") == conclusion_digest
+    )
+    good_release_rows = tuple(
+        row for row in release_rows
+        if _ref_digest(row["body"], "final_assurance_case_ref") == final_digest
+        and _ref_digest(row["body"], "stop_evaluation_ref") == stop_digest
+        and row["accepted_seq"] > final_case["accepted_seq"]
+    )
+    if len(release_rows) > 1 or (release_rows and len(good_release_rows) != 1):
+        return {
+            "state": "BLOCKED",
+            "next_action": "REVIEW_FINALIZATION_CHAIN",
+            "reason": "RELEASE_QUALIFICATION_BINDING_CONFLICT",
+            "campaign_conclusion_count": len(terminal),
+            "final_assurance_case_count": 1,
+            "release_qualification_count": len(release_rows),
+        }
+    if not good_release_rows:
+        return {
+            "state": "RELEASE_QUALIFICATION_PENDING",
+            "next_action": "RESUME_FINALIZATION",
+            "campaign_conclusion_count": len(terminal),
+            "final_assurance_case_count": 1,
+            "release_qualification_count": 0,
+            "campaign_conclusion_digest": conclusion_digest,
+            "final_assurance_case_digest": final_digest,
+        }
+
+    return {
+        "state": "COMPLETE",
+        "next_action": "CAMPAIGN_FINISHED",
+        "campaign_conclusion_count": len(terminal),
+        "final_assurance_case_count": 1,
+        "release_qualification_count": 1,
+        "campaign_conclusion_digest": conclusion_digest,
+        "final_assurance_case_digest": final_digest,
+        "release_qualification_digest": good_release_rows[0]["ref"]["revision_digest"],
+    }
+
+
 def campaign_source_identity(
     store: TransactionalHistoryStore,
     cut: dict[str, Any] | None = None,
@@ -241,6 +384,15 @@ class VerifiedCampaignReadModel:
         termination_state = latest_conclusion.get("termination_state") if latest_conclusion else "OPEN"
         if termination_state not in {"OPEN", "COMPLETED", "COMPLETED_LIMITED"}:
             raise ValidationError("CAMPAIGN_CONCLUSION_PROJECTION_INVALID", str(termination_state))
+        finalization = project_finalization_progress(
+            self.store,
+            cut,
+            conclusion_rows=tuple(conclusion_rows),
+        )
+        workflow_finished = (
+            termination_state in {"COMPLETED", "COMPLETED_LIMITED"}
+            and finalization["state"] == "COMPLETE"
+        )
 
         # 5. Determine current_stage rigorously:
         # If there are prepared stages, current_stage is the first prepared stage that is NOT completed.
@@ -270,6 +422,8 @@ class VerifiedCampaignReadModel:
             "campaign_conclusions_count": len(conclusion_rows),
             "termination_state": termination_state,
             "campaign_completed": termination_state in {"COMPLETED", "COMPLETED_LIMITED"},
+            "finalization_progress": finalization,
+            "workflow_finished": workflow_finished,
             "total_objects_count": _accepted_object_count(self.store, cut),
             "source_generation_id": source.get("source_generation_id"),
         }

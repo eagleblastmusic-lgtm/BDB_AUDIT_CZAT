@@ -28,6 +28,7 @@ def _pass_stop_input(campaign_id: str, head_seq: int, head_hash: str) -> dict:
         "campaign_id": campaign_id,
         "source_generation_ref": _ref("source_generation", "g"),
         "input_history_cut": {
+            "variant": "ACCEPTED_HISTORY_CUT",
             "campaign_id": campaign_id,
             "accepted_head_seq": head_seq,
             "accepted_head_hash": head_hash,
@@ -69,7 +70,7 @@ def test_v202_missing_accepted_stop_input_fails_closed(tmp_path: Path):
 
     cont = api.continue_campaign(store)
     assert cont["continuation_state"] == "AWAITING_STAGE_COMPLETION"
-    assert cont["next_action"] == "AWAITING_STAGE_COMPLETION"
+    assert cont["next_action"] == "QUALIFY_STAGE_E1"
 
     result = evaluate_stop_gate(store)
     assert result["status"] == "SUCCESS"

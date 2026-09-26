@@ -26,7 +26,14 @@ from ..history.store import TransactionalHistoryStore
 from ..stop.models import StageCompletion
 from .assignments import _command_id, _current_cut
 from .e2_shadow import _main_decisions
-from .inbox import _same_ref, _with_ref_class
+from .inbox import (
+    _canonical_content_ref_union,
+    _same_ref,
+    _with_ref_class,
+)
+from .stage_completion_evidence import (
+    latest_required_lane_completions,
+)
 from .manual_stage import StageBatch, StageResultInbox
 
 
@@ -810,12 +817,26 @@ class E2FinalizationService:
             and row["body"].get("phase_id")
             == "E2-BLIND"
         ]
-        required_outputs = canonical_reference_set(
+        required_outputs = _canonical_content_ref_union(
             [
                 *decision_refs,
                 *checkpoint_refs,
                 shadow_ref,
+                *(
+                    ref
+                    for completion in completions
+                    for ref in completion["body"].get(
+                        "required_output_refs", ()
+                    )
+                ),
             ]
+        )
+        required_slot_completions = latest_required_lane_completions(
+            self.store,
+            stage_key="E2",
+            stage_spec=stage_spec,
+            cut=cut,
+            candidates=completions,
         )
         completion_refs = canonical_reference_set(
             [
@@ -823,7 +844,7 @@ class E2FinalizationService:
                     row["ref"],
                     "CONTENT_OR_PRIOR",
                 )
-                for row in completions
+                for row in required_slot_completions
             ]
         )
         open_count = sum(
@@ -865,6 +886,11 @@ class E2FinalizationService:
                 ),
                 "open_adjudication_decisions": (
                     open_count
+                ),
+                "required_stage_completion_outputs": list(
+                    stage_spec["body"].get(
+                        "required_stage_completion_outputs", ()
+                    )
                 ),
             },
             unresolved_material_refs=[],

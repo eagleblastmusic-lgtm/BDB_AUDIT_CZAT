@@ -15,8 +15,8 @@ from bdb_audit.adjudication.models import (
 )
 from bdb_audit.coordinator import Coordinator
 from bdb_audit.coordinator.operations import AuditOperationApi
-from bdb_audit.core.errors import ValidationError
 from bdb_audit.core.ids import deterministic_id
+from bdb_audit.core.errors import ValidationError
 from bdb_audit.history.objects import CanonicalObject, CommandEnvelope
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.workflow.e2_checkpoint import E2BlindCheckpointService
@@ -54,6 +54,10 @@ from bdb_audit.workflow.read_models import current_accepted_cut
 from bdb_audit.workflow.inbox import E1ResultInbox
 from bdb_audit.workflow.packaging import prepare_e1_batch
 from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
+from bdb_audit.stop.models import StageCompletion
+from tests.f7.test_adaptive_e6_canonical_authority import (
+    _append_raw_commit,
+)
 
 
 LANES = (
@@ -92,14 +96,8 @@ def e2_phase(tmp_path: Path):
         seed="manual_stage_transport",
     )
     api.prepare_stage(store_path, "E1")
-    api.qualify_stage(store_path, "E1")
-    api.prepare_stage(store_path, "E2")
-    for lane in LANES:
-        api.prepare_lane(
-            store_path,
-            "E2",
-            lane.lane_slot,
-        )
+    for slot in E1_LANE_SLOTS:
+        api.prepare_lane(store_path, "E1", slot=slot)
 
     source = ResolvedSource(
         target_type="github",
@@ -111,6 +109,28 @@ def e2_phase(tmp_path: Path):
         exact_commit_sha="c" * 40,
     )
     store = TransactionalHistoryStore(store_path)
+    e1_batch = prepare_e1_batch(
+        store=store,
+        output_dir=tmp_path / "work",
+        source_info=source,
+    )
+    e1_inbox = E1ResultInbox(store, e1_batch)
+    e1_summary = e1_inbox.ingest_multiple_zips(
+        [
+            _write_e1_result(
+                tmp_path / f"e1_{slot}.zip",
+                e1_batch,
+                slot,
+            )
+            for slot in E1_LANE_SLOTS
+        ]
+    )
+    assert e1_summary.stage_complete is True
+
+    api.prepare_stage(store_path, "E2")
+    for lane in LANES:
+        api.prepare_lane(store_path, "E2", lane.lane_slot)
+
     batch = prepare_stage_phase_batch(
         store=store,
         output_dir=tmp_path / "work",
@@ -266,7 +286,7 @@ def test_exact_retry_is_idempotent(e2_phase):
     assert store.head().commit_seq == after_first
 
 
-def test_manual_e3_enforced_lane_blocks_phase_completion(
+def test_e3_phase_requires_accepted_predecessor_completion(
     tmp_path: Path,
 ):
     store_path = tmp_path / "campaign.sqlite"
@@ -277,12 +297,12 @@ def test_manual_e3_enforced_lane_blocks_phase_completion(
     )
     for stage in ("E1", "E2"):
         api.prepare_stage(store_path, stage)
-        api.qualify_stage(store_path, stage)
     api.prepare_stage(store_path, "E3")
     api.prepare_lane(
         store_path,
         "E3",
         "E3-X",
+        required_isolation_assurance="DECLARED",
     )
 
     store = TransactionalHistoryStore(store_path)
@@ -300,27 +320,19 @@ def test_manual_e3_enforced_lane_blocks_phase_completion(
         "Security / authority / trust",
         "BLIND_NOVELTY",
     )
-    batch = prepare_stage_phase_batch(
-        store=store,
-        output_dir=tmp_path / "work",
-        source_info=source,
-        stage_id="E3",
-        phase_id="E3-BLIND",
-        lane_definitions=(lane,),
-        all_stage_lane_slots=("E3-X",),
-    )
-    inbox = StageResultInbox(store, batch)
-    path = _write_result(
-        tmp_path / "e3.zip",
-        batch,
-        "E3-X",
-    )
-    summary = inbox.ingest_multiple_zips([path])
-    assert summary.accepted_count == 1
-    assert summary.phase_complete is False
-    assert "PHASE_COMPLETION_BLOCKED" in (
-        summary.error or ""
-    )
+    with pytest.raises(
+        ValidationError,
+        match="STAGE_ASSIGNMENT_PREREQUISITE_AMBIGUOUS",
+    ):
+        prepare_stage_phase_batch(
+            store=store,
+            output_dir=tmp_path / "work",
+            source_info=source,
+            stage_id="E3",
+            phase_id="E3-BLIND",
+            lane_definitions=(lane,),
+            all_stage_lane_slots=("E3-X",),
+        )
 
 
 
@@ -328,6 +340,7 @@ def _prepare_e3_isolation_fixture(
     tmp_path: Path,
     *,
     seed: str,
+    required_isolation_assurance: str = "DECLARED",
 ):
     store_path = tmp_path / f"{seed}.sqlite"
     api = AuditOperationApi()
@@ -337,14 +350,66 @@ def _prepare_e3_isolation_fixture(
     )
     for stage in ("E1", "E2"):
         api.prepare_stage(store_path, stage)
-        api.qualify_stage(store_path, stage)
+    store = TransactionalHistoryStore(store_path)
+    cut = current_accepted_cut(store)
+    source_generation_ref = store.accepted_records(
+        "source_generation",
+        cut,
+    )[0]["ref"]
+    e2_spec_record = next(
+        row
+        for row in store.accepted_records("stage_spec", cut)
+        if row["body"].get("stage_key") == "E2"
+    )
+    e2_stage_spec_ref = dict(e2_spec_record["ref"])
+    e2_stage_spec_ref["ref_class"] = "HISTORY_CONTEXT_BINDING"
+    synthetic_stage_run = CanonicalObject(
+        "stage_run",
+        {
+            "stage_run_id": f"synthetic-e2-prerequisite-{seed}",
+            "stage_spec_ref": e2_stage_spec_ref,
+            "source_generation_ref": source_generation_ref,
+            "creation_input_history_cut": cut,
+            "assigned_history_cut": cut,
+            "predecessor_stage_completion_refs": [],
+            "required_lane_slot_contract_refs": [],
+        },
+    )
+    # This helper focuses on E3 phase admission. Seed only its immediate E2
+    # predecessor explicitly; the raw accepted fixture bypasses E2 qualification
+    # services and is not evidence of a completed E2 execution.
+    synthetic_e2_completion = StageCompletion(
+        stage_completion_id=deterministic_id(
+            "stage_completion", f"{seed}:synthetic-e2-prerequisite"
+        ),
+        stage_run_ref=synthetic_stage_run.as_ref().as_dict(),
+        stage_spec_ref=e2_stage_spec_ref,
+        input_history_cut=cut,
+        required_lane_slot_results=(),
+        required_output_refs=(),
+        mandatory_obligation_summary={
+            "required_stage_completion_outputs": list(
+                e2_spec_record["body"].get(
+                    "required_stage_completion_outputs", ()
+                )
+            )
+        },
+        unresolved_material_refs=(),
+        unknown_blocked_summary={"unknown_surfaces_count": 0},
+        completion_predicate_result="STAGE_COMPLETED",
+    ).as_object()
+    _append_raw_commit(
+        store,
+        [synthetic_stage_run, synthetic_e2_completion],
+        index=store.head().commit_seq + 1,
+    )
     api.prepare_stage(store_path, "E3")
     api.prepare_lane(
         store_path,
         "E3",
         "E3-X",
+        required_isolation_assurance=required_isolation_assurance,
     )
-    store = TransactionalHistoryStore(store_path)
     source = ResolvedSource(
         target_type="github",
         location=(
@@ -382,19 +447,12 @@ def test_e3_enforced_proof_requires_accepted_boundary_receipts(
     )
     with pytest.raises(
         ValidationError,
-        match="ENFORCED_ISOLATION_RECEIPTS_REQUIRED",
+        match="ISOLATION_EVIDENCE_KIND_INVALID",
     ):
-        prepare_stage_phase_batch(
+        proof.normalized_body(
             store=store,
-            output_dir=tmp_path / "proof-missing",
-            source_info=source,
-            stage_id="E3",
-            phase_id="E3-BLIND",
-            lane_definitions=(lane,),
-            all_stage_lane_slots=("E3-X",),
-            isolation_proofs_by_slot={
-                "E3-X": proof,
-            },
+            cut=current_accepted_cut(store),
+            required_assurance="DECLARED",
         )
 
 
@@ -421,21 +479,14 @@ def test_e3_declared_proof_cannot_satisfy_enforced_lane(
         ValidationError,
         match="ISOLATION_PROOF_INSUFFICIENT",
     ):
-        prepare_stage_phase_batch(
+        proof.normalized_body(
             store=store,
-            output_dir=tmp_path / "proof-declared",
-            source_info=source,
-            stage_id="E3",
-            phase_id="E3-BLIND",
-            lane_definitions=(lane,),
-            all_stage_lane_slots=("E3-X",),
-            isolation_proofs_by_slot={
-                "E3-X": proof,
-            },
+            cut=current_accepted_cut(store),
+            required_assurance="ENFORCED",
         )
 
 
-def test_e3_accepted_enforced_proof_allows_lane_completion(
+def test_e3_source_generation_cannot_be_reused_as_enforced_proof(
     tmp_path: Path,
 ):
     store, source, lane, accepted_ref = (
@@ -458,61 +509,18 @@ def test_e3_accepted_enforced_proof_allows_lane_completion(
             "TEST_ACCEPTED_BOUNDARY_RECEIPTS",
         ),
     )
-    batch = prepare_stage_phase_batch(
-        store=store,
-        output_dir=tmp_path / "proof-enforced",
-        source_info=source,
-        stage_id="E3",
-        phase_id="E3-BLIND",
-        lane_definitions=(lane,),
-        all_stage_lane_slots=("E3-X",),
-        isolation_proofs_by_slot={
-            "E3-X": proof,
-        },
-    )
-    cut = current_accepted_cut(store)
-    assignment = store.resolve_accepted(
-        batch.get_job(
-            "E3-X"
-        ).assignment_ref,
-        cut,
-    )
-    knowledge = store.resolve_accepted(
-        assignment["body"]["knowledge_state_ref"],
-        cut,
-    )
-    isolation = store.resolve_accepted(
-        knowledge["body"][
-            "isolation_qualification_ref"
-        ],
-        cut,
-    )
-    assert isolation["body"]["result"] == "ENFORCED"
-    assert isolation["body"][
-        "enforcement_receipt_refs"
-    ]
-    assert isolation["body"][
-        "session_boundary_evidence_refs"
-    ]
-
-    inbox = StageResultInbox(
-        store,
-        batch,
-    )
-    path = _write_result(
-        tmp_path / "e3-enforced-result.zip",
-        batch,
-        "E3-X",
-    )
-    summary = inbox.ingest_multiple_zips(
-        [path]
-    )
-    assert summary.accepted_count == 1
-    assert summary.phase_complete is True
-    assert summary.error is None
+    with pytest.raises(
+        ValidationError,
+        match="ISOLATION_EVIDENCE_KIND_INVALID",
+    ):
+        proof.normalized_body(
+            store=store,
+            cut=current_accepted_cut(store),
+            required_assurance="DECLARED",
+        )
 
 
-def test_e3_enforced_proof_rejects_unaccepted_receipt(
+def test_e3_enforced_proof_rejects_source_generation_as_receipt(
     tmp_path: Path,
 ):
     store, source, lane, accepted_ref = (
@@ -537,22 +545,12 @@ def test_e3_enforced_proof_rejects_unaccepted_receipt(
     )
     with pytest.raises(
         ValidationError,
-        match=(
-            "OBJECT_NOT_ACCEPTED_AT_CUT"
-            "|ACCEPTED_HISTORY_INTEGRITY_FAILURE"
-        ),
+        match="ISOLATION_EVIDENCE_KIND_INVALID",
     ):
-        prepare_stage_phase_batch(
+        proof.normalized_body(
             store=store,
-            output_dir=tmp_path / "proof-unaccepted",
-            source_info=source,
-            stage_id="E3",
-            phase_id="E3-BLIND",
-            lane_definitions=(lane,),
-            all_stage_lane_slots=("E3-X",),
-            isolation_proofs_by_slot={
-                "E3-X": proof,
-            },
+            cut=current_accepted_cut(store),
+            required_assurance="DECLARED",
         )
 
 
@@ -632,16 +630,6 @@ def _prepare_e3_gap_fixture(
             seed=seed,
         )
     )
-    proof = StageIsolationProof(
-        result="ENFORCED",
-        channel_inventory_ref=accepted_ref,
-        enforcement_receipt_refs=(accepted_ref,),
-        session_boundary_evidence_refs=(accepted_ref,),
-        scope="TEST_CONTROLLED_SESSION",
-        reason_codes=(
-            "TEST_ACCEPTED_BOUNDARY_RECEIPTS",
-        ),
-    )
     blind_batch = prepare_stage_phase_batch(
         store=store,
         output_dir=tmp_path / f"{seed}-blind",
@@ -650,9 +638,6 @@ def _prepare_e3_gap_fixture(
         phase_id="E3-BLIND",
         lane_definitions=(blind_lane,),
         all_stage_lane_slots=("E3-X",),
-        isolation_proofs_by_slot={
-            "E3-X": proof,
-        },
     )
     blind_inbox = StageResultInbox(
         store,
@@ -690,9 +675,6 @@ def _prepare_e3_gap_fixture(
         all_stage_lane_slots=("E3-X",),
         executor_profile="ChatGPT / GitHub",
         model="Sol 5.6",
-        isolation_proofs_by_slot={
-            "E3-X": proof,
-        },
     ).authorize()
     batch = prepare_stage_phase_batch(
         store=store,
@@ -703,9 +685,6 @@ def _prepare_e3_gap_fixture(
         lane_definitions=(gap_lane,),
         all_stage_lane_slots=("E3-X",),
         authorized_context=authorization,
-        isolation_proofs_by_slot={
-            "E3-X": proof,
-        },
     )
     return (
         store,
@@ -874,6 +853,7 @@ def test_e3_gap_authorization_requires_fresh_isolation_proof(
         _prepare_e3_isolation_fixture(
             tmp_path,
             seed="e3_gap_requires_proof",
+            required_isolation_assurance="ENFORCED",
         )
     )
     with pytest.raises(
@@ -1095,25 +1075,6 @@ def _prepare_e3_cumulative_fixture(
             store
         )
     )
-    cut = current_accepted_cut(store)
-    accepted_ref = store.accepted_records(
-        "source_generation",
-        cut,
-    )[0]["ref"]
-    proof = StageIsolationProof(
-        result="ENFORCED",
-        channel_inventory_ref=accepted_ref,
-        enforcement_receipt_refs=(
-            accepted_ref,
-        ),
-        session_boundary_evidence_refs=(
-            accepted_ref,
-        ),
-        scope="TEST_CONTROLLED_SESSION",
-        reason_codes=(
-            "TEST_ACCEPTED_BOUNDARY_RECEIPTS",
-        ),
-    )
     lane = StageLaneDefinition(
         "E3-X",
         "Cumulative corpus comparison",
@@ -1126,9 +1087,6 @@ def _prepare_e3_cumulative_fixture(
             all_stage_lane_slots=("E3-X",),
             executor_profile="ChatGPT / GitHub",
             model="Sol 5.6",
-            isolation_proofs_by_slot={
-                "E3-X": proof,
-            },
         ).authorize()
     )
     source = ResolvedSource(
@@ -1149,9 +1107,6 @@ def _prepare_e3_cumulative_fixture(
         lane_definitions=(lane,),
         all_stage_lane_slots=("E3-X",),
         authorized_context=authorization,
-        isolation_proofs_by_slot={
-            "E3-X": proof,
-        },
     )
     return (
         store,
@@ -1533,25 +1488,6 @@ def _prepare_e3_holdout_fixture(
     holdout_ref = _accept_holdout_manifest(
         store
     )
-    cut = current_accepted_cut(store)
-    accepted_ref = store.accepted_records(
-        "source_generation",
-        cut,
-    )[0]["ref"]
-    proof = StageIsolationProof(
-        result="ENFORCED",
-        channel_inventory_ref=accepted_ref,
-        enforcement_receipt_refs=(
-            accepted_ref,
-        ),
-        session_boundary_evidence_refs=(
-            accepted_ref,
-        ),
-        scope="TEST_CONTROLLED_SESSION",
-        reason_codes=(
-            "TEST_ACCEPTED_BOUNDARY_RECEIPTS",
-        ),
-    )
     lane = StageLaneDefinition(
         "E3-X",
         "External holdout comparison",
@@ -1569,9 +1505,6 @@ def _prepare_e3_holdout_fixture(
                 "ChatGPT / GitHub"
             ),
             model="Sol 5.6",
-            isolation_proofs_by_slot={
-                "E3-X": proof,
-            },
         ).authorize()
     )
     source = ResolvedSource(
@@ -1594,16 +1527,13 @@ def _prepare_e3_holdout_fixture(
         lane_definitions=(lane,),
         all_stage_lane_slots=("E3-X",),
         authorized_context=authorization,
-        isolation_proofs_by_slot={
-            "E3-X": proof,
-        },
     )
     return (
         store,
         batch,
         authorization,
         holdout_ref,
-        proof,
+        None,
         lane,
     )
 
@@ -1789,9 +1719,6 @@ def test_e3_holdout_authorization_retry_is_idempotent(
         all_stage_lane_slots=("E3-X",),
         executor_profile="ChatGPT / GitHub",
         model="Sol 5.6",
-        isolation_proofs_by_slot={
-            "E3-X": proof,
-        },
     ).authorize()
     assert retry.already_authorized is True
     assert store.head().commit_seq == seq
@@ -1847,21 +1774,6 @@ def test_e3_holdout_rejects_non_auxiliary_role(
         store,
         role="CANONICAL_PREDECESSOR",
     )
-    cut = current_accepted_cut(store)
-    accepted_ref = store.accepted_records(
-        "source_generation",
-        cut,
-    )[0]["ref"]
-    proof = StageIsolationProof(
-        result="ENFORCED",
-        channel_inventory_ref=accepted_ref,
-        enforcement_receipt_refs=(
-            accepted_ref,
-        ),
-        session_boundary_evidence_refs=(
-            accepted_ref,
-        ),
-    )
     with pytest.raises(
         ValidationError,
         match="E3_HOLDOUT_ROLE_INVALID",
@@ -1883,10 +1795,43 @@ def test_e3_holdout_rejects_non_auxiliary_role(
                 "ChatGPT / GitHub"
             ),
             model="Sol 5.6",
-            isolation_proofs_by_slot={
-                "E3-X": proof,
-            },
         ).authorize()
+
+
+def test_primary_e3_holdout_phase_order_matches_preview_guard(
+    tmp_path: Path,
+):
+    store, _, _, _ = _prepare_e3_cumulative_fixture(
+        tmp_path,
+        seed="e3_holdout_before_cumulative_result",
+    )
+    holdout_ref = _accept_holdout_manifest(
+        store,
+        role="AUXILIARY_HOLDOUT",
+    )
+    lane = StageLaneDefinition(
+        "E3-X",
+        "Holdout",
+        "HOLDOUT",
+    )
+    head_before = store.head()
+    commit_count_before = len(store.commits())
+
+    with pytest.raises(
+        ValidationError,
+        match="E3_CUMULATIVE_RESULT_SET_INCOMPLETE",
+    ):
+        E3HoldoutAuthorizationService(
+            store,
+            holdout_corpus_manifest_ref=holdout_ref,
+            lane_definitions=(lane,),
+            all_stage_lane_slots=("E3-X",),
+            executor_profile="ChatGPT / GitHub",
+            model="Sol 5.6",
+        ).authorize()
+
+    assert store.head() == head_before
+    assert len(store.commits()) == commit_count_before
 
 
 def test_unbound_context_members_fail_closed(e2_phase):
@@ -2900,7 +2845,7 @@ def _shadow_checks(authorization, conflict=False):
     ]
 
 
-def test_e2_finalization_accepts_stage_completion_only_after_clean_shadow(
+def test_e2_clean_shadow_without_contradiction_artifact_cannot_complete(
     e2_shadow_flow,
 ):
     store = e2_shadow_flow["store"]
@@ -2928,48 +2873,21 @@ def test_e2_finalization_accepts_stage_completion_only_after_clean_shadow(
     assert imported.phase_complete is True
 
     before = store.head().commit_seq
-    result = E2FinalizationService(
-        store,
-        batch,
-        inbox,
-    ).finalize()
-    assert result.stage_completed is True
-    assert result.stage_completion_ref is not None
-    assert result.accepted_commit_seq == before + 1
-    assert result.next_action == "PREPARE_E3"
+    with pytest.raises(
+        ValidationError,
+        match="STAGE_COMPLETION_REQUIRED_OUTPUT_MISSING: contradiction_obligations",
+    ):
+        E2FinalizationService(
+            store,
+            batch,
+            inbox,
+        ).finalize()
+    assert store.head().commit_seq == before
 
     status = AuditOperationApi().get_campaign_status(
         store.path
     )
-    assert "E2" in status["stages_completed"]
-
-    cut = current_accepted_cut(store)
-    stage_completion = store.resolve_accepted(
-        result.stage_completion_ref,
-        cut,
-    )
-    assert (
-        stage_completion["body"][
-            "completion_predicate_result"
-        ]
-        == "STAGE_COMPLETED"
-    )
-    assert (
-        stage_completion["body"][
-            "mandatory_obligation_summary"
-        ]["shadow_conflicts"]
-        == 0
-    )
-
-    # Retry is read-only/idempotent.
-    seq = store.head().commit_seq
-    retry = E2FinalizationService(
-        store,
-        batch,
-        inbox,
-    ).finalize()
-    assert retry.already_finalized is True
-    assert store.head().commit_seq == seq
+    assert "E2" not in status["stages_completed"]
 
 
 def test_e2_finalization_conflict_requires_contradiction_protocol(

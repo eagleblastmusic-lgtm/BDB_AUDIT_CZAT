@@ -32,7 +32,7 @@ def _cut(seq: int = 7) -> dict[str, object]:
     }
 
 
-def _contexts(cut: dict[str, object]):
+def _contexts(cut: dict[str, object], source_generation_ref: dict[str, str]):
     executor_ref = _ref("executor_profile", "executor")
     delivery_ref = _ref("delivery_profile", "delivery")
     return {
@@ -42,6 +42,7 @@ def _contexts(cut: dict[str, object]):
             assigned_history_cut=cut,
             executor_profile_ref=executor_ref,
             delivery_profile_ref=delivery_ref,
+            source_generation_ref=source_generation_ref,
             channel_inventory_ref=_ref(
                 "registered_immutable_object",
                 "ru03_e3_channel_inventory",
@@ -54,10 +55,11 @@ def _contexts(cut: dict[str, object]):
 
 def _execute(discoveries: dict[str, list[dict[str, object]]]):
     cut = _cut()
+    source_generation_ref = _ref("source_generation", "source")
     result = execute_e3_blind_ensemble(
-        source_generation_ref=_ref("source_generation", "source"),
+        source_generation_ref=source_generation_ref,
         assigned_history_cut=cut,
-        lane_contexts=_contexts(cut),
+        lane_contexts=_contexts(cut, source_generation_ref),
         lane_discoveries=discoveries,
     )
     return result, cut

@@ -51,13 +51,18 @@ def test_report_tracks_new_accepted_history_without_rewriting_prior_projection(t
     before_dict = before.as_dict()
 
     api.prepare_stage(store_path, "E1")
-    api.qualify_stage(store_path, "E1")
+    prepared = api.get_campaign_status(store_path)
+    with pytest.raises(ValidationError) as exc:
+        api.qualify_stage(store_path, "E1")
+    assert exc.value.code == "STAGE_EXECUTION_EVIDENCE_REQUIRED"
 
     after = ReportBuilder(store).build_current()
     assert after.input_history_cut["accepted_head_seq"] > before.input_history_cut["accepted_head_seq"]
     assert after.report_model_sha256 != before.report_model_sha256
     assert before.as_dict() == before_dict
-    assert any(item.record_kind == "stage_completion" for item in after.facts)
+    assert after.input_history_cut["accepted_head_seq"] == prepared["accepted_head_seq"]
+    assert after.facts == before.facts
+    assert not any(item.record_kind == "stage_completion" for item in after.facts)
 
 
 def test_unknown_extraction_is_explicit_and_deterministic():

@@ -110,7 +110,7 @@ def test_residual_risk_revision_after_stop_requires_fresh_stop(monkeypatch) -> N
     service = FinalizationService(store)  # type: ignore[arg-type]
     _install_fake_accept(monkeypatch, store, service)
 
-    with pytest.raises(ValidationError, match="RESIDUAL_RISK_DRIFT_AFTER_STOP"):
+    with pytest.raises(ValidationError, match="STOP_INPUT_CUT_MISMATCH"):
         service.conclude_campaign(
             termination_state="COMPLETED",
             bounded_statement="Must not finalize stale residual-risk authority",

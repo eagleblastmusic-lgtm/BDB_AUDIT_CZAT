@@ -6,6 +6,7 @@ Coordinator/history adapter.
 """
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Mapping
+from types import MappingProxyType
 
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
@@ -15,7 +16,25 @@ from ..history.objects import CanonicalObject
 def _dict(value):
     if not isinstance(value, Mapping):
         raise ValidationError("TYPED_REF_REQUIRED")
-    return dict(value)
+    return {key: _copy_json(child) for key, child in value.items()}
+
+
+def _copy_json(value):
+    if isinstance(value, Mapping):
+        return {key: _copy_json(child) for key, child in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_copy_json(child) for child in value]
+    return value
+
+
+def _freeze_json(value):
+    if isinstance(value, Mapping):
+        return MappingProxyType(
+            {key: _freeze_json(child) for key, child in value.items()}
+        )
+    if isinstance(value, (list, tuple)):
+        return tuple(_freeze_json(child) for child in value)
+    return value
 
 
 def _head_seq(cut):
@@ -38,6 +57,23 @@ class GrantAccepted:
     channel_class: str
     previous_knowledge_state_ref: Mapping | None = None
     capability_profile_ref: Mapping | None = None
+
+    def __post_init__(self):
+        for name in (
+            "attempt_ref",
+            "grant_input_history_cut",
+            "view_manifest_ref",
+            "delivery_profile_ref",
+        ):
+            object.__setattr__(self, name, _dict(getattr(self, name)))
+        if self.previous_knowledge_state_ref is not None:
+            object.__setattr__(
+                self,
+                "previous_knowledge_state_ref",
+                _dict(self.previous_knowledge_state_ref),
+            )
+        if self.capability_profile_ref is not None:
+            object.__setattr__(self, "capability_profile_ref", _dict(self.capability_profile_ref))
 
     def body(self):
         out = {"attempt_ref": _dict(self.attempt_ref), "grant_input_history_cut": _dict(self.grant_input_history_cut),
@@ -68,7 +104,9 @@ class PotentialExposureRecord:
 
     def __post_init__(self):
         for name in ("attempt_ref", "grant_ref", "view_manifest_ref", "exposure_input_history_cut"):
-            _dict(getattr(self, name))
+            object.__setattr__(self, name, _dict(getattr(self, name)))
+        if self.previous_knowledge_state_ref is not None:
+            object.__setattr__(self, "previous_knowledge_state_ref", _dict(self.previous_knowledge_state_ref))
 
     def body(self):
         out = {"attempt_ref": _dict(self.attempt_ref), "grant_ref": _dict(self.grant_ref),
@@ -118,17 +156,28 @@ class KnowledgeState:
     known_classes: tuple[str, ...] = ()
 
     def __post_init__(self):
-        _dict(self.attempt_ref); _dict(self.basis_history_cut); _dict(self.isolation_qualification_ref)
+        for name in ("attempt_ref", "basis_history_cut", "isolation_qualification_ref"):
+            object.__setattr__(self, name, _freeze_json(_dict(getattr(self, name))))
         for name in ("allowed_view_refs", "potential_exposure_refs", "contamination_assessment_refs"):
-            object.__setattr__(self, name, tuple(getattr(self, name)))
+            object.__setattr__(
+                self,
+                name,
+                tuple(_freeze_json(_dict(ref)) for ref in getattr(self, name)),
+            )
+        if self.previous_knowledge_state_ref is not None:
+            object.__setattr__(
+                self,
+                "previous_knowledge_state_ref",
+                _freeze_json(_dict(self.previous_knowledge_state_ref)),
+            )
         object.__setattr__(self, "known_classes", tuple(sorted(set(self.known_classes))))
 
     def body(self):
         out = {"attempt_ref": _dict(self.attempt_ref), "basis_history_cut": _dict(self.basis_history_cut),
                "isolation_qualification_ref": _dict(self.isolation_qualification_ref),
-               "allowed_view_refs": [dict(v) for v in self.allowed_view_refs],
-               "potential_exposure_refs": [dict(v) for v in self.potential_exposure_refs],
-               "contamination_assessment_refs": [dict(v) for v in self.contamination_assessment_refs],
+               "allowed_view_refs": [_dict(v) for v in self.allowed_view_refs],
+               "potential_exposure_refs": [_dict(v) for v in self.potential_exposure_refs],
+               "contamination_assessment_refs": [_dict(v) for v in self.contamination_assessment_refs],
                "known_classes": list(self.known_classes)}
         if self.previous_knowledge_state_ref is not None:
             out["previous_knowledge_state_ref"] = _dict(self.previous_knowledge_state_ref)
@@ -227,6 +276,13 @@ class ExposureLedger:
             raise ValidationError("ACCEPTED_HISTORY_CUT_REQUIRED")
         accepted = self._history.resolve_accepted(state.as_object().ref, history_cut, require_current=True)
         key = state.attempt_ref.get("revision_digest")
+        for ref in state.potential_exposure_refs:
+            exposure = self._history.resolve_accepted(ref, history_cut)
+            if (
+                exposure["ref"]["kind"] != "potential_exposure_record"
+                or exposure["body"].get("attempt_ref") != state.attempt_ref
+            ):
+                raise ValidationError("KNOWLEDGE_EXPOSURE_BINDING_MISMATCH")
         if state.previous_knowledge_state_ref is not None:
             previous = self._history.resolve_accepted(state.previous_knowledge_state_ref, state.basis_history_cut)
             if previous["accepted_seq"] >= accepted["accepted_seq"] or previous["body"]["attempt_ref"] != state.attempt_ref:

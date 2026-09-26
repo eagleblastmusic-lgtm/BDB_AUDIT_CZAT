@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Any, Mapping, Sequence
 import hashlib
 
-from ..core.canonical_json import canonical_bytes
+from ..core.canonical_json import canonical_bytes, parse
 from ..core.errors import ValidationError
 from ..core.hashing import object_digest
 from ..core.ids import new_id
@@ -62,6 +62,33 @@ def _ref_dict(ref: Any) -> dict:
     raise ValidationError("REF_REQUIRED", f"Cannot convert {type(ref)} to ref dict")
 
 
+def _json_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {key: _json_value(child) for key, child in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_value(child) for child in value]
+    return value
+
+
+def _canonical_copy(value: Any) -> Any:
+    """Copy JSON contract data through the canonical parser, rejecting aliases."""
+    return parse(canonical_bytes(_json_value(value)))
+
+
+def _same_canonical(left: Any, right: Any) -> bool:
+    return canonical_bytes(_json_value(left)) == canonical_bytes(_json_value(right))
+
+
+def _require_ref_kind(ref: Mapping, expected_kind: str) -> bool:
+    return (
+        isinstance(ref, Mapping)
+        and ref.get("kind") == expected_kind
+        and isinstance(ref.get("revision_digest"), str)
+        and len(ref["revision_digest"]) == 64
+        and ref.get("digest_profile") == "BDB-OBJECT-DIGEST-1"
+    )
+
+
 def _discovery_binding_digest(discovery: Mapping[str, Any]) -> str:
     """Return a domain-separated content binding for one sealed blind discovery.
 
@@ -94,6 +121,7 @@ def build_e3_stage_spec(revision: str = "1") -> StageSpec:
         required_lane_slots=E3_LANE_SLOTS,
         blind_reveal_phase_model="AFTER_CHECKPOINT",
         required_stage_completion_outputs=("blind_checkpoint", "gap_directed_records", "stage_completion_digest"),
+        transition_policy_ref="TRANSITION_PROFILE_V1",
         stop_e6_relationship="CONTINUE_REQUIRED",
     )
 
@@ -149,9 +177,11 @@ class E3QuarantineBroker:
 
     def __init__(self):
         self._sealed_findings: dict[str, list[dict]] = {slot: [] for slot in E3_LANE_SLOTS}
-        self._isolation_qualifications: dict[str, IsolationQualification] = {}
+        self._isolation_qualifications: dict[str, str] = {}
         self._is_checkpoint_sealed: bool = False
         self._checkpoint_digest: str | None = None
+        self._checkpoint_cut_bytes: bytes | None = None
+        self._sealed_checkpoint: dict[str, Any] | None = None
 
     @property
     def is_checkpoint_sealed(self) -> bool:
@@ -221,7 +251,7 @@ class E3QuarantineBroker:
                 "LANE_CONTAMINATED",
                 f"Lane {lane_slot} is contaminated and cannot participate in blind novelty",
             )
-        self._isolation_qualifications[lane_slot] = qualification
+        self._isolation_qualifications[lane_slot] = qualification.as_object().digest
 
     def record_lane_discovery(
         self,
@@ -253,13 +283,13 @@ class E3QuarantineBroker:
                 f"Blind discovery must be PRE_REVEAL_DISCOVERY, got {classification}",
             )
 
-        self._sealed_findings[lane_slot].append(dict(discovery))
+        self._sealed_findings[lane_slot].append(_canonical_copy(discovery))
 
     def get_lane_view(self, requesting_lane: str) -> list[dict]:
         """A lane can ONLY see its own findings prior to checkpoint release."""
         if requesting_lane not in E3_LANE_SLOTS:
             raise ValidationError("UNKNOWN_LANE_SLOT", requesting_lane)
-        return list(self._sealed_findings[requesting_lane])
+        return _canonical_copy(self._sealed_findings[requesting_lane])
 
     def query_cross_lane_findings(
         self,
@@ -272,7 +302,7 @@ class E3QuarantineBroker:
                 "CROSS_LANE_KNOWLEDGE_LEAKAGE",
                 f"Blind lane {requesting_lane} cannot access unsealed findings of {target_lane}",
             )
-        return list(self._sealed_findings[target_lane])
+        return _canonical_copy(self._sealed_findings[target_lane])
 
     def query_finding_corpus(self, requesting_lane: str) -> None:
         """Adversarial check: requesting prior stage or cumulative finding corpus must fail closed."""
@@ -284,8 +314,15 @@ class E3QuarantineBroker:
 
     def seal_checkpoint(self, accepted_history_cut: dict) -> dict[str, Any]:
         """Seal E3 blind discoveries into an immutable checkpoint."""
+        cut = _canonical_copy(accepted_history_cut)
+        cut_bytes = canonical_bytes(cut)
         if self._is_checkpoint_sealed:
-            raise ValidationError("CHECKPOINT_ALREADY_SEALED", "Checkpoint has already been sealed")
+            if cut_bytes != self._checkpoint_cut_bytes:
+                raise ValidationError(
+                    "CHECKPOINT_SEAL_BASIS_MISMATCH",
+                    "Checkpoint was already sealed against a different exact history cut",
+                )
+            return _canonical_copy(self._sealed_checkpoint)
 
         # Verify all 3 lanes have completed isolation qualification
         for slot in E3_LANE_SLOTS:
@@ -295,28 +332,75 @@ class E3QuarantineBroker:
                     f"Cannot seal checkpoint: lane {slot} has not qualified isolation",
                 )
 
-        self._is_checkpoint_sealed = True
         body = {
             "checkpoint_type": "E3_BLIND_NOVELTY_CHECKPOINT",
-            "accepted_history_cut": dict(accepted_history_cut),
+            "accepted_history_cut": cut,
             "lane_discoveries_count": {slot: len(self._sealed_findings[slot]) for slot in E3_LANE_SLOTS},
             "sealed_discovery_digests": self.discovery_bindings(),
+            "isolation_qualification_digests": {
+                slot: self._isolation_qualifications[slot]
+                for slot in E3_LANE_SLOTS
+            },
             "lane_slots": list(E3_LANE_SLOTS),
         }
         self._checkpoint_digest = hashlib.sha256(canonical_bytes(body)).hexdigest()
-        return {
+        result = {
             "checkpoint_digest": self._checkpoint_digest,
+            "authority_status": "PREVIEW_ONLY",
             "body": body,
-            "sealed_findings": {slot: list(f) for slot, f in self._sealed_findings.items()},
+            "sealed_findings": _canonical_copy(self._sealed_findings),
         }
+        self._checkpoint_cut_bytes = cut_bytes
+        self._sealed_checkpoint = _canonical_copy(result)
+        self._is_checkpoint_sealed = True
+        return _canonical_copy(self._sealed_checkpoint)
 
 
 @dataclass(frozen=True)
 class E3BlindAttemptContext:
+    lane_slot: str
+    source_generation_ref: Mapping | None
     attempt: Attempt
     isolation_qualification: IsolationQualification
     knowledge_state: KnowledgeState
     result_slot_contract: dict
+    binding_digest: str = ""
+
+    def __post_init__(self):
+        payload = _e3_context_binding_payload(
+            self.lane_slot,
+            self.source_generation_ref,
+            self.attempt,
+            self.isolation_qualification,
+            self.knowledge_state,
+            self.result_slot_contract,
+        )
+        digest = hashlib.sha256(canonical_bytes(payload)).hexdigest()
+        if self.binding_digest and self.binding_digest != digest:
+            raise ValidationError("E3_ATTEMPT_CONTEXT_BINDING_MISMATCH")
+        object.__setattr__(self, "binding_digest", digest)
+
+
+def _e3_context_binding_payload(
+    lane_slot: str,
+    source_generation_ref: Mapping | None,
+    attempt: Attempt,
+    isolation_qualification: IsolationQualification,
+    knowledge_state: KnowledgeState,
+    result_slot_contract: Mapping,
+) -> dict[str, Any]:
+    return {
+        "lane_slot": lane_slot,
+        "source_generation_ref": _canonical_copy(dict(source_generation_ref))
+        if source_generation_ref is not None
+        else None,
+        "attempt": _canonical_copy(attempt.body()),
+        "isolation_qualification": _canonical_copy(
+            isolation_qualification.body()
+        ),
+        "knowledge_state": _canonical_copy(knowledge_state.body()),
+        "result_slot_contract": _canonical_copy(dict(result_slot_contract)),
+    }
 
 
 def create_e3_blind_attempt(
@@ -332,10 +416,22 @@ def create_e3_blind_attempt(
     fresh_session_boundary: bool = False,
     forbidden_channel_access: bool = False,
     contaminated: bool = False,
+    source_generation_ref: Mapping | None = None,
 ) -> E3BlindAttemptContext:
     """Construct a blind attempt with an honest, caller-supplied isolation class."""
     if lane_slot not in E3_LANE_SLOTS:
         raise ValidationError("UNKNOWN_LANE_SLOT", f"Invalid lane slot: {lane_slot}")
+    if source_generation_ref is None:
+        raise ValidationError(
+            "E3_SOURCE_GENERATION_REQUIRED",
+            "A blind attempt must be bound to its exact source generation",
+        )
+
+    lane_run_ref = _canonical_copy(dict(lane_run_ref))
+    assigned_history_cut = _canonical_copy(dict(assigned_history_cut))
+    executor_profile_ref = _canonical_copy(dict(executor_profile_ref))
+    delivery_profile_ref = _canonical_copy(dict(delivery_profile_ref))
+    source_generation_ref = _canonical_copy(dict(source_generation_ref))
 
     attempt_nonce = nonce or hashlib.sha256(f"{lane_slot}_{new_id('attempt')}".encode()).hexdigest()[:16]
     attempt_id = f"attempt_e3_{lane_slot.lower()}_{attempt_nonce}"
@@ -371,37 +467,24 @@ def create_e3_blind_attempt(
             f"Unsupported E3 isolation class: {isolation_assurance}",
         )
 
-    evidence_keys = (
-        "enforcement_receipt_refs",
-        "filesystem_boundary_evidence_refs",
-        "network_boundary_evidence_refs",
-        "tool_boundary_evidence_refs",
-        "session_boundary_evidence_refs",
-    )
     if isolation_assurance == "ENFORCED":
-        missing_evidence = [
-            key
-            for key in evidence_keys
-            if not tuple(ev.get(key, ()))
-        ]
-        if (
-            channel_inventory_ref is None
-            or not fresh_session_boundary
-            or forbidden_channel_access
-            or contaminated
-            or missing_evidence
-        ):
-            missing = list(missing_evidence)
-            if channel_inventory_ref is None:
-                missing.append("channel_inventory_ref")
-            details = ", ".join(missing) or "boundary state"
+        evidence_keys = (
+            "enforcement_receipt_refs",
+            "filesystem_boundary_evidence_refs",
+            "network_boundary_evidence_refs",
+            "tool_boundary_evidence_refs",
+            "session_boundary_evidence_refs",
+        )
+        missing_evidence = [key for key in evidence_keys if not tuple(ev.get(key, ()))]
+        if not fresh_session_boundary or forbidden_channel_access or contaminated or missing_evidence:
             raise ValidationError(
                 "E3_ENFORCED_BOUNDARY_EVIDENCE_REQUIRED",
-                (
-                    "ENFORCED E3 isolation requires a fresh uncontaminated "
-                    f"session and explicit material-channel witnesses; missing: {details}"
-                ),
+                "ENFORCED E3 needs uncontaminated boundary assertions and supplied witness refs",
             )
+        raise ValidationError(
+            "ISOLATION_ADMISSION_CONTEXT_REQUIRED",
+            "The reference helper cannot resolve accepted Executor/Lane material-channel policy and evidence",
+        )
 
     iso_qual = IsolationQualification(
         attempt_ref=attempt_ref,
@@ -449,6 +532,8 @@ def create_e3_blind_attempt(
     )
 
     return E3BlindAttemptContext(
+        lane_slot=lane_slot,
+        source_generation_ref=source_generation_ref,
         attempt=attempt,
         isolation_qualification=iso_qual,
         knowledge_state=knowledge_state,
@@ -470,6 +555,7 @@ class E3BlindNoveltyResult:
 
     def as_dict(self) -> dict:
         return {
+            "authority_status": "PREVIEW_ONLY",
             "stage_key": self.stage_key,
             "mode": "BLIND_NOVELTY",
             "stage_spec_digest": self.stage_spec_digest,
@@ -495,6 +581,8 @@ def execute_e3_blind_ensemble(
     - any forbidden knowledge leakage is detected.
     """
     spec = stage_spec or build_e3_stage_spec()
+    source_ref = _canonical_copy(_ref_dict(source_generation_ref))
+    assigned_cut = _canonical_copy(dict(assigned_history_cut))
 
     # Verify all 3 mandatory lanes are reported
     reported_lanes = set(lane_discoveries.keys())
@@ -504,10 +592,18 @@ def execute_e3_blind_ensemble(
             "MANDATORY_LANE_MISSING",
             f"Missing required E3 blind novelty lanes: {sorted(missing)}",
         )
+    if reported_lanes != set(spec.required_lane_slots) or set(lane_contexts) != set(spec.required_lane_slots):
+        raise ValidationError("E3_LANE_SET_MISMATCH")
+    if not _require_ref_kind(source_ref, "source_generation"):
+        raise ValidationError("E3_SOURCE_GENERATION_REF_INVALID")
+    if assigned_cut.get("variant") != "ACCEPTED_HISTORY_CUT":
+        raise ValidationError("E3_ACCEPTED_HISTORY_CUT_REQUIRED")
 
     broker = E3QuarantineBroker()
     all_quarantined: list[dict] = []
     total_count = 0
+    attempt_digests: set[str] = set()
+    lane_run_digests: set[str] = set()
 
     for slot in sorted(spec.required_lane_slots):
         ctx = lane_contexts.get(slot)
@@ -516,12 +612,87 @@ def execute_e3_blind_ensemble(
                 "MANDATORY_LANE_MISSING",
                 f"Missing attempt context for mandatory lane: {slot}",
             )
+        current_binding = _e3_context_binding_payload(
+            ctx.lane_slot,
+            ctx.source_generation_ref,
+            ctx.attempt,
+            ctx.isolation_qualification,
+            ctx.knowledge_state,
+            ctx.result_slot_contract,
+        )
+        if (
+            ctx.binding_digest
+            != hashlib.sha256(canonical_bytes(current_binding)).hexdigest()
+            or ctx.lane_slot != slot
+            or ctx.source_generation_ref is None
+            or not _same_canonical(ctx.source_generation_ref, source_ref)
+            or not _same_canonical(ctx.attempt.assigned_history_cut, assigned_cut)
+            or not _same_canonical(
+                ctx.isolation_qualification.assessment_input_history_cut,
+                assigned_cut,
+            )
+            or not _same_canonical(ctx.knowledge_state.basis_history_cut, assigned_cut)
+            or not _same_canonical(
+                ctx.isolation_qualification.attempt_ref,
+                ctx.attempt.as_object().ref.as_dict(),
+            )
+            or not _same_canonical(
+                ctx.knowledge_state.attempt_ref,
+                ctx.attempt.as_object().ref.as_dict(),
+            )
+            or not _same_canonical(
+                ctx.isolation_qualification.executor_profile_ref,
+                ctx.attempt.executor_profile_ref,
+            )
+            or not _same_canonical(
+                ctx.isolation_qualification.delivery_profile_ref,
+                ctx.attempt.delivery_profile_ref,
+            )
+            or not _same_canonical(
+                ctx.knowledge_state.isolation_qualification_ref,
+                ctx.isolation_qualification.as_object().ref.as_dict(),
+            )
+            or not _require_ref_kind(ctx.attempt.lane_run_ref, "lane_run")
+            or not _require_ref_kind(ctx.attempt.executor_profile_ref, "executor_profile")
+            or not _require_ref_kind(ctx.attempt.delivery_profile_ref, "delivery_profile")
+            or not _require_ref_kind(
+                ctx.attempt.as_object().ref.as_dict(),
+                "attempt",
+            )
+            or ctx.isolation_qualification.required_isolation_assurance
+            != build_e3_lane_specs(spec.stage_spec_revision)[slot].required_isolation_assurance
+            or not _same_canonical(
+                ctx.attempt.result_slot_contracts,
+                (ctx.result_slot_contract,),
+            )
+            or ctx.knowledge_state.previous_knowledge_state_ref is not None
+            or ctx.knowledge_state.allowed_view_refs
+            or ctx.knowledge_state.potential_exposure_refs
+        ):
+            raise ValidationError(
+                "E3_ATTEMPT_CONTEXT_MISMATCH",
+                f"Lane {slot} context does not match the exact blind-run source, cut, attempt and profiles",
+            )
+        attempt_digest = ctx.attempt.as_object().digest
+        lane_run_digest = ctx.attempt.lane_run_ref.get("revision_digest")
+        if (
+            attempt_digest in attempt_digests
+            or lane_run_digest in lane_run_digests
+            or not lane_run_digest
+        ):
+            raise ValidationError(
+                "E3_LANE_ATTEMPT_REUSED",
+                f"Each blind lane requires a distinct attempt and lane run: {slot}",
+            )
+        attempt_digests.add(attempt_digest)
+        lane_run_digests.add(lane_run_digest)
         broker.register_isolation_qualification(slot, ctx.isolation_qualification)
 
         disc_list = lane_discoveries.get(slot, [])
         for d in disc_list:
-            broker.record_lane_discovery(slot, d)
-            claim_data = dict(d)
+            discovery = _canonical_copy(dict(d))
+            broker.record_lane_discovery(slot, discovery)
+            claim_data = _canonical_copy(discovery)
             claim_data["originating_lane"] = slot
             claim_data["attempt_ref"] = ctx.attempt.as_object().ref.as_dict()
             claim_data["knowledge_state_ref"] = ctx.knowledge_state.as_object().ref.as_dict()
@@ -535,20 +706,24 @@ def execute_e3_blind_ensemble(
         "mode": "BLIND_NOVELTY",
         "stage_spec_digest": spec.revision_digest,
         "completed_lanes": sorted(spec.required_lane_slots),
-        "source_generation_ref": _ref_dict(source_generation_ref),
-        "assigned_history_cut": dict(assigned_history_cut),
+        "source_generation_ref": source_ref,
+        "assigned_history_cut": assigned_cut,
         "total_discoveries": total_count,
         "sealed_discovery_digests": broker.discovery_bindings(),
     }
     blind_comp_digest = hashlib.sha256(canonical_bytes(completion_body)).hexdigest()
+    broker.seal_checkpoint(assigned_cut)
 
     return E3BlindNoveltyResult(
         stage_key="E3",
         stage_spec_digest=spec.revision_digest,
-        assigned_history_cut=dict(assigned_history_cut),
+        assigned_history_cut=_canonical_copy(assigned_cut),
         completed_lanes=tuple(sorted(spec.required_lane_slots)),
         total_discoveries=total_count,
-        discoveries_by_lane={slot: list(lane_discoveries.get(slot, [])) for slot in spec.required_lane_slots},
+        discoveries_by_lane={
+            slot: _canonical_copy(list(lane_discoveries.get(slot, [])))
+            for slot in spec.required_lane_slots
+        },
         blind_completion_digest=blind_comp_digest,
         quarantined_claims=tuple(all_quarantined),
         broker=broker,

@@ -254,6 +254,7 @@ class ExternalStageFinalizationService:
 
         result_rows: list[dict[str, Any]] = []
         completion_rows: list[dict[str, Any]] = []
+        completion_by_slot: dict[str, dict[str, Any]] = {}
         stage_run_digests: set[str] = set()
         stage_run_ref: dict[str, Any] | None = None
         stage_spec_digest = stage_spec["ref"]["revision_digest"]
@@ -286,6 +287,11 @@ class ExternalStageFinalizationService:
                 )
                 result_rows.append(result)
                 completion_rows.append(completion)
+                # A stage can execute one required lane in several phases.
+                # StageCompletion names each governing StageSpec slot once;
+                # bind it to its last accepted phase completion and retain
+                # all phase artifacts in required_output_refs below.
+                completion_by_slot[slot] = completion
 
         if len(stage_run_digests) != 1 or stage_run_ref is None:
             raise ValidationError(
@@ -329,7 +335,7 @@ class ExternalStageFinalizationService:
                 _with_ref_class(
                     row["ref"], "CONTENT_OR_PRIOR"
                 )
-                for row in completion_rows
+                for row in completion_by_slot.values()
             ]
         )
         extra_output_refs.extend(
@@ -371,6 +377,11 @@ class ExternalStageFinalizationService:
                 ),
                 "completed_phases": list(phase_names),
                 "completed_lane_results": len(result_refs),
+                "required_stage_completion_outputs": list(
+                    stage_spec["body"].get(
+                        "required_stage_completion_outputs", ()
+                    )
+                ),
             },
             unresolved_material_refs=[],
             unknown_blocked_summary={

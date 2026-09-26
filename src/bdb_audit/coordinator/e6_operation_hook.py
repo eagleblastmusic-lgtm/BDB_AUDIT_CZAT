@@ -135,11 +135,17 @@ def install_adaptive_e6_prepare_stage() -> None:
             and "E6" not in status.get("stages_completed", ())
         ):
             return {
-                "status": "SUCCESS",
+                "status": "BLOCKED",
                 "campaign_id": status["campaign_id"],
                 "current_stage": "E6",
-                "continuation_state": "AWAITING_STAGE_COMPLETION",
-                "next_action": "AWAITING_STAGE_COMPLETION",
+                "continuation_state": "E6_EXECUTION_UNAVAILABLE",
+                "next_action": "E6_RUNTIME_UNAVAILABLE",
+                "reason": (
+                    "The accepted E6 plan has no connected execution, result, "
+                    "and obligation-qualification runtime."
+                ),
+                "finalization_progress": status.get("finalization_progress"),
+                "workflow_finished": False,
                 "head_seq": status["accepted_head_seq"],
             }
         # Once the latest E6 revision is complete, the baseline continuation

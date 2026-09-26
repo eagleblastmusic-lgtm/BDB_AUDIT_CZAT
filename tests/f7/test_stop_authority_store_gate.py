@@ -65,3 +65,61 @@ def test_authority_rejects_forged_stop_proof_before_durability(tmp_path: Path) -
 
     assert ctx["store"].head() == ctx["head"]
     assert ctx["store"].object_record(forged.digest) is None
+
+
+def test_authority_rejects_contradictory_stop_evaluation_before_durability(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    from bdb_audit.stop.models import StopEvaluation
+
+    ctx, stop_input, snapshot_obj = _prepared_final_stop(tmp_path, "contradictory-stop")
+    forged = StopEvaluation(
+        stop_input_ref=stop_input.ref,
+        continuation_decision="PASS",
+        assurance_level="ADEQUATE_FOR_DECLARED_SCOPE",
+        release_readiness="READY",
+    ).as_object()
+    command = ctx["next_cmd"](ctx["head_ref"])
+
+    with pytest.raises(ValidationError, match="STOP_EVALUATION_INPUT_MISMATCH"):
+        ctx["coordinator"].accept(
+            command,
+            immutable_objects=(snapshot_obj, stop_input.as_object(), forged),
+            expected_head=ctx["head"],
+        )
+
+    assert ctx["store"].head() == ctx["head"]
+    assert ctx["store"].object_record(forged.digest) is None
+
+    # The same exact contradiction becomes admissible only when the canonical
+    # store-side recomputation is deliberately bypassed.
+    monkeypatch.setattr(
+        ctx["store"],
+        "_validate_stop_evaluation_outcomes",
+        lambda *_args, **_kwargs: None,
+    )
+    accepted = ctx["coordinator"].accept(
+        command,
+        immutable_objects=(snapshot_obj, stop_input.as_object(), forged),
+        expected_head=ctx["head"],
+    )
+    assert accepted.head.commit_seq == ctx["head"].commit_seq + 1
+    assert ctx["store"].object_record(forged.digest) is not None
+
+
+def test_authority_accepts_exact_recomputed_stop_evaluation(tmp_path: Path) -> None:
+    from bdb_audit.stop.evaluator import evaluate_stop
+
+    ctx, stop_input, snapshot_obj = _prepared_final_stop(tmp_path, "truthful-stop")
+    evaluation = evaluate_stop(stop_input)
+    command = ctx["next_cmd"](ctx["head_ref"])
+
+    result = ctx["coordinator"].accept(
+        command,
+        immutable_objects=(snapshot_obj, stop_input.as_object(), evaluation.as_object()),
+        expected_head=ctx["head"],
+    )
+
+    assert result.head.commit_seq == ctx["head"].commit_seq + 1
+    assert ctx["store"].object_record(evaluation.as_object().digest) is not None

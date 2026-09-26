@@ -13,6 +13,7 @@ from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
 from bdb_audit.workflow.source_target import ResolvedSource
 from bdb_audit.workflow.packaging import prepare_e1_batch
 from bdb_audit.workflow.inbox import E1ResultInbox
+from bdb_audit.workflow.read_models import current_accepted_cut
 
 
 @pytest.fixture
@@ -91,6 +92,23 @@ def test_multi_zips_order_independent_matching(inbox_setup):
     assert summary.stage_complete is True
     assert summary.completion_digest is not None
     assert len(summary.completion_digest) == 64
+    cut = current_accepted_cut(store)
+    completion = next(
+        row
+        for row in store.accepted_records("stage_completion", cut)
+        if row["body"].get("stage_spec_ref", {}).get("revision_digest")
+        == store.accepted_records("stage_spec", cut)[0]["ref"]["revision_digest"]
+    )
+    output_digests = {
+        ref["revision_digest"]
+        for ref in completion["body"]["required_output_refs"]
+    }
+    accepted_discoveries = {
+        row["ref"]["revision_digest"]
+        for row in store.accepted_records("discovery_record", cut)
+    }
+    assert accepted_discoveries <= output_digests
+    assert summary.completion_digest == completion["ref"]["revision_digest"]
 
 
 def test_missing_lane_reports_waiting(inbox_setup):

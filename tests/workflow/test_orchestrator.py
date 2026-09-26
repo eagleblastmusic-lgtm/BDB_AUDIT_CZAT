@@ -16,6 +16,11 @@ from bdb_audit.workflow.executors import EXECUTION_MODES
 from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.workflow.read_models import current_accepted_cut
+from bdb_audit.orchestration.stages import initial_stage_specs
+from tests.f7.test_adaptive_e6_canonical_authority import (
+    _append_raw_commit,
+    _stage_execution_objects,
+)
 
 
 def _create_lane_result_zip(path: Path, batch, slot: str) -> Path:
@@ -100,6 +105,29 @@ def orchestrator_setup(tmp_path: Path):
         exact_commit_sha="c" * 40,
     )
     return orch, mgr, mock_platform, tmp_path
+
+
+def _seed_stage_prerequisite_fixture(orch, stage_keys: tuple[str, ...]) -> None:
+    """Seed explicitly synthetic prior-stage state for focused downstream tests."""
+    assert orch.active_store_path is not None
+    store = TransactionalHistoryStore(orch.active_store_path)
+    cut = current_accepted_cut(store)
+    source_generation_ref = store.accepted_records(
+        "source_generation", cut
+    )[0]["ref"]
+    specs = {spec.stage_key: spec for spec in initial_stage_specs()}
+    for stage_key in stage_keys:
+        _append_raw_commit(
+            store,
+            _stage_execution_objects(
+                specs[stage_key],
+                source_generation_ref=source_generation_ref,
+                label=f"orchestrator-prerequisite-{stage_key}",
+                required_isolation_assurance="DECLARED",
+                include_stage_spec=True,
+            ),
+            index=store.head().commit_seq + 1,
+        )
 
 
 def test_preflight_checks_pass_when_configured(orchestrator_setup, monkeypatch):
@@ -250,6 +278,38 @@ def test_resume_campaign_reconstructs_partial_state(orchestrator_setup):
     assert set(result["missing_lanes"]) == {"E1-A", "E1-C", "E1-D", "E1-E"}
 
 
+def test_fresh_resume_without_e1_package_returns_legal_next_step(orchestrator_setup):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    init = orch.initialize_campaign()
+
+    resumed = FullAuditOrchestrator(
+        settings_mgr=mgr,
+        platform_adapter=MockPlatformAdapter(),
+    )
+    result = resumed.resume_campaign(init["store_path"])
+    assert result["status"] == "SUCCESS"
+    assert result["current_stage"] == "GENESIS"
+    assert result["next_action"] == "PREPARE_STAGE_E1"
+    assert result["active_inbox"] == "NONE"
+    assert result["workflow_finished"] is False
+
+
+def test_prepared_e1_resume_without_assignments_requests_orchestration(orchestrator_setup):
+    orch, mgr, mock_platform, tmp = orchestrator_setup
+    init = orch.initialize_campaign()
+    orch.api.prepare_stage(init["store_path"], "E1")
+
+    resumed = FullAuditOrchestrator(
+        settings_mgr=mgr,
+        platform_adapter=MockPlatformAdapter(),
+    )
+    result = resumed.resume_campaign(init["store_path"])
+    assert result["status"] == "SUCCESS"
+    assert result["current_stage"] == "E1"
+    assert result["next_action"] == "PREPARE_E1_ORCHESTRATION"
+    assert result["active_inbox"] == "NONE"
+
+
 def test_resume_nonexistent_store_fails_closed(orchestrator_setup):
     orch, mgr, mock_platform, tmp = orchestrator_setup
     result = orch.resume_campaign(tmp / "missing.sqlite")
@@ -365,13 +425,9 @@ def test_e3_blind_preparation_uses_declared_manual_isolation_without_overclaim(
     orch, mgr, mock_platform, tmp = orchestrator_setup
     orch.initialize_campaign()
     assert orch.active_store_path is not None
-    # Build only the predecessor acceptance needed to reach E3. The public
-    # ChatGPT/GitHub transport can honestly prove DECLARED, not ENFORCED,
-    # isolation and must preserve that weaker assurance in accepted history.
-    orch.api.prepare_stage(orch.active_store_path, "E1")
-    orch.api.qualify_stage(orch.active_store_path, "E1")
-    orch.api.prepare_stage(orch.active_store_path, "E2")
-    orch.api.qualify_stage(orch.active_store_path, "E2")
+    # This isolates E3 preparation; prerequisite stage records are an explicitly
+    # synthetic fixture, not evidence that E1/E2 have been qualified.
+    _seed_stage_prerequisite_fixture(orch, ("E1", "E2"))
 
     batch = orch.prepare_e3_blind_orchestration()
     assert batch.stage_id == "E3"
@@ -443,10 +499,7 @@ def test_e3_blind_completion_automatically_prepares_positive_gap_phase(
     orch, mgr, mock_platform, tmp = orchestrator_setup
     orch.initialize_campaign()
     assert orch.active_store_path is not None
-    orch.api.prepare_stage(orch.active_store_path, "E1")
-    orch.api.qualify_stage(orch.active_store_path, "E1")
-    orch.api.prepare_stage(orch.active_store_path, "E2")
-    orch.api.qualify_stage(orch.active_store_path, "E2")
+    _seed_stage_prerequisite_fixture(orch, ("E1", "E2"))
 
     blind = orch.prepare_e3_blind_orchestration()
     imported = orch.import_stage_results(
@@ -589,18 +642,13 @@ def test_e3_blind_completion_automatically_prepares_positive_gap_phase(
     )
     assert imported_cumulative.phase_complete is True
 
-    e3_complete = orch.advance_to_next_stage()
-    assert e3_complete["status"] == "E3_COMPLETED"
-    assert e3_complete["current_stage"] == "E3"
-    assert e3_complete["next_stage"] == "E4"
-
-    e4 = orch.advance_to_next_stage()
-    assert e4["status"] == "WAITING_EXTERNAL_RESULTS"
-    assert e4["current_stage"] == "E4"
-    assert e4["current_phase"] == "E4-DEEPEN"
-    assert e4["next_action"] == (
-        "DELIVER_OR_IMPORT_E4_DEEPEN_RESULTS"
-    )
+    before_finalization = store.head().commit_seq
+    with pytest.raises(
+        ValidationError,
+        match="STAGE_COMPLETION_REQUIRED_OUTPUT_MISSING: gap_directed_records",
+    ):
+        orch.advance_to_next_stage()
+    assert store.head().commit_seq == before_finalization
 
 
 def test_e5b_completion_immediately_enters_final_stop(
@@ -930,13 +978,15 @@ def test_resume_ignores_synthetic_e2_completion_and_restores_real_e2_phase(
             for slot in E1_LANE_SLOTS
         ]
     )
-    # Prepare real E2-BLIND packages, then inject the legacy synthetic E2
-    # StageCompletion that used to make resume skip straight to E3.
+    # Prepare real E2-BLIND packages. The legacy generic completion entry point
+    # must reject without results, and resume must keep the active E2 phase.
     first = orch.advance_to_next_stage()
     assert first["current_stage"] == "E2"
     assert first["current_phase"] == "E2-BLIND"
     assert orch.active_store_path is not None
-    orch.api.qualify_stage(orch.active_store_path, "E2")
+    with pytest.raises(ValidationError) as exc:
+        orch.api.qualify_stage(orch.active_store_path, "E2")
+    assert exc.value.code == "STAGE_EXECUTION_EVIDENCE_REQUIRED"
 
     resumed = FullAuditOrchestrator(
         settings_mgr=mgr,
@@ -969,10 +1019,11 @@ def test_advance_ignores_synthetic_e2_completion_and_starts_real_e2(
         ]
     )
 
-    # Legacy compatibility helper records an accepted E2 StageCompletion
-    # without the external E2 BLIND/REVEAL/SHADOW workflow.
+    # An empty generic E2 qualification cannot replace the real blind phase.
     orch.api.prepare_stage(orch.active_store_path, "E2")
-    orch.api.qualify_stage(orch.active_store_path, "E2")
+    with pytest.raises(ValidationError) as exc:
+        orch.api.qualify_stage(orch.active_store_path, "E2")
+    assert exc.value.code == "STAGE_EXECUTION_EVIDENCE_REQUIRED"
 
     result = orch.advance_to_next_stage()
     assert result["status"] == "WAITING_EXTERNAL_RESULTS"

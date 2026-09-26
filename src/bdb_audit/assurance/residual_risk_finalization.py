@@ -55,7 +55,12 @@ def _stop_and_risks(service, termination_state):
     stop_input_ref = stop_eval_record["body"].get("stop_input_ref")
     if not isinstance(stop_input_ref, dict):
         raise ValidationError("FINALIZATION_STOP_INPUT_REQUIRED")
-    stop_input_record = service.store.resolve_accepted(stop_input_ref, cut)
+    (
+        stop_input_record,
+        source_generation_ref,
+        candidate_ref,
+        challenger_refs,
+    ) = service._stop_input_basis(stop_eval_record, cut)
     stop_risk_refs = tuple(stop_input_record["body"].get("residual_risk_refs", ()))
     stop_release_policy_ref = stop_input_record["body"].get("release_policy_ref")
     if not isinstance(stop_release_policy_ref, dict):
@@ -71,7 +76,15 @@ def _stop_and_risks(service, termination_state):
             "RESIDUAL_RISK_DRIFT_AFTER_STOP",
             "Residual-risk authority changed after STOP; a fresh STOP evaluation is required",
         )
-    return cut, stop_eval_record, _prior_risk_refs(stop_risk_refs), stop_release_policy_ref
+    return (
+        cut,
+        stop_eval_record,
+        _prior_risk_refs(stop_risk_refs),
+        stop_release_policy_ref,
+        source_generation_ref,
+        candidate_ref,
+        challenger_refs,
+    )
 
 
 def _conclude_with_residual_risk(
@@ -83,6 +96,9 @@ def _conclude_with_residual_risk(
     stop_eval_record: dict[str, Any],
     residual_risk_refs: tuple[dict[str, Any], ...],
     stop_release_policy_ref: dict[str, Any],
+    source_generation_ref: dict[str, Any],
+    candidate_ref: dict[str, Any] | None,
+    challenger_refs: tuple[dict[str, Any], ...],
 ) -> dict[str, Any]:
     stop_eval_body = stop_eval_record["body"]
     stop_eval_ref = dict(stop_eval_record["ref"], ref_class="PRIOR_ACCEPTED_ONLY")
@@ -115,17 +131,8 @@ def _conclude_with_residual_risk(
         "schema_revision_ref": "BDB_TARGET/campaign_ref",
         "ref_class": "PRIOR_ACCEPTED_ONLY",
     }
-    sg_record = service._latest(service.store.accepted_records("source_generation", cut))
-    if sg_record is None:
-        si_record = service._latest(service.store.accepted_records("source_identity", cut))
-        if si_record is None:
-            raise ValidationError("SOURCE_GENERATION_REQUIRED")
-        sg_ref = dict(si_record["ref"], ref_class="PRIOR_ACCEPTED_ONLY")
-    else:
-        sg_ref = dict(sg_record["ref"], ref_class="PRIOR_ACCEPTED_ONLY")
-
-    cac_record = service._latest(service.store.accepted_records("candidate_assurance_case", cut))
-    cac_ref = dict(cac_record["ref"], ref_class="PRIOR_ACCEPTED_ONLY") if cac_record else None
+    sg_ref = source_generation_ref
+    cac_ref = candidate_ref
     basis_refs: tuple[dict[str, Any], ...] = ()
     if termination_state == "COMPLETED_LIMITED":
         basis_refs = (stop_eval_ref,)
@@ -142,6 +149,10 @@ def _conclude_with_residual_risk(
             body.get("termination_state") != termination_state
             or body.get("bounded_conclusion_statement") != bounded_statement
             or _digest_set(body.get("residual_risk_refs", ())) != _digest_set(residual_risk_refs)
+            or service._ref_identity(body.get("source_generation_ref"))
+            != service._ref_identity(sg_ref)
+            or service._ref_identity(body.get("candidate_assurance_case_ref"))
+            != service._ref_identity(cac_ref)
         ):
             raise ValidationError("FINALIZATION_REPLAY_CONFLICT")
         concl_ref = dict(existing_conclusion["ref"], ref_class="PRIOR_ACCEPTED_ONLY")
@@ -192,6 +203,11 @@ def _conclude_with_residual_risk(
             body.get("public_conclusion_statement_ref", {}).get("revision_digest")
             != stmt_ref["revision_digest"]
             or _digest_set(body.get("residual_risk_refs", ())) != _digest_set(residual_risk_refs)
+            or service._ref_identity(body.get("candidate_assurance_case_ref"))
+            != service._ref_identity(cac_ref)
+            or not service._same_ref_set(
+                body.get("challenger_result_refs", ()), challenger_refs
+            )
         ):
             raise ValidationError("FINALIZATION_REPLAY_CONFLICT")
         final_ref = dict(existing_final["ref"], ref_class="PRIOR_ACCEPTED_ONLY")
@@ -206,6 +222,7 @@ def _conclude_with_residual_risk(
             final_case_input_history_cut=final_case_cut,
             residual_risk_refs=residual_risk_refs,
             candidate_assurance_case_ref=cac_ref,
+            challenger_result_refs=challenger_refs,
             limited_conclusion_basis_refs=basis_refs,
         )
         final_obj = CanonicalObject(
@@ -305,9 +322,15 @@ def install_residual_risk_finalization(finalization_cls) -> None:
         termination_state: str | None = None,
         bounded_statement: str = "Campaign concluded via post-E5 finalization",
     ):
-        cut, stop_eval_record, risk_refs, stop_release_policy_ref = _stop_and_risks(
-            self, termination_state
-        )
+        (
+            cut,
+            stop_eval_record,
+            risk_refs,
+            stop_release_policy_ref,
+            source_generation_ref,
+            candidate_ref,
+            challenger_refs,
+        ) = _stop_and_risks(self, termination_state)
         if not risk_refs:
             return original(self, termination_state, bounded_statement)
         return _conclude_with_residual_risk(
@@ -318,6 +341,9 @@ def install_residual_risk_finalization(finalization_cls) -> None:
             stop_eval_record=stop_eval_record,
             residual_risk_refs=risk_refs,
             stop_release_policy_ref=stop_release_policy_ref,
+            source_generation_ref=source_generation_ref,
+            candidate_ref=candidate_ref,
+            challenger_refs=challenger_refs,
         )
 
     setattr(conclude_campaign, "_bdb_residual_risk_finalization", True)

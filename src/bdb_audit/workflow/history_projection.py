@@ -28,8 +28,10 @@ class CampaignProjection:
     accepted_head_seq: int
     accepted_head_hash: str
     is_finished: bool
-    status_label: str  # IN_PROGRESS | COMPLETED | COMPLETED_LIMITED | NOT_FOUND | ERROR
+    status_label: str  # IN_PROGRESS | FINALIZATION_PENDING | COMPLETED | COMPLETED_LIMITED | NOT_FOUND | ERROR
     error: str | None = None
+    finalization_state: str = "NOT_STARTED"
+    next_action: str | None = None
 
 
 class CampaignHistoryService:
@@ -75,10 +77,15 @@ class CampaignHistoryService:
                 lanes_prep = status.get("lanes_prepared", [])
                 completions = status.get("stage_completions_count", 0)
                 termination = status.get("termination_state", "OPEN")
-                is_completed = termination in {"COMPLETED", "COMPLETED_LIMITED"}
-                if termination == "COMPLETED_LIMITED":
+                finalization = status.get("finalization_progress", {"state": "NOT_STARTED"})
+                workflow_finished = bool(status.get("workflow_finished"))
+                if finalization.get("state") == "BLOCKED":
+                    status_label = "FINALIZATION_BLOCKED"
+                elif termination in {"COMPLETED", "COMPLETED_LIMITED"} and not workflow_finished:
+                    status_label = "FINALIZATION_PENDING"
+                elif termination == "COMPLETED_LIMITED" and workflow_finished:
                     status_label = "COMPLETED_LIMITED"
-                elif termination == "COMPLETED":
+                elif termination == "COMPLETED" and workflow_finished:
                     status_label = "COMPLETED"
                 else:
                     status_label = "IN_PROGRESS"
@@ -94,9 +101,11 @@ class CampaignHistoryService:
                     stage_completions_count=completions,
                     accepted_head_seq=status.get("accepted_head_seq", 0),
                     accepted_head_hash=status.get("accepted_head_hash", ""),
-                    is_finished=is_completed,
+                    is_finished=workflow_finished,
                     status_label=status_label,
                     error=None,
+                    finalization_state=finalization.get("state", "UNKNOWN"),
+                    next_action=finalization.get("next_action"),
                 ))
             except Exception as exc:
                 projections.append(CampaignProjection(
@@ -120,7 +129,7 @@ class CampaignHistoryService:
     def get_latest_unfinished_campaign(self) -> CampaignProjection | None:
         """Find the most recent unfinished campaign eligible for resume."""
         for proj in self.get_known_campaigns():
-            if proj.status_label == "IN_PROGRESS":
+            if proj.status_label in {"IN_PROGRESS", "FINALIZATION_PENDING"}:
                 return proj
         return None
 

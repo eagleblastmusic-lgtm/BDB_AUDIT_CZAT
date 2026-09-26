@@ -1,18 +1,17 @@
 """Tests for Complete User Workflow E1-E6 and STOP / Conclusion (RU08 / B02).
 
 Validates:
-1. Complete workflow without E6 (E1 -> E2 -> E3 -> E4 -> E5 -> STOP -> Conclusion).
-2. Material E6 + fresh challengers scenario.
-3. Early BLOCKED -> COMPLETED_LIMITED -> QUALIFICATION_BLOCKED.
+1. Empty E1 qualification is rejected without changing accepted history.
+2. Prepared E6 remains blocked until an execution runtime exists.
+3. A limited conclusion cannot be created without accepted STOP basis.
 4. Process restart between stages preserves exact same accepted truth.
 5. UI and CLI project same terminal result.
 6. No manual PASS setter.
-7. E2 claim without evidence remains UNKNOWN.
+7. Caller supplied E2 claim data cannot bypass execution prerequisites.
 8. Real small target integration.
 """
 import json
 from pathlib import Path
-import tempfile
 import zipfile
 import pytest
 
@@ -44,28 +43,27 @@ from bdb_audit.workflow.source_target import ResolvedSource
 
 
 @pytest.fixture
-def workflow_env():
-    with tempfile.TemporaryDirectory() as td:
-        root = Path(td)
-        target_dir = root / "sample_target"
-        target_dir.mkdir()
-        (target_dir / "README.md").write_text("# Target App\nSample target for audit.\n", encoding="utf-8")
-        (target_dir / "app.py").write_text("def run(): return 42\n", encoding="utf-8")
+def workflow_env(tmp_path: Path):
+    root = tmp_path
+    target_dir = root / "sample_target"
+    target_dir.mkdir()
+    (target_dir / "README.md").write_text("# Target App\nSample target for audit.\n", encoding="utf-8")
+    (target_dir / "app.py").write_text("def run(): return 42\n", encoding="utf-8")
 
-        store_path = root / "campaign.sqlite"
-        settings_file = root / "settings.json"
-        settings_mgr = SettingsManager(settings_file)
-        settings_mgr.settings = UserSettings(
-            local_repo_path=str(target_dir),
-            output_work_dir=str(root / "out"),
-            execution_mode="ChatGPT / GitHub",
-        )
-        yield {
-            "root": root,
-            "target_dir": target_dir,
-            "store_path": store_path,
-            "settings_mgr": settings_mgr,
-        }
+    store_path = root / "campaign.sqlite"
+    settings_file = root / "settings.json"
+    settings_mgr = SettingsManager(settings_file)
+    settings_mgr.settings = UserSettings(
+        local_repo_path=str(target_dir),
+        output_work_dir=str(root / "out"),
+        execution_mode="ChatGPT / GitHub",
+    )
+    return {
+        "root": root,
+        "target_dir": target_dir,
+        "store_path": store_path,
+        "settings_mgr": settings_mgr,
+    }
 
 
 def _e5_source() -> ResolvedSource:
@@ -282,118 +280,68 @@ def _complete_real_e5(
     assert completion.stage_id == "E5"
 
 
-def test_core_acceptance_1_complete_scenario_without_e6(workflow_env):
-    """1. Complete scenario without E6: E1 -> E2 -> E3 -> E4 -> E5 -> STOP -> Conclusion."""
+def test_core_acceptance_1_empty_e1_qualification_is_rejected(workflow_env):
+    """1. Preparing E1 alone cannot manufacture its accepted completion."""
     store_path = workflow_env["store_path"]
     api = AuditOperationApi()
 
-    # Genesis
     api.create_campaign(store_path, seed="full_audit_test", target_repo=str(workflow_env["target_dir"]))
+    api.prepare_stage(store_path, "E1")
+    before = api.get_campaign_status(store_path)
 
-    # E1-E4 use the compact legacy test scaffold; E5 must execute the
-    # real external candidate/challenger runtime.
-    for stage in ("E1", "E2", "E3", "E4"):
-        api.prepare_stage(store_path, stage)
-        res = api.qualify_stage(store_path, stage)
-        assert res["status"] == "SUCCESS"
-        assert res["stage"] == stage
-    _complete_real_e5(
-        store_path,
-        workflow_env["root"],
-    )
+    with pytest.raises(ValidationError) as exc:
+        api.qualify_stage(store_path, "E1")
+    assert exc.value.code == "STAGE_EXECUTION_EVIDENCE_REQUIRED"
 
-    # Status shows all 5 stages completed
-    status = api.get_campaign_status(store_path)
-    assert status["stages_completed"] == ["E1", "E2", "E3", "E4", "E5"]
-
-    # STOP Evaluation
-    stop_res = api.evaluate_stop_gate(store_path, evaluation_context="FINAL_POST_E5")
-    assert stop_res["status"] == "SUCCESS"
-    assert stop_res["continuation_decision"] == "PASS"
-    assert stop_res["assurance_level"] == "ADEQUATE_FOR_DECLARED_SCOPE"
-
-    # Campaign Conclusion
-    concl_res = api.conclude_campaign(store_path)
-    assert concl_res["status"] == "SUCCESS"
-    assert concl_res["termination_state"] == "COMPLETED"
-    assert concl_res["release_readiness"] == "READY"
-
-    # Final projection
-    final_status = api.get_campaign_status(store_path)
-    assert final_status["campaign_completed"] is True
-    assert final_status["termination_state"] == "COMPLETED"
+    after = api.get_campaign_status(store_path)
+    assert after["stages_prepared"] == ["E1"]
+    assert after["stages_completed"] == []
+    assert after["stage_completions_count"] == before["stage_completions_count"] == 0
+    assert after["accepted_head_seq"] == before["accepted_head_seq"]
+    assert after["termination_state"] == "OPEN"
 
 
 def test_core_acceptance_2_material_e6_fresh_challenger(workflow_env):
-    """2. Material E6 + fresh challenge: STOP yields E6_REQUIRED -> scoped E6 run -> re-evaluates."""
-    store_path = workflow_env["store_path"]
+    """2. Material E6 remains blocked until an execution runtime exists."""
+    from tests.f7.test_adaptive_e6_canonical_authority import _seed_authority_store
+
+    store_path = workflow_env["root"] / "m45.sqlite"
+    _seed_authority_store(workflow_env["root"])
     api = AuditOperationApi()
 
-    api.create_campaign(store_path, seed="e6_test", target_repo=str(workflow_env["target_dir"]))
-
-    for stage in ("E1", "E2", "E3", "E4"):
-        api.prepare_stage(store_path, stage)
-        api.qualify_stage(store_path, stage)
-    _complete_real_e5(
-        store_path,
-        workflow_env["root"],
-    )
-
-    # Simulate STOP evaluation with approved E6 plan
-    stop_res = api.evaluate_stop_gate(store_path, evaluation_context="FINAL_POST_E5", e6_plan_approved=True)
-    assert stop_res["status"] == "SUCCESS"
-    # When E6 plan is approved for gap resolution, continuation_decision is E6_REQUIRED
-    assert stop_res["continuation_decision"] == "E6_REQUIRED"
-    assert stop_res["assurance_level"] == "BOUNDED"
-
-    # Prepare E6 from the exact accepted STOP authority.  Continuation must not
-    # skip an active E6 revision and jump directly back to STOP.
+    # The fixture contains an accepted E5 completion and exact E6_REQUIRED STOP.
+    # Prepare E6 from that authority, then prove no facade can fabricate success.
     api.prepare_stage(store_path, "E6")
     awaiting_e6 = api.continue_campaign(store_path)
+    assert awaiting_e6["status"] == "BLOCKED"
     assert awaiting_e6["current_stage"] == "E6"
-    assert awaiting_e6["continuation_state"] == "AWAITING_STAGE_COMPLETION"
-    assert awaiting_e6["next_action"] == "AWAITING_STAGE_COMPLETION"
+    assert awaiting_e6["continuation_state"] == "E6_EXECUTION_UNAVAILABLE"
+    assert awaiting_e6["next_action"] == "E6_RUNTIME_UNAVAILABLE"
 
-    e6_res = api.qualify_stage(store_path, "E6")
-    assert e6_res["status"] == "SUCCESS"
-    assert e6_res["stage"] == "E6"
+    with pytest.raises(ValidationError) as exc:
+        api.qualify_stage(store_path, "E6")
+    assert exc.value.code == "STAGE_EXECUTION_EVIDENCE_REQUIRED"
 
-    # A completed E6 revision returns control to the global STOP gate.
-    after_e6 = api.continue_campaign(store_path)
-    assert after_e6["continuation_state"] == "READY_FOR_STOP_EVALUATION"
-    assert after_e6["next_action"] == "EVALUATE_STOP_GATE"
-
-    # Post-E6 STOP evaluation
-    post_e6_stop = api.evaluate_stop_gate(store_path, evaluation_context="POST_E6")
-    assert post_e6_stop["status"] == "SUCCESS"
-    assert post_e6_stop["continuation_decision"] == "PASS"
+    unchanged = api.get_campaign_status(store_path)
+    assert "E6" in unchanged["stages_prepared"]
+    assert "E6" not in unchanged["stages_completed"]
+    assert unchanged["termination_state"] == "OPEN"
 
 
-def test_core_acceptance_3_early_blocked_completed_limited(workflow_env):
-    """3. Early BLOCKED -> COMPLETED_LIMITED -> QUALIFICATION_BLOCKED, never READY."""
+def test_core_acceptance_3_limited_conclusion_requires_stop_basis(workflow_env):
+    """3. A missing inventory/STOP basis cannot be converted to limited closure."""
     store_path = workflow_env["store_path"]
     api = AuditOperationApi()
+    api.create_campaign(store_path, seed="limited_requires_stop", target_repo=str(workflow_env["target_dir"]))
 
-    api.create_campaign(store_path, seed="blocked_test", target_repo=str(workflow_env["target_dir"]))
+    with pytest.raises(ValidationError) as exc:
+        api.conclude_campaign(store_path, termination_state="COMPLETED_LIMITED")
+    assert exc.value.code == "STOP_INVENTORY_REQUIRED"
 
-    for stage in ("E1", "E2", "E3"):
-        api.prepare_stage(store_path, stage)
-        api.qualify_stage(store_path, stage)
-
-    # Evaluate intermediate STOP when required stages E4-E5 are pending and surface is blocked
-    stop_res = api.evaluate_stop_gate(
-        store_path,
-        evaluation_context="FINAL_POST_E5",
-        unknown_blocked_summary={"unknown_surfaces_count": 0, "is_blocked": True},
-    )
-    assert stop_res["continuation_decision"] == "BLOCKED"
-    assert stop_res["release_readiness"] == "QUALIFICATION_BLOCKED"
-
-    # Concluding a blocked campaign produces COMPLETED_LIMITED, never READY
-    concl_res = api.conclude_campaign(store_path, termination_state="COMPLETED_LIMITED")
-    assert concl_res["termination_state"] == "COMPLETED_LIMITED"
-    assert concl_res["release_readiness"] == "QUALIFICATION_BLOCKED"
-    assert concl_res["release_readiness"] != "READY"
+    final_status = api.get_campaign_status(store_path)
+    assert final_status["termination_state"] == "OPEN"
+    assert final_status["campaign_conclusions_count"] == 0
+    assert final_status["finalization_progress"]["state"] == "NOT_STARTED"
 
 
 def test_core_acceptance_4_restart_between_stages_preserves_accepted_truth(workflow_env):
@@ -403,26 +351,23 @@ def test_core_acceptance_4_restart_between_stages_preserves_accepted_truth(workf
 
     api1.create_campaign(store_path, seed="restart_test", target_repo=str(workflow_env["target_dir"]))
     api1.prepare_stage(store_path, "E1")
-    api1.qualify_stage(store_path, "E1")
-    api1.prepare_stage(store_path, "E2")
-    api1.qualify_stage(store_path, "E2")
+    head_before = api1.get_campaign_status(store_path)
+    with pytest.raises(ValidationError) as exc:
+        api1.qualify_stage(store_path, "E1")
+    assert exc.value.code == "STAGE_EXECUTION_EVIDENCE_REQUIRED"
 
     head1 = api1.get_campaign_status(store_path)
-    assert head1["stages_completed"] == ["E1", "E2"]
-    commit_seq1 = head1["accepted_head_seq"]
+    assert head1["stages_prepared"] == ["E1"]
+    assert head1["stages_completed"] == []
+    assert head1["accepted_head_seq"] == head_before["accepted_head_seq"]
 
     # Completely new process / API instance reading from disk.
     api2 = AuditOperationApi()
     head2 = api2.get_campaign_status(store_path)
-    assert head2["stages_completed"] == ["E1", "E2"]
-    assert head2["accepted_head_seq"] == commit_seq1
-    # current_stage remains accepted-history state, not a second next-stage authority.
-    assert head2["current_stage"] == "E2"
-
-    store2 = TransactionalHistoryStore(store_path)
-    continuation = ContinuationService.evaluate_continuation(store2)
-    assert continuation["current_stage"] == "E3"
-    assert continuation["next_action"] == "PREPARE_STAGE_E3"
+    assert head2["stages_prepared"] == ["E1"]
+    assert head2["stages_completed"] == []
+    assert head2["accepted_head_seq"] == head1["accepted_head_seq"]
+    assert head2["current_stage"] == "E1"
 
 
 def test_core_acceptance_6_no_manual_pass_setter(workflow_env):
@@ -436,25 +381,27 @@ def test_core_acceptance_6_no_manual_pass_setter(workflow_env):
         api.conclude_campaign(store_path, termination_state="COMPLETED")
 
 
-def test_core_acceptance_7_e2_claim_without_evidence_remains_unknown(workflow_env):
-    """7. E2 claim without evidence remains UNKNOWN."""
+def test_core_acceptance_7_caller_e2_claim_cannot_bypass_execution(workflow_env):
+    """7. Caller supplied E2 claim data cannot bypass the E1 execution prerequisite."""
     store_path = workflow_env["store_path"]
     api = AuditOperationApi()
 
     api.create_campaign(store_path, seed="e2_evidence_test", target_repo=str(workflow_env["target_dir"]))
     api.prepare_stage(store_path, "E1")
-    api.qualify_stage(store_path, "E1")
 
-    # Pass an unbacked finding to E2
+    # A caller assertion is not stage execution evidence and cannot skip E1.
     unbacked_finding = {
         "finding_id": "find_001",
         "claim": "Hypothetical injection vulnerability",
         "evidence_refs": [],  # NO EVIDENCE!
     }
-    api.prepare_stage(store_path, "E2")
-    res = api.qualify_stage(store_path, "E2", findings=[unbacked_finding])
-    assert res["status"] == "SUCCESS"
-    assert unbacked_finding["claim_status"] == "UNKNOWN"
+    with pytest.raises(ValidationError) as exc:
+        api.qualify_stage(store_path, "E2", findings=[unbacked_finding])
+    assert exc.value.code == "PREDECESSOR_STAGE_NOT_COMPLETED"
+    assert "claim_status" not in unbacked_finding
+    status = api.get_campaign_status(store_path)
+    assert status["stages_prepared"] == ["E1"]
+    assert status["stages_completed"] == []
 
 
 def test_core_acceptance_5_ui_and_cli_parity(workflow_env):

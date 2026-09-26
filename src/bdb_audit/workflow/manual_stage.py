@@ -112,6 +112,42 @@ class StageIsolationProof:
         if not isinstance(self.scope, str) or not self.scope:
             raise ValidationError("ISOLATION_PROOF_SCOPE_REQUIRED")
 
+        # Use the active Registry as the authority for typed field roles. A
+        # source, profile or unrelated accepted artifact cannot be re-labeled
+        # as channel inventory or executor-boundary evidence.
+        contract = store.registry.contract("isolation_qualification")
+        allowed_by_field = {
+            item["field"]: set(item.get("allowed", ()))
+            for item in contract.get("material_refs", ())
+        }
+        typed_fields = {
+            "channel_inventory_ref": (self.channel_inventory_ref,),
+            "enforcement_receipt_refs": self.enforcement_receipt_refs,
+            "filesystem_boundary_evidence_refs": self.filesystem_boundary_evidence_refs,
+            "network_boundary_evidence_refs": self.network_boundary_evidence_refs,
+            "tool_boundary_evidence_refs": self.tool_boundary_evidence_refs,
+            "session_boundary_evidence_refs": self.session_boundary_evidence_refs,
+            "contamination_assessment_refs": self.contamination_assessment_refs,
+        }
+        for field, refs in typed_fields.items():
+            allowed = allowed_by_field.get(field, set())
+            if not allowed:
+                raise ValidationError("ISOLATION_EVIDENCE_CONTRACT_UNAVAILABLE", field)
+            for ref in refs:
+                if not isinstance(ref, dict) or ref.get("kind") not in allowed:
+                    raise ValidationError("ISOLATION_EVIDENCE_KIND_INVALID", field)
+
+        if self.result == "ENFORCED":
+            if not self.enforcement_receipt_refs or not self.session_boundary_evidence_refs:
+                raise ValidationError(
+                    "ENFORCED_ISOLATION_RECEIPTS_REQUIRED",
+                    "ENFORCED requires enforcement and session-boundary receipts",
+                )
+            raise ValidationError(
+                "ISOLATION_ADMISSION_CONTEXT_REQUIRED",
+                "Manual stage proof cannot resolve the pinned material-channel evidence mapping",
+            )
+
         def accepted(ref: dict[str, Any]) -> dict[str, Any]:
             record = store.resolve_accepted(ref, cut)
             return _with_ref_class(

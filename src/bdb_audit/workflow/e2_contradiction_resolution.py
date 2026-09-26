@@ -35,8 +35,15 @@ from ..history.store import TransactionalHistoryStore
 from ..stop.models import StageCompletion
 from .assignments import _command_id, _current_cut
 from .e2_shadow import _main_decisions
-from .inbox import _same_ref, _with_ref_class
+from .inbox import (
+    _canonical_content_ref_union,
+    _same_ref,
+    _with_ref_class,
+)
 from .manual_stage import StageBatch, StageResultInbox
+from .stage_completion_evidence import (
+    latest_required_lane_completions,
+)
 
 
 _RESOLUTION_KINDS = {
@@ -911,7 +918,7 @@ class E2ContradictionResolutionService:
             )
             for row in case_records.values()
         ]
-        required_outputs = canonical_reference_set(
+        required_outputs = _canonical_content_ref_union(
             [
                 *main_decision_refs,
                 *checkpoints,
@@ -919,11 +926,25 @@ class E2ContradictionResolutionService:
                 *case_refs,
                 *decision_refs,
                 *successor_refs,
+                *(
+                    ref
+                    for lane_completion in lane_completions
+                    for ref in lane_completion["body"].get(
+                        "required_output_refs", ()
+                    )
+                ),
                 _with_ref_class(
                     contradiction_result["ref"],
                     "CONTENT_OR_PRIOR",
                 ),
             ]
+        )
+        required_slot_completions = latest_required_lane_completions(
+            self.store,
+            stage_key="E2",
+            stage_spec=stage_spec,
+            cut=cut,
+            candidates=lane_completions,
         )
         completion_refs = canonical_reference_set(
             [
@@ -931,7 +952,7 @@ class E2ContradictionResolutionService:
                     row["ref"],
                     "CONTENT_OR_PRIOR",
                 )
-                for row in lane_completions
+                for row in required_slot_completions
             ]
         )
 
@@ -971,6 +992,11 @@ class E2ContradictionResolutionService:
                     successor_refs
                 ),
                 "majority_vote_forbidden": True,
+                "required_stage_completion_outputs": list(
+                    stage_spec["body"].get(
+                        "required_stage_completion_outputs", ()
+                    )
+                ),
             },
             unresolved_material_refs=[],
             unknown_blocked_summary={

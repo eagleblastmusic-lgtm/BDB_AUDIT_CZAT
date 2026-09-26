@@ -321,16 +321,17 @@ class AuditOperationApi:
             predecessor_requirements = (
                 (_BASELINE_STAGE_ORDER[stage_ordinal - 2],) if stage_ordinal > 1 else ()
             )
-        spec = StageSpec(
-            stage_key=stage_key,
-            stage_spec_revision=stage_spec_revision,
-            stage_role=stage_key,
-            stage_ordinal=stage_ordinal,
-            purpose=f"BDB {stage_key} operational stage",
-            predecessor_requirements=predecessor_requirements,
-            blind_reveal_phase_model="CONTROLLED",
-            transition_policy_ref="TRANSITION_PROFILE_V1",
-        )
+        if stage_key == "E6":
+            # E6 is generated only from an accepted E6_REQUIRED STOP.
+            raise ValidationError("E6_SPEC_GENERATOR_REQUIRED")
+        from ..orchestration.stages import native_stage_spec
+
+        spec = native_stage_spec(stage_key, stage_spec_revision)
+        if (
+            spec.stage_ordinal != stage_ordinal
+            or spec.predecessor_requirements != tuple(predecessor_requirements)
+        ):
+            raise ValidationError("NATIVE_STAGE_TRANSITION_MISMATCH", stage_key)
         spec_obj = spec.as_object()
 
         parent_head_ref = {"tag": "ACCEPTED_HEAD_REF", **head.as_dict()}
@@ -432,7 +433,8 @@ class AuditOperationApi:
             "slot": slot,
             "lane_id": lane_spec.lane_key,
             "lane_spec_digest": lane_obj.digest,
-            "isolation_status": "QUALIFIED",
+            "lane_status": "PREPARED",
+            "required_isolation_assurance": lane_spec.required_isolation_assurance,
             "commit_seq": res.head.commit_seq,
             "commit_hash": res.head.commit_hash,
         }
@@ -529,39 +531,27 @@ class AuditOperationApi:
         }
 
     def continue_campaign(self, store_path: str | Path) -> dict[str, Any]:
-        """Evaluate continuation from verified completed-stage history, not preparation alone."""
-        status = self.get_campaign_status(store_path)
-        stage = status["current_stage"]
-        prepared_stages = list(status["stages_prepared"])
-        completed_stages = set(status["stages_completed"])
-        termination_state = status.get("termination_state", "OPEN")
+        """Return the same history-derived next step used by continuation read paths."""
+        path = Path(store_path).resolve()
+        store = TransactionalHistoryStore(path, registry=self.registry)
+        from ..workflow.continuation_service import ContinuationService
 
-        if termination_state == "COMPLETED":
-            action = "CAMPAIGN_FINISHED"
-            state = "COMPLETED"
-        elif termination_state == "COMPLETED_LIMITED":
-            action = "CAMPAIGN_TERMINATED_LIMITED"
-            state = "COMPLETED_LIMITED"
-        else:
-            next_incomplete = next((s for s in _BASELINE_STAGE_ORDER if s not in completed_stages), None)
-            if next_incomplete is None:
-                action = "EVALUATE_STOP_GATE"
-                state = "READY_FOR_STOP_EVALUATION"
-            elif next_incomplete not in prepared_stages:
-                action = f"PREPARE_STAGE_{next_incomplete}"
-                state = "READY_FOR_NEXT_STAGE"
-            else:
-                action = "AWAITING_STAGE_COMPLETION"
-                state = "AWAITING_STAGE_COMPLETION"
-                stage = next_incomplete
-
+        plan = ContinuationService.evaluate_continuation(store)
+        api_state = {
+            "NOT_PREPARED": "READY_FOR_NEXT_STAGE",
+            "RUNNING": "AWAITING_STAGE_COMPLETION",
+        }.get(plan["continuation_state"], plan["continuation_state"])
         return {
             "status": "SUCCESS",
-            "campaign_id": status["campaign_id"],
-            "current_stage": stage,
-            "continuation_state": state,
-            "next_action": action,
-            "head_seq": status["accepted_head_seq"],
+            "campaign_id": plan["campaign_id"],
+            "current_stage": plan["current_stage"],
+            "continuation_state": api_state,
+            "next_action": plan["next_action"],
+            "head_seq": plan["accepted_head_seq"],
+            "accepted_head_seq": plan["accepted_head_seq"],
+            "termination_state": plan["termination_state"],
+            "finalization_progress": plan["finalization_progress"],
+            "workflow_finished": plan["workflow_finished"],
         }
 
     def qualify_stage(

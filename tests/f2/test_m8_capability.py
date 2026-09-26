@@ -48,3 +48,58 @@ def test_grant_is_accepted_before_delivery():
     # accepted grant token is the only path to delivery.
     with pytest.raises(ValidationError, match="GRANT_NOT_ACCEPTED"):
         broker.accept_grant(grant)
+
+
+@pytest.mark.parametrize(
+    ("nested_ref", "expected_error"),
+    [
+        ("cycle", "VIEW_REFERENCE_CYCLE"),
+        ("unknown", "VIEW_TRANSITIVE_LEAK"),
+    ],
+)
+def test_recursive_positive_view_rejects_nested_cycles_and_unknown_refs(
+    nested_ref, expected_error
+):
+    root = ref("finding_claim_revision", "nested-root")
+    child = ref("finding_claim_revision", "nested-child")
+    unknown = ref("finding_claim_revision", "nested-unknown")
+    root_key = root["revision_digest"]
+    child_key = child["revision_digest"]
+    unknown_key = unknown["revision_digest"]
+
+    root_target = child if nested_ref == "cycle" else unknown
+    artifact_map = {
+        root_key: {
+            "kind": "finding_claim_revision",
+            "details": {"related_refs": [root_target]},
+        },
+        child_key: {
+            "kind": "finding_claim_revision",
+            "details": {"related_refs": [root]},
+        },
+    }
+    if nested_ref == "unknown":
+        artifact_map[unknown_key] = {
+            "kind": "finding_claim_revision",
+            "details": {"related_refs": []},
+        }
+
+    policy = ProjectionPolicy(
+        "nested",
+        "1",
+        {
+            "finding_claim_revision": ("details",),
+            "finding_claim_revision.details": ("related_refs",),
+        },
+        allowed_kinds=("finding_claim_revision",),
+    )
+    manifest = ViewManifest(
+        "nested-view",
+        {"kind": "projection_policy", "revision_digest": "policy"},
+        (root, child) if nested_ref == "cycle" else (root,),
+        phase="PRE_REVEAL",
+    )
+
+    broker = CapabilityBroker(artifact_map)
+    with pytest.raises(ValidationError, match=expected_error):
+        broker.prepare_view(manifest, policy)

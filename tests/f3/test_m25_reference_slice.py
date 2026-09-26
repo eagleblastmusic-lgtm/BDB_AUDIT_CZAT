@@ -5,6 +5,9 @@ from pathlib import Path
 import pytest
 
 from bdb_audit.coordinator import run_foundation_reference_slice
+from bdb_audit.core.errors import ValidationError
+from bdb_audit.stop.models import StageCompletion
+from bdb_audit.workflow.read_models import current_accepted_cut
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -33,9 +36,10 @@ def test_foundation_reference_slice_end_to_end():
     assert result["commit_count"] == 10
     assert result["head_commit"].commit_seq == 10
 
-    # 2. StageCompletion is recorded and valid
+    # 2. The slice carries one example lane only; it must remain blocked under
+    # the pinned E3 three-lane/checkpoint/gap-output StageSpec.
     sc = result["stage_completion"]
-    assert sc.completion_predicate_result == "STAGE_COMPLETED"
+    assert sc.completion_predicate_result == "STAGE_COMPLETION_BLOCKED"
     assert sc.stage_spec_ref["revision_digest"] is not None
 
     # 3. Intermediate STOP evaluation
@@ -73,3 +77,43 @@ def test_foundation_reference_slice_determinism():
     assert res_a["stage_completion"].as_object().digest == res_b["stage_completion"].as_object().digest
     assert res_a["stop_evaluation"].as_object().digest == res_b["stop_evaluation"].as_object().digest
     assert res_a["contribution_projection"].to_bytes() == res_b["contribution_projection"].to_bytes()
+
+
+@pytest.mark.parametrize(
+    ("lane_refs", "output_refs", "expected_code"),
+    [
+        ((), None, "REFERENCE_CARDINALITY_MISMATCH"),
+        (None, (), "STAGE_COMPLETION_EXECUTION_EVIDENCE_REQUIRED"),
+    ],
+)
+def test_store_rejects_completed_stage_without_required_results(
+    tmp_path: Path,
+    lane_refs,
+    output_refs,
+    expected_code,
+):
+    ctx = run_foundation_reference_slice(tmp_path / "stage-admission.sqlite", stop_at_seq=9)
+    store = ctx["store"]
+    valid = ctx["stage_comp"]
+    candidate = StageCompletion(
+        stage_run_ref=valid.stage_run_ref,
+        stage_spec_ref=valid.stage_spec_ref,
+        input_history_cut=current_accepted_cut(store),
+        required_lane_slot_results=(
+            valid.required_lane_slot_results if lane_refs is None else lane_refs
+        ),
+        required_output_refs=(
+            valid.required_output_refs if output_refs is None else output_refs
+        ),
+        mandatory_obligation_summary=valid.mandatory_obligation_summary,
+        unknown_blocked_summary=valid.unknown_blocked_summary,
+        completion_predicate_result="STAGE_COMPLETED",
+    ).as_object()
+    head = store.head()
+    command = ctx["next_cmd"]({"tag": "ACCEPTED_HEAD_REF", **head.as_dict()})
+
+    with pytest.raises(ValidationError, match=expected_code):
+        store.accept(command, immutable_objects=(candidate,), expected_head=head)
+
+    assert store.head() == head
+    assert store.object_record(candidate.digest) is None

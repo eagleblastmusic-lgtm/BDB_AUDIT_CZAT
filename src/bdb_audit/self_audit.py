@@ -24,9 +24,7 @@ from typing import Any
 from .core.canonical_json import canonical_bytes
 from .core.errors import ValidationError
 from .core.registry import ContractRegistry
-from .history.objects import (
-    CommandEnvelope,
-)
+from .history.objects import CanonicalObject, CommandEnvelope
 from .history.store import TransactionalHistoryStore
 from .coordinator import Coordinator
 from .coordinator.operations import AuditOperationApi
@@ -54,6 +52,12 @@ class SelfAuditReport:
     open_high_critical_count: int
     findings: list[SelfAuditFinding]
     gates: dict[str, str]
+    qualification_scope: str = "NARROW_LOCAL_CONTROLS"
+    unverified_requirements: tuple[str, ...] = (
+        "R1-R11_INTEGRATED_NEGATIVE_AND_POSITIVE_REGRESSION_MATRIX",
+        "MUTATION_SENSITIVITY_AND_INDEPENDENT_ORACLE",
+        "CLEAN_ROOM_AND_PINNED_CI_QUALIFICATION",
+    )
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -62,6 +66,9 @@ class SelfAuditReport:
             "open_findings_count": self.open_findings_count,
             "open_high_critical_count": self.open_high_critical_count,
             "gates": self.gates,
+            "qualification_scope": self.qualification_scope,
+            "release_qualified": self.status == "PASS",
+            "unverified_requirements": list(self.unverified_requirements),
             "findings": [
                 {
                     "finding_id": f.finding_id,
@@ -210,9 +217,9 @@ class SelfAuditEngine:
         except ValidationError:
             pass
         self._record_finding(
-            "C", "Fail-closed gate enforcement", "INFO", "RESOLVED",
-            "FSM skipping, uncalibrated qualification, and STOP bypass attempts are rejected fail-closed.",
-            "Enforced in fsm.py, calibrator.py, and evaluator.py."
+            "C", "Sampled fail-closed gate checks", "INFO", "MITIGATED",
+            "The sampled FSM skip, calibration partition, and self-retry controls were rejected.",
+            "This probe does not qualify STOP, release, or the full stage-completion path."
         )
         return True
 
@@ -221,14 +228,35 @@ class SelfAuditEngine:
     # -------------------------------------------------------------------------
     def audit_schema_bypass(self) -> bool:
         """Verify strict schema validation, reference parity, and canonicalization attack rejection."""
-        # 1. Registry reference parity checks
+        # 1. Registry reference parity checks with valid and invalid controls.
+        attempt_contract = self.registry.contract("attempt")
+        self.registry.reference_parity(
+            "attempt",
+            attempt_contract["material_refs"],
+        )
+        parity_rejected = False
         try:
-            self.registry.reference_parity("stage_spec", material_refs=[{"field": "unknown_field"}])
-            # reference_parity should detect mismatch if invalid
+            self.registry.reference_parity(
+                "attempt",
+                [*attempt_contract["material_refs"], {"field": "unknown_field"}],
+            )
         except ValidationError:
-            pass
+            parity_rejected = True
+        if not parity_rejected:
+            self._record_finding(
+                "D",
+                "Invalid reference parity accepted",
+                "HIGH",
+                "OPEN",
+                "Registry accepted a material-ref contract with an unknown field.",
+                "Reject reference-contract drift before admission.",
+            )
+            return False
 
-        # 2. Canonical serialization rejects float NaN/Inf
+        # 2. Canonical serialization accepts a legal value and rejects NaN.
+        if canonical_bytes({"val": 1}) != b'{"val":1}':
+            self._record_finding("D", "Canonical positive control failed", "HIGH", "OPEN", "Legal integer did not serialize canonically", "Preserve legal canonical values")
+            return False
         try:
             canonical_bytes({"val": float("nan")})
             self._record_finding("D", "NaN float accepted in canonical JSON", "HIGH", "OPEN", "NaN serialized", "Reject non-standard floats")
@@ -237,9 +265,9 @@ class SelfAuditEngine:
             pass
 
         self._record_finding(
-            "D", "Canonical schema and serialization enforcement", "INFO", "RESOLVED",
-            "Schema bypass, reference mismatch, and canonical serialization attacks are strictly rejected.",
-            "Enforced in canonical_json.py and registry.py."
+            "D", "Sampled schema and canonicalization checks", "INFO", "MITIGATED",
+            "Valid attempt reference parity and canonical integer serialization passed; unknown-field drift and NaN were rejected.",
+            "This probe does not qualify every schema, validator layer, or runtime admission path."
         )
         return True
 
@@ -278,9 +306,9 @@ class SelfAuditEngine:
                 pass  # Correctly rejected fail-closed
 
         self._record_finding(
-            "E", "Cross-source and cross-campaign isolation", "INFO", "RESOLVED",
-            "Commands referencing cross-campaign cuts or foreign parent heads are rejected fail-closed.",
-            "Enforced in TransactionalHistoryStore.accept."
+            "E", "Sampled cross-campaign parent binding", "INFO", "MITIGATED",
+            "A command using a foreign campaign parent head was rejected.",
+            "This probe does not cover every source-generation mix or downstream consumer."
         )
         return True
 
@@ -317,9 +345,9 @@ class SelfAuditEngine:
             return False
 
         self._record_finding(
-            "F", "Quarantine and exposure leak prevention", "INFO", "RESOLVED",
-            "Forbidden kinds and quarantined findings are blocked from projection views.",
-            "Enforced in ClaimQuarantine._project."
+            "F", "Sampled quarantine projection boundary", "INFO", "MITIGATED",
+            "The sampled forbidden-kind projection failed and the allowed clean projection remained readable.",
+            "This is a local projection probe, not accepted-history exposure qualification."
         )
         return True
 
@@ -365,9 +393,9 @@ class SelfAuditEngine:
             pass
 
         self._record_finding(
-            "G", "Prompt compiler determinism and injection protection", "INFO", "RESOLVED",
-            "Deterministic packages guaranteed; injection across authority boundary and malformed templates rejected.",
-            "Enforced in PromptPackageCompiler and TemplateRegistry."
+            "G", "Sampled prompt compiler controls", "INFO", "MITIGATED",
+            "Two identical compile requests matched; the sampled injection and unknown-template inputs were rejected.",
+            "This probe does not cover stale accepted inputs or the complete delivery boundary."
         )
         return True
 
@@ -393,9 +421,9 @@ class SelfAuditEngine:
             pass
 
         self._record_finding(
-            "H", "Campaign FSM integrity and transition invariants", "INFO", "RESOLVED",
-            "Illegal transitions, skipped genesis, and mutations of terminal states fail closed.",
-            "Enforced in orchestration/fsm.py."
+            "H", "Sampled campaign FSM transitions", "INFO", "MITIGATED",
+            "The sampled genesis skip and terminal-state mutation were rejected.",
+            "This probe does not qualify the accepted workflow read model or recovery paths."
         )
         return True
 
@@ -443,36 +471,68 @@ class SelfAuditEngine:
                 )
                 return False
 
-        enforced_specs = build_e3_lane_specs(
-            required_isolation_assurance="ENFORCED"
-        )
-        if any(
-            spec.required_isolation_assurance != "ENFORCED"
-            for spec in enforced_specs.values()
-        ):
+        from .orchestration.e3 import create_e3_blind_attempt
+        from .orchestration.e3 import E3_LANE_SLOTS
+        from .workflow.assignments import _external_ref as target_ref
+
+        def probe_ref(kind: str, seed: str) -> dict[str, Any]:
+            return target_ref(kind, seed, "CONTENT_OR_PRIOR")
+
+        cut = {
+            "variant": "ACCEPTED_HISTORY_CUT",
+            "campaign_id": "camp_self_audit_e3",
+            "accepted_head_seq": 1,
+            "accepted_head_hash": "a" * 64,
+            "governing_policy_ref": "pin:policy",
+            "governing_spec_refs": ["pin:spec"],
+        }
+        witness = probe_ref("raw_artifact_ref", "witness")
+        try:
+            create_e3_blind_attempt(
+                lane_slot=E3_LANE_SLOTS[0],
+                lane_run_ref=probe_ref("lane_run", "lane"),
+                assigned_history_cut=cut,
+                executor_profile_ref=probe_ref("executor_spec", "executor"),
+                delivery_profile_ref=probe_ref("delivery_spec", "delivery"),
+                source_generation_ref=probe_ref("source_generation", "source"),
+                channel_inventory_ref=witness,
+                isolation_assurance="ENFORCED",
+                fresh_session_boundary=True,
+                boundary_evidence_refs={
+                    name: [witness]
+                    for name in (
+                        "enforcement_receipt_refs",
+                        "filesystem_boundary_evidence_refs",
+                        "network_boundary_evidence_refs",
+                        "tool_boundary_evidence_refs",
+                        "session_boundary_evidence_refs",
+                    )
+                },
+            )
+        except ValidationError as exc:
+            if exc.code not in {"ISOLATION_ADMISSION_CONTEXT_REQUIRED", "E3_ENFORCED_BOUNDARY_EVIDENCE_REQUIRED"}:
+                raise
+        else:
             self._record_finding(
                 "I",
-                "E3 enforced profile cannot be expressed",
+                "E3 helper overstated enforced isolation",
                 "HIGH",
                 "OPEN",
-                "Explicit ENFORCED E3 LaneSpecs were not preserved",
-                "Keep ENFORCED available only for evidence-backed profiles",
+                "The standalone E3 helper issued an ENFORCED attempt without accepted policy context.",
+                "Require accepted isolation-admission context before ENFORCED is returned.",
             )
             return False
 
         self._record_finding(
             "I",
-            "Corpus contamination and holdout isolation defense",
+            "Sampled E3 declared boundary and ENFORCED rejection",
             "INFO",
-            "RESOLVED",
+            "MITIGATED",
             (
-                "E3 blind lanes require at least DECLARED isolation, "
-                "UNKNOWN fails closed, and forbidden corpus/reveal classes "
-                "remain excluded."
+                "LaneSpec forbids the sampled corpus classes, and the standalone ENFORCED helper rejected an unaccepted policy context."
             ),
             (
-                "Enforced via truthful E3 LaneSpec isolation profiles and "
-                "positive-view capability boundaries."
+                "This configuration/helper probe does not qualify accepted runtime isolation or E3 reveal phases."
             ),
         )
         return True
@@ -482,7 +542,7 @@ class SelfAuditEngine:
         self.findings.clear()
         self._finding_counter = 0
 
-        gates = {
+        local_checks = {
             "SOURCE_INTEGRITY_GATE": "PASS" if self.audit_source_integrity(dist_path) else "FAIL",
             "ARTIFACT_VALIDATOR_GATE": "PASS" if self.audit_artifact_validators() else "FAIL",
             "GATE_BYPASS_GATE": "PASS" if self.audit_gate_bypass() else "FAIL",
@@ -494,9 +554,20 @@ class SelfAuditEngine:
             "CORPUS_CONTAMINATION_GATE": "PASS" if self.audit_corpus_contamination() else "FAIL",
         }
 
+        gates = {
+            name: "LIMITED_PASS" if result == "PASS" else result
+            for name, result in local_checks.items()
+        }
+        gates.update({
+            "INTEGRATED_R1_R11_REGRESSION_MATRIX": "NOT_EXECUTED",
+            "MUTATION_SENSITIVITY_AND_INDEPENDENT_ORACLE": "NOT_EXECUTED",
+            "CLEAN_ROOM_AND_PINNED_CI_QUALIFICATION": "NOT_EXECUTED",
+        })
+
         open_high = sum(1 for f in self.findings if f.status == "OPEN" and f.severity in ("HIGH", "CRITICAL"))
         open_all = sum(1 for f in self.findings if f.status == "OPEN")
-        overall = "PASS" if (all(v == "PASS" for v in gates.values()) and open_high == 0) else "FAIL"
+        local_failed = any(value == "FAIL" for value in gates.values())
+        overall = "FAIL" if (local_failed or open_high > 0) else "NOT_QUALIFIED"
 
         return SelfAuditReport(
             status=overall,
@@ -505,6 +576,7 @@ class SelfAuditEngine:
             open_high_critical_count=open_high,
             findings=list(self.findings),
             gates=gates,
+            qualification_scope="NARROW_LOCAL_CONTROLS; no integrated, mutation-sensitivity, clean-room, or pinned-CI qualification",
         )
 
 
