@@ -266,14 +266,7 @@ class StopInput:
 
     @property
     def ref(self) -> dict[str, Any]:
-        obj = self.as_object()
-        return {
-            "kind": "stop_input",
-            "revision_digest": obj.digest,
-            "digest_profile": "BDB-OBJECT-DIGEST-1",
-            "schema_revision_ref": "BDB_SCHEMA_REGISTRY::stop_input/1",
-            "ref_class": "CONTENT_OR_PRIOR",
-        }
+        return self.as_object().as_ref(ref_class="CONTENT_OR_PRIOR").as_dict()
 
 
 @dataclass(frozen=True)
@@ -394,4 +387,3 @@ class Snapshot:
             "schema_revision_ref": "BDB_SCHEMA_REGISTRY::snapshot/1",
             "ref_class": "CONTENT_OR_PRIOR",
         }
-

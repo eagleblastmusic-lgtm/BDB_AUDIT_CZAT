@@ -21,6 +21,7 @@ from ..coordinator import Coordinator
 from ..core.canonical_json import canonical_bytes, parse
 from ..core.errors import ValidationError
 from ..core.ids import deterministic_id
+from ..core.registry import canonical_reference_set
 from ..history.objects import CanonicalObject, CommandEnvelope, HistoryCut
 from ..history.store import TransactionalHistoryStore
 from ..orchestration.native_ensemble import E1_LANE_SLOTS, E1CompletionResult, execute_e1_ensemble
@@ -99,6 +100,19 @@ def _with_ref_class(ref: dict[str, Any], ref_class: str) -> dict[str, Any]:
     result = dict(ref)
     result["ref_class"] = ref_class
     return result
+
+
+def _canonical_content_ref_union(refs: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Build a canonical output union while collapsing repeated accepted refs."""
+    normalized = (
+        _with_ref_class(ref, "CONTENT_OR_PRIOR")
+        for ref in refs
+    )
+    unique_by_bytes = {
+        canonical_bytes(ref): ref
+        for ref in normalized
+    }
+    return canonical_reference_set(unique_by_bytes.values())
 
 
 def _same_ref(left: Any, right: Any) -> bool:
@@ -607,7 +621,7 @@ class E1ResultInbox:
                         completion_by_assignment[proposal_assignment_digest] = completion
 
         required_completion_refs: list[dict[str, Any]] = []
-        proposal_refs: list[dict[str, Any]] = []
+        stage_output_refs: dict[str, dict[str, Any]] = {}
         stage_run_digests: set[str] = set()
         stage_run_ref: dict[str, Any] | None = None
         stage_spec_ref: dict[str, Any] | None = None
@@ -622,11 +636,19 @@ class E1ResultInbox:
             if completion is None or completion["body"].get("completion_predicate_result") != "LANE_COMPLETED":
                 raise ValidationError("STAGE_COMPLETION_BLOCKED", f"Missing completed lane {slot}")
             required_completion_refs.append(_with_ref_class(completion["ref"], "CONTENT_OR_PRIOR"))
+            for output_ref in completion["body"].get("required_output_refs", ()):
+                if not isinstance(output_ref, dict):
+                    raise ValidationError("STAGE_COMPLETION_OUTPUT_REF_INVALID", slot)
+                output_digest = output_ref.get("revision_digest")
+                if not isinstance(output_digest, str):
+                    raise ValidationError("STAGE_COMPLETION_OUTPUT_REF_INVALID", slot)
+                stage_output_refs[output_digest] = _with_ref_class(
+                    output_ref, "CONTENT_OR_PRIOR"
+                )
 
             accepted_proposal = self._accepted_result_for_job(job, cut)
             if accepted_proposal is None:
                 raise ValidationError("STAGE_COMPLETION_BLOCKED", f"Missing accepted result {slot}")
-            proposal_refs.append(_with_ref_class(accepted_proposal["ref"], "CONTENT_OR_PRIOR"))
             lane_discoveries[slot] = [
                 dict(finding)
                 for finding in accepted_proposal["body"].get("findings", [])
@@ -643,6 +665,9 @@ class E1ResultInbox:
 
         if len(stage_run_digests) != 1 or stage_run_ref is None or stage_spec_ref is None:
             raise ValidationError("STAGE_RUN_BINDING_CONFLICT")
+        stage_spec_body = self.store.resolve_accepted(
+            stage_spec_ref, cut
+        )["body"]
 
         stage_completion = StageCompletion(
             stage_completion_id=deterministic_id(
@@ -653,8 +678,22 @@ class E1ResultInbox:
             stage_spec_ref=stage_spec_ref,
             input_history_cut=cut,
             required_lane_slot_results=required_completion_refs,
-            required_output_refs=proposal_refs,
-            mandatory_obligation_summary={"required_lanes": len(E1_LANE_SLOTS), "completed_lanes": len(required_completion_refs)},
+            # Preserve the complete output closure already accepted for each lane,
+            # including its discovery_record objects. The stage completion's own
+            # canonical digest supplies the stage_completion_digest readback.
+            required_output_refs=tuple(
+                stage_output_refs[digest]
+                for digest in sorted(stage_output_refs)
+            ),
+            mandatory_obligation_summary={
+                "required_lanes": len(E1_LANE_SLOTS),
+                "completed_lanes": len(required_completion_refs),
+                "required_stage_completion_outputs": list(
+                    stage_spec_body.get(
+                        "required_stage_completion_outputs", ()
+                    )
+                ),
+            },
             unresolved_material_refs=[],
             unknown_blocked_summary={"unknown_surfaces_count": 0},
             completion_predicate_result="STAGE_COMPLETED",

@@ -22,7 +22,7 @@ def test_prepared_stages_do_not_make_campaign_ready_for_stop(tmp_path: Path):
     continuation = api.continue_campaign(store_path)
     assert continuation["current_stage"] == "E1"
     assert continuation["continuation_state"] == "AWAITING_STAGE_COMPLETION"
-    assert continuation["next_action"] == "AWAITING_STAGE_COMPLETION"
+    assert continuation["next_action"] == "QUALIFY_STAGE_E1"
 
 
 def test_prepared_stage_specs_preserve_normative_predecessor_requirements(tmp_path: Path):

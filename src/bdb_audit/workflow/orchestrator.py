@@ -1127,6 +1127,25 @@ class FullAuditOrchestrator:
         status = self.api.get_campaign_status(
             self.active_store_path
         )
+        if (
+            status.get("termination_state", "OPEN") == "OPEN"
+            and "E6" in status.get("stages_prepared", [])
+            and "E6" not in status.get("stages_completed", [])
+        ):
+            return {
+                "status": "BLOCKED",
+                "campaign_id": status["campaign_id"],
+                "current_stage": "E6",
+                "continuation_state": "E6_EXECUTION_UNAVAILABLE",
+                "next_action": "E6_RUNTIME_UNAVAILABLE",
+                "reason": (
+                    "The accepted E6 plan has no connected execution, result, "
+                    "and obligation-qualification runtime."
+                ),
+                "finalization_progress": status.get("finalization_progress"),
+                "workflow_finished": False,
+                "head_seq": status["accepted_head_seq"],
+            }
         if "E5" in status.get("stages_completed", []):
             store = TransactionalHistoryStore(
                 self.active_store_path
@@ -1431,14 +1450,136 @@ class FullAuditOrchestrator:
 
         try:
             status = self.api.get_campaign_status(path)
-            campaign_id = status["campaign_id"]
             self.active_store_path = path
             store = TransactionalHistoryStore(path)
+        except ValidationError as exc:
+            return {
+                "status": "ERROR",
+                "error": exc.code,
+                "details": str(exc),
+                "store_path": str(path),
+            }
+
+        termination = status.get("termination_state", "OPEN")
+        if termination in {"COMPLETED", "COMPLETED_LIMITED"}:
+            progress = status["finalization_progress"]
+            self.e1_batch = None
+            self.e1_inbox = None
+            self.stage_batch = None
+            self.stage_inbox = None
+            if progress["state"] == "BLOCKED":
+                return {
+                    "status": "BLOCKED",
+                    "error": "FINALIZATION_CHAIN_INVALID",
+                    "details": progress.get("reason"),
+                    "current_stage": "FINALIZATION",
+                    "finalization_progress": progress,
+                    "store_path": str(path),
+                }
+            if not status["workflow_finished"]:
+                conclusion_rows = sorted(
+                    store.accepted_records(
+                        "campaign_conclusion",
+                        current_accepted_cut(store),
+                    ),
+                    key=lambda row: row["accepted_seq"],
+                )
+                conclusion = next(
+                    row for row in reversed(conclusion_rows)
+                    if row["body"].get("termination_state") == termination
+                )
+                recovered = self.api.conclude_campaign(
+                    path,
+                    termination_state=termination,
+                    bounded_statement=conclusion["body"].get(
+                        "bounded_conclusion_statement",
+                        "Campaign concluded via post-E5 finalization",
+                    ),
+                )
+                status = self.api.get_campaign_status(path)
+                return {
+                    "status": "SUCCESS",
+                    "campaign_id": status["campaign_id"],
+                    "store_path": str(path),
+                    "current_stage": "CONCLUDED",
+                    "current_phase": None,
+                    "active_inbox": "FINALIZATION",
+                    "accepted_lanes_count": 0,
+                    "total_required_lanes": 0,
+                    "missing_lanes": [],
+                    "stage_complete": True,
+                    "phase_complete": True,
+                    "termination_state": status["termination_state"],
+                    "finalization_progress": status["finalization_progress"],
+                    "workflow_finished": status["workflow_finished"],
+                    "next_action": "CAMPAIGN_FINISHED",
+                    "finalization_commit_seq": recovered["commit_seq"],
+                }
+            return {
+                "status": "SUCCESS",
+                "campaign_id": status["campaign_id"],
+                "store_path": str(path),
+                "current_stage": "CONCLUDED",
+                "current_phase": None,
+                "active_inbox": "FINALIZATION",
+                "accepted_lanes_count": 0,
+                "total_required_lanes": 0,
+                "missing_lanes": [],
+                "stage_complete": True,
+                "phase_complete": True,
+                "termination_state": termination,
+                "finalization_progress": progress,
+                "workflow_finished": True,
+                "next_action": "CAMPAIGN_FINISHED",
+            }
+
+        try:
+            campaign_id = status["campaign_id"]
             batch, durable_source = load_e1_batch(store, self._artifact_root())
             self.resolved_source = durable_source
             self.e1_batch = batch
             self.e1_inbox = E1ResultInbox(store, batch)
         except ValidationError as exc:
+            if exc.code == "RESUME_PACKAGE_STATE_MISSING":
+                cut = current_accepted_cut(store)
+                e1_spec_digests = {
+                    row["ref"]["revision_digest"]
+                    for row in store.accepted_records("stage_spec", cut)
+                    if row["body"].get("stage_key") == "E1"
+                }
+                has_e1_assignments = any(
+                    row["body"].get("stage_spec_ref", {}).get("revision_digest")
+                    in e1_spec_digests
+                    for row in store.accepted_records("assignment_manifest", cut)
+                )
+                if not has_e1_assignments:
+                    self.e1_batch = None
+                    self.e1_inbox = None
+                    self.stage_batch = None
+                    self.stage_inbox = None
+                    current_stage = status.get("current_stage", "GENESIS")
+                    next_action = (
+                        "PREPARE_E1_ORCHESTRATION"
+                        if "E1" in status.get("stages_prepared", [])
+                        else "PREPARE_STAGE_E1"
+                    )
+                    return {
+                        "status": "SUCCESS",
+                        "campaign_id": status["campaign_id"],
+                        "store_path": str(path),
+                        "current_stage": current_stage,
+                        "current_phase": None,
+                        "active_inbox": "NONE",
+                        "accepted_lanes_count": 0,
+                        "total_required_lanes": len(E1_LANE_SLOTS),
+                        "missing_lanes": list(E1_LANE_SLOTS),
+                        "stage_complete": False,
+                        "phase_complete": False,
+                        "termination_state": status.get("termination_state", "OPEN"),
+                        "finalization_progress": status["finalization_progress"],
+                        "workflow_finished": False,
+                        "next_action": next_action,
+                    }
             self.e1_batch = None
             self.e1_inbox = None
             self.stage_batch = None

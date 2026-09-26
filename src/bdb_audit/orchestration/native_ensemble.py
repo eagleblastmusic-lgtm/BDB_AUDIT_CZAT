@@ -42,6 +42,7 @@ def build_e1_stage_spec(revision: str = "1") -> StageSpec:
         required_lane_slots=E1_LANE_SLOTS,
         blind_reveal_phase_model="CONTROLLED",
         required_stage_completion_outputs=("discovery_records", "stage_completion_digest"),
+        transition_policy_ref="TRANSITION_PROFILE_V1",
         stop_e6_relationship="CONTINUE_REQUIRED",
     )
 
@@ -80,6 +81,7 @@ def build_e2_stage_spec(revision: str = "1") -> StageSpec:
         required_lane_slots=("E2-CONVERGENCE", "E2-ADJUDICATION"),
         blind_reveal_phase_model="CONTROLLED",
         required_stage_completion_outputs=("adjudication_decisions", "contradiction_obligations"),
+        transition_policy_ref="TRANSITION_PROFILE_V1",
         stop_e6_relationship="CONTINUE_REQUIRED",
     )
 

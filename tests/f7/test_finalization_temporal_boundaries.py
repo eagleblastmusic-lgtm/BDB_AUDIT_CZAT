@@ -17,7 +17,9 @@ import bdb_audit.assurance.residual_risk_finalization as risk_finalization_modul
 from bdb_audit.assurance.finalization_service import FinalizationService
 from bdb_audit.core.errors import ValidationError
 from bdb_audit.history.closure import canonical_order
-from bdb_audit.history.objects import CanonicalObject
+from bdb_audit.history.objects import CanonicalObject, CommitBody, ObjectRef
+from bdb_audit.history.store import _commit_from_body
+from bdb_audit.workflow.read_models import project_finalization_progress
 
 
 def _ref(kind: str, token: str) -> dict[str, str]:
@@ -52,6 +54,32 @@ class _FakeAcceptedStore:
         self.seq = 10
         self.hash = "a" * 64
         self.governing_policy_ref = "policy:temporal-boundary"
+        command = CanonicalObject(
+            "command_envelope",
+            {"command_id": "fake-stop-basis-command"},
+        )
+        command_ref = command.as_ref(ref_class="CONTENT_OBJECT")
+        parent = {
+            "tag": "ACCEPTED_HEAD_REF",
+            "campaign_id": self.campaign_id,
+            "commit_seq": 8,
+            "commit_hash": "8" * 64,
+        }
+        cut_commit = CommitBody(
+            campaign_id=self.campaign_id,
+            commit_seq=9,
+            prev_history_ref=parent,
+            command_ref=command_ref,
+            command_digest=command.digest,
+            actor_ref="test-actor",
+            expected_parent_head=parent,
+            governing_policy_ref=self.governing_policy_ref,
+            governing_spec_refs=("spec:temporal-boundary",),
+            ordered_event_bodies=(),
+            immutable_object_refs=(command_ref,),
+        )
+        self.cut_commit = cut_commit.body()
+        self.stop_cut_hash = cut_commit.digest
         stop_input_ref = _ref("stop_input", "stop-input")
         release_policy_ref = FinalizationService._policy_ref_from_cut(
             {"governing_policy_ref": self.governing_policy_ref}
@@ -62,6 +90,16 @@ class _FakeAcceptedStore:
                     "accepted_seq": 10,
                     "ref": stop_input_ref,
                     "body": {
+                        "campaign_id": self.campaign_id,
+                        "source_generation_ref": _ref("source_generation", "source"),
+                        "input_history_cut": {
+                            "variant": "ACCEPTED_HISTORY_CUT",
+                            "campaign_id": self.campaign_id,
+                            "accepted_head_seq": 9,
+                            "accepted_head_hash": self.stop_cut_hash,
+                        },
+                        "candidate_assurance_case_ref": _ref("candidate_assurance_case", "candidate"),
+                        "challenger_refs": [],
                         "residual_risk_refs": [],
                         "release_policy_ref": release_policy_ref,
                     },
@@ -123,6 +161,53 @@ class _FakeAcceptedStore:
             if record["ref"]["revision_digest"] == ref["revision_digest"]:
                 return record
         raise ValidationError("OBJECT_NOT_ACCEPTED_AT_CUT")
+
+    def commits(self):
+        commits = [self.cut_commit]
+        previous_hash = _commit_from_body(self.cut_commit).digest
+        max_seq = max(
+            [self.seq]
+            + [
+                int(record["accepted_seq"])
+                for records in self.records.values()
+                for record in records
+            ]
+        )
+        for seq in range(10, max_seq + 1):
+            command = CanonicalObject(
+                "command_envelope", {"command_id": f"fake-commit-{seq}"}
+            )
+            command_ref = command.as_ref(ref_class="CONTENT_OBJECT")
+            objects = [
+                ObjectRef.from_dict(
+                    {**record["ref"], "ref_class": "CONTENT_OBJECT"}
+                )
+                for records in self.records.values()
+                for record in records
+                if int(record["accepted_seq"]) == seq
+            ]
+            parent = {
+                "tag": "ACCEPTED_HEAD_REF",
+                "campaign_id": self.campaign_id,
+                "commit_seq": seq - 1,
+                "commit_hash": previous_hash,
+            }
+            commit = CommitBody(
+                campaign_id=self.campaign_id,
+                commit_seq=seq,
+                prev_history_ref=parent,
+                command_ref=command_ref,
+                command_digest=command.digest,
+                actor_ref="test-actor",
+                expected_parent_head=parent,
+                governing_policy_ref=self.governing_policy_ref,
+                governing_spec_refs=("spec:temporal-boundary",),
+                ordered_event_bodies=(),
+                immutable_object_refs=(command_ref, *objects),
+            )
+            commits.append(commit.body())
+            previous_hash = commit.digest
+        return commits
 
 
 def _install_fake_boundaries(monkeypatch, store: _FakeAcceptedStore, service: FinalizationService) -> None:
@@ -192,6 +277,95 @@ def test_finalization_service_uses_three_prior_accepted_boundaries_and_resumes(m
     assert len(store.records["release_qualification"]) == 1
 
 
+def test_finalization_progress_requires_the_complete_exact_chain() -> None:
+    store = _FakeAcceptedStore()
+    conclusion_ref = _ref("campaign_conclusion", "progress-conclusion")
+    stop_ref = store.records["stop_evaluation"][0]["ref"]
+    store.records["campaign_conclusion"].append(
+        {
+            "accepted_seq": 11,
+            "ref": conclusion_ref,
+            "body": {
+                "termination_state": "COMPLETED",
+                "stop_evaluation_ref": stop_ref,
+            },
+        }
+    )
+    store.seq = 11
+    cut = {
+        "campaign_id": store.campaign_id,
+        "accepted_head_seq": store.seq,
+        "accepted_head_hash": store.hash,
+    }
+    assert project_finalization_progress(store, cut)["state"] == "FINAL_CASE_PENDING"
+
+    final_ref = _ref("final_assurance_case", "progress-final")
+    store.records["final_assurance_case"].append(
+        {
+            "accepted_seq": 12,
+            "ref": final_ref,
+            "body": {
+                "campaign_conclusion_ref": conclusion_ref,
+                "stop_evaluation_ref": stop_ref,
+            },
+        }
+    )
+    store.seq = 12
+    cut["accepted_head_seq"] = store.seq
+    assert project_finalization_progress(store, cut)["state"] == "RELEASE_QUALIFICATION_PENDING"
+
+    store.records["release_qualification"].append(
+        {
+            "accepted_seq": 13,
+            "ref": _ref("release_qualification", "progress-release"),
+            "body": {
+                "campaign_conclusion_ref": conclusion_ref,
+                "final_assurance_case_ref": final_ref,
+                "stop_evaluation_ref": stop_ref,
+            },
+        }
+    )
+    store.seq = 13
+    cut["accepted_head_seq"] = store.seq
+    progress = project_finalization_progress(store, cut)
+    assert progress["state"] == "COMPLETE"
+    assert progress["next_action"] == "CAMPAIGN_FINISHED"
+
+
+def test_finalization_progress_blocks_a_conflicting_boundary() -> None:
+    store = _FakeAcceptedStore()
+    conclusion_ref = _ref("campaign_conclusion", "conflict-conclusion")
+    store.records["campaign_conclusion"].append(
+        {
+            "accepted_seq": 11,
+            "ref": conclusion_ref,
+            "body": {
+                "termination_state": "COMPLETED",
+                "stop_evaluation_ref": store.records["stop_evaluation"][0]["ref"],
+            },
+        }
+    )
+    store.records["final_assurance_case"].append(
+        {
+            "accepted_seq": 12,
+            "ref": _ref("final_assurance_case", "wrong-stop"),
+            "body": {
+                "campaign_conclusion_ref": conclusion_ref,
+                "stop_evaluation_ref": _ref("stop_evaluation", "foreign-stop"),
+            },
+        }
+    )
+    store.seq = 12
+    cut = {
+        "campaign_id": store.campaign_id,
+        "accepted_head_seq": store.seq,
+        "accepted_head_hash": store.hash,
+    }
+    progress = project_finalization_progress(store, cut)
+    assert progress["state"] == "BLOCKED"
+    assert progress["next_action"] == "REVIEW_FINALIZATION_CHAIN"
+
+
 def test_finalization_service_rejects_release_policy_drift_after_stop(monkeypatch) -> None:
     store = _FakeAcceptedStore()
     service = FinalizationService(store)  # type: ignore[arg-type]
@@ -209,3 +383,28 @@ def test_finalization_service_rejects_release_policy_drift_after_stop(monkeypatc
     assert len(store.records["campaign_conclusion"]) == 1
     assert len(store.records["final_assurance_case"]) == 1
     assert len(store.records["release_qualification"]) == 0
+
+
+def test_finalization_rejects_candidate_added_after_stop(monkeypatch) -> None:
+    store = _FakeAcceptedStore()
+    store.seq = 11
+    store.hash = "b" * 64
+    store.records["candidate_assurance_case"].append(
+        {
+            "accepted_seq": 11,
+            "ref": _ref("candidate_assurance_case", "new-candidate"),
+            "body": {"marker": "candidate added after STOP"},
+        }
+    )
+    service = FinalizationService(store)  # type: ignore[arg-type]
+    _install_fake_boundaries(monkeypatch, store, service)
+
+    with pytest.raises(ValidationError, match="STOP_INPUT_CUT_MISMATCH"):
+        service.conclude_campaign(
+            termination_state="COMPLETED",
+            bounded_statement="Must require fresh challenger roles and STOP",
+        )
+
+    assert store.records["campaign_conclusion"] == []
+    assert store.records["final_assurance_case"] == []
+    assert store.records["release_qualification"] == []

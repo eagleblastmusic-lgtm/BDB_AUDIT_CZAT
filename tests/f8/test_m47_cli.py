@@ -14,6 +14,9 @@ from bdb_audit.cli import (
     EXIT_CONFLICT_ERROR,
 )
 from bdb_audit.coordinator.operations import AuditOperationApi
+from bdb_audit.core.errors import ValidationError
+from bdb_audit.history.store import TransactionalHistoryStore
+from bdb_audit.workflow.read_models import current_accepted_cut
 
 
 @pytest.fixture
@@ -74,7 +77,8 @@ def test_m47_happy_path_workflow(temp_store, capsys):
     assert out["stage_key"] == "E1"
     assert out["slot"] == "L1"
     assert out["lane_id"] == "lane_E1_L1"
-    assert out["isolation_status"] == "QUALIFIED"
+    assert out["lane_status"] == "PREPARED"
+    assert out["required_isolation_assurance"] == "DECLARED"
     assert out["commit_seq"] == 3
 
     rc = run_cli(["campaign", "status", "--store", store_str, "--json"])
@@ -91,7 +95,7 @@ def test_m47_happy_path_workflow(temp_store, capsys):
     assert out["status"] == "SUCCESS"
     assert out["current_stage"] == "E1"
     assert out["continuation_state"] == "AWAITING_STAGE_COMPLETION"
-    assert out["next_action"] == "AWAITING_STAGE_COMPLETION"
+    assert out["next_action"] == "QUALIFY_STAGE_E1"
 
     # 6. validate valid artifact
     with tempfile.TemporaryDirectory() as td:
@@ -144,7 +148,28 @@ def test_m47_legacy_descriptive_stage_alias_projects_canonical_key(temp_store, c
 
     assert run_cli(["continue", "--store", store_str, "--json"]) == EXIT_SUCCESS
     out = json.loads(capsys.readouterr().out)
-    assert out["next_action"] == "AWAITING_STAGE_COMPLETION"
+    assert out["next_action"] == "QUALIFY_STAGE_E1"
+
+
+def test_stage_qualify_api_and_cli_reject_missing_execution_evidence(temp_store, capsys):
+    api = AuditOperationApi()
+    api.create_campaign(temp_store, seed="stage-qualify-requires-evidence")
+    api.prepare_stage(temp_store, "E1")
+    store = TransactionalHistoryStore(temp_store)
+    head_before = store.head()
+
+    with pytest.raises(ValidationError, match="STAGE_EXECUTION_EVIDENCE_REQUIRED"):
+        api.qualify_stage(temp_store, "E1")
+    assert store.head() == head_before
+    cut = current_accepted_cut(store)
+    assert store.accepted_records("stage_completion", cut) == ()
+    assert store.accepted_records("inventory_revision", cut) == ()
+
+    rc = run_cli(["stage", "qualify", "--store", str(temp_store), "--stage", "E1", "--json"])
+    assert rc == EXIT_DOMAIN_ERROR
+    error = json.loads(capsys.readouterr().err)
+    assert error["error"] == "STAGE_EXECUTION_EVIDENCE_REQUIRED"
+    assert store.head() == head_before
 
 
 def test_m47_stage_order_and_lane_parent_fail_closed(temp_store, capsys):

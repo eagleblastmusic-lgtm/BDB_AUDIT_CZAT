@@ -37,3 +37,71 @@ def test_transitive_forbidden_ref_fails_closed():
     with pytest.raises(ValidationError, match="VIEW_TRANSITIVE_LEAK"):
         q.reveal(root_ref=root, allowed_refs=(root["revision_digest"],))
 
+
+@pytest.mark.parametrize(
+    "nested_value",
+    [
+        lambda ref: {"outer": {"ref": ref}},
+        lambda ref: {"outer": [ref]},
+        lambda ref: [{"ref": ref}],
+        lambda ref: [[ref]],
+    ],
+    ids=("dict-in-dict", "list-in-dict", "dict-in-list", "list-in-list"),
+)
+def test_nested_forbidden_refs_are_checked_recursively(nested_value):
+    root, forbidden = ref("finding_claim_revision", "nested-root"), ref("legacy_raw_ref", "nested-raw")
+    policy = ProjectionPolicy(
+        "claim", "1", {"finding_claim_revision": ("details",)},
+        allowed_kinds=("finding_claim_revision",),
+    )
+    artifacts = {
+        root["revision_digest"]: {
+            "kind": "finding_claim_revision",
+            "details": nested_value(forbidden),
+        },
+        forbidden["revision_digest"]: {"kind": "legacy_raw_ref", "raw": "secret"},
+    }
+    quarantine = ClaimQuarantine(artifacts=artifacts, policy=policy)
+
+    with pytest.raises(ValidationError, match="VIEW_TRANSITIVE_LEAK"):
+        quarantine.reveal(root_ref=root, allowed_refs=(root["revision_digest"],))
+
+
+def test_nested_allowed_refs_are_projected_to_safe_bytes_deterministically():
+    root = ref("finding_claim_revision", "nested-positive-root")
+    child = ref("observation", "nested-positive-child")
+    artifacts = {
+        root["revision_digest"]: {
+            "kind": "finding_claim_revision",
+            "details": {"items": [child]},
+        },
+        child["revision_digest"]: {
+            "kind": "observation",
+            "value": "safe",
+            "filename": "hidden.json",
+        },
+    }
+    policy = ProjectionPolicy(
+        "claim", "1",
+        {
+            "finding_claim_revision": ("details",),
+            "finding_claim_revision.details": ("items",),
+            "observation": ("value",),
+        },
+        allowed_kinds=("finding_claim_revision", "observation"),
+    )
+    quarantine = ClaimQuarantine(artifacts=artifacts, policy=policy)
+
+    first = quarantine.reveal(
+        root_ref=root,
+        allowed_refs=(root["revision_digest"], child["revision_digest"]),
+    )
+    second = quarantine.reveal(
+        root_ref=root,
+        allowed_refs=(root["revision_digest"], child["revision_digest"]),
+    )
+
+    assert first.raw == second.raw
+    assert b"safe" in first.raw
+    assert b"hidden.json" not in first.raw
+    assert child["revision_digest"].encode() not in first.raw

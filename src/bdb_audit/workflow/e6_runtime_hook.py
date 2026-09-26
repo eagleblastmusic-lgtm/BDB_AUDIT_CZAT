@@ -15,7 +15,6 @@ from ..core.errors import ValidationError
 
 def install_recursive_e6_runtime_support() -> None:
     from . import read_models as rm
-    from . import stage_service as ss
 
     model_cls = rm.VerifiedCampaignReadModel
     if not getattr(model_cls, "_bdb_recursive_e6_projection_installed", False):
@@ -151,6 +150,15 @@ def install_recursive_e6_runtime_support() -> None:
             termination_state = latest_conclusion.get("termination_state") if latest_conclusion else "OPEN"
             if termination_state not in {"OPEN", "COMPLETED", "COMPLETED_LIMITED"}:
                 raise ValidationError("CAMPAIGN_CONCLUSION_PROJECTION_INVALID", str(termination_state))
+            finalization = rm.project_finalization_progress(
+                self.store,
+                cut,
+                conclusion_rows=conclusion_rows,
+            )
+            workflow_finished = (
+                termination_state in {"COMPLETED", "COMPLETED_LIMITED"}
+                and finalization["state"] == "COMPLETE"
+            )
 
             current_stage = "GENESIS"
             completed_set = set(completed_stages)
@@ -177,54 +185,11 @@ def install_recursive_e6_runtime_support() -> None:
                 "campaign_conclusions_count": len(conclusion_rows),
                 "termination_state": termination_state,
                 "campaign_completed": termination_state in {"COMPLETED", "COMPLETED_LIMITED"},
+                "finalization_progress": finalization,
+                "workflow_finished": workflow_finished,
                 "total_objects_count": rm._accepted_object_count(self.store, cut),
                 "source_generation_id": source.get("source_generation_id"),
             }
 
         setattr(model_cls, "project_status", project_status)
         setattr(model_cls, "_bdb_recursive_e6_projection_installed", True)
-
-    service_cls = ss.StageService
-    if getattr(service_cls, "_bdb_recursive_e6_completion_installed", False):
-        return
-
-    original_qualify = service_cls.qualify_and_complete_stage
-
-    def qualify_and_complete_stage(self, stage_key, *args, **kwargs):
-        if str(stage_key).upper() != "E6":
-            return original_qualify(self, stage_key, *args, **kwargs)
-
-        cut = ss.current_accepted_cut(self.store)
-        e6_specs = [
-            row for row in self.store.accepted_records("stage_spec", cut)
-            if row["body"].get("stage_key") == "E6"
-        ]
-        if not e6_specs:
-            raise ValidationError("STAGE_SPEC_NOT_FOUND", "No accepted StageSpec found for E6")
-        latest_e6 = max(e6_specs, key=lambda row: int(row.get("accepted_seq", 0)))
-        latest_revision = str(latest_e6["body"].get("stage_spec_revision"))
-
-        original_records = self.store.accepted_records
-        original_lane_spec = ss.LaneSpec
-
-        def chronological_records(kind, selected_cut):
-            rows = original_records(kind, selected_cut)
-            return tuple(sorted(
-                rows,
-                key=lambda row: (int(row.get("accepted_seq", 0)), row["ref"]["revision_digest"]),
-            ))
-
-        def e6_lane_spec(*lane_args, **lane_kwargs):
-            lane_kwargs["stage_spec_revision"] = latest_revision
-            return original_lane_spec(*lane_args, **lane_kwargs)
-
-        setattr(self.store, "accepted_records", chronological_records)
-        setattr(ss, "LaneSpec", e6_lane_spec)
-        try:
-            return original_qualify(self, "E6", *args, **kwargs)
-        finally:
-            setattr(self.store, "accepted_records", original_records)
-            setattr(ss, "LaneSpec", original_lane_spec)
-
-    setattr(service_cls, "qualify_and_complete_stage", qualify_and_complete_stage)
-    setattr(service_cls, "_bdb_recursive_e6_completion_installed", True)

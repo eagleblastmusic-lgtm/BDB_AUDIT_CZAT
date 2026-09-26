@@ -15,6 +15,7 @@ import hashlib
 import json
 from pathlib import Path
 import time
+from types import SimpleNamespace
 from typing import Any, Callable, Sequence
 
 from ..history.objects import CommandEnvelope
@@ -26,6 +27,7 @@ from ..history.store import TransactionalHistoryStore
 from ..stop.evaluator import evaluate_stop
 from ..stop.input_builder import StopInputBuilder
 from ..stop.predicates import validate_stop_evaluation_invariants
+from ..core.registry import canonical_reference_set
 from ..workflow.read_models import current_accepted_cut
 from .conclusion import CampaignConclusion, FinalAssuranceCase
 from .release import ReleaseQualification
@@ -43,6 +45,80 @@ class FinalizationService:
         if not records:
             return None
         return max(records, key=lambda record: int(record.get("accepted_seq", 0)))
+
+    @staticmethod
+    def _prior_refs(refs) -> tuple[dict[str, Any], ...]:
+        if not refs:
+            return ()
+        return tuple(
+            canonical_reference_set(
+                [dict(ref, ref_class="PRIOR_ACCEPTED_ONLY") for ref in refs]
+            )
+        )
+
+    @staticmethod
+    def _ref_identity(ref):
+        if not isinstance(ref, dict):
+            return None
+        return tuple(
+            ref.get(field)
+            for field in (
+                "kind",
+                "revision_digest",
+                "digest_profile",
+                "schema_revision_ref",
+                "logical_id",
+            )
+        )
+
+    @classmethod
+    def _same_ref_set(cls, actual, expected) -> bool:
+        if not isinstance(actual, (list, tuple)) or not isinstance(expected, (list, tuple)):
+            return False
+        return sorted(cls._ref_identity(ref) for ref in actual) == sorted(
+            cls._ref_identity(ref) for ref in expected
+        )
+
+    def _stop_input_basis(self, stop_eval_record, cut):
+        """Resolve and freshness-check the exact basis pinned by accepted STOP."""
+        stop_input_ref = stop_eval_record["body"].get("stop_input_ref")
+        if not isinstance(stop_input_ref, dict):
+            raise ValidationError("FINALIZATION_STOP_INPUT_REQUIRED")
+        stop_input_record = self.store.resolve_accepted(stop_input_ref, cut)
+        stop_input_body = stop_input_record["body"]
+        accepted_seq = stop_input_record.get("accepted_seq")
+        if type(accepted_seq) is not int:
+            raise ValidationError("FINALIZATION_STOP_INPUT_REQUIRED")
+
+        # Reuse the STOP authority's material-cut predicate across every
+        # finalization entry point. Administrative finalization commits may
+        # follow the cut; any material change requires a fresh STOP.
+        from ..stop.operation import _require_current_campaign_cut
+
+        _require_current_campaign_cut(
+            SimpleNamespace(
+                campaign_id=stop_input_body.get("campaign_id"),
+                input_history_cut=stop_input_body.get("input_history_cut", {}),
+            ),
+            self.store,
+            authoritative=True,
+            accepted_commit_seq=accepted_seq,
+        )
+
+        candidate_ref = stop_input_body.get("candidate_assurance_case_ref")
+        if candidate_ref is not None and not isinstance(candidate_ref, dict):
+            raise ValidationError("FINALIZATION_CANDIDATE_MISMATCH")
+        challenger_refs = stop_input_body.get("challenger_refs", ())
+        if not isinstance(challenger_refs, (list, tuple)) or any(
+            not isinstance(ref, dict) for ref in challenger_refs
+        ):
+            raise ValidationError("FINALIZATION_CHALLENGER_MISMATCH")
+        return (
+            stop_input_record,
+            dict(stop_input_body["source_generation_ref"], ref_class="PRIOR_ACCEPTED_ONLY"),
+            dict(candidate_ref, ref_class="PRIOR_ACCEPTED_ONLY") if candidate_ref else None,
+            self._prior_refs(challenger_refs),
+        )
 
     @staticmethod
     def _policy_ref_from_cut(cut: dict[str, Any]) -> dict[str, Any]:
@@ -243,6 +319,12 @@ class FinalizationService:
                 "StopEvaluation must resolve to exactly one accepted StopInput at its finalization cut",
             )
         stop_input_record = stop_input_matches[0]
+        (
+            stop_input_record,
+            sg_ref,
+            cac_ref,
+            challenger_refs,
+        ) = self._stop_input_basis(stop_eval_record, cut)
         stop_release_policy_ref = stop_input_record["body"].get("release_policy_ref")
         if not isinstance(stop_release_policy_ref, dict):
             raise ValidationError(
@@ -284,25 +366,6 @@ class FinalizationService:
             "ref_class": "PRIOR_ACCEPTED_ONLY",
         }
 
-        sg_record = self._latest(self.store.accepted_records("source_generation", cut))
-        if sg_record is None:
-            si_record = self._latest(self.store.accepted_records("source_identity", cut))
-            if si_record is None:
-                raise ValidationError(
-                    "SOURCE_GENERATION_REQUIRED",
-                    "Finalization requires a prior accepted source generation",
-                )
-            sg_ref = dict(si_record["ref"], ref_class="PRIOR_ACCEPTED_ONLY")
-        else:
-            sg_ref = dict(sg_record["ref"], ref_class="PRIOR_ACCEPTED_ONLY")
-
-        cac_record = self._latest(self.store.accepted_records("candidate_assurance_case", cut))
-        cac_ref = (
-            dict(cac_record["ref"], ref_class="PRIOR_ACCEPTED_ONLY")
-            if cac_record is not None
-            else None
-        )
-
         basis_refs: tuple[dict[str, Any], ...] = ()
         if termination_state == "COMPLETED_LIMITED":
             basis_refs = (stop_eval_ref,)
@@ -319,6 +382,10 @@ class FinalizationService:
             if (
                 concl_body.get("termination_state") != termination_state
                 or concl_body.get("bounded_conclusion_statement") != bounded_statement
+                or self._ref_identity(concl_body.get("source_generation_ref"))
+                != self._ref_identity(sg_ref)
+                or self._ref_identity(concl_body.get("candidate_assurance_case_ref"))
+                != self._ref_identity(cac_ref)
             ):
                 raise ValidationError(
                     "FINALIZATION_REPLAY_CONFLICT",
@@ -374,6 +441,17 @@ class FinalizationService:
                     "FINALIZATION_REPLAY_CONFLICT",
                     "An accepted final assurance case exists with a different public conclusion statement",
                 )
+            if (
+                self._ref_identity(final_body.get("candidate_assurance_case_ref"))
+                != self._ref_identity(cac_ref)
+                or not self._same_ref_set(
+                    final_body.get("challenger_result_refs", ()), challenger_refs
+                )
+            ):
+                raise ValidationError(
+                    "FINALIZATION_REPLAY_CONFLICT",
+                    "Accepted FinalAssuranceCase does not preserve the exact STOP candidate/challenger closure",
+                )
             final_ref = dict(existing_final["ref"], ref_class="PRIOR_ACCEPTED_ONLY")
             final_digest = final_ref["revision_digest"]
             final_case_commit_seq = int(existing_final["accepted_seq"])
@@ -385,6 +463,7 @@ class FinalizationService:
                 public_conclusion_statement_ref=stmt_ref,
                 final_case_input_history_cut=final_case_cut,
                 candidate_assurance_case_ref=cac_ref,
+                challenger_result_refs=challenger_refs,
             )
             final_obj = CanonicalObject(
                 "final_assurance_case",
@@ -429,6 +508,13 @@ class FinalizationService:
                     "RELEASE_POLICY_BINDING_MISMATCH",
                     "Accepted release qualification does not bind the governing release policy",
                 )
+            if (
+                self._ref_identity(existing_body.get("source_generation_ref"))
+                != self._ref_identity(sg_ref)
+                or existing_body.get("stop_evaluation_ref", {}).get("revision_digest")
+                != stop_digest
+            ):
+                raise ValidationError("FINALIZATION_REPLAY_CONFLICT")
             rel_digest = existing_qualification["ref"]["revision_digest"]
             qualification_commit_seq = int(existing_qualification["accepted_seq"])
             final_head = self.store.head()

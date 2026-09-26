@@ -75,13 +75,35 @@ class FindingClaimRevision:
     discovery_relation_refs: Sequence[Any] = ()
     previous_finding_claim_revision_ref: Any = None
     claim_id: str | None = None
-    claim_revision: str = "1"
+    claim_revision: str | None = None
 
     def __post_init__(self):
-        if self.claim_id is None:
+        previous_ref = None
+        if self.previous_finding_claim_revision_ref is not None:
+            previous_ref = _ref_dict(self.previous_finding_claim_revision_ref)
+            predecessor_id = previous_ref.get("logical_id")
+            if not isinstance(predecessor_id, str) or not predecessor_id:
+                raise ValidationError("FINDING_CLAIM_PREDECESSOR_ID_REQUIRED")
+            if self.claim_id is None:
+                object.__setattr__(self, "claim_id", predecessor_id)
+            elif self.claim_id != predecessor_id:
+                raise ValidationError("FINDING_CLAIM_IDENTITY_MISMATCH")
+            if self.claim_revision is None or str(self.claim_revision) == "1":
+                raise ValidationError("FINDING_CLAIM_SUCCESSOR_REVISION_REQUIRED")
+        elif self.claim_id is None:
             object.__setattr__(self, "claim_id", new_id("finding_claim_revision"))
-        elif self.claim_id.startswith("finding_claim_revision_"):
+
+        if self.claim_id.startswith("finding_claim_revision_"):
             validate_id(self.claim_id, "finding_claim_revision")
+
+        revision = "1" if self.claim_revision is None else str(self.claim_revision)
+        if not revision.isdecimal() or int(revision) < 1:
+            raise ValidationError("FINDING_CLAIM_REVISION_INVALID")
+        if previous_ref is None and revision != "1":
+            raise ValidationError("FINDING_CLAIM_PREDECESSOR_REQUIRED")
+        object.__setattr__(self, "claim_revision", revision)
+        if previous_ref is not None:
+            object.__setattr__(self, "previous_finding_claim_revision_ref", previous_ref)
 
         object.__setattr__(
             self, "scope_refs",
@@ -574,4 +596,3 @@ class ContradictionResolutionDecision:
     @property
     def digest(self) -> str:
         return self.as_object().digest
-

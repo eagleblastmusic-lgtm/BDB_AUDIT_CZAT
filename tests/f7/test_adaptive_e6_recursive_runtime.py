@@ -1,7 +1,10 @@
-"""Recursive M45 runtime proof: only the newest E6 revision can be current/completed."""
+"""Recursive M45 projection: latest E6 authority wins; generic completion fails closed."""
 from __future__ import annotations
 
+import pytest
+
 from bdb_audit.stop.e6 import AdaptiveE6Generator
+from bdb_audit.core.errors import ValidationError
 from bdb_audit.workflow.read_models import campaign_status, current_accepted_cut
 from bdb_audit.workflow.stage_service import StageService
 from tests.f7.test_adaptive_e6_canonical_authority import (
@@ -76,19 +79,26 @@ def test_second_e6_revision_requires_its_own_completion(tmp_path) -> None:
     assert "E6" not in pending_status["stages_completed"]
     assert pending_status["current_stage"] == "E6"
 
-    result = StageService(store).qualify_and_complete_stage("E6")
-    assert result["status"] == "SUCCESS"
-    assert result["stage"] == "E6"
+    head_before_attempt = store.head()
+    completions_before_attempt = store.accepted_records(
+        "stage_completion",
+        current_accepted_cut(store),
+    )
+    with pytest.raises(ValidationError) as exc:
+        StageService(store).qualify_and_complete_stage("E6")
+    assert exc.value.code == "STAGE_EXECUTION_EVIDENCE_REQUIRED"
 
-    completed_status = campaign_status(store, _canonical_stage)
-    assert "E6" in completed_status["stages_completed"]
+    status_after_attempt = campaign_status(store, _canonical_stage)
+    assert "E6" in status_after_attempt["stages_prepared"]
+    assert "E6" not in status_after_attempt["stages_completed"]
+    assert store.head() == head_before_attempt
 
-    # The accepted StageCompletion must bind the newest E6 StageSpec revision,
-    # never the already-completed first revision.
+    # The fail-closed generic facade cannot manufacture a second E6 completion.
     cut8 = current_accepted_cut(store)
-    e6_completions = []
-    for row in store.accepted_records("stage_completion", cut8):
-        spec_ref = row["body"].get("stage_spec_ref", {})
-        if spec_ref.get("revision_digest") == second.as_object().digest:
-            e6_completions.append(row)
-    assert len(e6_completions) == 1
+    completions_after_attempt = store.accepted_records("stage_completion", cut8)
+    assert len(completions_after_attempt) == len(completions_before_attempt)
+    assert all(
+        row["body"].get("stage_spec_ref", {}).get("revision_digest")
+        != second.as_object().digest
+        for row in completions_after_attempt
+    )

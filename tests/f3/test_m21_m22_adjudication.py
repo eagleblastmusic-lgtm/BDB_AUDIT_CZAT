@@ -138,6 +138,29 @@ def test_finding_adjudication_flow():
     assert len(adj.digest) == 64
 
 
+def test_finding_claim_successor_keeps_logical_identity_and_changes_revision_digest():
+    source = ref("source_generation", "stable-finding-source")
+    predecessor = FindingClaimRevision(
+        statement="Original claim",
+        source_generation_ref=source,
+        claim_id="finding_claim_revision_123e4567-e89b-42d3-a456-426614174000",
+        claim_revision="1",
+    )
+    predecessor_ref = predecessor.as_object().as_ref().as_dict()
+
+    successor = FindingClaimRevision(
+        statement="Corrected claim statement",
+        source_generation_ref=source,
+        previous_finding_claim_revision_ref=predecessor_ref,
+        claim_revision="2",
+    )
+
+    assert successor.claim_id == predecessor.claim_id
+    assert successor.as_object().logical_id == predecessor.as_object().logical_id
+    assert successor.digest != predecessor.digest
+    assert successor.body()["previous_finding_claim_revision_ref"] == predecessor_ref
+
+
 def test_contradiction_and_majority_vote_forbidden():
     cut = {"tag": "EMPTY_HISTORY"}
     claim_a = ref("finding_claim_revision", "c1")

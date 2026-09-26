@@ -10,15 +10,6 @@ from __future__ import annotations
 from functools import wraps
 
 from ..core.errors import ValidationError
-from ..stop.residual_risk_projection import _current_risk_rows
-
-
-def _digest_set(refs) -> set[str]:
-    return {
-        ref.get("revision_digest")
-        for ref in refs
-        if isinstance(ref, dict) and isinstance(ref.get("revision_digest"), str)
-    }
 
 
 def install_full_identity_stop_lookup(finalization_module) -> None:
@@ -39,19 +30,12 @@ def install_full_identity_stop_lookup(finalization_module) -> None:
             if stop_eval_record is None:
                 raise ValidationError("STOP_EVALUATION_REQUIRED")
 
-        stop_input_ref = stop_eval_record["body"].get("stop_input_ref")
-        stop_digest = stop_input_ref.get("revision_digest") if isinstance(stop_input_ref, dict) else None
-        if not isinstance(stop_digest, str):
-            raise ValidationError("FINALIZATION_STOP_INPUT_REQUIRED")
-
-        matches = [
-            row
-            for row in service.store.accepted_records("stop_input", cut)
-            if row["ref"].get("revision_digest") == stop_digest
-        ]
-        if len(matches) != 1:
-            raise ValidationError("FINALIZATION_STOP_INPUT_IDENTITY_MISMATCH")
-        stop_input_record = matches[0]
+        (
+            stop_input_record,
+            source_generation_ref,
+            candidate_ref,
+            challenger_refs,
+        ) = service._stop_input_basis(stop_eval_record, cut)
         stop_risk_refs = tuple(stop_input_record["body"].get("residual_risk_refs", ()))
         stop_release_policy_ref = stop_input_record["body"].get("release_policy_ref")
         if not isinstance(stop_release_policy_ref, dict):
@@ -60,15 +44,18 @@ def install_full_identity_stop_lookup(finalization_module) -> None:
                 "Accepted StopInput must carry release_policy_ref",
             )
 
-        current_rows = _current_risk_rows(service.store, cut)
-        current_risk_refs = tuple(row["ref"] for row in current_rows)
-        if _digest_set(stop_risk_refs) != _digest_set(current_risk_refs):
-            raise ValidationError(
-                "RESIDUAL_RISK_DRIFT_AFTER_STOP",
-                "Residual-risk authority changed after STOP; a fresh STOP evaluation is required",
-            )
+        # Residual risk equality is admitted by the shared store hook and is
+        # checked again while materializing the finalization boundaries.
         prior_refs = finalization_module._prior_risk_refs(stop_risk_refs)
-        return cut, stop_eval_record, prior_refs, stop_release_policy_ref
+        return (
+            cut,
+            stop_eval_record,
+            prior_refs,
+            stop_release_policy_ref,
+            source_generation_ref,
+            candidate_ref,
+            challenger_refs,
+        )
 
     setattr(stop_and_risks, "_bdb_full_stop_identity", True)
     finalization_module._stop_and_risks = stop_and_risks

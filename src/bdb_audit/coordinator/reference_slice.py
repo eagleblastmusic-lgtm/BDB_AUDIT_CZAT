@@ -238,17 +238,9 @@ def run_foundation_reference_slice(store_path: str | Path, *, stop_at_seq: int =
     # -------------------------------------------------------------------------
     # 4. SEQ=4: E3 StageRun / Lane / Attempt / Isolation (F2 / M6 / M7)
     # -------------------------------------------------------------------------
-    stage_spec = StageSpec(
-        stage_key="E3",
-        stage_spec_revision="1",
-        stage_role="E3",
-        stage_ordinal=3,
-        purpose="Foundation reference slice E3 execution",
-        predecessor_requirements=("E2",),
-        required_lane_slots=("lane_1",),
-        blind_reveal_phase_model="CONTROLLED",
-        transition_policy_ref="TRANSITION_PROFILE_V1",
-    )
+    from ..orchestration.stages import native_stage_spec
+
+    stage_spec = native_stage_spec("E3", "1")
     stage_spec_obj = stage_spec.as_object()
 
     stage_run = CanonicalObject("stage_run", {
@@ -269,7 +261,7 @@ def run_foundation_reference_slice(store_path: str | Path, *, stop_at_seq: int =
         purpose="E3 primary exploratory lane",
         primary_strategy="DYNAMIC_FUZZING",
         scope_selectors=("sub:core",),
-        required_isolation_assurance="ENFORCED",
+        required_isolation_assurance="DECLARED",
         required_outputs=("DISCOVERY",),
     )
     lane_spec_obj = lane_spec.as_object()
@@ -306,11 +298,11 @@ def run_foundation_reference_slice(store_path: str | Path, *, stop_at_seq: int =
         "tool_boundary_evidence_refs": [],
         "session_boundary_evidence_refs": [],
         "contamination_assessment_refs": [],
-        "required_isolation_assurance": "ENFORCED",
-        "result": "ENFORCED",
+        "required_isolation_assurance": "DECLARED",
+        "result": "DECLARED",
         "scope": "LOCAL_SANDBOX",
-        "limitations": [],
-        "reason_codes": [],
+        "limitations": ["Synthetic reference-slice fixture has no material-channel enforcement evidence"],
+        "reason_codes": ["DECLARED_ISOLATION_ONLY"],
     })
 
     seq4_objects = (
@@ -549,8 +541,18 @@ def run_foundation_reference_slice(store_path: str | Path, *, stop_at_seq: int =
         input_history_cut=head_cut,
         required_lane_slot_results=[_ref_for("stage_completion", "required_lane_slot_results", lane_comp)],
         required_output_refs=[_ref_for("stage_completion", "required_output_refs", discovery)],
-        mandatory_obligation_summary={"total_mandatory": 1, "qualified": 1},
-        completion_predicate_result="STAGE_COMPLETED",
+        mandatory_obligation_summary={
+            "total_mandatory": len(stage_spec.required_lane_slots),
+            "qualified": 0,
+            "observed_lane_results": 1,
+            "required_stage_completion_outputs": list(
+                stage_spec.body()["required_stage_completion_outputs"]
+            ),
+        },
+        # This reference slice contains one example lane, not the pinned E3
+        # three-lane/checkpoint/gap-evidence closure.  Preserve the fixture as
+        # an explicit blocked record instead of advertising synthetic E3 PASS.
+        completion_predicate_result="STAGE_COMPLETION_BLOCKED",
     )
 
     seq9_objects = (lane_comp.as_object(), stage_comp.as_object())
@@ -591,7 +593,6 @@ def run_foundation_reference_slice(store_path: str | Path, *, stop_at_seq: int =
         _ref_for("stop_input", "inventory_revision_ref", inv_rev),
         _ref_for("stop_input", "mandatory_obligation_refs", cov_ob),
         _ref_for("stop_input", "current_obligation_qualification_refs", cov_qual),
-        _ref_for("stop_input", "completed_stage_refs", stage_comp),
         _ref_for("stop_input", "required_stage_spec_refs", stage_spec_obj),
         e4_spec,
         e5_spec,
@@ -617,8 +618,12 @@ def run_foundation_reference_slice(store_path: str | Path, *, stop_at_seq: int =
         evaluator_revision_ref=_external_ref("spec_revision", "eval_rev", ref_class="HISTORY_CONTEXT_BINDING"),
         required_stage_set_ref=_external_ref("external_profile_ref", "stg_set", ref_class="HISTORY_CONTEXT_BINDING"),
         required_stage_spec_refs=[_ref_for("stop_input", "required_stage_spec_refs", stage_spec_obj), e4_spec, e5_spec],
-        completed_stage_refs=[_ref_for("stop_input", "completed_stage_refs", stage_comp)],
-        pending_required_stage_refs=[e4_spec, e5_spec],
+        completed_stage_refs=[],
+        pending_required_stage_refs=[
+            _ref_for("stop_input", "pending_required_stage_refs", stage_spec_obj),
+            e4_spec,
+            e5_spec,
+        ],
         stop_input_snapshot_ref=_ref_for("stop_input", "stop_input_snapshot_ref", snapshot),
         inventory_revision_ref=_ref_for("stop_input", "inventory_revision_ref", inv_rev),
         mandatory_obligation_refs=[_ref_for("stop_input", "mandatory_obligation_refs", cov_ob)],

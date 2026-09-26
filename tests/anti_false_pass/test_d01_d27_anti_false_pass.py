@@ -75,7 +75,10 @@ def test_d08_fake_enforced_isolation_prohibited():
     assert qual.isolation_class != "ENFORCED"
 
     # Direct construction with ENFORCED and no fresh boundary must fail closed
-    with pytest.raises(ValidationError, match="NO_FALSE_ENFORCED_FALLBACK"):
+    with pytest.raises(
+        ValidationError,
+        match="ISOLATION_ENFORCEMENT_EVIDENCE_REQUIRED",
+    ):
         IsolationQualification(
             attempt_ref=_ref("attempt", "a"),
             assessment_input_history_cut={"cut": 1},

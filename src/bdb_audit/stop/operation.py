@@ -82,67 +82,104 @@ def _require_current_campaign_cut(
     head = store.head()
     if head is None:
         raise ValidationError("CAMPAIGN_NOT_FOUND", "Campaign contains no accepted head")
+    body = {
+        "campaign_id": stop_input.campaign_id,
+        "input_history_cut": stop_input.input_history_cut,
+    }
+    _require_material_stop_basis_current(
+        body,
+        campaign_id=head.campaign_id,
+        head_seq=head.commit_seq,
+        head_hash=head.commit_hash,
+        commits=store.commits(),
+        authoritative=authoritative,
+        accepted_commit_seq=accepted_commit_seq,
+    )
 
-    if stop_input.campaign_id != head.campaign_id:
-        raise ValidationError(
-            "STOP_INPUT_CAMPAIGN_MISMATCH",
-            f"STOP input campaign {stop_input.campaign_id} does not match active campaign {head.campaign_id}",
-        )
 
-    cut = dict(stop_input.input_history_cut)
-    cut_campaign = cut.get("campaign_id")
+_ADMINISTRATIVE_STOP_KINDS = frozenset(
+    {
+        "command_envelope",
+        "stop_input",
+        "stop_evaluation",
+        "campaign_conclusion",
+        "final_assurance_case",
+        "release_qualification",
+        "successor_campaign_selection_decision",
+    }
+)
+
+
+def _require_material_stop_basis_current(
+    stop_input_body: dict[str, Any],
+    *,
+    campaign_id: str,
+    head_seq: int,
+    head_hash: str,
+    commits,
+    authoritative: bool,
+    accepted_commit_seq: int | None,
+) -> None:
+    """Share exact STOP material freshness across service and store admission."""
+    if stop_input_body.get("campaign_id") != campaign_id:
+        raise ValidationError("STOP_INPUT_CAMPAIGN_MISMATCH")
+
+    cut = stop_input_body.get("input_history_cut")
+    if not isinstance(cut, dict):
+        raise ValidationError("STOP_INPUT_CUT_MISMATCH")
     cut_seq = cut.get("accepted_head_seq")
-    if cut_seq is None:
-        cut_seq = cut.get("commit_seq")
-    cut_hash = cut.get("accepted_head_hash") or cut.get("commit_hash")
+    cut_hash = cut.get("accepted_head_hash")
+    if (
+        cut.get("variant") != "ACCEPTED_HISTORY_CUT"
+        or cut.get("campaign_id") != campaign_id
+        or type(cut_seq) is not int
+        or cut_seq < 1
+        or not isinstance(cut_hash, str)
+    ):
+        raise ValidationError("STOP_INPUT_CUT_MISMATCH")
 
-    if cut_campaign != head.campaign_id:
+    from ..history.store import _commit_from_body
+
+    exact_cut_hash = next(
+        (
+            _commit_from_body(commit).digest
+            for commit in commits
+            if commit.get("commit_seq") == cut_seq
+            and commit.get("campaign_id") == campaign_id
+        ),
+        None,
+    )
+    if exact_cut_hash != cut_hash:
         raise ValidationError(
             "STOP_INPUT_CUT_MISMATCH",
-            f"STOP input cut campaign {cut_campaign} does not match head {head.campaign_id}",
+            "STOP input cut hash does not identify its accepted history revision",
         )
 
-    # For preview / non-authoritative inputs, cut must match the active campaign head exactly
     if not authoritative or accepted_commit_seq is None:
-        if cut_seq != head.commit_seq or cut_hash != head.commit_hash:
+        if cut_seq != head_seq or cut_hash != head_hash:
             raise ValidationError(
                 "STOP_INPUT_CUT_MISMATCH",
                 "STOP input is stale or is not bound to the current accepted campaign head",
             )
         return
 
-    # For accepted history stop_input: cut_seq cannot be greater than the commit where it was accepted
-    if cut_seq > accepted_commit_seq:
+    if cut_seq > accepted_commit_seq or accepted_commit_seq > head_seq:
         raise ValidationError(
             "STOP_INPUT_CUT_MISMATCH",
-            f"Accepted STOP input cut {cut_seq} exceeds its acceptance commit {accepted_commit_seq}",
+            "Accepted STOP input is outside its accepted history",
         )
 
-    # If head has moved past cut_seq, verify no material audit drift occurred in intermediate commits.
-    # Allowed intermediate commits are administrative: stop_input, stop_evaluation, campaign_conclusion,
-    # final_assurance_case, release_qualification. Any stages, findings, or claims invalidate the cut.
-    if cut_seq < head.commit_seq:
-        administrative_kinds = {
-            "command_envelope",
-            "stop_input",
-            "stop_evaluation",
-            "campaign_conclusion",
-            "final_assurance_case",
-            "release_qualification",
-            "successor_campaign_selection_decision",
-        }
-        for commit in store.commits():
-            c_seq = commit.get("commit_seq", 0)
-            if c_seq <= cut_seq or c_seq > head.commit_seq:
-                continue
-            refs = commit.get("immutable_object_refs", [])
-            for ref in refs:
-                kind = ref.get("kind") if isinstance(ref, dict) else None
-                if kind and kind not in administrative_kinds:
-                    raise ValidationError(
-                        "STOP_INPUT_CUT_MISMATCH",
-                        f"Material audit changes occurred after STOP input cut at commit seq {c_seq} (kind: {kind})",
-                    )
+    for commit in commits:
+        c_seq = commit.get("commit_seq", 0)
+        if type(c_seq) is not int or c_seq <= cut_seq or c_seq > head_seq:
+            continue
+        for ref in commit.get("immutable_object_refs", ()):
+            kind = ref.get("kind") if isinstance(ref, dict) else None
+            if kind is not None and kind not in _ADMINISTRATIVE_STOP_KINDS:
+                raise ValidationError(
+                    "STOP_INPUT_CUT_MISMATCH",
+                    f"Material audit changes occurred after STOP input cut at commit seq {c_seq} (kind: {kind})",
+                )
 
 
 def _next_action(decision: str, authoritative: bool) -> str:

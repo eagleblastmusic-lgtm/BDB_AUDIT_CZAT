@@ -535,7 +535,7 @@ class TransactionalHistoryStore:
         ):
             raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
 
-    def _validate_material_ref_contracts(self, obj, *, current, con):
+    def _validate_material_ref_contracts(self, obj, *, current, con, content_objects=()):
         """Check exact field/class/allowed-kind/cardinality for inline refs.
 
         Structural executable schemas intentionally stay small; this layer is
@@ -616,6 +616,48 @@ class TransactionalHistoryStore:
             snap_body = json.loads(row[0])
         from ..stop.evaluator import validate_stop_snapshot_binding
         validate_stop_snapshot_binding(obj.body, snap_body)
+
+    def _validate_stop_evaluation_outcomes(self, objects, con):
+        """Recompute each accepted STOP decision from its exact immutable input."""
+        from ..stop.evaluator import evaluate_stop
+        from ..stop.models import StopInput
+
+        by_digest = {obj.digest: obj for obj in objects}
+        semantic_fields = (
+            "stop_input_ref",
+            "continuation_decision",
+            "assurance_level",
+            "release_readiness",
+            "reason_codes",
+            "blocking_obligation_refs",
+            "remaining_obligation_refs",
+        )
+        for obj in objects:
+            if obj.kind != "stop_evaluation":
+                continue
+            stop_input_ref = obj.body.get("stop_input_ref")
+            digest = stop_input_ref.get("revision_digest") if isinstance(stop_input_ref, dict) else None
+            input_obj = by_digest.get(digest)
+            if input_obj is None:
+                row = con.execute(
+                    "SELECT kind,version,schema_ref,logical_id,body FROM immutable_objects WHERE digest=?",
+                    (digest,),
+                ).fetchone()
+                if row is None:
+                    raise ValidationError("STOP_EVALUATION_INPUT_NOT_FOUND")
+                input_obj = CanonicalObject(row[0], json.loads(row[4]), row[2], row[3], row[1])
+            if input_obj.kind != "stop_input" or input_obj.digest != digest:
+                raise ValidationError("STOP_EVALUATION_INPUT_MISMATCH")
+            try:
+                stop_input = StopInput(**input_obj.body)
+                expected = evaluate_stop(stop_input)
+            except (TypeError, ValueError, ValidationError) as exc:
+                raise ValidationError("STOP_EVALUATION_INPUT_INVALID", str(exc)) from exc
+
+            actual_semantics = {field: obj.body.get(field) for field in semantic_fields}
+            expected_semantics = {field: expected.body().get(field) for field in semantic_fields}
+            if canonical_bytes(actual_semantics) != canonical_bytes(expected_semantics):
+                raise ValidationError("STOP_EVALUATION_INPUT_MISMATCH")
 
 
     def _validate_bootstrap_closure(self, objects, profile):
@@ -738,11 +780,17 @@ class TransactionalHistoryStore:
                 raise ValidationError("CAMPAIGN_ID_REQUIRED")
             self._validate_content_refs(objects, con)
             for obj in objects:
-                self._validate_material_ref_contracts(obj, current=current, con=con)
+                self._validate_material_ref_contracts(
+                    obj,
+                    current=current,
+                    con=con,
+                    content_objects=objects,
+                )
                 if obj.kind == "stop_input":
                     self._validate_stop_snapshot_binding(obj, objects, con)
                     from ..stop.authority import validate_stop_input_accepted_authority
                     validate_stop_input_accepted_authority(obj, current=current, con=con)
+            self._validate_stop_evaluation_outcomes(objects, con)
             from ..orchestration.fsm import project_states
             prior_events = [event for (raw,) in con.execute("SELECT body FROM commits ORDER BY seq")
                             for event in json.loads(raw)["ordered_event_bodies"]]

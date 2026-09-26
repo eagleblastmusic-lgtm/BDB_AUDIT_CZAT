@@ -130,8 +130,15 @@ class IsolationQualification:
     def __post_init__(self):
         if self.isolation_class not in _ISOLATION:
             raise ValidationError("ISOLATION_CLASS_INVALID")
-        if self.isolation_class == "ENFORCED" and (not self.fresh_session_boundary or self.forbidden_channel_access or self.contaminated):
-            raise ValidationError("NO_FALSE_ENFORCED_FALLBACK")
+        if self.isolation_class == "ENFORCED":
+            if self.forbidden_channel_access or self.contaminated:
+                raise ValidationError("NO_FALSE_ENFORCED_FALLBACK")
+            if (
+                self.channel_inventory_ref is None
+                or not self.enforcement_receipt_refs
+                or not self.session_boundary_evidence_refs
+            ):
+                raise ValidationError("ISOLATION_ENFORCEMENT_EVIDENCE_REQUIRED")
         object.__setattr__(self, "evidence_refs", tuple(self.evidence_refs))
         for name in ("enforcement_receipt_refs", "filesystem_boundary_evidence_refs",
                      "network_boundary_evidence_refs", "tool_boundary_evidence_refs",
@@ -162,16 +169,36 @@ def qualify_isolation(*, attempt_ref, history_cut, executor_profile_ref,
                       delivery_profile_ref, fresh_session_boundary=False,
                       forbidden_channel_access=False, contaminated=False,
                       requested="ENFORCED", evidence_refs=(), channel_inventory_ref=None):
-    """Return an honest qualification; unavailable enforcement degrades to UNKNOWN."""
+    """Return a truthful local result without treating caller assertions as proof.
+
+    This helper has no accepted Executor/Lane policy resolver, so it cannot
+    establish a complete material-channel basis. ENFORCED must be admitted by
+    the contextual history validator, not by this convenience constructor.
+    """
     if requested not in _ISOLATION:
         raise ValidationError("ISOLATION_CLASS_INVALID")
     actual = requested
-    if requested == "ENFORCED" and (not fresh_session_boundary or forbidden_channel_access or contaminated):
+    if requested == "ENFORCED":
         actual = "UNKNOWN"
-    return IsolationQualification(attempt_ref, history_cut, executor_profile_ref,
-                                  delivery_profile_ref, actual, contaminated,
-                                  fresh_session_boundary, forbidden_channel_access,
-                                  tuple(evidence_refs), channel_inventory_ref)
+    return IsolationQualification(
+        attempt_ref,
+        history_cut,
+        executor_profile_ref,
+        delivery_profile_ref,
+        actual,
+        contaminated,
+        fresh_session_boundary,
+        forbidden_channel_access,
+        tuple(evidence_refs),
+        channel_inventory_ref,
+        required_isolation_assurance=requested,
+        limitations=("Material-channel enforcement was not resolved at this API boundary",)
+        if requested == "ENFORCED"
+        else (),
+        reason_codes=("ISOLATION_BASIS_NOT_VERIFIED",)
+        if requested == "ENFORCED"
+        else (),
+    )
 
 
 __all__ = ["LaneSpec", "Attempt", "IsolationQualification", "qualify_isolation"]

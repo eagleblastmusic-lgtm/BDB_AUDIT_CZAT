@@ -60,6 +60,10 @@ def create_blind_attempt(*args, **kwargs):
             "e3_test_channel_inventory",
         ),
     )
+    kwargs.setdefault(
+        "source_generation_ref",
+        make_ref("source_generation", "gen_e3"),
+    )
     return create_e3_blind_attempt(*args, **kwargs)
 
 
@@ -82,7 +86,14 @@ def _setup_blind_result(cut_seq: int = 4):
     deliv_ref = make_ref("delivery_profile", "deliv")
 
     lane_contexts = {
-        slot: create_blind_attempt(slot, lr_ref, cut, exec_ref, deliv_ref)
+        slot: create_blind_attempt(
+            slot,
+            make_ref("lane_run", f"{slot}-{cut_seq}"),
+            cut,
+            exec_ref,
+            deliv_ref,
+            source_generation_ref=src_gen,
+        )
         for slot in E3_LANE_SLOTS
     }
 
@@ -147,9 +158,16 @@ def test_positive_gap_projection_and_reveal_flow():
         producer_ref=producer_ref,
     )
 
+    obligations[0]["category"] = "caller mutation"
+    gap_map["gaps"].clear()
+
     assert proj.checkpoint_ref == chk.ref
     assert len(proj.coverage_obligations) == 2
+    assert proj.coverage_obligations[0]["category"] == "PARSER_FIDELITY"
     assert len(proj.explicit_unknown_scope) == 1
+    assert len(proj.gap_map["gaps"]) == 1
+    assert chk.authority_status == "PREVIEW_ONLY"
+    assert proj.authority_status == rev_event.authority_status == "PREVIEW_ONLY"
 
     assert rev_event.reveal_type == "POSITIVE_GAP_VIEW"
     assert rev_event.checkpoint_ref == chk.ref
@@ -160,6 +178,64 @@ def test_positive_gap_projection_and_reveal_flow():
     assert "GAP_DIRECTED_COVERAGE_VIEW" in k_state_after.known_classes
     assert "EXPLICIT_UNKNOWN_SCOPE" in k_state_after.known_classes
     assert len(k_state_after.potential_exposure_refs) == 1
+
+
+def test_returned_e3_preview_contexts_are_nested_copy_safe():
+    blind_res, cut, k_state_before = _setup_blind_result(4)
+    checkpoint = create_e3_blind_checkpoint(blind_res, cut)
+    checkpoint_digest = checkpoint.digest
+
+    checkpoint_body = checkpoint.body()
+    checkpoint_body["accepted_history_cut"]["governing_spec_refs"].clear()
+    assert checkpoint.digest == checkpoint_digest
+    with pytest.raises(TypeError):
+        checkpoint.accepted_history_cut["governing_spec_refs"][0] = "mutated"
+
+    gap_map = {
+        "gaps": [
+            {
+                "gap_id": "gap-copy-safe",
+                "target_scope_ref": make_ref("surface", "copy-safe"),
+                "missing_or_unsatisfied_obligation_refs": ["obligation-1"],
+            }
+        ]
+    }
+    projection, reveal, state_after = execute_positive_gap_reveal(
+        checkpoint=checkpoint,
+        accepted_history_cut=cut,
+        knowledge_state_before=k_state_before,
+        coverage_obligations=({"nested": {"labels": ["original"]}},),
+        gap_map=gap_map,
+        explicit_unknown_scope=(),
+        explicit_unsupported_scope=(),
+        producer_ref=make_ref("coordinator", "copy-safe"),
+    )
+
+    projection_digest = projection.digest
+    projection_body = projection.body()
+    projection_body["gap_map"]["gaps"][0]["target_scope_ref"][
+        "revision_digest"
+    ] = "0" * 64
+    projection_body["coverage_obligations"][0]["nested"]["labels"].clear()
+    assert projection.digest == projection_digest
+    assert projection.gap_map["gaps"][0]["target_scope_ref"]["revision_digest"] != "0" * 64
+    with pytest.raises(TypeError):
+        projection.gap_map["gaps"][0]["target_scope_ref"]["revision_digest"] = "0" * 64
+
+    reveal_digest = reveal.digest
+    reveal_body = reveal.body()
+    reveal_body["accepted_history_cut"]["governing_spec_refs"].clear()
+    assert reveal.digest == reveal_digest
+
+    state_digest = state_after.revision_digest
+    state_body = state_after.body()
+    state_body["basis_history_cut"]["governing_spec_refs"].clear()
+    assert state_after.revision_digest == state_digest
+    with pytest.raises(TypeError):
+        state_after.basis_history_cut["governing_spec_refs"][0] = "mutated"
+
+    assert checkpoint.authority_status == "PREVIEW_ONLY"
+    assert projection.authority_status == reveal.authority_status == "PREVIEW_ONLY"
 
 
 def test_adversarial_finding_corpus_leakage_in_positive_reveal_rejected():
@@ -204,6 +280,23 @@ def test_positive_reveal_stale_history_cut_rejected():
             explicit_unknown_scope=(),
             explicit_unsupported_scope=(),
             producer_ref=producer_ref,
+        )
+
+
+def test_preview_reveal_rejects_same_sequence_wrong_cut_hash():
+    blind_res, cut, k_state_before = _setup_blind_result(5)
+    chk = create_e3_blind_checkpoint(blind_res, cut)
+    same_seq_other_hash = dict(cut, accepted_head_hash="b" * 64)
+    with pytest.raises(ValidationError, match="REVEAL_CUT_ANCESTRY_UNVERIFIED"):
+        execute_positive_gap_reveal(
+            checkpoint=chk,
+            accepted_history_cut=same_seq_other_hash,
+            knowledge_state_before=k_state_before,
+            coverage_obligations=(),
+            gap_map={"gaps": []},
+            explicit_unknown_scope=(),
+            explicit_unsupported_scope=(),
+            producer_ref=make_ref("coordinator", "wrong-cut"),
         )
 
 
@@ -289,6 +382,7 @@ def test_cumulative_corpus_reveal_phase_e():
 
     assert rev_cumul.reveal_type == "CUMULATIVE_CORPUS_VIEW"
     assert "CUMULATIVE_E1_E2_CORPUS" in state_cumul.known_classes
+    assert len(state_cumul.potential_exposure_refs) == 2
 
 
 def test_holdout_reveal_and_canonical_predecessor_confusion_rejection():
@@ -306,9 +400,37 @@ def test_holdout_reveal_and_canonical_predecessor_confusion_rejection():
             corpus_role="CANONICAL_PREDECESSOR",
         )
 
-    # Valid holdout reveal
+    with pytest.raises(ValidationError, match="E3_HOLDOUT_PREDECESSOR_NOT_ACCEPTED"):
+        execute_holdout_reveal(
+            knowledge_state=k_state_before,
+            holdout_corpus_manifest_ref=holdout_manifest,
+            accepted_history_cut=cut,
+            producer_ref=producer_ref,
+            corpus_role="AUXILIARY_HOLDOUT",
+        )
+
+    chk = create_e3_blind_checkpoint(blind_res, cut)
+    projection, gap_reveal, gap_state = execute_positive_gap_reveal(
+        checkpoint=chk,
+        accepted_history_cut=cut,
+        knowledge_state_before=k_state_before,
+        coverage_obligations=(),
+        gap_map={"gaps": []},
+        explicit_unknown_scope=(),
+        explicit_unsupported_scope=(),
+        producer_ref=producer_ref,
+    )
+    scheduler = E3GapDirectedScheduler(projection, gap_reveal, gap_state)
+    _, cumulative_state = execute_cumulative_corpus_reveal(
+        scheduler=scheduler,
+        e1_e2_corpus_manifest_ref=make_ref("manifest", "cumulative-before-holdout"),
+        accepted_history_cut=cut,
+        producer_ref=producer_ref,
+    )
+
+    # Valid holdout preview follows positive-gap and cumulative previews.
     rev_holdout, state_holdout = execute_holdout_reveal(
-        knowledge_state=k_state_before,
+        knowledge_state=cumulative_state,
         holdout_corpus_manifest_ref=holdout_manifest,
         accepted_history_cut=cut,
         producer_ref=producer_ref,
@@ -316,6 +438,7 @@ def test_holdout_reveal_and_canonical_predecessor_confusion_rejection():
     )
     assert rev_holdout.reveal_type == "HOLDOUT_CORPUS_VIEW"
     assert "CONSUMED_EXTERNAL_HOLDOUT" in state_holdout.known_classes
+    assert len(state_holdout.potential_exposure_refs) == 3
 
 
 def test_multi_stage_false_negative_assessment_rules():

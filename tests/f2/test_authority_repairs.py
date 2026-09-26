@@ -141,3 +141,91 @@ def test_runtime_acceptance_enforces_fsm_before_persistence():
             "aggregate_id": old_head.campaign_id, "from_state": "GENESIS_ACCEPTED", "to_state": "AUDIT_RUNNING"},))
     assert store.head() == old_head
     assert store.receipt(follow.command_id) is None
+
+
+def test_finding_claim_successor_identity_and_revision_are_store_enforced(tmp_path):
+    from dataclasses import replace
+    from bdb_audit.adjudication.models import FindingClaimRevision
+    from bdb_audit.history.objects import CanonicalObject
+
+    profile, command, objects, parts = bootstrap_fixture()
+    store = TransactionalHistoryStore(tmp_path / "finding-lineage.sqlite")
+    first = store.accept(command, immutable_objects=objects, bootstrap_profile=profile)
+    source_ref = parts["source_generation"].as_ref(ref_class="CONTENT_OR_PRIOR").as_dict()
+    claim_id = "finding_claim_revision_123e4567-e89b-42d3-a456-426614174000"
+    predecessor = FindingClaimRevision(
+        statement="Original claim",
+        source_generation_ref=source_ref,
+        claim_id=claim_id,
+        claim_revision="1",
+    ).as_object()
+    claim_command = replace(
+        command,
+        command_id="command_923e4567-e89b-42d3-a456-426614174000",
+        command_kind="RECORD_FOUNDATION_FACT",
+        campaign_ref=first.head.campaign_id,
+        expected_parent_head={"tag": "ACCEPTED_HEAD_REF", **first.head.as_dict()},
+        proposed_campaign_id=None,
+        history_namespace_ref=None,
+        bootstrap_profile_ref=None,
+    )
+    accepted_claim = store.accept(claim_command, expected_head=first.head, immutable_objects=(predecessor,))
+    predecessor_ref = predecessor.as_ref(ref_class="PRIOR_ACCEPTED_ONLY").as_dict()
+
+    for bad_id, bad_revision, command_id in (
+        ("finding_claim_revision_223e4567-e89b-42d3-a456-426614174000", "2",
+         "command_a23e4567-e89b-42d3-a456-426614174000"),
+        (claim_id, "3", "command_b23e4567-e89b-42d3-a456-426614174000"),
+    ):
+        bad_body = {
+            "claim_id": bad_id,
+            "claim_revision": bad_revision,
+            "source_generation_ref": source_ref,
+            "statement": "Invalid successor",
+            "scope_refs": [],
+            "violated_invariant_refs": [],
+            "discovery_relation_refs": [],
+            "previous_finding_claim_revision_ref": predecessor_ref,
+        }
+        bad_object = CanonicalObject(
+            "finding_claim_revision", bad_body, logical_id=bad_id,
+        )
+        head_before = store.head()
+        bad_command = replace(
+            command,
+            command_id=command_id,
+            command_kind="RECORD_FOUNDATION_FACT",
+            campaign_ref=head_before.campaign_id,
+            expected_parent_head={"tag": "ACCEPTED_HEAD_REF", **head_before.as_dict()},
+            proposed_campaign_id=None,
+            history_namespace_ref=None,
+            bootstrap_profile_ref=None,
+        )
+        with pytest.raises(ValidationError, match="FINDING_CLAIM_(IDENTITY_MISMATCH|REVISION_SEQUENCE_MISMATCH)"):
+            store.accept(bad_command, expected_head=head_before, immutable_objects=(bad_object,))
+        assert store.head() == head_before
+        assert store.object_record(bad_object.digest) is None
+
+    successor = FindingClaimRevision(
+        statement="Corrected claim",
+        source_generation_ref=source_ref,
+        previous_finding_claim_revision_ref=predecessor_ref,
+        claim_id=claim_id,
+        claim_revision="2",
+    ).as_object()
+    good_head = store.head()
+    good_command = replace(
+        command,
+        command_id="command_c23e4567-e89b-42d3-a456-426614174000",
+        command_kind="RECORD_FOUNDATION_FACT",
+        campaign_ref=good_head.campaign_id,
+        expected_parent_head={"tag": "ACCEPTED_HEAD_REF", **good_head.as_dict()},
+        proposed_campaign_id=None,
+        history_namespace_ref=None,
+        bootstrap_profile_ref=None,
+    )
+    result = store.accept(good_command, expected_head=good_head, immutable_objects=(successor,))
+
+    assert result.head.commit_seq == accepted_claim.head.commit_seq + 1
+    assert successor.digest != predecessor.digest
+    assert successor.logical_id == predecessor.logical_id

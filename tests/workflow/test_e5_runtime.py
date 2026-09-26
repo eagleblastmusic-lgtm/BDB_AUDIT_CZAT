@@ -1,16 +1,25 @@
-"""End-to-end regressions for real E5A -> candidate -> E5B runtime."""
+"""Focused transactional E5A -> candidate -> E5B regressions.
+
+Earlier E1-E4 records are synthetic accepted-history prerequisites for these
+E5-only service tests; they do not qualify a complete campaign.
+"""
 from __future__ import annotations
 
 import json
+from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
+import uuid
 import zipfile
 
 import pytest
 
+from bdb_audit.coordinator import Coordinator
 from bdb_audit.coordinator.operations import AuditOperationApi
 from bdb_audit.core.errors import ValidationError
+from bdb_audit.history.objects import CanonicalObject, CommandEnvelope
 from bdb_audit.history.store import TransactionalHistoryStore
-from bdb_audit.stop.input_builder import StopInputBuilder
+from bdb_audit.orchestration.stages import initial_stage_specs
 from bdb_audit.workflow.e5_runtime import (
     CandidateAssuranceCaseService,
     E5A_LANES,
@@ -26,6 +35,11 @@ from bdb_audit.workflow.manual_stage import (
 )
 from bdb_audit.workflow.source_target import ResolvedSource
 from bdb_audit.workflow.read_models import current_accepted_cut
+from bdb_audit.workflow.scope_baseline import ensure_pre_e3_scope_baseline
+from tests.f7.test_adaptive_e6_canonical_authority import (
+    _append_raw_commit,
+    _stage_execution_objects,
+)
 
 
 def _source() -> ResolvedSource:
@@ -42,13 +56,29 @@ def _base_campaign(tmp_path: Path):
     store_path = tmp_path / "campaign.sqlite"
     api = AuditOperationApi()
     api.create_campaign(store_path, seed="e5_real_runtime")
-    for stage in ("E1", "E2", "E3", "E4"):
-        api.prepare_stage(store_path, stage)
-        api.qualify_stage(store_path, stage)
+    store = TransactionalHistoryStore(store_path)
+    cut = current_accepted_cut(store)
+    source_generation_ref = store.accepted_records("source_generation", cut)[0]["ref"]
+
+    # These narrow fixtures keep E5 service tests independent of E1-E4 runtime
+    # behavior.  The raw accepted history helper is deliberately test-only.
+    for stage_spec in initial_stage_specs()[:4]:
+        _append_raw_commit(
+            store,
+            _stage_execution_objects(
+                stage_spec,
+                source_generation_ref=source_generation_ref,
+                label=f"e5-prerequisite-{stage_spec.stage_key}",
+                required_isolation_assurance="DECLARED",
+                include_stage_spec=True,
+            ),
+            index=store.head().commit_seq + 1,
+        )
+    ensure_pre_e3_scope_baseline(store)
     api.prepare_stage(store_path, "E5")
     for lane in (*E5A_LANES, *E5B_LANES):
         api.prepare_lane(store_path, "E5", lane.lane_slot)
-    return store_path, TransactionalHistoryStore(store_path)
+    return store_path, store
 
 
 def _write_stage_result(
@@ -317,6 +347,190 @@ def test_real_e5_runtime_preserves_temporal_boundaries(
     assert completion.next_action == "EVALUATE_FINAL_POST_E5_STOP"
 
 
+def test_direct_coordinator_stage_completion_requires_exact_e5_evidence(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    """Canonical admission rejects incomplete or non-governing E5 completion."""
+    _, store = _base_campaign(tmp_path)
+    e5a, e5a_inbox = _prepare_e5a(tmp_path, store)
+    frozen = CandidateAssuranceCaseService(store).freeze(e5a, e5a_inbox)
+    e5b, e5b_inbox = _prepare_e5b(tmp_path, store, frozen.candidate)
+    E5ChallengerResultService(store, e5b, e5b_inbox).materialize()
+
+    captured: dict[str, object] = {}
+    original_accept = Coordinator.accept
+
+    class _CapturedCompletion(Exception):
+        pass
+
+    def capture_completion(self, command, expected_head=None, **kwargs):
+        objects = tuple(kwargs.get("immutable_objects", ()))
+        completion = next(
+            (obj for obj in objects if obj.kind == "stage_completion"),
+            None,
+        )
+        if completion is not None:
+            captured.update(
+                command=command,
+                expected_head=expected_head,
+                completion=completion,
+            )
+            raise _CapturedCompletion
+        return original_accept(self, command, expected_head, **kwargs)
+
+    monkeypatch.setattr(Coordinator, "accept", capture_completion)
+    with pytest.raises(_CapturedCompletion):
+        E5FinalizationService(store).finalize()
+    monkeypatch.setattr(Coordinator, "accept", original_accept)
+
+    command = captured["command"]
+    expected_head = captured["expected_head"]
+    exact_completion = captured["completion"]
+    assert isinstance(exact_completion, CanonicalObject)
+    assert expected_head == store.head()
+
+    def direct_accept(obj: CanonicalObject, *, label: str, extras=()) -> None:
+        head_before = store.head()
+        count_before = len(store.commits())
+        assert head_before == expected_head
+        direct_command = replace(
+            command,
+            command_id=f"command_{uuid.uuid4()}",
+            idempotency_scope=f"direct-e5-completion:{label}:{obj.digest}",
+        )
+        with pytest.raises(ValidationError):
+            Coordinator(store).accept(
+                direct_command,
+                immutable_objects=[*extras, obj],
+                expected_head=head_before,
+            )
+        assert store.head() == head_before
+        assert len(store.commits()) == count_before
+        assert store.object_record(obj.digest) is None
+
+    base = deepcopy(exact_completion.body)
+
+    duplicate_lane = deepcopy(base)
+    duplicate_lane["required_lane_slot_results"].append(
+        deepcopy(duplicate_lane["required_lane_slot_results"][0])
+    )
+    direct_accept(
+        CanonicalObject("stage_completion", duplicate_lane, logical_id=exact_completion.logical_id),
+        label="duplicate-lane",
+    )
+
+    missing_lane = deepcopy(base)
+    missing_lane["required_lane_slot_results"].pop()
+    direct_accept(
+        CanonicalObject("stage_completion", missing_lane, logical_id=exact_completion.logical_id),
+        label="missing-lane",
+    )
+
+    missing_output = deepcopy(base)
+    missing_output["required_output_refs"] = [
+        ref
+        for ref in missing_output["required_output_refs"]
+        if ref.get("kind") != "candidate_assurance_case"
+    ]
+    direct_accept(
+        CanonicalObject("stage_completion", missing_output, logical_id=exact_completion.logical_id),
+        label="missing-output",
+    )
+
+    wrong_output_kind = deepcopy(base)
+    candidate_ref = next(
+        ref
+        for ref in wrong_output_kind["required_output_refs"]
+        if ref.get("kind") == "candidate_assurance_case"
+    )
+    candidate_ref["kind"] = "bdb_audit_lane_result"
+    direct_accept(
+        CanonicalObject("stage_completion", wrong_output_kind, logical_id=exact_completion.logical_id),
+        label="wrong-output-kind",
+    )
+
+    from bdb_audit.orchestration.stages import native_stage_spec
+
+    weakened_spec = native_stage_spec("E5", "2").as_object()
+    weakened_completion = deepcopy(base)
+    weakened_completion["stage_spec_ref"] = weakened_spec.as_ref(
+        ref_class="HISTORY_CONTEXT_BINDING"
+    ).as_dict()
+    direct_accept(
+        CanonicalObject("stage_completion", weakened_completion, logical_id=exact_completion.logical_id),
+        label="non-governing-spec",
+        extras=(weakened_spec,),
+    )
+
+    head_before = store.head()
+    count_before = len(store.commits())
+    positive_command = replace(
+        command,
+        command_id=f"command_{uuid.uuid4()}",
+        idempotency_scope=f"direct-e5-completion:exact:{exact_completion.digest}",
+    )
+    accepted = Coordinator(store).accept(
+        positive_command,
+        immutable_objects=[exact_completion],
+        expected_head=head_before,
+    )
+    assert accepted.head.commit_seq == head_before.commit_seq + 1
+    assert len(store.commits()) == count_before + 1
+
+
+def test_native_stage_spec_admission_guard_is_mutation_sensitive(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    _, store = _base_campaign(tmp_path)
+    from bdb_audit.history import authority_hooks
+    from bdb_audit.orchestration.stages import native_stage_spec
+
+    weakened_spec = native_stage_spec("E5", "2").as_object()
+
+    def command(label: str) -> CommandEnvelope:
+        head = store.head()
+        assert head is not None
+        prior = store.commits()[-1]
+        return CommandEnvelope(
+            command_id=f"command_{uuid.uuid4()}",
+            command_kind="RECORD_ASSURANCE_DECISION",
+            actor_ref=prior["actor_ref"],
+            expected_parent_head={"tag": "ACCEPTED_HEAD_REF", **head.as_dict()},
+            governing_policy_ref=prior["governing_policy_ref"],
+            governing_spec_refs=tuple(prior["governing_spec_refs"]),
+            idempotency_scope=f"native-stage-spec-mutation:{label}:{uuid.uuid4()}",
+            campaign_ref=head.campaign_id,
+        )
+
+    head_before = store.head()
+    count_before = len(store.commits())
+    with pytest.raises(ValidationError, match="STAGE_SPEC_NOT_GOVERNING_NATIVE_REVISION"):
+        Coordinator(store).accept(
+            command("guard-enabled"),
+            immutable_objects=[weakened_spec],
+            expected_head=head_before,
+        )
+    assert store.head() == head_before
+    assert len(store.commits()) == count_before
+
+    # Controlled guard deletion: the weakened revision is mechanically
+    # admissible, proving the canonical negative regression depends on this
+    # authority hook rather than an unrelated schema error.
+    monkeypatch.setattr(
+        authority_hooks,
+        "_validate_native_stage_spec_authority",
+        lambda _obj: None,
+    )
+    accepted = Coordinator(store).accept(
+        command("guard-bypassed"),
+        immutable_objects=[weakened_spec],
+        expected_head=head_before,
+    )
+    assert accepted.head.commit_seq == head_before.commit_seq + 1
+
+
 def test_material_challenger_counterevidence_blocks_e5_completion(
     tmp_path: Path,
 ) -> None:
@@ -540,16 +754,16 @@ def test_candidate_pins_exact_current_adjudication_for_each_finding(
     ).materialize()
     E5FinalizationService(store).finalize()
 
-    stop_input = StopInputBuilder.build_from_store(
-        store,
-        evaluation_context="FINAL_POST_E5",
+    cut = current_accepted_cut(store)
+    accepted_candidates = store.accepted_records(
+        "candidate_assurance_case",
+        cut,
     )
-    assert (
-        stop_input.candidate_assurance_case_ref[
-            "revision_digest"
-        ]
-        == frozen.candidate.digest()
+    latest_candidate = max(
+        accepted_candidates,
+        key=lambda row: int(row["accepted_seq"]),
     )
+    assert latest_candidate["ref"]["revision_digest"] == frozen.candidate.digest()
 
 
 def test_material_counterevidence_forces_new_candidate_and_new_challengers(

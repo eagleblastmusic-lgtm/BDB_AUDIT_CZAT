@@ -87,6 +87,10 @@ def create_blind_attempt(*args, **kwargs):
             "e3_test_channel_inventory",
         ),
     )
+    kwargs.setdefault(
+        "source_generation_ref",
+        make_ref("source_generation", "gen_e3"),
+    )
     return create_e3_blind_attempt(*args, **kwargs)
 
 
@@ -114,7 +118,14 @@ def test_full_e3_integration_fixture_to_stage_completion():
     producer_ref = make_ref("coordinator", "coord_primary")
 
     lane_contexts = {
-        slot: create_blind_attempt(slot, lr_ref, cut, exec_ref, deliv_ref)
+        slot: create_blind_attempt(
+            slot,
+            make_ref("lane_run", f"lr-e3-{slot}"),
+            cut,
+            exec_ref,
+            deliv_ref,
+            source_generation_ref=src_gen,
+        )
         for slot in E3_LANE_SLOTS
     }
 

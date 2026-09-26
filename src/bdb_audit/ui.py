@@ -590,6 +590,10 @@ class InteractiveAuditUI:
             output_func(f"{i}. {c.target_display}")
             output_func(f"   Store:  {c.store_path}")
             output_func(f"   Stage:  {c.current_stage} | Status: {c.status_label}{sha_part}")
+            output_func(
+                f"   Finalization: {c.finalization_state}"
+                + (f" | Next: {c.next_action}" if c.next_action else "")
+            )
             if c.error:
                 output_func(f"   Note:   {c.error}")
             output_func("")
@@ -606,6 +610,7 @@ class InteractiveAuditUI:
                 output_func(f"Lanes Prepared:    {selected.lanes_prepared}")
                 output_func(f"Completions Count: {selected.stage_completions_count}")
                 output_func(f"Status:            {selected.status_label}")
+                output_func(f"Finalization:      {selected.finalization_state}")
         except ValueError:
             pass
 

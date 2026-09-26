@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field
 from typing import Any, Mapping, Sequence
 import hashlib
+from types import MappingProxyType
 from uuid import uuid4
 
 from ..core.canonical_json import canonical_bytes
@@ -15,8 +16,29 @@ from ..knowledge.exposure import (
 from .e3 import (
     E3_LANE_SLOTS,
     E3BlindNoveltyResult,
+    _canonical_copy,
     _ref_dict,
+    _same_canonical,
 )
+
+
+def _freeze_preview_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return MappingProxyType(
+            {key: _freeze_preview_value(child) for key, child in value.items()}
+        )
+    if isinstance(value, (list, tuple)):
+        return tuple(_freeze_preview_value(child) for child in value)
+    return value
+
+
+def _exposure_union(state: KnowledgeState, exposure_ref: Mapping) -> tuple[dict, ...]:
+    by_digest = {
+        ref.get("revision_digest"): _canonical_copy(dict(ref))
+        for ref in state.potential_exposure_refs
+    }
+    by_digest[exposure_ref.get("revision_digest")] = _canonical_copy(dict(exposure_ref))
+    return tuple(by_digest[key] for key in sorted(by_digest))
 
 FORBIDDEN_REVEAL_FIELDS = frozenset({
     "finding_claim_ref",
@@ -39,6 +61,7 @@ class E3BlindCheckpoint:
     blind_completion_digest: str
     sealed_findings_count: int
     lane_slots: tuple[str, ...] = E3_LANE_SLOTS
+    authority_status: str = field(default="PREVIEW_ONLY", init=False)
 
     def __post_init__(self):
         if not self.checkpoint_id:
@@ -49,11 +72,16 @@ class E3BlindCheckpoint:
             raise ValidationError("INVALID_BLIND_COMPLETION_DIGEST")
         if tuple(self.lane_slots) != E3_LANE_SLOTS:
             raise ValidationError("LANE_SLOTS_MISMATCH")
+        object.__setattr__(
+            self,
+            "accepted_history_cut",
+            _freeze_preview_value(_canonical_copy(dict(self.accepted_history_cut))),
+        )
 
     def body(self) -> dict:
         return {
             "checkpoint_id": self.checkpoint_id,
-            "accepted_history_cut": dict(self.accepted_history_cut),
+            "accepted_history_cut": _canonical_copy(self.accepted_history_cut),
             "blind_completion_digest": self.blind_completion_digest,
             "sealed_findings_count": self.sealed_findings_count,
             "lane_slots": list(self.lane_slots),
@@ -82,7 +110,7 @@ def create_e3_blind_checkpoint(
     blind_result: E3BlindNoveltyResult,
     accepted_history_cut: Mapping,
 ) -> E3BlindCheckpoint:
-    """Accept and seal an immutable checkpoint after blind novelty ensemble."""
+    """Create a local preview checkpoint; accepted sealing uses E3BlindCheckpointService."""
     cut_seq = accepted_history_cut.get("accepted_head_seq", 0)
     blind_seq = blind_result.assigned_history_cut.get("accepted_head_seq", 0)
     if cut_seq < blind_seq:
@@ -90,10 +118,14 @@ def create_e3_blind_checkpoint(
             "STALE_CHECKPOINT_OR_CUT_REJECTED",
             f"Checkpoint cut seq {cut_seq} is older than blind cut seq {blind_seq}",
         )
+    if not _same_canonical(accepted_history_cut, blind_result.assigned_history_cut):
+        raise ValidationError(
+            "CHECKPOINT_CUT_ANCESTRY_UNVERIFIED",
+            "The preview API cannot prove a later or different accepted cut descends from the blind input cut",
+        )
 
-    # Ensure all mandatory lanes are sealed in broker
-    if not blind_result.broker.is_checkpoint_sealed:
-        blind_result.broker.seal_checkpoint(dict(accepted_history_cut))
+    # This call is idempotent only for the exact sealed basis.
+    blind_result.broker.seal_checkpoint(dict(accepted_history_cut))
 
     chk_id = f"chk_e3_blind_{blind_result.blind_completion_digest[:16]}"
     return E3BlindCheckpoint(
@@ -114,8 +146,15 @@ class PositiveGapProjection:
     gap_map: dict
     explicit_unknown_scope: tuple[dict, ...]
     explicit_unsupported_scope: tuple[dict, ...]
+    authority_status: str = field(default="PREVIEW_ONLY", init=False)
 
     def __post_init__(self):
+        object.__setattr__(self, "checkpoint_ref", _freeze_preview_value(_canonical_copy(dict(self.checkpoint_ref))))
+        object.__setattr__(self, "accepted_history_cut", _freeze_preview_value(_canonical_copy(dict(self.accepted_history_cut))))
+        object.__setattr__(self, "coverage_obligations", tuple(_freeze_preview_value(_canonical_copy(dict(value))) for value in self.coverage_obligations))
+        object.__setattr__(self, "gap_map", _freeze_preview_value(_canonical_copy(dict(self.gap_map))))
+        object.__setattr__(self, "explicit_unknown_scope", tuple(_freeze_preview_value(_canonical_copy(dict(value))) for value in self.explicit_unknown_scope))
+        object.__setattr__(self, "explicit_unsupported_scope", tuple(_freeze_preview_value(_canonical_copy(dict(value))) for value in self.explicit_unsupported_scope))
         # Fail closed on any forbidden finding leakage
         self._check_for_forbidden_leak(self.body())
 
@@ -135,12 +174,12 @@ class PositiveGapProjection:
     def body(self) -> dict:
         return {
             "projection_id": self.projection_id,
-            "checkpoint_ref": dict(self.checkpoint_ref),
-            "accepted_history_cut": dict(self.accepted_history_cut),
-            "coverage_obligations": [dict(o) for o in self.coverage_obligations],
-            "gap_map": dict(self.gap_map),
-            "explicit_unknown_scope": [dict(s) for s in self.explicit_unknown_scope],
-            "explicit_unsupported_scope": [dict(s) for s in self.explicit_unsupported_scope],
+            "checkpoint_ref": _canonical_copy(self.checkpoint_ref),
+            "accepted_history_cut": _canonical_copy(self.accepted_history_cut),
+            "coverage_obligations": [_canonical_copy(o) for o in self.coverage_obligations],
+            "gap_map": _canonical_copy(self.gap_map),
+            "explicit_unknown_scope": [_canonical_copy(s) for s in self.explicit_unknown_scope],
+            "explicit_unsupported_scope": [_canonical_copy(s) for s in self.explicit_unsupported_scope],
         }
 
     def canonical_bytes(self) -> bytes:
@@ -172,17 +211,33 @@ class E3RevealEvent:
     knowledge_state_after_ref: dict
     revealed_view_manifest_ref: dict
     producer_ref: dict
+    authority_status: str = field(default="PREVIEW_ONLY", init=False)
+
+    def __post_init__(self):
+        for name in (
+            "checkpoint_ref",
+            "accepted_history_cut",
+            "knowledge_state_before_ref",
+            "knowledge_state_after_ref",
+            "revealed_view_manifest_ref",
+            "producer_ref",
+        ):
+            object.__setattr__(
+                self,
+                name,
+                _freeze_preview_value(_canonical_copy(dict(getattr(self, name)))),
+            )
 
     def body(self) -> dict:
         return {
             "reveal_id": self.reveal_id,
             "reveal_type": self.reveal_type,
-            "checkpoint_ref": dict(self.checkpoint_ref),
-            "accepted_history_cut": dict(self.accepted_history_cut),
-            "knowledge_state_before_ref": dict(self.knowledge_state_before_ref),
-            "knowledge_state_after_ref": dict(self.knowledge_state_after_ref),
-            "revealed_view_manifest_ref": dict(self.revealed_view_manifest_ref),
-            "producer_ref": dict(self.producer_ref),
+            "checkpoint_ref": _canonical_copy(self.checkpoint_ref),
+            "accepted_history_cut": _canonical_copy(self.accepted_history_cut),
+            "knowledge_state_before_ref": _canonical_copy(self.knowledge_state_before_ref),
+            "knowledge_state_after_ref": _canonical_copy(self.knowledge_state_after_ref),
+            "revealed_view_manifest_ref": _canonical_copy(self.revealed_view_manifest_ref),
+            "producer_ref": _canonical_copy(self.producer_ref),
         }
 
     def canonical_bytes(self) -> bytes:
@@ -214,7 +269,7 @@ def execute_positive_gap_reveal(
     explicit_unsupported_scope: Sequence[Mapping],
     producer_ref: Mapping,
 ) -> tuple[PositiveGapProjection, E3RevealEvent, KnowledgeState]:
-    """Execute positive gap projection reveal.
+    """Build a non-authoritative preview of the positive gap reveal.
 
     Fails closed if:
     - checkpoint is missing or invalid;
@@ -228,6 +283,18 @@ def execute_positive_gap_reveal(
             "STALE_OR_INCONSISTENT_HISTORY_CUT",
             f"Current cut {current_seq} is older than checkpoint cut {chk_seq}",
         )
+    if not _same_canonical(accepted_history_cut, checkpoint.accepted_history_cut):
+        raise ValidationError(
+            "REVEAL_CUT_ANCESTRY_UNVERIFIED",
+            "The preview API requires the exact checkpoint cut; accepted ancestry is checked by the primary phase service",
+        )
+    if not _same_canonical(
+        knowledge_state_before.basis_history_cut,
+        checkpoint.accepted_history_cut,
+    ):
+        raise ValidationError("REVEAL_KNOWLEDGE_CUT_MISMATCH")
+    if "GAP_DIRECTED_COVERAGE_VIEW" in knowledge_state_before.known_classes:
+        raise ValidationError("E3_GAP_REVEAL_ALREADY_COMPLETED")
 
     proj_id = f"proj_gap_{uuid4().hex[:12]}"
     projection = PositiveGapProjection(
@@ -276,7 +343,10 @@ def execute_positive_gap_reveal(
         basis_history_cut=dict(accepted_history_cut),
         isolation_qualification_ref=iso_ref,
         allowed_view_refs=(view_manifest_ref,),
-        potential_exposure_refs=(exposure.as_object().ref.as_dict(),),
+        potential_exposure_refs=_exposure_union(
+            knowledge_state_before,
+            exposure.as_object().ref.as_dict(),
+        ),
         contamination_assessment_refs=(),
         previous_knowledge_state_ref=prev_state_ref,
         known_classes=new_known_classes,
@@ -310,6 +380,17 @@ class E3GapDirectedScheduler:
                 "REVEAL_REQUIRED_FOR_GAP_MODE",
                 f"Cannot enter gap-directed mode with reveal_type {reveal_event.reveal_type}",
             )
+        if (
+            not _same_canonical(reveal_event.knowledge_state_after_ref, knowledge_state.as_object().ref.as_dict())
+            or not _same_canonical(reveal_event.checkpoint_ref, positive_projection.checkpoint_ref)
+            or not _same_canonical(reveal_event.accepted_history_cut, positive_projection.accepted_history_cut)
+        ):
+            raise ValidationError("E3_GAP_REVEAL_CONTEXT_MISMATCH")
+        if not _same_canonical(
+            knowledge_state.basis_history_cut,
+            positive_projection.accepted_history_cut,
+        ):
+            raise ValidationError("E3_GAP_KNOWLEDGE_CUT_MISMATCH")
         self.projection = positive_projection
         self.reveal_event = reveal_event
         self.knowledge_state = knowledge_state
@@ -327,7 +408,7 @@ class E3GapDirectedScheduler:
                 "materiality": g.get("materiality", "MATERIAL"),
                 "missing_obligations": g.get("missing_or_unsatisfied_obligation_refs", []),
             })
-        return sorted(targets, key=lambda x: str(x.get("gap_id")))
+        return _canonical_copy(sorted(targets, key=lambda x: str(x.get("gap_id"))))
 
     def record_gap_directed_discovery(
         self,
@@ -349,8 +430,8 @@ class E3GapDirectedScheduler:
         disc["mode"] = "GAP_DIRECTED"
         disc["target_scope_ref"] = dict(target_scope_ref)
         disc["knowledge_state_ref"] = self.knowledge_state.as_object().ref.as_dict()
-        self._executed_targets.append(disc)
-        return disc
+        self._executed_targets.append(_canonical_copy(disc))
+        return _canonical_copy(disc)
 
 
 def execute_cumulative_corpus_reveal(
@@ -359,7 +440,18 @@ def execute_cumulative_corpus_reveal(
     accepted_history_cut: Mapping,
     producer_ref: Mapping,
 ) -> tuple[E3RevealEvent, KnowledgeState]:
-    """Phase E cumulative corpus reveal (E1 + E2 corpus) after gap phase execution."""
+    """Build a non-authoritative preview after the exact positive-gap preview."""
+    if (
+        scheduler.reveal_event.reveal_type != "POSITIVE_GAP_VIEW"
+        or "GAP_DIRECTED_COVERAGE_VIEW" not in scheduler.knowledge_state.known_classes
+        or not _same_canonical(
+            scheduler.reveal_event.knowledge_state_after_ref,
+            scheduler.knowledge_state.as_object().ref.as_dict(),
+        )
+        or not _same_canonical(accepted_history_cut, scheduler.reveal_event.accepted_history_cut)
+        or not _same_canonical(accepted_history_cut, scheduler.knowledge_state.basis_history_cut)
+    ):
+        raise ValidationError("E3_CUMULATIVE_PREDECESSOR_NOT_ACCEPTED")
     prev_state_ref = scheduler.knowledge_state.as_object().ref.as_dict()
     new_known = tuple(sorted(set(scheduler.knowledge_state.known_classes) | {"CUMULATIVE_E1_E2_CORPUS"}))
 
@@ -385,7 +477,10 @@ def execute_cumulative_corpus_reveal(
         basis_history_cut=dict(accepted_history_cut),
         isolation_qualification_ref=scheduler.knowledge_state.isolation_qualification_ref,
         allowed_view_refs=(dict(e1_e2_corpus_manifest_ref),),
-        potential_exposure_refs=(exposure.as_object().ref.as_dict(),),
+        potential_exposure_refs=_exposure_union(
+            scheduler.knowledge_state,
+            exposure.as_object().ref.as_dict(),
+        ),
         contamination_assessment_refs=(),
         previous_knowledge_state_ref=prev_state_ref,
         known_classes=new_known,
@@ -411,7 +506,7 @@ def execute_holdout_reveal(
     producer_ref: Mapping,
     corpus_role: str = "AUXILIARY_HOLDOUT",
 ) -> tuple[E3RevealEvent, KnowledgeState]:
-    """Phase F external holdout reveal (e.g. A1/A2/A3 external corpus).
+    """Build a non-authoritative holdout preview after the cumulative preview.
 
     Fails closed if corpus_role is confused with canonical direct predecessor.
     """
@@ -420,6 +515,13 @@ def execute_holdout_reveal(
             "CANONICAL_PREDECESSOR_CONFUSION",
             f"Auxiliary holdout corpus role cannot be '{corpus_role}'; must not be confused with direct predecessor",
         )
+
+    if (
+        "CUMULATIVE_E1_E2_CORPUS" not in knowledge_state.known_classes
+        or knowledge_state.previous_knowledge_state_ref is None
+        or not _same_canonical(accepted_history_cut, knowledge_state.basis_history_cut)
+    ):
+        raise ValidationError("E3_HOLDOUT_PREDECESSOR_NOT_ACCEPTED")
 
     prev_state_ref = knowledge_state.as_object().ref.as_dict()
     new_known = tuple(sorted(set(knowledge_state.known_classes) | {"CONSUMED_EXTERNAL_HOLDOUT"}))
@@ -446,7 +548,10 @@ def execute_holdout_reveal(
         basis_history_cut=dict(accepted_history_cut),
         isolation_qualification_ref=knowledge_state.isolation_qualification_ref,
         allowed_view_refs=(dict(holdout_corpus_manifest_ref),),
-        potential_exposure_refs=(exposure.as_object().ref.as_dict(),),
+        potential_exposure_refs=_exposure_union(
+            knowledge_state,
+            exposure.as_object().ref.as_dict(),
+        ),
         contamination_assessment_refs=(),
         previous_knowledge_state_ref=prev_state_ref,
         known_classes=new_known,

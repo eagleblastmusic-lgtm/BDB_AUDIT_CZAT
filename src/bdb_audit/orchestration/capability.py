@@ -15,6 +15,85 @@ def _key(ref):
     return ref
 
 
+_TYPED_REF_FIELDS = {
+    "kind", "revision_digest", "digest_profile", "schema_revision_ref", "ref_class",
+}
+
+
+def _policy_fields(policy, kind, path):
+    key = kind if not path else ".".join((kind, *path))
+    return set(policy.allowed_fields.get(key, ()))
+
+
+def _check_reveal_flag(policy, field_name):
+    if field_name in {"filename", "original_path"} and not policy.reveal_filenames:
+        raise ValidationError("VIEW_METADATA_NOT_ALLOWLISTED", field_name)
+    if field_name == "support_count" and not policy.reveal_support_count:
+        raise ValidationError("VIEW_METADATA_NOT_ALLOWLISTED", field_name)
+
+
+def project_positive_artifact(artifacts, policy, root_key, allowed_refs, path=()):
+    """Build a recursive positive projection over an exact allowlisted graph.
+
+    ``allowed_fields`` can contain nested entries such as
+    ``{"finding_claim_revision.details": ("items",)}``. Typed references
+    are traversed at every depth and are never emitted as raw locators.
+    """
+    if root_key in path:
+        raise ValidationError("VIEW_REFERENCE_CYCLE")
+    source = artifacts.get(root_key)
+    if not isinstance(source, Mapping):
+        raise ValidationError("VIEW_REJECTED")
+    kind = source.get("kind", "")
+    if kind in policy.forbidden_kinds or (policy.allowed_kinds and kind not in policy.allowed_kinds):
+        raise ValidationError("VIEW_REJECTED")
+    fields = policy.allowed_fields.get(kind)
+    if fields is None:
+        raise ValidationError("VIEW_FIELDS_NOT_ALLOWLISTED")
+    next_path = path + (root_key,)
+
+    def visit(value, field_path):
+        if isinstance(value, Mapping):
+            markers = _TYPED_REF_FIELDS.intersection(value)
+            if "revision_digest" in value or markers:
+                if not _TYPED_REF_FIELDS.issubset(value):
+                    raise ValidationError("TYPED_REF_INCOMPLETE")
+                child = _key(value)
+                if child not in allowed_refs:
+                    raise ValidationError("VIEW_TRANSITIVE_LEAK")
+                target = artifacts.get(child)
+                if not isinstance(target, Mapping) or target.get("kind") != value.get("kind"):
+                    raise ValidationError("VIEW_REJECTED")
+                return project_positive_artifact(
+                    artifacts, policy, child, allowed_refs, next_path,
+                )
+
+            permitted = _policy_fields(policy, kind, field_path)
+            projected = {}
+            # Visit every nested value, including fields that will be omitted,
+            # so a forbidden or dangling reference cannot hide in a container.
+            for name, child_value in value.items():
+                projected_value = visit(child_value, field_path + (str(name),))
+                if name not in permitted:
+                    continue
+                _check_reveal_flag(policy, str(name))
+                projected[name] = projected_value
+            return projected
+        if isinstance(value, list):
+            return [visit(item, field_path) for item in value]
+        if isinstance(value, tuple):
+            return [visit(item, field_path) for item in value]
+        return value
+
+    out = {}
+    for name in fields:
+        if name not in source:
+            continue
+        _check_reveal_flag(policy, name)
+        out[name] = visit(source[name], (name,))
+    return out
+
+
 @dataclass(frozen=True)
 class ExecutorProfile:
     profile_id: str
@@ -193,48 +272,15 @@ class CapabilityBroker:
         self._grants = {}
 
     def _project(self, key, policy, seen):
-        if key in seen:
-            raise ValidationError("VIEW_REFERENCE_CYCLE")
-        if key not in self._artifacts:
-            raise ValidationError("VIEW_REJECTED")
-        item = self._artifacts[key]
-        if not isinstance(item, Mapping):
-            raise ValidationError("VIEW_REJECTED")
-        kind = item.get("kind", "")
-        if kind in policy.forbidden_kinds or (policy.allowed_kinds and kind not in policy.allowed_kinds):
-            raise ValidationError("VIEW_REJECTED")
-        fields = policy.allowed_fields.get(kind)
-        if fields is None:
-            # An explicit artifact allowlist still needs a field allowlist;
-            # copying the whole raw object would be negative redaction.
-            raise ValidationError("VIEW_FIELDS_NOT_ALLOWLISTED")
-        out = {name: item[name] for name in fields if name in item}
-        # Resolve only refs that are explicitly allowlisted and permitted by
-        # the view namespace. Hidden/transitive refs never get traversed.
-        for name, value in list(out.items()):
-            if isinstance(value, Mapping) and "revision_digest" in value:
-                child = _key(value)
-                if child not in seen and child in self._artifacts:
-                    if child not in {_key(r) for r in policy._allowed_refs}:
-                        raise ValidationError("VIEW_TRANSITIVE_LEAK")
-                    out[name] = self._project(child, policy, seen | {key})
-            elif isinstance(value, list):
-                for child_ref in value:
-                    if isinstance(child_ref, Mapping) and "revision_digest" in child_ref:
-                        child = _key(child_ref)
-                        if child in self._artifacts and child not in {_key(r) for r in policy._allowed_refs}:
-                            raise ValidationError("VIEW_TRANSITIVE_LEAK")
-        return out
+        allowed = {_key(ref) for ref in policy._allowed_refs}
+        return project_positive_artifact(self._artifacts, policy, key, allowed, tuple(seen))
 
     def prepare_view(self, manifest: ViewManifest, policy: ProjectionPolicy):
         allowed = {_key(ref) for ref in manifest.allowed_artifact_refs}
         if not allowed:
             raise ValidationError("VIEW_ALLOWLIST_EMPTY")
-        # Attach the manifest allowlist to an immutable policy copy for the
-        # recursive projector; this is internal capability state, not output.
-        object.__setattr__(policy, "_allowed_refs", tuple(manifest.allowed_artifact_refs))
         root = next(ref for ref in manifest.allowed_artifact_refs if _key(ref) in allowed)
-        body = self._project(_key(root), policy, set())
+        body = project_positive_artifact(self._artifacts, policy, _key(root), allowed)
         raw = canonical_bytes(body)
         import hashlib
         digest = hashlib.sha256(raw).hexdigest()

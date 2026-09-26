@@ -50,7 +50,11 @@ from bdb_audit.assurance.conclusion import CampaignConclusion, FinalAssuranceCas
 from bdb_audit.assurance.release import ReleaseLifecycleManager, ReleaseQualification
 from bdb_audit.workflow.read_models import VerifiedCampaignReadModel
 from bdb_audit.history.store import TransactionalHistoryStore
-from bdb_audit.history.objects import CanonicalObject, CommandEnvelope
+from bdb_audit.history.objects import (
+    CanonicalObject,
+    CommandEnvelope,
+    CommitBody,
+)
 
 
 def _ref(kind: str, token: str, ref_class: str = "CONTENT_OR_PRIOR") -> dict:
@@ -63,6 +67,136 @@ def _ref(kind: str, token: str, ref_class: str = "CONTENT_OR_PRIOR") -> dict:
         "schema_revision_ref": f"BDB_SCHEMA_REGISTRY::{kind}/1",
         "ref_class": ref_class,
     }
+
+
+def _store_stop_input(campaign_id: str, head_seq: int, head_hash: str) -> StopInput:
+    policy = _ref("policy_revision", "p", "HISTORY_CONTEXT_BINDING")
+    spec = _ref("spec_revision", "s", "HISTORY_CONTEXT_BINDING")
+    return StopInput(
+        campaign_id=campaign_id,
+        source_generation_ref=_ref("source_generation", "sg"),
+        input_history_cut={
+            "variant": "ACCEPTED_HISTORY_CUT",
+            "campaign_id": campaign_id,
+            "accepted_head_seq": head_seq,
+            "accepted_head_hash": head_hash,
+        },
+        evaluation_context="FINAL_POST_E5",
+        governing_policy_ref=policy,
+        policy_spec_refs=[spec],
+        evaluator_revision_ref=spec,
+        required_stage_set_ref=_ref(
+            "external_profile_ref", "st", "HISTORY_CONTEXT_BINDING"
+        ),
+        required_stage_spec_refs=[spec],
+        completed_stage_refs=[spec],
+        pending_required_stage_refs=[],
+        stop_input_snapshot_ref=_ref("snapshot", "sn"),
+        inventory_revision_ref=_ref("inventory_revision", "inv"),
+        mandatory_obligation_refs=[],
+        current_obligation_qualification_refs=[],
+        evidence_invalidation_refs=[],
+        contradiction_refs=[],
+        residual_risk_refs=[],
+        evidence_invalidation_state={"invalidated_count": 0},
+        release_policy_ref=policy,
+        effort_profile_ref=_ref(
+            "external_profile_ref", "eff", "HISTORY_CONTEXT_BINDING"
+        ),
+        effort_results_ref={"rounds_executed": 5},
+        unknown_blocked_summary={
+            "unknown_surfaces_count": 0,
+            "is_blocked": False,
+        },
+        candidate_assurance_case_ref=_ref("candidate_assurance_case", "cac"),
+        challenger_refs=[
+            _ref("challenger_result", "cr1"),
+            _ref("challenger_result", "cr2"),
+        ],
+    )
+
+
+def _append_canonical_admin_commit(
+    store_path: Path,
+    objects: tuple[CanonicalObject, ...],
+    *,
+    command_seed: str,
+) -> None:
+    """Append exact-hash test history while bypassing unrelated command gates."""
+    store = TransactionalHistoryStore(store_path)
+    head = store.head()
+    assert head is not None
+    prior_body = store.commits()[-1]
+    parent = {"tag": "ACCEPTED_HEAD_REF", **head.as_dict()}
+    command = CommandEnvelope(
+        command_id=(
+            "command_"
+            + __import__("uuid").uuid5(
+                __import__("uuid").NAMESPACE_URL, command_seed
+            ).hex[:8]
+            + "-0000-4000-8000-000000000000"
+        ),
+        command_kind="TEST_ADMINISTRATIVE_RECORD",
+        actor_ref="installation-owner",
+        expected_parent_head=parent,
+        governing_policy_ref=prior_body["governing_policy_ref"],
+        governing_spec_refs=tuple(prior_body["governing_spec_refs"]),
+        idempotency_scope=f"test/{command_seed}",
+        command_payload={"case": command_seed},
+        campaign_ref=head.campaign_id,
+    ).as_object()
+    accepted_objects = (command, *objects)
+    object_refs = tuple(
+        obj.as_ref(ref_class="CONTENT_OBJECT")
+        for obj in accepted_objects
+    )
+    commit = CommitBody(
+        campaign_id=head.campaign_id,
+        commit_seq=head.commit_seq + 1,
+        prev_history_ref=parent,
+        command_ref=object_refs[0],
+        command_digest=command.digest,
+        actor_ref="installation-owner",
+        expected_parent_head=parent,
+        governing_policy_ref=prior_body["governing_policy_ref"],
+        governing_spec_refs=tuple(prior_body["governing_spec_refs"]),
+        ordered_event_bodies=(),
+        immutable_object_refs=object_refs,
+    )
+    conn = store._connect()
+    try:
+        for obj in accepted_objects:
+            record = obj.record()
+            conn.execute(
+                "INSERT OR IGNORE INTO immutable_objects"
+                "(digest,kind,version,schema_ref,logical_id,body)"
+                " VALUES(?,?,?,?,?,?)",
+                (
+                    record["revision_digest"],
+                    record["kind"],
+                    record["version"],
+                    record["schema_revision_ref"],
+                    record["logical_id"],
+                    json.dumps(record["body"]),
+                ),
+            )
+        conn.execute(
+            "INSERT INTO commits(seq,commit_hash,campaign_id,body)"
+            " VALUES(?,?,?,?)",
+            (
+                commit.commit_seq,
+                commit.digest,
+                commit.campaign_id,
+                json.dumps(commit.body()),
+            ),
+        )
+        conn.execute(
+            "UPDATE accepted_head SET seq=?, commit_hash=? WHERE singleton=1",
+            (commit.commit_seq, commit.digest),
+        )
+        conn.commit()
+    finally:
+        conn.close()
 
 
 @pytest.fixture
@@ -195,190 +329,55 @@ def test_case_g_positive_control_stop_pass_ready(base_stop_kwargs):
 
 def test_case_h_accepted_stop_input_cut_h_evaluated_at_h_plus_1(tmp_path: Path):
     store_path = tmp_path / "campaign_h.sqlite"
-    api = AuditOperationApi()
-    created = api.create_campaign(store_path, seed="case_h")
-    cid = created["campaign_id"]
-    h_seq = created["commit_seq"]
-    h_hash = created["commit_hash"]
-
-    # Build valid StopInput dict with cut at commit H
-    cut = {"campaign_id": cid, "accepted_head_seq": h_seq, "accepted_head_hash": h_hash}
-    p = _ref("policy_revision", "p", "HISTORY_CONTEXT_BINDING")
-    s = _ref("spec_revision", "s", "HISTORY_CONTEXT_BINDING")
-    cac = _ref("candidate_assurance_case", "cac")
-    cr1 = _ref("challenger_result", "cr1")
-    cr2 = _ref("challenger_result", "cr2")
-
-    si_dict = {
-        "campaign_id": cid,
-        "source_generation_ref": _ref("source_generation", "sg"),
-        "input_history_cut": cut,
-        "evaluation_context": "FINAL_POST_E5",
-        "governing_policy_ref": p,
-        "policy_spec_refs": [s],
-        "evaluator_revision_ref": s,
-        "required_stage_set_ref": _ref("external_profile_ref", "st", "HISTORY_CONTEXT_BINDING"),
-        "required_stage_spec_refs": [s],
-        "completed_stage_refs": [s],
-        "pending_required_stage_refs": [],
-        "stop_input_snapshot_ref": _ref("snapshot", "sn"),
-        "inventory_revision_ref": _ref("inventory_revision", "inv"),
-        "mandatory_obligation_refs": [],
-        "current_obligation_qualification_refs": [],
-        "evidence_invalidation_refs": [],
-        "contradiction_refs": [],
-        "residual_risk_refs": [],
-        "evidence_invalidation_state": {"invalidated_count": 0},
-        "release_policy_ref": p,
-        "effort_profile_ref": _ref("external_profile_ref", "eff", "HISTORY_CONTEXT_BINDING"),
-        "effort_results_ref": {"rounds_executed": 5},
-        "unknown_blocked_summary": {"unknown_surfaces_count": 0, "is_blocked": False},
-        "candidate_assurance_case_ref": cac,
-        "challenger_refs": [cr1, cr2],
-    }
-
-    import sqlite3
-    con = sqlite3.connect(store_path)
-    import hashlib
-    si_digest = hashlib.sha256(json.dumps(si_dict, sort_keys=True).encode("utf-8")).hexdigest()
-    con.execute(
-        "INSERT INTO immutable_objects(digest,kind,version,schema_ref,logical_id,body) VALUES(?,?,?,?,?,?)",
-        (si_digest, "stop_input", "1", "BDB_SCHEMA_REGISTRY::stop_input/1", None, json.dumps(si_dict)),
+    created = AuditOperationApi().create_campaign(
+        store_path, seed="case_h"
     )
-    c2_hash = hashlib.sha256(b"commit_2_h").hexdigest()
-    c2_body = {
-        "campaign_id": cid,
-        "commit_seq": h_seq + 1,
-        "prev_history_ref": {"commit_seq": h_seq, "commit_hash": h_hash},
-        "command_ref": {"kind": "command_envelope", "revision_digest": hashlib.sha256(b"cmd2").hexdigest(), "ref_class": "CONTENT_OBJECT"},
-        "command_digest": hashlib.sha256(b"cmd2").hexdigest(),
-        "actor_ref": "installation-owner",
-        "expected_parent_head": {"commit_seq": h_seq, "commit_hash": h_hash},
-        "governing_policy_ref": "pin:initial_governing_policy_ref",
-        "governing_spec_refs": ["pin:initial_transition_profile_ref"],
-        "ordered_event_bodies": [],
-        "immutable_object_refs": [{"kind": "stop_input", "revision_digest": si_digest, "ref_class": "CONTENT_OBJECT"}],
-    }
-    con.execute(
-        "INSERT INTO commits(seq,commit_hash,campaign_id,body) VALUES(?,?,?,?)",
-        (h_seq + 1, c2_hash, cid, json.dumps(c2_body)),
+    stop_input = _store_stop_input(
+        created["campaign_id"],
+        created["commit_seq"],
+        created["commit_hash"],
     )
-    con.execute(
-        "UPDATE accepted_head SET seq=?, commit_hash=? WHERE singleton=1",
-        (h_seq + 1, c2_hash),
+    _append_canonical_admin_commit(
+        store_path,
+        (stop_input.as_object(),),
+        command_seed="case_h_stop_input",
     )
-    con.commit()
-    con.close()
 
-    # Now head is at H+1. evaluate_stop_gate on accepted history should NOT fail with STOP_INPUT_CUT_MISMATCH
-    res = evaluate_stop_gate(store_path)
-    assert res["status"] == "SUCCESS"
-    assert res["evaluated"] is True
-    assert res["continuation_decision"] == "PASS"
+    result = evaluate_stop_gate(store_path)
+    assert result["status"] == "SUCCESS"
+    assert result["evaluated"] is True
+    assert result["continuation_decision"] == "PASS"
 
 
-def test_case_i_administrative_commits_do_not_stale_accepted_stop_input(tmp_path: Path):
+def test_case_i_administrative_commits_do_not_stale_accepted_stop_input(
+    tmp_path: Path,
+):
     store_path = tmp_path / "campaign_i.sqlite"
-    api = AuditOperationApi()
-    created = api.create_campaign(store_path, seed="case_i")
-    cid = created["campaign_id"]
-    h_seq = created["commit_seq"]
-    h_hash = created["commit_hash"]
-
-    cut = {"campaign_id": cid, "accepted_head_seq": h_seq, "accepted_head_hash": h_hash}
-    p = _ref("policy_revision", "p", "HISTORY_CONTEXT_BINDING")
-    s = _ref("spec_revision", "s", "HISTORY_CONTEXT_BINDING")
-    cac = _ref("candidate_assurance_case", "cac")
-    cr1 = _ref("challenger_result", "cr1")
-    cr2 = _ref("challenger_result", "cr2")
-
-    si_dict = {
-        "campaign_id": cid,
-        "source_generation_ref": _ref("source_generation", "sg"),
-        "input_history_cut": cut,
-        "evaluation_context": "FINAL_POST_E5",
-        "governing_policy_ref": p,
-        "policy_spec_refs": [s],
-        "evaluator_revision_ref": s,
-        "required_stage_set_ref": _ref("external_profile_ref", "st", "HISTORY_CONTEXT_BINDING"),
-        "required_stage_spec_refs": [s],
-        "completed_stage_refs": [s],
-        "pending_required_stage_refs": [],
-        "stop_input_snapshot_ref": _ref("snapshot", "sn"),
-        "inventory_revision_ref": _ref("inventory_revision", "inv"),
-        "mandatory_obligation_refs": [],
-        "current_obligation_qualification_refs": [],
-        "evidence_invalidation_refs": [],
-        "contradiction_refs": [],
-        "residual_risk_refs": [],
-        "evidence_invalidation_state": {"invalidated_count": 0},
-        "release_policy_ref": p,
-        "effort_profile_ref": _ref("external_profile_ref", "eff", "HISTORY_CONTEXT_BINDING"),
-        "effort_results_ref": {"rounds_executed": 5},
-        "unknown_blocked_summary": {"unknown_surfaces_count": 0, "is_blocked": False},
-        "candidate_assurance_case_ref": cac,
-        "challenger_refs": [cr1, cr2],
-    }
-
-    import sqlite3
-    con = sqlite3.connect(store_path)
-    import hashlib
-    si_digest = hashlib.sha256(json.dumps(si_dict, sort_keys=True).encode("utf-8")).hexdigest()
-    con.execute(
-        "INSERT INTO immutable_objects(digest,kind,version,schema_ref,logical_id,body) VALUES(?,?,?,?,?,?)",
-        (si_digest, "stop_input", "1", "BDB_SCHEMA_REGISTRY::stop_input/1", None, json.dumps(si_dict)),
+    created = AuditOperationApi().create_campaign(
+        store_path, seed="case_i"
     )
-    # Commit 2: accepts stop_input
-    c2_hash = hashlib.sha256(b"commit_2_i").hexdigest()
-    c2_body = {
-        "campaign_id": cid,
-        "commit_seq": h_seq + 1,
-        "prev_history_ref": {"commit_seq": h_seq, "commit_hash": h_hash},
-        "command_ref": {"kind": "command_envelope", "revision_digest": hashlib.sha256(b"cmd2_i").hexdigest(), "ref_class": "CONTENT_OBJECT"},
-        "command_digest": hashlib.sha256(b"cmd2_i").hexdigest(),
-        "actor_ref": "installation-owner",
-        "expected_parent_head": {"commit_seq": h_seq, "commit_hash": h_hash},
-        "governing_policy_ref": "pin:initial_governing_policy_ref",
-        "governing_spec_refs": ["pin:initial_transition_profile_ref"],
-        "ordered_event_bodies": [],
-        "immutable_object_refs": [{"kind": "stop_input", "revision_digest": si_digest, "ref_class": "CONTENT_OBJECT"}],
-    }
-    con.execute(
-        "INSERT INTO commits(seq,commit_hash,campaign_id,body) VALUES(?,?,?,?)",
-        (h_seq + 1, c2_hash, cid, json.dumps(c2_body)),
+    stop_input = _store_stop_input(
+        created["campaign_id"],
+        created["commit_seq"],
+        created["commit_hash"],
+    )
+    stop_input_object = stop_input.as_object()
+    _append_canonical_admin_commit(
+        store_path,
+        (stop_input_object,),
+        command_seed="case_i_stop_input",
+    )
+    stop_evaluation = evaluate_stop(stop_input)
+    _append_canonical_admin_commit(
+        store_path,
+        (stop_evaluation.as_object(),),
+        command_seed="case_i_stop_evaluation",
     )
 
-    # Commit 3: accepts stop_evaluation (administrative commit)
-    c3_hash = hashlib.sha256(b"commit_3_i").hexdigest()
-    se_digest = hashlib.sha256(b"se_digest").hexdigest()
-    c3_body = {
-        "campaign_id": cid,
-        "commit_seq": h_seq + 2,
-        "prev_history_ref": {"commit_seq": h_seq + 1, "commit_hash": c2_hash},
-        "command_ref": {"kind": "command_envelope", "revision_digest": hashlib.sha256(b"cmd3_i").hexdigest(), "ref_class": "CONTENT_OBJECT"},
-        "command_digest": hashlib.sha256(b"cmd3_i").hexdigest(),
-        "actor_ref": "installation-owner",
-        "expected_parent_head": {"commit_seq": h_seq + 1, "commit_hash": c2_hash},
-        "governing_policy_ref": "pin:initial_governing_policy_ref",
-        "governing_spec_refs": ["pin:initial_transition_profile_ref"],
-        "ordered_event_bodies": [],
-        "immutable_object_refs": [{"kind": "stop_evaluation", "revision_digest": se_digest, "ref_class": "CONTENT_OBJECT"}],
-    }
-    con.execute(
-        "INSERT INTO commits(seq,commit_hash,campaign_id,body) VALUES(?,?,?,?)",
-        (h_seq + 2, c3_hash, cid, json.dumps(c3_body)),
-    )
-    con.execute(
-        "UPDATE accepted_head SET seq=?, commit_hash=? WHERE singleton=1",
-        (h_seq + 2, c3_hash),
-    )
-    con.commit()
-    con.close()
-
-    # evaluate_stop_gate should still evaluate successfully
-    res = evaluate_stop_gate(store_path)
-    assert res["status"] == "SUCCESS"
-    assert res["evaluated"] is True
+    result = evaluate_stop_gate(store_path)
+    assert result["status"] == "SUCCESS"
+    assert result["evaluated"] is True
+    assert result["continuation_decision"] == "PASS"
 
 
 def test_case_j_material_audit_commit_after_cut_fails_closed(tmp_path: Path):

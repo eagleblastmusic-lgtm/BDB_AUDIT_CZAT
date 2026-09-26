@@ -50,28 +50,12 @@ def test_r5n50_assignment_and_result_same_commit_are_rejected() -> None:
 def test_e5_legacy_qualify_stage_fails_closed_without_external_challengers(
     tmp_path: Path,
 ) -> None:
-    target = tmp_path / "target"
-    target.mkdir()
-    (target / "README.md").write_text(
-        "# R5N-50 target\n", encoding="utf-8"
-    )
-    store_path = tmp_path / "campaign.sqlite"
+    from tests.workflow.test_e5_runtime import _base_campaign
 
+    store_path, _ = _base_campaign(tmp_path)
     api = AuditOperationApi()
-    api.create_campaign(
-        store_path,
-        seed="r5n50",
-        target_repo=str(target),
-    )
-    for stage in ("E1", "E2", "E3", "E4"):
-        api.prepare_stage(store_path, stage)
-        result = api.qualify_stage(store_path, stage)
-        assert result["status"] == "SUCCESS"
-
-    api.prepare_stage(store_path, "E5")
     with pytest.raises(
         ValidationError,
         match="E5_EXTERNAL_CHALLENGER_RUNTIME_REQUIRED",
     ):
         api.qualify_stage(store_path, "E5")
-
