@@ -46,8 +46,12 @@ def build_e1_stage_spec(revision: str = "1") -> StageSpec:
     )
 
 
-def build_e1_lane_specs(stage_spec_revision: str = "1", lane_revision: str = "1") -> dict[str, LaneSpec]:
-    """Construct normative LaneSpecs for all 5 E1 lanes with enforced isolation."""
+def build_e1_lane_specs(
+    stage_spec_revision: str = "1",
+    lane_revision: str = "1",
+    required_isolation_assurance: str = "DECLARED",
+) -> dict[str, LaneSpec]:
+    """Construct E1 LaneSpecs without overstating executor isolation."""
     specs = {}
     for slot in E1_LANE_SLOTS:
         purpose, strategy = E1_LANE_STRATEGIES[slot]
@@ -57,7 +61,7 @@ def build_e1_lane_specs(stage_spec_revision: str = "1", lane_revision: str = "1"
             stage_spec_revision=stage_spec_revision,
             purpose=purpose,
             primary_strategy=strategy,
-            required_isolation_assurance="ENFORCED",
+            required_isolation_assurance=required_isolation_assurance,
             forbidden_knowledge_classes=("OTHER_LANE_UNSEALED_FINDINGS", "FUTURE_ADJUDICATION_OUTCOMES"),
             required_outputs=("discovery_records",),
         )

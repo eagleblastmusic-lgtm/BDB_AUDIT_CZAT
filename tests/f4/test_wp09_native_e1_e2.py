@@ -57,8 +57,16 @@ def test_e1_stage_and_lane_specs():
     for slot in E1_LANE_SLOTS:
         assert slot in lane_specs
         ls = lane_specs[slot]
-        assert ls.required_isolation_assurance == "ENFORCED"
+        assert ls.required_isolation_assurance == "DECLARED"
         assert "OTHER_LANE_UNSEALED_FINDINGS" in ls.forbidden_knowledge_classes
+
+    enforced_lane_specs = build_e1_lane_specs(
+        required_isolation_assurance="ENFORCED"
+    )
+    assert all(
+        spec.required_isolation_assurance == "ENFORCED"
+        for spec in enforced_lane_specs.values()
+    )
 
 
 def test_quarantine_broker_knowledge_isolation():
