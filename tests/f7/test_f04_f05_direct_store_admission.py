@@ -6,11 +6,13 @@ accepted-history fixture. Every result under test goes through Coordinator.accep
 from __future__ import annotations
 
 import hashlib
+from dataclasses import replace
 from pathlib import Path
 import uuid
 
 import pytest
 
+from bdb_audit.assurance.candidate_case import CandidateAssuranceCase
 from bdb_audit.assurance.conclusion import CampaignConclusion, FinalAssuranceCase
 from bdb_audit.assurance.finalization_service import FinalizationService
 from bdb_audit.assurance.release import ReleaseQualification
@@ -21,10 +23,22 @@ from bdb_audit.core.ids import new_id
 from bdb_audit.core.registry import canonical_reference_set
 from bdb_audit.history.objects import CanonicalObject, CommandEnvelope
 from bdb_audit.history.store import TransactionalHistoryStore
+from bdb_audit.inventory.models import InventoryRevision
 from bdb_audit.stop.evaluator import evaluate_stop
 from bdb_audit.stop.models import StopInput
 from bdb_audit.workflow.read_models import current_accepted_cut
+from bdb_audit.workflow.scope_baseline import ensure_pre_e3_scope_baseline
+from bdb_audit.workflow.e5_runtime import (
+    CandidateAssuranceCaseService,
+    E5ChallengerResultService,
+    E5FinalizationService,
+)
 from tests.f7.test_adaptive_e6_canonical_authority import _append_raw_commit
+from tests.workflow.test_e5_runtime import (
+    _base_campaign as _base_e5_campaign,
+    _prepare_e5a,
+    _prepare_e5b,
+)
 
 
 def _typed_ref(kind: str, token: str, ref_class: str = "HISTORY_CONTEXT_BINDING") -> dict:
@@ -303,6 +317,208 @@ def _accept(store: TransactionalHistoryStore, obj: CanonicalObject, label: str):
     )
 
 
+def _normal_produced_stop(tmp_path: Path, seed: str):
+    store_path = tmp_path / f"{seed}.sqlite"
+    AuditOperationApi().create_campaign(store_path, seed=seed)
+    store = TransactionalHistoryStore(store_path)
+    ensure_pre_e3_scope_baseline(store)
+    api = AuditOperationApi()
+    for stage_id in ("E1", "E2", "E3", "E4", "E5"):
+        api.prepare_stage(store_path, stage_id)
+    service = FinalizationService(store)
+    result = service.evaluate_stop_gate()
+    cut = current_accepted_cut(store)
+    stop_input = store.accepted_records("stop_input", cut)[-1]
+    stop_eval = store.accepted_records("stop_evaluation", cut)[-1]
+    snapshot = next(
+        row
+        for row in store.accepted_records("snapshot", cut)
+        if row["ref"]["revision_digest"]
+        == stop_input["body"]["stop_input_snapshot_ref"]["revision_digest"]
+    )
+    assert stop_input["accepted_seq"] == stop_eval["accepted_seq"]
+    assert snapshot["accepted_seq"] == stop_input["accepted_seq"]
+    assert snapshot["body"]["as_of_head"] == stop_input["body"]["input_history_cut"]
+    return store_path, store, service, result, stop_input, stop_eval
+
+
+def test_normal_stop_snapshot_does_not_stale_direct_or_service_finalization(
+    tmp_path: Path,
+) -> None:
+    store_path, store, service, stop_result, stop_input, stop_eval = (
+        _normal_produced_stop(tmp_path, "normal-stop-snapshot-finalization")
+    )
+    assert stop_result["status"] == "SUCCESS"
+    stop_eval_ref = dict(stop_eval["ref"], ref_class="PRIOR_ACCEPTED_ONLY")
+    head = store.head()
+    assert head is not None
+    conclusion_model = CampaignConclusion(
+        campaign_conclusion_id=new_id("campaign_conclusion"),
+        campaign_ref={
+            "kind": "campaign_ref",
+            "revision_digest": hashlib.sha256(head.campaign_id.encode()).hexdigest(),
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": "BDB_TARGET/campaign_ref",
+            "ref_class": "PRIOR_ACCEPTED_ONLY",
+        },
+        source_generation_ref=dict(
+            stop_input["body"]["source_generation_ref"],
+            ref_class="PRIOR_ACCEPTED_ONLY",
+        ),
+        stop_evaluation_ref=stop_eval_ref,
+        termination_state="COMPLETED_LIMITED",
+        assurance_level=stop_eval["body"]["assurance_level"],
+        bounded_conclusion_statement="Normal producer STOP snapshot control",
+        conclusion_command_input_history_cut=current_accepted_cut(store),
+        limited_conclusion_basis_refs=(stop_eval_ref,),
+    )
+    direct_conclusion = CanonicalObject(
+        "campaign_conclusion",
+        conclusion_model.body(),
+        logical_id=conclusion_model.campaign_conclusion_id,
+    )
+    accepted = _accept(store, direct_conclusion, "normal-stop-direct-finalizer")
+    assert accepted.head.commit_seq == head.commit_seq + 1
+
+    completed = service.conclude_campaign(
+        termination_state="COMPLETED_LIMITED",
+        bounded_statement="Normal producer STOP snapshot control",
+    )
+    assert completed["status"] == "SUCCESS"
+    finalized_cut = current_accepted_cut(store)
+    assert len(store.accepted_records("campaign_conclusion", finalized_cut)) == 1
+    assert len(store.accepted_records("final_assurance_case", finalized_cut)) == 1
+    assert len(store.accepted_records("release_qualification", finalized_cut)) == 1
+    retry = FinalizationService(
+        TransactionalHistoryStore(store_path)
+    ).conclude_campaign(
+        termination_state="COMPLETED_LIMITED",
+        bounded_statement="Normal producer STOP snapshot control",
+    )
+    assert retry["commit_seq"] == completed["commit_seq"]
+    assert AuditOperationApi().continue_campaign(store_path)["workflow_finished"] is True
+
+
+def test_normal_stop_rejects_material_inventory_successor(tmp_path: Path) -> None:
+    store_path, store, service, _stop_result, _stop_input, _stop_eval = (
+        _normal_produced_stop(tmp_path, "normal-stop-material-successor")
+    )
+    cut = current_accepted_cut(store)
+    source = store.accepted_records("source_generation", cut)[-1]
+    candidate = InventoryRevision(
+        inventory_id=new_id("inventory_revision"),
+        inventory_revision="1",
+        source_generation_ref=dict(
+            source["ref"], ref_class="PRIOR_ACCEPTED_ONLY"
+        ),
+        basis_history_cut=cut,
+    ).as_object()
+    _accept(store, candidate, "material-inventory-successor-after-stop")
+    head_before = store.head()
+    commit_count_before = len(store.commits())
+    con = store._connect()
+    try:
+        object_count_before = con.execute(
+            "SELECT COUNT(*) FROM immutable_objects"
+        ).fetchone()[0]
+        receipt_count_before = con.execute(
+            "SELECT COUNT(*) FROM receipts"
+        ).fetchone()[0]
+    finally:
+        con.close()
+
+    with pytest.raises(ValidationError, match="STOP_INPUT_CUT_MISMATCH"):
+        service.conclude_campaign(
+            termination_state="COMPLETED_LIMITED",
+            bounded_statement="Stale STOP must not finalize",
+        )
+    assert store.head() == head_before
+    assert len(store.commits()) == commit_count_before
+    final_cut = current_accepted_cut(store)
+    assert len(store.accepted_records("campaign_conclusion", final_cut)) == 0
+    assert len(store.accepted_records("final_assurance_case", final_cut)) == 0
+    con = store._connect()
+    try:
+        assert con.execute(
+            "SELECT COUNT(*) FROM immutable_objects"
+        ).fetchone()[0] == object_count_before
+        assert con.execute(
+            "SELECT COUNT(*) FROM receipts"
+        ).fetchone()[0] == receipt_count_before
+    finally:
+        con.close()
+
+
+def test_normal_producer_candidate_challengers_stop_rejects_new_candidate(
+    tmp_path: Path,
+) -> None:
+    store_path, store = _base_e5_campaign(tmp_path)
+    e5a, e5a_inbox = _prepare_e5a(tmp_path, store)
+    frozen = CandidateAssuranceCaseService(store).freeze(e5a, e5a_inbox)
+    e5b, e5b_inbox = _prepare_e5b(tmp_path, store, frozen.candidate)
+    E5ChallengerResultService(store, e5b, e5b_inbox).materialize()
+    E5FinalizationService(store).finalize()
+
+    stop_service = FinalizationService(store)
+    stop_result = stop_service.evaluate_stop_gate()
+    assert stop_result["status"] == "SUCCESS"
+    stop_cut = current_accepted_cut(store)
+    accepted_stop_input = store.accepted_records("stop_input", stop_cut)[-1]
+    assert (
+        accepted_stop_input["body"]["candidate_assurance_case_ref"][
+            "revision_digest"
+        ]
+        == frozen.candidate.digest()
+    )
+    assert len(accepted_stop_input["body"]["challenger_refs"]) == 2
+
+    current_candidate = CandidateAssuranceCase(**frozen.candidate.body())
+    successor_cut = current_accepted_cut(store)
+    successor_model = replace(
+        current_candidate,
+        candidate_assurance_case_id=new_id("candidate_assurance_case"),
+        candidate_input_history_cut=successor_cut,
+    )
+    successor = CanonicalObject(
+        "candidate_assurance_case",
+        successor_model.body(),
+        logical_id=successor_model.candidate_assurance_case_id,
+    )
+    _accept(store, successor, "normal-producer-new-candidate-after-stop")
+
+    head_before = store.head()
+    commit_count_before = len(store.commits())
+    con = store._connect()
+    try:
+        object_count_before = con.execute(
+            "SELECT COUNT(*) FROM immutable_objects"
+        ).fetchone()[0]
+        receipt_count_before = con.execute(
+            "SELECT COUNT(*) FROM receipts"
+        ).fetchone()[0]
+    finally:
+        con.close()
+
+    with pytest.raises(ValidationError, match="STOP_INPUT_CUT_MISMATCH"):
+        stop_service.conclude_campaign(
+            termination_state="COMPLETED_LIMITED",
+            bounded_statement="Old normal-producer STOP cannot finalize a new candidate",
+        )
+
+    assert store.head() == head_before
+    assert len(store.commits()) == commit_count_before
+    con = store._connect()
+    try:
+        assert con.execute(
+            "SELECT COUNT(*) FROM immutable_objects"
+        ).fetchone()[0] == object_count_before
+        assert con.execute(
+            "SELECT COUNT(*) FROM receipts"
+        ).fetchone()[0] == receipt_count_before
+    finally:
+        con.close()
+
+
 def test_stop_freshness_is_enforced_in_direct_base_and_release_admission(
     tmp_path: Path,
 ) -> None:
@@ -323,6 +539,16 @@ def test_stop_freshness_is_enforced_in_direct_base_and_release_admission(
     stale_conclusion = _conclusion(basis, statement="stale direct conclusion")
     head_before = store.head()
     count_before = len(store.commits())
+    con = store._connect()
+    try:
+        object_count_before = con.execute(
+            "SELECT COUNT(*) FROM immutable_objects"
+        ).fetchone()[0]
+        receipt_count_before = con.execute(
+            "SELECT COUNT(*) FROM receipts"
+        ).fetchone()[0]
+    finally:
+        con.close()
     with pytest.raises(ValidationError, match="STOP_INPUT_CUT_MISMATCH"):
         Coordinator(store).accept(
             _command(store, "stale-base-finalizer"),
@@ -332,6 +558,16 @@ def test_stop_freshness_is_enforced_in_direct_base_and_release_admission(
     assert store.head() == head_before
     assert len(store.commits()) == count_before
     assert store.object_record(stale_conclusion.digest) is None
+    con = store._connect()
+    try:
+        assert con.execute(
+            "SELECT COUNT(*) FROM immutable_objects"
+        ).fetchone()[0] == object_count_before
+        assert con.execute(
+            "SELECT COUNT(*) FROM receipts"
+        ).fetchone()[0] == receipt_count_before
+    finally:
+        con.close()
 
     release_cut = current_accepted_cut(store)
     qualification_model = ReleaseQualification(
@@ -364,6 +600,16 @@ def test_stop_freshness_is_enforced_in_direct_base_and_release_admission(
     assert store.head() == head_before
     assert len(store.commits()) == count_before
     assert store.object_record(stale_release.digest) is None
+    con = store._connect()
+    try:
+        assert con.execute(
+            "SELECT COUNT(*) FROM immutable_objects"
+        ).fetchone()[0] == object_count_before
+        assert con.execute(
+            "SELECT COUNT(*) FROM receipts"
+        ).fetchone()[0] == receipt_count_before
+    finally:
+        con.close()
 
 
 def test_administrative_history_after_stop_does_not_stale_direct_finalization(
@@ -603,4 +849,98 @@ def test_real_store_finalization_recovers_each_boundary_without_duplicates(
         bounded_statement="Real store crash recovery regression",
     )
     assert retry["commit_seq"] == result["commit_seq"]
+    assert counts() == (1, 1, 1)
+
+
+@pytest.mark.parametrize(
+    ("crash_at", "partial_counts"),
+    [
+        ("campaign_conclusion", (0, 0, 0)),
+        ("final_assurance_case", (1, 0, 0)),
+        ("release_qualification", (1, 1, 0)),
+        ("after_release_qualification", (1, 1, 1)),
+    ],
+)
+def test_normal_producer_stop_recovers_after_reopening_each_boundary(
+    tmp_path: Path,
+    monkeypatch,
+    crash_at: str,
+    partial_counts: tuple[int, int, int],
+) -> None:
+    store_path, store, service, _stop_result, _stop_input, _stop_eval = (
+        _normal_produced_stop(tmp_path, f"normal-stop-crash-{crash_at}")
+    )
+    original_accept_one = service._accept_one
+    tripped = False
+
+    def crash_once(obj: CanonicalObject, scope: str):
+        nonlocal tripped
+        after_release = (
+            crash_at == "after_release_qualification"
+            and scope == "release_qualification"
+        )
+        if not tripped and (scope == crash_at or after_release):
+            tripped = True
+            if after_release:
+                result = original_accept_one(obj, scope)
+                raise RuntimeError(
+                    "simulated crash after normal-producer release qualification"
+                )
+            raise RuntimeError(
+                f"simulated normal-producer crash before {scope}"
+            )
+        return original_accept_one(obj, scope)
+
+    monkeypatch.setattr(service, "_accept_one", crash_once)
+    with pytest.raises(RuntimeError, match="simulated .*crash"):
+        service.conclude_campaign(
+            termination_state="COMPLETED_LIMITED",
+            bounded_statement="Normal STOP producer crash recovery",
+        )
+
+    reopened = TransactionalHistoryStore(store_path)
+    api = AuditOperationApi()
+
+    def counts() -> tuple[int, int, int]:
+        cut = current_accepted_cut(reopened)
+        return tuple(
+            len(reopened.accepted_records(kind, cut))
+            for kind in (
+                "campaign_conclusion",
+                "final_assurance_case",
+                "release_qualification",
+            )
+        )
+
+    assert counts() == partial_counts
+    progress = api.continue_campaign(store_path)
+    if partial_counts == (0, 0, 0):
+        assert progress["workflow_finished"] is False
+        assert progress["finalization_progress"]["state"] == "NOT_STARTED"
+    elif partial_counts == (1, 1, 1):
+        assert progress["workflow_finished"] is True
+        assert progress["next_action"] == "CAMPAIGN_TERMINATED_LIMITED"
+    else:
+        assert progress["workflow_finished"] is False
+        assert progress["next_action"] == "RESUME_FINALIZATION"
+        assert progress["finalization_progress"]["next_action"] == "RESUME_FINALIZATION"
+
+    resumed = FinalizationService(reopened).conclude_campaign(
+        termination_state="COMPLETED_LIMITED",
+        bounded_statement="Normal STOP producer crash recovery",
+    )
+    assert resumed["status"] == "SUCCESS"
+    assert counts() == (1, 1, 1)
+    completed = api.continue_campaign(store_path)
+    assert completed["workflow_finished"] is True
+    assert completed["finalization_progress"]["state"] == "COMPLETE"
+
+    final_head_seq = reopened.head().commit_seq
+    retry = FinalizationService(
+        TransactionalHistoryStore(store_path)
+    ).conclude_campaign(
+        termination_state="COMPLETED_LIMITED",
+        bounded_statement="Normal STOP producer crash recovery",
+    )
+    assert retry["commit_seq"] == final_head_seq
     assert counts() == (1, 1, 1)

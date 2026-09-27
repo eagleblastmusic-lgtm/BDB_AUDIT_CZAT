@@ -9,7 +9,7 @@ from ..core.errors import ValidationError
 from ..core.hashing import object_digest
 from ..core.ids import new_id, validate_id
 from ..core.registry import canonical_reference_set
-from ..history.objects import CanonicalObject
+from ..history.objects import CanonicalObject, ObjectRef
 
 
 _EVAL_CONTEXTS = {"INTERMEDIATE", "FINAL_POST_E5", "POST_E6"}
@@ -19,6 +19,64 @@ _RELEASE_READINESS = {
     "READY", "READY_WITH_RESIDUAL_RISK",
     "TECHNICALLY_NOT_READY", "QUALIFICATION_BLOCKED",
 }
+
+
+def validate_stage_completion_body(body: Mapping[str, Any]) -> None:
+    """Validate the shared semantic invariants for a StageCompletion body.
+
+    This function is intentionally usable both before model serialization and
+    at canonical store admission, where callers can provide a raw
+    ``CanonicalObject`` without constructing the dataclass.
+    """
+    if not isinstance(body, Mapping):
+        raise ValidationError("STAGE_COMPLETION_BODY_INVALID")
+
+    result = body.get("completion_predicate_result")
+    if not isinstance(result, str) or result not in {
+        "STAGE_COMPLETED",
+        "STAGE_COMPLETION_BLOCKED",
+    }:
+        raise ValidationError(f"INVALID_STAGE_COMPLETION_RESULT: {result}")
+
+    unresolved = body.get("unresolved_material_refs", ())
+    if not isinstance(unresolved, (list, tuple)):
+        raise ValidationError("STAGE_COMPLETION_BLOCKER_REFS_INVALID")
+    for ref in unresolved:
+        if not isinstance(ref, Mapping) or any(
+            not isinstance(ref.get(field), str) or not ref.get(field)
+            for field in (
+                "kind",
+                "revision_digest",
+                "digest_profile",
+                "schema_revision_ref",
+                "ref_class",
+            )
+        ):
+            raise ValidationError("STAGE_COMPLETION_BLOCKER_REFS_INVALID")
+    try:
+        normalized_refs = [dict(ref) for ref in unresolved]
+        for ref in normalized_refs:
+            ObjectRef.from_dict(ref)
+        canonical_reference_set(normalized_refs)
+    except (KeyError, TypeError, ValueError, ValidationError) as exc:
+        raise ValidationError("STAGE_COMPLETION_BLOCKER_REFS_INVALID") from exc
+
+    summary = body.get("unknown_blocked_summary", {})
+    if not isinstance(summary, Mapping):
+        raise ValidationError("STAGE_COMPLETION_BLOCKER_SUMMARY_INVALID")
+    count = summary.get("unknown_surfaces_count", 0)
+    if type(count) is not int or count < 0:
+        raise ValidationError("STAGE_COMPLETION_BLOCKER_SUMMARY_INVALID")
+
+    if result == "STAGE_COMPLETED":
+        if unresolved:
+            raise ValidationError(
+                "STAGE_COMPLETION_BLOCKED: unresolved material refs present"
+            )
+        if count:
+            raise ValidationError(
+                "STAGE_COMPLETION_BLOCKED: unknown surfaces in denominator"
+            )
 
 
 def _ref_dict(ref: Any) -> dict:
@@ -114,15 +172,21 @@ class StageCompletion:
         elif self.stage_completion_id.startswith("stage_completion_"):
             validate_id(self.stage_completion_id, "stage_completion")
 
-        if self.completion_predicate_result not in {"STAGE_COMPLETED", "STAGE_COMPLETION_BLOCKED"}:
-            raise ValidationError(f"INVALID_STAGE_COMPLETION_RESULT: {self.completion_predicate_result}")
-
-        # Fail-closed checks: if unresolved material refs or unknown blocked exist, must be STAGE_COMPLETION_BLOCKED
-        if self.unresolved_material_refs and self.completion_predicate_result == "STAGE_COMPLETED":
-            raise ValidationError("STAGE_COMPLETION_BLOCKED: unresolved material refs present")
-
-        if self.unknown_blocked_summary.get("unknown_surfaces_count", 0) > 0 and self.completion_predicate_result == "STAGE_COMPLETED":
-            raise ValidationError("STAGE_COMPLETION_BLOCKED: unknown surfaces in denominator")
+        unresolved_refs = self.unresolved_material_refs
+        if isinstance(unresolved_refs, (list, tuple)):
+            try:
+                unresolved_refs = [_ref_dict(ref) for ref in unresolved_refs]
+            except (AttributeError, KeyError, TypeError, ValueError) as exc:
+                raise ValidationError(
+                    "STAGE_COMPLETION_BLOCKER_REFS_INVALID"
+                ) from exc
+        validate_stage_completion_body(
+            {
+                "completion_predicate_result": self.completion_predicate_result,
+                "unresolved_material_refs": unresolved_refs,
+                "unknown_blocked_summary": self.unknown_blocked_summary,
+            }
+        )
 
         object.__setattr__(
             self, "required_lane_slot_results",
@@ -131,7 +195,7 @@ class StageCompletion:
         object.__setattr__(self, "required_output_refs", tuple(canonical_reference_set([_ref_dict(r) for r in self.required_output_refs])))
         object.__setattr__(
             self, "unresolved_material_refs",
-            tuple(canonical_reference_set([_ref_dict(r) for r in self.unresolved_material_refs])),
+            tuple(canonical_reference_set(unresolved_refs)),
         )
 
     def body(self) -> dict[str, Any]:

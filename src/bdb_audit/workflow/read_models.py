@@ -313,6 +313,7 @@ class VerifiedCampaignReadModel:
         completed_stages: list[str] = []
         completed_by_stage: dict[str, str] = {}  # stage_key -> completion_digest
         completion_record_by_stage: dict[str, dict[str, Any]] = {}
+        from ..stop.models import validate_stage_completion_body
 
         def _e2_external_marker(candidate: dict[str, Any]) -> bool:
             body = candidate.get("body", {})
@@ -326,6 +327,12 @@ class VerifiedCampaignReadModel:
 
         for row in completion_rows:
             doc = row["body"]
+            try:
+                validate_stage_completion_body(doc)
+            except ValidationError:
+                # Older raw accepted objects may predate store-side semantic
+                # admission. They cannot project a completed stage.
+                continue
             if doc.get("completion_predicate_result") != "STAGE_COMPLETED":
                 continue
 

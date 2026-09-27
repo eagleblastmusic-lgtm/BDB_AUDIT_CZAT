@@ -57,6 +57,7 @@ def install_residual_risk_stop_projection(builder_cls) -> None:
     original = original_descriptor.__func__
 
     def build_from_store(cls, store, *args, **kwargs):
+        from ..core.registry import canonical_reference_set
         from .input_builder import _derived_registered_ref
 
         stop_input = original(cls, store, *args, **kwargs)
@@ -71,7 +72,9 @@ def install_residual_risk_stop_projection(builder_cls) -> None:
         new_snapshot_obj = snapshot_obj
         if risk_refs and snapshot_obj is not None:
             snap_body = snapshot_obj.body
-            projection_input_refs = [*snap_body.get("projection_input_refs", ()), *risk_refs]
+            projection_input_refs = canonical_reference_set(
+                [*snap_body.get("projection_input_refs", ()), *risk_refs]
+            )
             artifact_ref = _derived_registered_ref(
                 "stop-input-snapshot",
                 {

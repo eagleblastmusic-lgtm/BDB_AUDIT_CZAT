@@ -9,8 +9,11 @@ which Python executes before either ``bdb_audit.history`` or
 from __future__ import annotations
 
 from functools import wraps
+import hashlib
 import json
+from typing import Any
 
+from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
 from .objects import ACCEPTED_HEAD_REF, EMPTY_HISTORY, CanonicalObject
 
@@ -147,6 +150,23 @@ def _accepted_body(kind: str, digest: str | None, index, con) -> dict:
     return obj.body
 
 
+def _object_record(digest: str, con) -> dict | None:
+    row = con.execute(
+        "SELECT kind,version,schema_ref,logical_id,body FROM immutable_objects WHERE digest=?",
+        (digest,),
+    ).fetchone()
+    if row is None:
+        return None
+    return {
+        "kind": row[0],
+        "version": row[1],
+        "schema_revision_ref": row[2],
+        "logical_id": row[3],
+        "revision_digest": digest,
+        "body": json.loads(row[4]),
+    }
+
+
 def _stop_risk_set(stop_eval_ref, index, con) -> set[str]:
     stop_eval_digest = stop_eval_ref.get("revision_digest") if isinstance(stop_eval_ref, dict) else None
     stop_eval = _accepted_body("stop_evaluation", stop_eval_digest, index, con)
@@ -224,6 +244,7 @@ def _stop_basis(stop_eval_ref, index, con, current):
         commits=commits,
         authoritative=True,
         accepted_commit_seq=int(membership["accepted_seq"]),
+        object_loader=lambda digest: _object_record(digest, con),
     )
     return stop_eval, stop_input
 
@@ -446,14 +467,95 @@ def _validate_finalization_basis(obj, *, current, con) -> None:
         return
 
 
-def _validate_candidate_residual_risk_projection(obj, *, current, con) -> None:
+def _validate_finding_claim_branch_unambiguity(
+    claim_refs, *, current, con, content_objects=()
+) -> None:
+    """Fail closed at candidate/STOP consumers while claim-branch policy is open."""
+    if not claim_refs:
+        return
+    accepted = _accepted_completion_records(
+        "finding_claim_revision", current=current, con=con
+    )
+    revisions: dict[str, dict[str, Any]] = {
+        row["ref"]["revision_digest"]: {
+            "ref": row["ref"],
+            "body": row["body"],
+        }
+        for row in accepted
+    }
+    for candidate in content_objects:
+        if candidate.kind == "finding_claim_revision":
+            revisions[candidate.digest] = {
+                "ref": candidate.ref.as_dict(),
+                "body": candidate.body,
+            }
+
+    selected_claim_ids: set[str] = set()
+    for ref in claim_refs:
+        target = _resolve_completion_object(
+            ref,
+            content_objects=content_objects,
+            con=con,
+            context="finding_claim_revision_refs",
+        )
+        if target.kind != "finding_claim_revision":
+            raise ValidationError("FINDING_CLAIM_BRANCH_CONFLICT")
+        claim_id = target.body.get("claim_id")
+        if not isinstance(claim_id, str) or not claim_id:
+            raise ValidationError("FINDING_CLAIM_BRANCH_CONFLICT")
+        selected_claim_ids.add(claim_id)
+
+    for claim_id in selected_claim_ids:
+        claims = {
+            digest: record
+            for digest, record in revisions.items()
+            if record["body"].get("claim_id") == claim_id
+        }
+        roots = [
+            digest
+            for digest, record in claims.items()
+            if record["body"].get("previous_finding_claim_revision_ref") is None
+        ]
+        successors: dict[str, set[str]] = {}
+        for digest, record in claims.items():
+            previous = record["body"].get("previous_finding_claim_revision_ref")
+            if previous is None:
+                continue
+            predecessor_digest = (
+                previous.get("revision_digest")
+                if isinstance(previous, dict)
+                else None
+            )
+            if predecessor_digest not in claims:
+                raise ValidationError("FINDING_CLAIM_BRANCH_CONFLICT")
+            successors.setdefault(predecessor_digest, set()).add(digest)
+        leaves = set(claims) - set(successors)
+        if (
+            len(roots) != 1
+            or any(len(children) > 1 for children in successors.values())
+            or len(leaves) != 1
+        ):
+            raise ValidationError("FINDING_CLAIM_BRANCH_CONFLICT")
+
+
+def _validate_candidate_residual_risk_projection(
+    obj, *, current, con, content_objects=()
+) -> None:
+    _validate_finding_claim_branch_unambiguity(
+        obj.body.get("finding_claim_revision_refs", ()),
+        current=current,
+        con=con,
+        content_objects=content_objects,
+    )
     rows, _current, _index = _active_risk_rows(current, con)
     expected = _digest_set(row["ref"] for row in rows)
     if _digest_set(obj.body.get("residual_risk_refs", ())) != expected:
         raise ValidationError("CANDIDATE_RESIDUAL_RISK_PROJECTION_MISMATCH")
 
 
-def _validate_stop_residual_risk_projection(obj, *, current, con) -> None:
+def _validate_stop_residual_risk_projection(
+    obj, *, current, con, content_objects=()
+) -> None:
     """Equality-check StopInput's residual-risk set against accepted history."""
     if current is None:
         raise ValidationError("STOP_INPUT_REQUIRES_ACCEPTED_PARENT")
@@ -465,6 +567,23 @@ def _validate_stop_residual_risk_projection(obj, *, current, con) -> None:
     actual_refs = obj.body.get("residual_risk_refs", ())
     if _digest_set(actual_refs) != _digest_set(expected_refs):
         raise ValidationError("STOP_CURRENT_PROJECTION_MISMATCH", "residual_risk_refs")
+
+    candidate_ref = obj.body.get("candidate_assurance_case_ref")
+    if isinstance(candidate_ref, dict):
+        candidate = _resolve_completion_object(
+            candidate_ref,
+            content_objects=content_objects,
+            con=con,
+            context="candidate_assurance_case_ref",
+        )
+        if candidate.kind != "candidate_assurance_case":
+            raise ValidationError("FINDING_CLAIM_BRANCH_CONFLICT")
+        _validate_finding_claim_branch_unambiguity(
+            candidate.body.get("finding_claim_revision_refs", ()),
+            current=current,
+            con=con,
+            content_objects=content_objects,
+        )
 
     # Residual-risk readiness counters are final-STOP decision inputs.  An
     # INTERMEDIATE StopInput still has its exact risk denominator equality-
@@ -853,6 +972,30 @@ def _cut_seq(cut, *, context):
     return value
 
 
+def _exact_lane_completion_cut_seq(
+    cut, *, campaign_id, max_seq, con, context
+):
+    """Return a cut sequence only when its campaign and accepted head are exact."""
+    from ..history.store import _commit_from_body
+
+    cut_seq = _cut_seq(cut, context=context)
+    if cut.get("campaign_id") != campaign_id or cut_seq > max_seq:
+        raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+    commit_row = con.execute(
+        "SELECT commit_hash,body FROM commits WHERE seq=?", (cut_seq,)
+    ).fetchone()
+    if commit_row is None:
+        raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+    accepted_commit = _commit_from_body(json.loads(commit_row[1]))
+    if (
+        accepted_commit.campaign_id != campaign_id
+        or accepted_commit.digest != commit_row[0]
+        or cut.get("accepted_head_hash") != commit_row[0]
+    ):
+        raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+    return cut_seq
+
+
 _NON_OUTPUT_KINDS = frozenset(
     {
         "source_generation",
@@ -872,7 +1015,15 @@ _NON_OUTPUT_KINDS = frozenset(
 )
 
 
-def _validate_lane_completion(obj, *, content_objects, con):
+def _accepted_completion_records(kind, *, current, con):
+    if current is None:
+        return ()
+    from ..stop.authority import _accepted_index, _records
+
+    return _records(kind, _accepted_index(current, con), con)
+
+
+def _validate_lane_completion(obj, *, content_objects, con, current):
     body = obj.body
     if body.get("completion_predicate_result") != "LANE_COMPLETED":
         return
@@ -901,6 +1052,60 @@ def _validate_lane_completion(obj, *, content_objects, con):
     ):
         raise ValidationError("LANE_COMPLETION_SOURCE_BINDING_MISMATCH")
     lane_cut = _cut_seq(body.get("input_history_cut"), context="lane_completion")
+
+    stage_spec = _resolve_completion_object(
+        stage_run.body.get("stage_spec_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="stage_run.stage_spec_ref",
+    )
+    stage_key = stage_spec.body.get("stage_key")
+    native_stage = stage_key in {"E1", "E2", "E3", "E4", "E5"}
+    if native_stage and str(lane_spec.body.get("stage_spec_revision")) != str(
+        stage_spec.body.get("stage_spec_revision")
+    ):
+        raise ValidationError("LANE_COMPLETION_STAGE_SPEC_REVISION_MISMATCH")
+
+    lane_completion_record = None
+    if native_stage:
+        if current is None:
+            raise ValidationError("LANE_COMPLETION_HISTORY_CUT_INVALID")
+        from ..history.store import _commit_from_body
+
+        input_cut = body.get("input_history_cut")
+        if (
+            not isinstance(input_cut, dict)
+            or input_cut.get("campaign_id") != current.campaign_id
+            or lane_cut > current.commit_seq
+        ):
+            raise ValidationError("LANE_COMPLETION_HISTORY_CUT_INVALID")
+        cut_row = con.execute(
+            "SELECT commit_hash,body FROM commits WHERE seq=?", (lane_cut,)
+        ).fetchone()
+        if cut_row is None:
+            raise ValidationError("LANE_COMPLETION_HISTORY_CUT_INVALID")
+        cut_commit = _commit_from_body(json.loads(cut_row[1]))
+        if (
+            cut_commit.campaign_id != current.campaign_id
+            or cut_commit.digest != cut_row[0]
+            or input_cut.get("accepted_head_hash") != cut_row[0]
+        ):
+            raise ValidationError("LANE_COMPLETION_HISTORY_CUT_INVALID")
+        lane_completion_record = next(
+            (
+                row
+                for row in _accepted_completion_records(
+                    "lane_completion", current=current, con=con
+                )
+                if row.get("ref", {}).get("revision_digest") == obj.digest
+            ),
+            None,
+        )
+        if lane_completion_record is None:
+            if lane_cut != current.commit_seq or cut_row[0] != current.commit_hash:
+                raise ValidationError("LANE_COMPLETION_HISTORY_CUT_INVALID")
+        elif int(lane_completion_record.get("accepted_seq", 0)) != lane_cut + 1:
+            raise ValidationError("LANE_COMPLETION_HISTORY_CUT_INVALID")
 
     resolved_attempts = []
     for attempt_ref in attempt_refs:
@@ -959,9 +1164,661 @@ def _validate_lane_completion(obj, *, content_objects, con):
         if target.kind in _NON_OUTPUT_KINDS:
             raise ValidationError("LANE_COMPLETION_OUTPUT_KIND_INVALID", target.kind)
 
+    if not native_stage:
+        return
+
+    # Native completion must carry an accepted result proposal for the exact
+    # assignment and final attempt. An output-shaped object alone is not
+    # execution authority.
+    assignments = _accepted_completion_records(
+        "assignment_manifest", current=current, con=con
+    )
+    lane_assignment_records = [
+        row
+        for row in assignments
+        if _typed_ref_identity(row.get("body", {}).get("lane_spec_ref"))
+        == _typed_ref_identity(body.get("lane_spec_ref"))
+        and _typed_ref_identity(row.get("body", {}).get("stage_spec_ref"))
+        == _typed_ref_identity(stage_run.body.get("stage_spec_ref"))
+        and _typed_ref_identity(row.get("body", {}).get("source_generation_ref"))
+        == _typed_ref_identity(stage_run.body.get("source_generation_ref"))
+    ]
+    accepted_results = list(
+        _accepted_completion_records(
+            "bdb_audit_lane_result", current=current, con=con
+        )
+    )
+    result_objects = [
+        candidate
+        for candidate in content_objects
+        if candidate.kind == "bdb_audit_lane_result"
+    ]
+    assignments_by_attempt: dict[tuple, dict[str, Any]] = {}
+    attempt_identities = {
+        _typed_ref_identity(attempt_ref) for attempt_ref, _attempt in resolved_attempts
+    }
+    attempt_assignment_records = [
+        row
+        for row in assignments
+        if _typed_ref_identity(row.get("body", {}).get("attempt_ref"))
+        in attempt_identities
+    ]
+    if attempt_assignment_records and not lane_assignment_records:
+        raise ValidationError("LANE_COMPLETION_ASSIGNMENT_BINDING_MISMATCH")
+    for attempt_ref, attempt in resolved_attempts:
+        matches = [
+            row
+            for row in assignments
+            if _typed_ref_identity(row.get("body", {}).get("attempt_ref"))
+            == _typed_ref_identity(attempt_ref)
+            and _typed_ref_identity(row.get("body", {}).get("lane_spec_ref"))
+            == _typed_ref_identity(body.get("lane_spec_ref"))
+        ]
+        if not matches:
+            if lane_assignment_records or attempt_assignment_records:
+                raise ValidationError("LANE_COMPLETION_ASSIGNMENT_REQUIRED")
+            continue
+        if len(matches) != 1:
+            raise ValidationError("LANE_COMPLETION_ASSIGNMENT_AMBIGUOUS")
+        assignment = matches[0]
+        assignment_body = assignment["body"]
+        if (
+            _typed_ref_identity(assignment_body.get("source_generation_ref"))
+            != _typed_ref_identity(stage_run.body.get("source_generation_ref"))
+            or _typed_ref_identity(assignment_body.get("stage_spec_ref"))
+            != _typed_ref_identity(stage_run.body.get("stage_spec_ref"))
+        ):
+            raise ValidationError("LANE_COMPLETION_ASSIGNMENT_BINDING_MISMATCH")
+        assignments_by_attempt[_typed_ref_identity(attempt_ref)] = assignment
+
+    output_targets = [
+        _resolve_completion_object(
+            output_ref,
+            content_objects=content_objects,
+            con=con,
+            context="required_output_refs",
+        )
+        for output_ref in output_refs
+    ]
+    output_result_targets = [
+        target
+        for target in output_targets
+        if target.kind == "bdb_audit_lane_result"
+    ]
+    if not output_result_targets:
+        if lane_assignment_records or attempt_assignment_records:
+            raise ValidationError("LANE_COMPLETION_EXECUTION_RESULT_REQUIRED")
+        if current is None or not output_targets or any(
+            target.kind != "discovery_record" for target in output_targets
+        ):
+            raise ValidationError("LANE_COMPLETION_EXECUTION_RESULT_REQUIRED")
+
+        # Some direct, pre-manifest native producers use a canonical
+        # discovery_record as the lane output. Admit that shape only when its
+        # exact lane/attempt/source/knowledge provenance matches an accepted
+        # execution descriptor and result on the same input cut.
+        lane_run_identity = _typed_ref_identity(body.get("lane_run_ref"))
+        attempt_by_identity = {
+            _typed_ref_identity(attempt_ref): attempt
+            for attempt_ref, attempt in resolved_attempts
+        }
+        accepted_discoveries = _accepted_completion_records(
+            "discovery_record", current=current, con=con
+        )
+        accepted_knowledge = _accepted_completion_records(
+            "knowledge_state", current=current, con=con
+        )
+        execution_descriptors = _accepted_completion_records(
+            "execution_descriptor", current=current, con=con
+        )
+        execution_results = _accepted_completion_records(
+            "execution_result", current=current, con=con
+        )
+
+        for target in output_targets:
+            digest = target.digest
+            accepted_match = any(
+                row.get("ref", {}).get("revision_digest") == digest
+                and _typed_ref_identity(row.get("ref"))
+                == _typed_ref_identity(target.ref.as_dict())
+                for row in accepted_discoveries
+            )
+            in_closure = any(
+                candidate.digest == digest for candidate in content_objects
+            )
+            if not accepted_match and not in_closure:
+                raise ValidationError("LANE_COMPLETION_OUTPUT_NOT_ACCEPTED")
+
+            discovery = target.body
+            attempt_identity = _typed_ref_identity(discovery.get("attempt_ref"))
+            attempt = attempt_by_identity.get(attempt_identity)
+            if (
+                attempt is None
+                or _typed_ref_identity(discovery.get("lane_run_ref"))
+                != lane_run_identity
+                or _typed_ref_identity(discovery.get("source_generation_ref"))
+                != _typed_ref_identity(stage_run.body.get("source_generation_ref"))
+            ):
+                raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+
+            discovery_cut = discovery.get("discovery_input_history_cut")
+            discovery_cut_seq = _exact_lane_completion_cut_seq(
+                discovery_cut,
+                campaign_id=current.campaign_id,
+                max_seq=lane_cut,
+                con=con,
+                context="discovery_record",
+            )
+            if discovery_cut_seq < _cut_seq(
+                attempt.body.get("assigned_history_cut"), context="attempt"
+            ):
+                raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+            if discovery.get("result_proposal_digest") is not None:
+                raise ValidationError("LANE_COMPLETION_OUTPUT_RESULT_MISMATCH")
+
+            knowledge_ref = discovery.get("knowledge_state_ref")
+            knowledge = _resolve_completion_object(
+                knowledge_ref,
+                content_objects=content_objects,
+                con=con,
+                context="discovery_record.knowledge_state_ref",
+            )
+            knowledge_accepted = any(
+                row.get("ref", {}).get("revision_digest")
+                == knowledge.digest
+                and _typed_ref_identity(row.get("ref"))
+                == _typed_ref_identity(knowledge.ref.as_dict())
+                for row in accepted_knowledge
+            )
+            knowledge_in_closure = any(
+                candidate.digest == knowledge.digest
+                for candidate in content_objects
+            )
+            if (
+                knowledge.kind != "knowledge_state"
+                or _typed_ref_identity(knowledge.body.get("attempt_ref"))
+                != attempt_identity
+                or (not knowledge_accepted and not knowledge_in_closure)
+            ):
+                raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+
+            matching_execution_result = False
+            for result in execution_results:
+                if int(result.get("accepted_seq", 0)) > lane_cut:
+                    continue
+                descriptor = _resolve_completion_object(
+                    result.get("body", {}).get("execution_descriptor_ref"),
+                    content_objects=content_objects,
+                    con=con,
+                    context="execution_result.execution_descriptor_ref",
+                )
+                if descriptor.kind != "execution_descriptor":
+                    continue
+                descriptor_accepted = any(
+                    row.get("ref", {}).get("revision_digest")
+                    == descriptor.digest
+                    and _typed_ref_identity(row.get("ref"))
+                    == _typed_ref_identity(descriptor.ref.as_dict())
+                    for row in execution_descriptors
+                )
+                if not descriptor_accepted:
+                    continue
+                if (
+                    _typed_ref_identity(descriptor.body.get("attempt_ref"))
+                    != attempt_identity
+                    or canonical_bytes(
+                        descriptor.body.get("input_history_cut")
+                    )
+                    != canonical_bytes(discovery_cut)
+                ):
+                    continue
+                descriptor_cut_seq = _exact_lane_completion_cut_seq(
+                    descriptor.body.get("input_history_cut"),
+                    campaign_id=current.campaign_id,
+                    max_seq=lane_cut,
+                    con=con,
+                    context="execution_descriptor",
+                )
+                if descriptor_cut_seq < _cut_seq(
+                    attempt.body.get("assigned_history_cut"), context="attempt"
+                ):
+                    continue
+                matching_execution_result = True
+                break
+            if not matching_execution_result:
+                raise ValidationError("LANE_COMPLETION_EXECUTION_RESULT_REQUIRED")
+        return
+
+    # Every result used by the completion must itself be accepted (in the
+    # parent history or this exact atomic closure) and bound to an assignment
+    # for this lane, stage, and one of the declared attempts.
+    used_result_attempt_by_digest: dict[str, tuple] = {}
+    used_result_body_by_digest: dict[str, dict[str, Any]] = {}
+    for target in output_result_targets:
+        digest = target.digest
+        accepted_match = next(
+            (
+                row
+                for row in accepted_results
+                if row.get("ref", {}).get("revision_digest") == digest
+                and _typed_ref_identity(row.get("ref"))
+                == _typed_ref_identity(target.ref.as_dict())
+            ),
+            None,
+        )
+        in_closure = any(candidate.digest == digest for candidate in result_objects)
+        if accepted_match is None and not in_closure:
+            raise ValidationError("LANE_COMPLETION_RESULT_NOT_ACCEPTED")
+        if accepted_match is not None:
+            result_seq = int(accepted_match.get("accepted_seq", 0))
+            same_atomic_commit = (
+                lane_completion_record is not None
+                and result_seq
+                == int(lane_completion_record.get("accepted_seq", 0))
+                == lane_cut + 1
+            )
+            if result_seq > lane_cut and not same_atomic_commit:
+                raise ValidationError("LANE_COMPLETION_RESULT_CUT_MISMATCH")
+        elif lane_completion_record is not None or lane_cut != current.commit_seq:
+            raise ValidationError("LANE_COMPLETION_RESULT_CUT_MISMATCH")
+
+        result_body = target.body
+        result_attempt_ref = result_body.get("attempt_ref")
+        result_assignment_ref = result_body.get("assignment_ref")
+        assignment = assignments_by_attempt.get(
+            _typed_ref_identity(result_attempt_ref)
+        )
+        if (
+            assignment is None
+            or _typed_ref_identity(result_assignment_ref)
+            != _typed_ref_identity(assignment.get("ref"))
+            or result_body.get("stage_id") != stage_key
+            or _stage_slot_key(stage_key, result_body.get("lane_slot"))
+            != _stage_slot_key(stage_key, lane_spec.body.get("lane_key"))
+            or result_body.get("campaign_id")
+            != (current.campaign_id if current is not None else None)
+            or canonical_bytes(result_body.get("history_cut"))
+            != canonical_bytes(
+                assignment["body"].get("assignment_input_history_cut")
+            )
+        ):
+            raise ValidationError("LANE_COMPLETION_RESULT_PROVENANCE_MISMATCH")
+        used_result_attempt_by_digest[digest] = _typed_ref_identity(
+            result_attempt_ref
+        )
+        used_result_body_by_digest[digest] = result_body
+
+    final_attempt_ref = matching_attempt[0]
+    final_assignment = assignments_by_attempt.get(
+        _typed_ref_identity(final_attempt_ref)
+    )
+    if final_assignment is None or not any(
+        _typed_ref_identity(target.body.get("attempt_ref"))
+        == _typed_ref_identity(final_attempt_ref)
+        and _typed_ref_identity(target.body.get("assignment_ref"))
+        == _typed_ref_identity(final_assignment.get("ref"))
+        for target in output_result_targets
+    ):
+        raise ValidationError("LANE_COMPLETION_FINAL_ATTEMPT_RESULT_REQUIRED")
+
+    attempt_identities = set(assignments_by_attempt)
+    assignment_identities = {
+        key: _typed_ref_identity(value.get("ref"))
+        for key, value in assignments_by_attempt.items()
+    }
+    lane_run_identity = _typed_ref_identity(body.get("lane_run_ref"))
+    accepted_knowledge = _accepted_completion_records(
+        "knowledge_state", current=current, con=con
+    )
+    for target in output_targets:
+        if target.kind == "bdb_audit_lane_result":
+            continue
+        out_body = target.body
+        if target.kind == "discovery_record":
+            if (
+                _typed_ref_identity(out_body.get("lane_run_ref"))
+                != lane_run_identity
+                or _typed_ref_identity(out_body.get("attempt_ref"))
+                not in attempt_identities
+                or _typed_ref_identity(out_body.get("source_generation_ref"))
+                != _typed_ref_identity(stage_run.body.get("source_generation_ref"))
+                or (
+                    out_body.get("stage_id") is not None
+                    and out_body.get("stage_id") != stage_key
+                )
+            ):
+                raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+            result_digest = out_body.get("result_proposal_digest")
+            discovery_attempt = _typed_ref_identity(out_body.get("attempt_ref"))
+            if result_digest is not None:
+                result_body = used_result_body_by_digest.get(result_digest)
+                if (
+                    result_body is None
+                    or used_result_attempt_by_digest.get(result_digest)
+                    != discovery_attempt
+                    or (
+                        out_body.get("phase_id") is not None
+                        and result_body.get("phase_id") is not None
+                        and out_body.get("phase_id")
+                        != result_body.get("phase_id")
+                    )
+                ):
+                    raise ValidationError("LANE_COMPLETION_OUTPUT_RESULT_MISMATCH")
+            discovery_cut_seq = _exact_lane_completion_cut_seq(
+                out_body.get("discovery_input_history_cut"),
+                campaign_id=current.campaign_id,
+                max_seq=lane_cut,
+                con=con,
+                context="discovery_record",
+            )
+            assignment = assignments_by_attempt.get(discovery_attempt)
+            if assignment is None or discovery_cut_seq < int(
+                assignment.get("accepted_seq", 0)
+            ):
+                raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+            knowledge_ref = out_body.get("knowledge_state_ref")
+            knowledge = _resolve_completion_object(
+                knowledge_ref,
+                content_objects=content_objects,
+                con=con,
+                context="discovery_record.knowledge_state_ref",
+            )
+            knowledge_record = next(
+                (
+                    row
+                    for row in accepted_knowledge
+                    if row.get("ref", {}).get("revision_digest")
+                    == knowledge.digest
+                    and _typed_ref_identity(row.get("ref"))
+                    == _typed_ref_identity(knowledge.ref.as_dict())
+                ),
+                None,
+            )
+            if (
+                knowledge.kind != "knowledge_state"
+                or _typed_ref_identity(knowledge.body.get("attempt_ref"))
+                != discovery_attempt
+                or knowledge_record is None
+                or int(knowledge_record.get("accepted_seq", 0))
+                > discovery_cut_seq
+            ):
+                raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+            slot = out_body.get("lane_slot")
+            if slot is not None and _stage_slot_key(stage_key, slot) != _stage_slot_key(
+                stage_key, lane_spec.body.get("lane_key")
+            ):
+                raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+            continue
+
+        bindings = 0
+        if "lane_run_ref" in out_body:
+            bindings += 1
+            if _typed_ref_identity(out_body.get("lane_run_ref")) != lane_run_identity:
+                raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+        if "attempt_ref" in out_body:
+            bindings += 1
+            if _typed_ref_identity(out_body.get("attempt_ref")) not in attempt_identities:
+                raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+        if "assignment_ref" in out_body:
+            bindings += 1
+            if _typed_ref_identity(out_body.get("assignment_ref")) not in set(
+                assignment_identities.values()
+            ):
+                raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+        if "result_proposal_digest" in out_body:
+            bindings += 1
+            if out_body.get("result_proposal_digest") not in used_result_attempt_by_digest:
+                raise ValidationError("LANE_COMPLETION_OUTPUT_RESULT_MISMATCH")
+        if "source_generation_ref" in out_body and _typed_ref_identity(
+            out_body.get("source_generation_ref")
+        ) != _typed_ref_identity(stage_run.body.get("source_generation_ref")):
+            raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+        if "stage_id" in out_body and out_body.get("stage_id") != stage_key:
+            raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+        if "lane_slot" in out_body and _stage_slot_key(
+            stage_key, out_body.get("lane_slot")
+        ) != _stage_slot_key(stage_key, lane_spec.body.get("lane_key")):
+            raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_MISMATCH")
+        if bindings == 0:
+            raise ValidationError("LANE_COMPLETION_OUTPUT_PROVENANCE_REQUIRED")
+
+
+def _validate_e3_blind_checkpoint(obj, *, content_objects, current, con):
+    body = obj.body
+    if body.get("stage_id") != "E3" or body.get("phase_id") != "E3-BLIND":
+        return
+    if current is None:
+        raise ValidationError("E3_BLIND_CHECKPOINT_REQUIRES_ACCEPTED_RESULT")
+
+    from ..history.store import _commit_from_body
+    from ..stop.authority import _accepted_index, _records
+
+    index = _accepted_index(current, con)
+    cut = body.get("checkpoint_input_history_cut")
+    cut_seq = _cut_seq(cut, context="e3_blind_checkpoint")
+    if cut.get("campaign_id") != current.campaign_id:
+        raise ValidationError("E3_BLIND_CHECKPOINT_CUT_MISMATCH")
+    cut_row = con.execute(
+        "SELECT commit_hash,body FROM commits WHERE seq=?", (cut_seq,)
+    ).fetchone()
+    if cut_row is None:
+        raise ValidationError("E3_BLIND_CHECKPOINT_CUT_MISMATCH")
+    cut_commit = _commit_from_body(json.loads(cut_row[1]))
+    if cut_commit.digest != cut_row[0] or cut.get("accepted_head_hash") != cut_row[0]:
+        raise ValidationError("E3_BLIND_CHECKPOINT_CUT_MISMATCH")
+
+    checkpoint_membership = index.get(("checkpoint", obj.digest))
+    if checkpoint_membership is None:
+        if cut_seq != current.commit_seq or cut_row[0] != current.commit_hash:
+            raise ValidationError("E3_BLIND_CHECKPOINT_CUT_MISMATCH")
+    elif int(checkpoint_membership.get("accepted_seq", 0)) != cut_seq + 1:
+        raise ValidationError("E3_BLIND_CHECKPOINT_CUT_MISMATCH")
+
+    stage_run = _resolve_completion_object(
+        body.get("stage_run_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="checkpoint.stage_run_ref",
+    )
+    lane_run = _resolve_completion_object(
+        body.get("lane_run_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="checkpoint.lane_run_ref",
+    )
+    attempt = _resolve_completion_object(
+        body.get("attempt_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="checkpoint.attempt_ref",
+    )
+    source = _resolve_completion_object(
+        body.get("source_generation_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="checkpoint.source_generation_ref",
+    )
+    knowledge = _resolve_completion_object(
+        body.get("knowledge_state_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="checkpoint.knowledge_state_ref",
+    )
+    if (
+        stage_run.kind != "stage_run"
+        or lane_run.kind != "lane_run"
+        or attempt.kind != "attempt"
+        or source.kind != "source_generation"
+        or knowledge.kind != "knowledge_state"
+        or _typed_ref_identity(lane_run.body.get("stage_run_ref"))
+        != _typed_ref_identity(body.get("stage_run_ref"))
+        or _typed_ref_identity(attempt.body.get("lane_run_ref"))
+        != _typed_ref_identity(body.get("lane_run_ref"))
+        or _typed_ref_identity(lane_run.body.get("source_generation_ref"))
+        != _typed_ref_identity(body.get("source_generation_ref"))
+        or _typed_ref_identity(stage_run.body.get("source_generation_ref"))
+        != _typed_ref_identity(body.get("source_generation_ref"))
+        or _typed_ref_identity(knowledge.body.get("attempt_ref"))
+        != _typed_ref_identity(body.get("attempt_ref"))
+    ):
+        raise ValidationError("E3_BLIND_CHECKPOINT_CONTEXT_BINDING_MISMATCH")
+
+    stage_spec = _resolve_completion_object(
+        stage_run.body.get("stage_spec_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="checkpoint.stage_spec_ref",
+    )
+    lane_spec = _resolve_completion_object(
+        lane_run.body.get("lane_spec_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="checkpoint.lane_spec_ref",
+    )
+    if (
+        stage_spec.kind != "stage_spec"
+        or stage_spec.body.get("stage_key") != "E3"
+        or lane_spec.kind != "lane_spec"
+        or str(lane_spec.body.get("stage_spec_revision"))
+        != str(stage_spec.body.get("stage_spec_revision"))
+        or _stage_slot_key("E3", body.get("lane_slot"))
+        != _stage_slot_key("E3", lane_spec.body.get("lane_key"))
+    ):
+        raise ValidationError("E3_BLIND_CHECKPOINT_CONTEXT_BINDING_MISMATCH")
+
+    assignments = _records("assignment_manifest", index, con)
+    matching_assignments = [
+        row
+        for row in assignments
+        if _typed_ref_identity(row["body"].get("attempt_ref"))
+        == _typed_ref_identity(body.get("attempt_ref"))
+        and _typed_ref_identity(row["body"].get("lane_spec_ref"))
+        == _typed_ref_identity(lane_run.body.get("lane_spec_ref"))
+        and _typed_ref_identity(row["body"].get("stage_spec_ref"))
+        == _typed_ref_identity(stage_run.body.get("stage_spec_ref"))
+        and _typed_ref_identity(row["body"].get("source_generation_ref"))
+        == _typed_ref_identity(body.get("source_generation_ref"))
+    ]
+    if len(matching_assignments) != 1:
+        raise ValidationError("E3_BLIND_CHECKPOINT_ASSIGNMENT_MISMATCH")
+    assignment = matching_assignments[0]
+    if _typed_ref_identity(
+        assignment["body"].get("knowledge_state_ref")
+    ) != _typed_ref_identity(body.get("knowledge_state_ref")):
+        raise ValidationError("E3_BLIND_CHECKPOINT_CONTEXT_BINDING_MISMATCH")
+
+    result_rows = [
+        row
+        for row in _records("bdb_audit_lane_result", index, con)
+        if row["body"].get("stage_id") == "E3"
+        and row["body"].get("phase_id") == "E3-BLIND"
+        and _typed_ref_identity(row["body"].get("assignment_ref"))
+        == _typed_ref_identity(assignment["ref"])
+        and _typed_ref_identity(row["body"].get("attempt_ref"))
+        == _typed_ref_identity(body.get("attempt_ref"))
+        and _stage_slot_key("E3", row["body"].get("lane_slot"))
+        == _stage_slot_key("E3", lane_spec.body.get("lane_key"))
+    ]
+    if len(result_rows) != 1:
+        raise ValidationError("E3_BLIND_CHECKPOINT_ACCEPTED_RESULT_REQUIRED")
+    result = result_rows[0]
+    result_digest = result["ref"]["revision_digest"]
+    if (
+        int(result.get("accepted_seq", 0)) > cut_seq
+        or canonical_bytes(result["body"].get("history_cut"))
+        != canonical_bytes(assignment["body"].get("assignment_input_history_cut"))
+    ):
+        raise ValidationError("E3_BLIND_CHECKPOINT_RESULT_BINDING_MISMATCH")
+
+    sealed_refs = body.get("sealed_output_refs")
+    if not isinstance(sealed_refs, (list, tuple)):
+        raise ValidationError("E3_BLIND_CHECKPOINT_SEALED_OUTPUTS_INVALID")
+    sealed_targets = [
+        _resolve_completion_object(
+            ref,
+            content_objects=content_objects,
+            con=con,
+            context="checkpoint.sealed_output_refs",
+        )
+        for ref in sealed_refs
+    ]
+    sealed_digests = [target.digest for target in sealed_targets]
+    if len(sealed_digests) != len(set(sealed_digests)) or result_digest not in sealed_digests:
+        raise ValidationError("E3_BLIND_CHECKPOINT_SEALED_OUTPUTS_INVALID")
+
+    discovery_records = list(_records("discovery_record", index, con))
+    closure_discoveries = [
+        candidate
+        for candidate in content_objects
+        if candidate.kind == "discovery_record"
+    ]
+    discoveries_by_digest = {
+        row["ref"]["revision_digest"]: row["body"]
+        for row in discovery_records
+        if row["body"].get("result_proposal_digest") == result_digest
+    }
+    discoveries_by_digest.update(
+        {
+            candidate.digest: candidate.body
+            for candidate in closure_discoveries
+            if candidate.body.get("result_proposal_digest") == result_digest
+        }
+    )
+    findings = result["body"].get("findings")
+    if not isinstance(findings, list) or len(discoveries_by_digest) != len(findings):
+        raise ValidationError("E3_BLIND_CHECKPOINT_DISCOVERY_RESULT_MISMATCH")
+    expected_discovery_digests: set[str] = set()
+    seen_indexes: set[int] = set()
+    for digest, discovery in discoveries_by_digest.items():
+        finding_index = discovery.get("submission_finding_index")
+        if (
+            type(finding_index) is not int
+            or finding_index < 0
+            or finding_index >= len(findings)
+            or finding_index in seen_indexes
+            or discovery.get("result_proposal_digest") != result_digest
+            or discovery.get("stage_id") != "E3"
+            or discovery.get("phase_id") != "E3-BLIND"
+            or _stage_slot_key("E3", discovery.get("lane_slot"))
+            != _stage_slot_key("E3", lane_spec.body.get("lane_key"))
+            or _typed_ref_identity(discovery.get("lane_run_ref"))
+            != _typed_ref_identity(body.get("lane_run_ref"))
+            or _typed_ref_identity(discovery.get("attempt_ref"))
+            != _typed_ref_identity(body.get("attempt_ref"))
+            or _typed_ref_identity(discovery.get("source_generation_ref"))
+            != _typed_ref_identity(body.get("source_generation_ref"))
+            or _typed_ref_identity(discovery.get("knowledge_state_ref"))
+            != _typed_ref_identity(body.get("knowledge_state_ref"))
+            or canonical_bytes(discovery.get("discovery_input_history_cut"))
+            != canonical_bytes(cut)
+            or discovery.get("submission_finding_fingerprint")
+            != hashlib.sha256(canonical_bytes(findings[finding_index])).hexdigest()
+        ):
+            raise ValidationError("E3_BLIND_CHECKPOINT_DISCOVERY_RESULT_MISMATCH")
+        seen_indexes.add(finding_index)
+        expected_discovery_digests.add(digest)
+    if seen_indexes != set(range(len(findings))):
+        raise ValidationError("E3_BLIND_CHECKPOINT_DISCOVERY_RESULT_MISMATCH")
+
+    if set(sealed_digests) != {result_digest, *expected_discovery_digests}:
+        raise ValidationError("E3_BLIND_CHECKPOINT_SEALED_OUTPUTS_INVALID")
+
+
+def validate_e3_blind_checkpoint_provenance(checkpoint, *, current, con):
+    """Revalidate an accepted checkpoint through the canonical authority path."""
+    _validate_e3_blind_checkpoint(
+        checkpoint,
+        content_objects=(),
+        current=current,
+        con=con,
+    )
+
 
 def _validate_stage_completion(obj, *, content_objects, current, con):
     body = obj.body
+    from ..stop.models import validate_stage_completion_body
+
+    validate_stage_completion_body(body)
     if body.get("completion_predicate_result") != "STAGE_COMPLETED":
         return
     lane_refs = body.get("required_lane_slot_results")
@@ -1024,6 +1881,12 @@ def _validate_stage_completion(obj, *, content_objects, current, con):
             raise ValidationError("STAGE_COMPLETION_LANE_KIND_MISMATCH")
         if lane_completion.body.get("completion_predicate_result") != "LANE_COMPLETED":
             raise ValidationError("STAGE_COMPLETION_LANE_NOT_COMPLETED")
+        _validate_lane_completion(
+            lane_completion,
+            content_objects=content_objects,
+            con=con,
+            current=current,
+        )
         if _typed_ref_identity(lane_completion.body.get("lane_run_ref")) is None:
             raise ValidationError("STAGE_COMPLETION_LANE_RUN_REQUIRED")
         lane_run = _resolve_completion_object(
@@ -1191,7 +2054,12 @@ def install_domain_authority_hooks(store_cls) -> None:
         elif obj.kind == "residual_risk":
             _validate_residual_risk_authority(obj, con=con)
         elif obj.kind == "candidate_assurance_case":
-            _validate_candidate_residual_risk_projection(obj, current=current, con=con)
+            _validate_candidate_residual_risk_projection(
+                obj,
+                current=current,
+                con=con,
+                content_objects=content_objects,
+            )
         elif obj.kind == "finding_claim_revision":
             _validate_finding_claim_lineage(obj, con=con)
         elif obj.kind == "isolation_qualification":
@@ -1200,14 +2068,23 @@ def install_domain_authority_hooks(store_cls) -> None:
             )
         elif obj.kind == "lane_completion":
             _validate_lane_completion(
-                obj, content_objects=content_objects, con=con
+                obj, content_objects=content_objects, con=con, current=current
             )
         elif obj.kind == "stage_completion":
             _validate_stage_completion(
                 obj, content_objects=content_objects, current=current, con=con
             )
+        elif obj.kind == "checkpoint":
+            _validate_e3_blind_checkpoint(
+                obj, content_objects=content_objects, current=current, con=con
+            )
         elif obj.kind == "stop_input":
-            _validate_stop_residual_risk_projection(obj, current=current, con=con)
+            _validate_stop_residual_risk_projection(
+                obj,
+                current=current,
+                con=con,
+                content_objects=content_objects,
+            )
         elif obj.kind in {"campaign_conclusion", "final_assurance_case", "release_qualification"}:
             _validate_finalization_basis(obj, current=current, con=con)
             _validate_finalization_residual_risk_projection(obj, current=current, con=con)

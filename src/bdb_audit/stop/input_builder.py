@@ -13,7 +13,7 @@ from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
 from ..core.registry import canonical_reference_set
 from ..history.store import TransactionalHistoryStore
-from .models import StopInput
+from .models import StopInput, validate_stage_completion_body
 
 
 def _ref(kind: str, digest: str, ref_class: str = "CONTENT_OR_PRIOR", *, schema_ref: str | None = None) -> dict[str, Any]:
@@ -120,6 +120,10 @@ class StopInputBuilder:
         current_completions: dict[str, dict[str, Any]] = {}
         for row in store.accepted_records("stage_completion", cut):
             body = row["body"]
+            try:
+                validate_stage_completion_body(body)
+            except ValidationError:
+                continue
             if body.get("completion_predicate_result") != "STAGE_COMPLETED":
                 continue
             spec_ref = body.get("stage_spec_ref")
@@ -450,7 +454,16 @@ class StopInputBuilder:
         effort_results_ref = _derived_registered_ref("effort-results", {"input_history_cut": cut, "completed_stage_refs": completed_stage_refs})
 
         from .models import Snapshot
-        direct_refs = [sg_ref, inv_ref, *mandatory_obligation_refs, *current_qualification_refs, *completed_stage_refs, *required_stage_spec_refs]
+        direct_refs = canonical_reference_set(
+            [
+                sg_ref,
+                inv_ref,
+                *mandatory_obligation_refs,
+                *current_qualification_refs,
+                *completed_stage_refs,
+                *required_stage_spec_refs,
+            ]
+        )
         snapshot = Snapshot(
             snapshot_type="STOP_INPUT_STATE_CAPTURE",
             as_of_head=cut,

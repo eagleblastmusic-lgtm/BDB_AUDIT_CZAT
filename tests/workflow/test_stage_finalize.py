@@ -15,6 +15,7 @@ from bdb_audit.core.errors import ValidationError
 from bdb_audit.history.objects import CanonicalObject
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.orchestration.stages import initial_stage_specs
+from bdb_audit.stop.models import StageCompletion, validate_stage_completion_body
 from bdb_audit.workflow.manual_stage import (
     StageLaneDefinition,
     StageResultInbox,
@@ -336,7 +337,28 @@ def test_e4_stage_completion_direct_admission_requires_exact_accepted_evidence(
             required_output_refs=wrong_kind_outputs
         ),
         mutated_completion(stage_spec_ref=non_governing_spec),
+        mutated_completion(
+            unknown_blocked_summary={"unknown_surfaces_count": 1}
+        ),
+        mutated_completion(
+            unresolved_material_refs=[valid_outputs[0]]
+        ),
+        mutated_completion(unknown_blocked_summary=[]),
+        mutated_completion(
+            unknown_blocked_summary={"unknown_surfaces_count": -1}
+        ),
+        mutated_completion(unresolved_material_refs=[{"kind": "snapshot"}]),
     )
+    conn = store._connect()
+    try:
+        before_object_count = conn.execute(
+            "SELECT COUNT(*) FROM immutable_objects"
+        ).fetchone()[0]
+        before_receipt_count = conn.execute(
+            "SELECT COUNT(*) FROM receipts"
+        ).fetchone()[0]
+    finally:
+        conn.close()
     for candidate in rejected:
         with pytest.raises(ValidationError):
             Coordinator(store).accept(
@@ -346,6 +368,32 @@ def test_e4_stage_completion_direct_admission_requires_exact_accepted_evidence(
             )
         assert store.head() == before
         assert store.object_record(candidate.digest) is None
+        assert len(store.commits()) == before.commit_seq
+        conn = store._connect()
+        try:
+            assert conn.execute(
+                "SELECT COUNT(*) FROM immutable_objects"
+            ).fetchone()[0] == before_object_count
+            assert conn.execute(
+                "SELECT COUNT(*) FROM receipts"
+            ).fetchone()[0] == before_receipt_count
+        finally:
+            conn.close()
+
+    blocked_model = StageCompletion(
+        stage_run_ref=completion.body["stage_run_ref"],
+        stage_spec_ref=completion.body["stage_spec_ref"],
+        input_history_cut=completion.body["input_history_cut"],
+        required_lane_slot_results=valid_lane_refs,
+        required_output_refs=valid_outputs,
+        mandatory_obligation_summary=completion.body[
+            "mandatory_obligation_summary"
+        ],
+        unresolved_material_refs=[valid_outputs[0]],
+        unknown_blocked_summary={"unknown_surfaces_count": 1},
+        completion_predicate_result="STAGE_COMPLETION_BLOCKED",
+    )
+    assert blocked_model.body()["completion_predicate_result"] == "STAGE_COMPLETION_BLOCKED"
 
     accepted = Coordinator(store).accept(
         captured.value.command,
@@ -400,3 +448,76 @@ def test_e4_prompt_contains_structured_output_contract(e4_phase):
     assert "outputs.e4_assessments" in prompt
     assert "MODEL_IMPLEMENTATION_CONFORMANCE" in prompt
     assert "outputs.model_fidelity_assessment" in prompt
+
+
+def test_read_model_ignores_legacy_raw_completion_with_blockers(
+    e4_phase,
+    monkeypatch,
+):
+    store, batch, inbox, tmp_path = e4_phase
+    assert inbox.ingest_multiple_zips(
+        [
+            _write_result(tmp_path / f"legacy-raw-{slot}.zip", batch, slot)
+            for slot in batch.lane_slots
+        ]
+    ).phase_complete
+
+    class CapturedAdmission(Exception):
+        def __init__(self, command, expected_head, immutable_objects):
+            self.command = command
+            self.expected_head = expected_head
+            self.immutable_objects = immutable_objects
+
+    original_accept = Coordinator.accept
+
+    def capture_accept(_coordinator, command, expected_head=None, **kwargs):
+        objects = kwargs["immutable_objects"]
+        if any(obj.kind == "stage_completion" for obj in objects):
+            raise CapturedAdmission(command, expected_head, objects)
+        return original_accept(_coordinator, command, expected_head, **kwargs)
+
+    with monkeypatch.context() as patcher:
+        patcher.setattr(Coordinator, "accept", capture_accept)
+        with pytest.raises(CapturedAdmission) as captured:
+            E4FinalizationService(
+                store,
+                stage_id="E4",
+                required_phase_slots={"E4-DEEPEN": batch.lane_slots},
+                next_action="PREPARE_E5A_ATTACK",
+            ).finalize()
+
+    completion = next(
+        obj
+        for obj in captured.value.immutable_objects
+        if obj.kind == "stage_completion"
+    )
+    assert "E4" not in AuditOperationApi().get_campaign_status(store.path)[
+        "stages_completed"
+    ]
+    raw_blocked = CanonicalObject(
+        "stage_completion",
+        {
+            **completion.body,
+            "unknown_blocked_summary": {"unknown_surfaces_count": 1},
+        },
+        completion.schema_revision_ref,
+        completion.logical_id,
+        completion.version,
+    )
+    _append_raw_commit(
+        store,
+        [raw_blocked],
+        index=store.head().commit_seq + 1,
+    )
+    raw_row = next(
+        row
+        for row in store.accepted_records(
+            "stage_completion", current_accepted_cut(store)
+        )
+        if row["ref"]["revision_digest"] == raw_blocked.digest
+    )
+    with pytest.raises(ValidationError, match="STAGE_COMPLETION_BLOCKED"):
+        validate_stage_completion_body(raw_row["body"])
+    assert "E4" not in AuditOperationApi().get_campaign_status(store.path)[
+        "stages_completed"
+    ]

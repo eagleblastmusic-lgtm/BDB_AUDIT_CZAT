@@ -62,7 +62,8 @@ def _risk(approval_obj, *, disposition="ACCEPTED_RESIDUAL_RISK", blocking=False,
 
 
 def test_residual_risk_becomes_canonical_and_enters_stop_projection(tmp_path: Path) -> None:
-    ctx = run_foundation_reference_slice(tmp_path / "risk-authority.sqlite", stop_at_seq=9)
+    store_path = tmp_path / "risk-authority.sqlite"
+    ctx = run_foundation_reference_slice(store_path, stop_at_seq=9)
     approval_obj, _ = _accept_approval(ctx, "APPROVED", "01")
 
     risk = _risk(approval_obj)
@@ -85,6 +86,13 @@ def test_residual_risk_becomes_canonical_and_enters_stop_projection(tmp_path: Pa
     assert stop_input.unknown_blocked_summary["accepted_residual_risk_count"] == 1
     assert stop_input.unknown_blocked_summary["blocking_residual_risk_count"] == 0
     assert stop_input.unknown_blocked_summary["unresolved_residual_risk_count"] == 0
+
+    from bdb_audit.assurance.finalization_service import FinalizationService
+    from bdb_audit.stop.operation import evaluate_stop_gate as read_stop_gate
+
+    producer_result = FinalizationService(ctx["store"]).evaluate_stop_gate()
+    assert producer_result["status"] == "SUCCESS"
+    assert read_stop_gate(store_path)["status"] == "SUCCESS"
 
 
 def test_store_rejects_stop_input_that_omits_current_residual_risk_before_durability(tmp_path: Path) -> None:
