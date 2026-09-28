@@ -27,6 +27,8 @@ def _validate_overlay_prior_accepted(self, ref, *, consumer_kind, current, con) 
         if isinstance(row, dict) and isinstance(row.get("kind"), str)
     }
     canonical_kinds = set(getattr(self.registry, "canonical_contract_kinds", baseline_kinds))
+    if hasattr(self.registry, "_extension_contracts"):
+        canonical_kinds.update(k for k, _ in self.registry._extension_contracts.keys())
     if kind in baseline_kinds or kind not in canonical_kinds:
         return
 
@@ -1011,6 +1013,7 @@ _NON_OUTPUT_KINDS = frozenset(
         "knowledge_state",
         "lane_completion",
         "stage_completion",
+        "lane_result_admission_evidence",
     }
 )
 
@@ -1021,6 +1024,125 @@ def _accepted_completion_records(kind, *, current, con):
     from ..stop.authority import _accepted_index, _records
 
     return _records(kind, _accepted_index(current, con), con)
+
+
+def _validate_lane_result_admission_evidence(obj, *, content_objects, current, con) -> None:
+    body = obj.body
+    raw_digest = body.get("raw_result_digest")
+    if not isinstance(raw_digest, str) or len(raw_digest) != 64:
+        raise ValidationError("INVALID_RAW_DIGEST")
+
+    from pathlib import Path
+    db_row = con.execute("PRAGMA database_list").fetchone()
+    db_path = db_row[2] if db_row and len(db_row) > 2 else ""
+    if not db_path:
+        raise ValidationError("RAW_ARTIFACT_NOT_FOUND", raw_digest)
+    vault_dir = Path(db_path).resolve().parent / "raw_vault"
+    from ..vault.raw_store import RawArtifactVault
+    vault = RawArtifactVault(vault_dir)
+    try:
+        raw_bytes = vault.read_bytes(raw_digest)
+    except ValidationError:
+        raise
+    except Exception as exc:
+        raise ValidationError("RAW_ARTIFACT_NOT_FOUND", str(exc)) from exc
+
+    expected_len = body.get("raw_result_byte_length")
+    if isinstance(expected_len, int) and len(raw_bytes) != expected_len:
+        raise ValidationError("RAW_RESULT_BYTE_LENGTH_MISMATCH")
+
+    from ..assurance.zip_safety import read_bytes as read_zip_bytes
+    try:
+        members = read_zip_bytes(raw_bytes)
+    except Exception as exc:
+        raise ValidationError("INVALID_ZIP", str(exc)) from exc
+
+    if "MANIFEST.json" not in members:
+        raise ValidationError("MISSING_MANIFEST")
+    from ..core.canonical_json import parse
+    try:
+        manifest = parse(members["MANIFEST.json"])
+    except Exception as exc:
+        raise ValidationError("MALFORMED_MANIFEST", str(exc)) from exc
+    if not isinstance(manifest, dict):
+        raise ValidationError("MALFORMED_MANIFEST")
+
+    if manifest.get("campaign_id") != body.get("campaign_id"):
+        raise ValidationError("CAMPAIGN_BINDING_MISMATCH")
+    if manifest.get("stage_id") != body.get("stage_id"):
+        raise ValidationError("STAGE_BINDING_MISMATCH")
+    if manifest.get("lane_slot") != body.get("lane_slot"):
+        raise ValidationError("LANE_SLOT_BINDING_MISMATCH")
+    if str(manifest.get("source_commit_sha", "")).lower() != str(body.get("source_commit_sha", "")).lower():
+        raise ValidationError("SOURCE_COMMIT_MISMATCH")
+    if manifest.get("input_package_digest") != body.get("input_package_digest"):
+        raise ValidationError("PACKAGE_DIGEST_MISMATCH")
+    if manifest.get("executor_profile") != body.get("executor_profile"):
+        raise ValidationError("EXECUTOR_PROFILE_MISMATCH")
+    if manifest.get("executor_model") != body.get("executor_model"):
+        raise ValidationError("EXECUTOR_MODEL_MISMATCH")
+
+    assignment = _resolve_completion_object(
+        body.get("assignment_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="assignment_ref",
+    )
+    if assignment.kind != "assignment_manifest":
+        raise ValidationError("ASSIGNMENT_REF_INVALID")
+    if _typed_ref_identity(assignment.body.get("attempt_ref")) != _typed_ref_identity(body.get("attempt_ref")):
+        raise ValidationError("ASSIGNMENT_ATTEMPT_BINDING_MISMATCH")
+    if _typed_ref_identity(assignment.body.get("source_generation_ref")) != _typed_ref_identity(body.get("source_generation_ref")):
+        raise ValidationError("ASSIGNMENT_SOURCE_BINDING_MISMATCH")
+    if canonical_bytes(assignment.body.get("assignment_input_history_cut")) != canonical_bytes(body.get("history_cut")):
+        raise ValidationError("ASSIGNMENT_CUT_MISMATCH")
+
+
+def _validate_lane_result(obj, *, content_objects, current, con) -> None:
+    body = obj.body
+    admission_ref = body.get("admission_evidence_ref")
+    if not isinstance(admission_ref, dict):
+        raise ValidationError("ADMISSION_EVIDENCE_REF_REQUIRED")
+
+    evidence_obj = _resolve_completion_object(
+        admission_ref,
+        content_objects=content_objects,
+        con=con,
+        context="admission_evidence_ref",
+    )
+    if evidence_obj.kind != "lane_result_admission_evidence":
+        raise ValidationError("ADMISSION_EVIDENCE_KIND_MISMATCH")
+
+    evidence = evidence_obj.body
+    if body.get("campaign_id") != evidence.get("campaign_id"):
+        raise ValidationError("RESULT_ADMISSION_EVIDENCE_MISMATCH", "campaign_id")
+    if body.get("stage_id") != evidence.get("stage_id"):
+        raise ValidationError("RESULT_ADMISSION_EVIDENCE_MISMATCH", "stage_id")
+    if body.get("phase_id") != evidence.get("phase_id"):
+        raise ValidationError("RESULT_ADMISSION_EVIDENCE_MISMATCH", "phase_id")
+    if body.get("lane_slot") != evidence.get("lane_slot"):
+        raise ValidationError("RESULT_ADMISSION_EVIDENCE_MISMATCH", "lane_slot")
+    if str(body.get("source_commit_sha", "")).lower() != str(evidence.get("source_commit_sha", "")).lower():
+        raise ValidationError("RESULT_ADMISSION_EVIDENCE_MISMATCH", "source_commit_sha")
+    if canonical_bytes(body.get("history_cut")) != canonical_bytes(evidence.get("history_cut")):
+        raise ValidationError("RESULT_ADMISSION_EVIDENCE_MISMATCH", "history_cut")
+    if body.get("input_package_digest") != evidence.get("input_package_digest"):
+        raise ValidationError("RESULT_ADMISSION_EVIDENCE_MISMATCH", "input_package_digest")
+    if body.get("executor_profile") != evidence.get("executor_profile"):
+        raise ValidationError("RESULT_ADMISSION_EVIDENCE_MISMATCH", "executor_profile")
+    if body.get("executor_model") != evidence.get("executor_model"):
+        raise ValidationError("RESULT_ADMISSION_EVIDENCE_MISMATCH", "executor_model")
+    if body.get("assignment_ref") and _typed_ref_identity(body.get("assignment_ref")) != _typed_ref_identity(evidence.get("assignment_ref")):
+        raise ValidationError("RESULT_ADMISSION_EVIDENCE_MISMATCH", "assignment_ref")
+    if body.get("attempt_ref") and _typed_ref_identity(body.get("attempt_ref")) != _typed_ref_identity(evidence.get("attempt_ref")):
+        raise ValidationError("RESULT_ADMISSION_EVIDENCE_MISMATCH", "attempt_ref")
+    if body.get("raw_result_digest") and body.get("raw_result_digest") != evidence.get("raw_result_digest"):
+        raise ValidationError("RESULT_ADMISSION_EVIDENCE_MISMATCH", "raw_result_digest")
+
+    proposal_copy = {k: v for k, v in body.items() if k != "admission_evidence_ref"}
+    calculated_digest = hashlib.sha256(canonical_bytes(proposal_copy)).hexdigest()
+    if calculated_digest != evidence.get("result_proposal_digest"):
+        raise ValidationError("RESULT_PROPOSAL_DIGEST_MISMATCH")
 
 
 def _validate_lane_completion(obj, *, content_objects, con, current):
@@ -2065,6 +2187,14 @@ def install_domain_authority_hooks(store_cls) -> None:
         elif obj.kind == "isolation_qualification":
             _validate_isolation_qualification(
                 obj, content_objects=content_objects, con=con
+            )
+        elif obj.kind == "lane_result_admission_evidence":
+            _validate_lane_result_admission_evidence(
+                obj, content_objects=content_objects, current=current, con=con
+            )
+        elif obj.kind == "bdb_audit_lane_result":
+            _validate_lane_result(
+                obj, content_objects=content_objects, current=current, con=con
             )
         elif obj.kind == "lane_completion":
             _validate_lane_completion(

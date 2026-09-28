@@ -7,11 +7,15 @@ FIELDS = {
     "lane_run": "lane_run_id stage_run_ref lane_spec_ref source_generation_ref creation_input_history_cut required_result_slots",
     "attempt": "attempt_id lane_run_ref attempt_nonce executor_profile_ref delivery_profile_ref assigned_history_cut result_slot_contracts",
     "isolation_qualification": "isolation_qualification_id attempt_ref assessment_input_history_cut executor_profile_ref delivery_profile_ref channel_inventory_ref enforcement_receipt_refs filesystem_boundary_evidence_refs network_boundary_evidence_refs tool_boundary_evidence_refs session_boundary_evidence_refs contamination_assessment_refs required_isolation_assurance result scope limitations reason_codes",
-    "bdb_audit_lane_result": "kind version campaign_id stage_id lane_slot source_commit_sha history_cut input_package_digest executor_profile executor_model findings",
+    "lane_result_admission_evidence": "kind version admission_evidence_id campaign_id stage_id lane_slot assignment_ref attempt_ref source_generation_ref source_commit_sha history_cut input_package_digest raw_result_digest raw_result_byte_length result_proposal_digest executor_profile executor_model",
+    "bdb_audit_lane_result": "kind version campaign_id stage_id lane_slot source_commit_sha history_cut input_package_digest executor_profile executor_model findings admission_evidence_ref",
 }
 OPTIONAL = {
     "stage_run": ("successor_of_stage_run_ref",), "lane_run": ("successor_of_lane_run_ref",),
     "attempt": ("retry_of_attempt_ref", "retry_reason_ref"),
+    "lane_result_admission_evidence": (
+        "phase_id", "source_tree_sha", "evidence_files",
+    ),
     "bdb_audit_lane_result": (
         "phase_id", "outputs", "findings_count", "notes", "evidence_files",
         "assignment_ref", "attempt_ref", "raw_result_digest",
@@ -33,7 +37,7 @@ def orchestration_schema(kind):
         elif name.endswith("history_cut"):
             properties[name] = {"type": "object"}
         elif name.endswith("_ref") and (
-            kind in {"stage_run", "lane_run", "attempt", "isolation_qualification"}
+            kind in {"stage_run", "lane_run", "attempt", "isolation_qualification", "lane_result_admission_evidence"}
             or kind == "bdb_audit_lane_result"
         ) and name != "campaign_ref":
             properties[name] = {"type": "object", "required": ["kind", "revision_digest", "digest_profile", "schema_revision_ref", "ref_class"]}
@@ -48,6 +52,17 @@ def orchestration_schema(kind):
     if kind == "isolation_qualification":
         properties["result"] = {"enum": ["ENFORCED", "DECLARED", "UNKNOWN"]}
         properties["required_isolation_assurance"] = {"enum": ["ENFORCED", "DECLARED", "UNKNOWN"]}
+    if kind == "lane_result_admission_evidence":
+        properties["kind"] = {"const": "lane_result_admission_evidence"}
+        properties["version"] = {"const": "1"}
+        properties["stage_id"] = {"enum": ["E1", "E2", "E3", "E4", "E5", "E6"]}
+        properties["lane_slot"] = {"type": "string", "minLength": 1}
+        properties["phase_id"] = {"type": "string", "minLength": 1}
+        properties["raw_result_digest"] = {"type": "string", "format": "bdb-sha256"}
+        properties["result_proposal_digest"] = {"type": "string", "format": "bdb-sha256"}
+        properties["input_package_digest"] = {"type": "string", "format": "bdb-sha256"}
+        properties["history_cut"] = {"type": "object"}
+        properties["raw_result_byte_length"] = {"type": "integer", "minimum": 0}
     if kind == "bdb_audit_lane_result":
         properties["findings"] = {"type": "array"}
         properties["history_cut"] = {"type": "object"}

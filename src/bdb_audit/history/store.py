@@ -399,7 +399,7 @@ class TransactionalHistoryStore:
                             raise ValidationError("HISTORY_INPUT_SAME_COMMIT_FORBIDDEN")
                         if expected_empty is not None and value != expected_empty:
                             raise ValidationError("HISTORY_CUT_PROFILE_BINDING_MISMATCH")
-                    elif object_kind == "bdb_audit_lane_result" and depth == 1 and field_name == "history_cut":
+                    elif object_kind in {"bdb_audit_lane_result", "lane_result_admission_evidence"} and depth == 1 and field_name == "history_cut":
                         validate_historical_accepted_cut(value)
                     else:
                         if variant != "ACCEPTED_HISTORY_CUT":
@@ -459,6 +459,7 @@ class TransactionalHistoryStore:
             "campaign_conclusion",
             "final_assurance_case",
             "release_qualification",
+            "bdb_audit_lane_result",
         }
         return (
             "PRIOR_ACCEPTED_REFERENCE_REQUIRED"
@@ -479,6 +480,8 @@ class TransactionalHistoryStore:
             row["kind"] for row in self.registry.document.get("contracts", ())
             if isinstance(row, dict) and isinstance(row.get("kind"), str)
         }
+        if hasattr(self.registry, "_extension_contracts"):
+            registered_kinds.update(k for k, _ in self.registry._extension_contracts.keys())
         kind = ref.get("kind")
         if kind not in registered_kinds:
             return
@@ -769,6 +772,12 @@ class TransactionalHistoryStore:
                 self._validate_bootstrap_closure(objects, bootstrap_profile)
             elif seq == 1:
                 raise ValidationError("INITIALIZATION_REQUIRED")
+            if any(obj.kind == "lane_result_admission_evidence" for obj in objects):
+                if command.command_kind != "INGEST_EXTERNAL_LANE_RESULT":
+                    raise ValidationError("LANE_RESULT_ADMISSION_COMMAND_REQUIRED")
+            if command.command_kind == "INGEST_EXTERNAL_LANE_RESULT":
+                if any(obj.kind != "lane_result_admission_evidence" for obj in objects if obj.kind != "command_envelope"):
+                    raise ValidationError("UNAUTHORIZED_PRODUCER_AUTHORITY")
             if command.expected_parent_head != parent:
                 raise ValidationError("COMMAND_BINDING_CONFLICT")
             if current is not None and command.campaign_ref != current.campaign_id:
