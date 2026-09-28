@@ -73,7 +73,7 @@ def _latest_accepted_stop_input(store: TransactionalHistoryStore) -> tuple[dict[
 
 
 def _require_current_campaign_cut(
-    stop_input: StopInput,
+    stop_input: StopInput | dict[str, Any],
     store: TransactionalHistoryStore,
     *,
     authoritative: bool = True,
@@ -82,10 +82,7 @@ def _require_current_campaign_cut(
     head = store.head()
     if head is None:
         raise ValidationError("CAMPAIGN_NOT_FOUND", "Campaign contains no accepted head")
-    body = {
-        "campaign_id": stop_input.campaign_id,
-        "input_history_cut": stop_input.input_history_cut,
-    }
+    body = dict(stop_input) if isinstance(stop_input, dict) else stop_input.body()
     _require_material_stop_basis_current(
         body,
         campaign_id=head.campaign_id,
@@ -94,6 +91,7 @@ def _require_current_campaign_cut(
         commits=store.commits(),
         authoritative=authoritative,
         accepted_commit_seq=accepted_commit_seq,
+        object_loader=getattr(store, "object_record", None),
     )
 
 
@@ -119,6 +117,7 @@ def _require_material_stop_basis_current(
     commits,
     authoritative: bool,
     accepted_commit_seq: int | None,
+    object_loader=None,
 ) -> None:
     """Share exact STOP material freshness across service and store admission."""
     if stop_input_body.get("campaign_id") != campaign_id:
@@ -175,11 +174,153 @@ def _require_material_stop_basis_current(
             continue
         for ref in commit.get("immutable_object_refs", ()):
             kind = ref.get("kind") if isinstance(ref, dict) else None
+            if (
+                kind == "snapshot"
+                and c_seq == accepted_commit_seq
+                and _is_exact_stop_snapshot(
+                    ref,
+                    stop_input_body,
+                    commit,
+                    object_loader=object_loader,
+                )
+            ):
+                continue
             if kind is not None and kind not in _ADMINISTRATIVE_STOP_KINDS:
                 raise ValidationError(
                     "STOP_INPUT_CUT_MISMATCH",
                     f"Material audit changes occurred after STOP input cut at commit seq {c_seq} (kind: {kind})",
                 )
+
+
+def _same_exact_object_ref(left, right) -> bool:
+    """Compare exact object references, tolerating optional logical_id omission."""
+    if not isinstance(left, dict) or not isinstance(right, dict):
+        return False
+    identity_fields = (
+        "kind",
+        "revision_digest",
+        "digest_profile",
+        "schema_revision_ref",
+    )
+    if any(left.get(field) != right.get(field) for field in identity_fields):
+        return False
+    left_id = left.get("logical_id")
+    right_id = right.get("logical_id")
+    return left_id is None or right_id is None or left_id == right_id
+
+
+def _is_exact_stop_snapshot(
+    snapshot_ref: dict[str, Any],
+    stop_input_body: dict[str, Any],
+    commit: dict[str, Any],
+    *,
+    object_loader,
+) -> bool:
+    """Recognize only the derived snapshot in this exact accepted STOP commit."""
+    referenced = stop_input_body.get("stop_input_snapshot_ref")
+    cut = stop_input_body.get("input_history_cut")
+    if (
+        object_loader is None
+        or not isinstance(referenced, dict)
+        or not isinstance(cut, dict)
+        or not _same_exact_object_ref(snapshot_ref, referenced)
+    ):
+        return False
+
+    from ..history.objects import CanonicalObject
+
+    stop_input_id = stop_input_body.get("stop_input_id")
+    stop_input_obj = CanonicalObject(
+        "stop_input",
+        stop_input_body,
+        logical_id=(
+            stop_input_id
+            if isinstance(stop_input_id, str)
+            and stop_input_id.startswith("stop_input_")
+            else None
+        ),
+    )
+    commit_refs = commit.get("immutable_object_refs", ())
+    if not isinstance(commit_refs, (list, tuple)) or not any(
+        isinstance(ref, dict)
+        and ref.get("kind") == "stop_input"
+        and ref.get("revision_digest") == stop_input_obj.digest
+        for ref in commit_refs
+    ):
+        return False
+
+    snapshot_record = object_loader(referenced.get("revision_digest"))
+    if not isinstance(snapshot_record, dict) or not isinstance(
+        snapshot_record.get("body"), dict
+    ):
+        return False
+    snapshot_body = snapshot_record["body"]
+    snapshot_id = snapshot_body.get("snapshot_id")
+    snapshot_obj = CanonicalObject(
+        "snapshot",
+        snapshot_body,
+        snapshot_record.get("schema_revision_ref"),
+        snapshot_record.get("logical_id")
+        or (
+            snapshot_id
+            if isinstance(snapshot_id, str)
+            and snapshot_id.startswith("snapshot_")
+            else None
+        ),
+        snapshot_record.get("version", "1"),
+    )
+    if (
+        snapshot_obj.digest != referenced.get("revision_digest")
+        or snapshot_record.get("kind") != "snapshot"
+        or snapshot_body.get("snapshot_type") != "STOP_INPUT_STATE_CAPTURE"
+        or snapshot_body.get("as_of_head") != cut
+    ):
+        return False
+
+    residual_refs = stop_input_body.get("residual_risk_refs", ())
+    if not isinstance(residual_refs, (list, tuple)):
+        return False
+    expected_projection_refs = [
+        stop_input_body.get("source_generation_ref"),
+        stop_input_body.get("inventory_revision_ref"),
+        *stop_input_body.get("mandatory_obligation_refs", ()),
+        *stop_input_body.get("current_obligation_qualification_refs", ()),
+        *stop_input_body.get("completed_stage_refs", ()),
+        *stop_input_body.get("required_stage_spec_refs", ()),
+        *residual_refs,
+    ]
+    if any(not isinstance(ref, dict) for ref in expected_projection_refs):
+        return False
+    try:
+        from ..core.registry import canonical_reference_set
+        from .input_builder import _derived_registered_ref
+
+        expected_projection_refs = canonical_reference_set(
+            expected_projection_refs
+        )
+        expected_artifact_ref = _derived_registered_ref(
+            "stop-input-snapshot",
+            {
+                "input_history_cut": cut,
+                "projection_input_refs": expected_projection_refs,
+            },
+        )
+    except (KeyError, TypeError, ValueError, ValidationError):
+        return False
+
+    expected_revision = (
+        "BDB_V2_SNAPSHOT_PROJECTION_3"
+        if residual_refs
+        else "BDB_V2_SNAPSHOT_PROJECTION_2"
+    )
+    return (
+        snapshot_body.get("projection_code_revision") == expected_revision
+        and snapshot_body.get("projection_input_refs")
+        == expected_projection_refs
+        and _same_exact_object_ref(
+            snapshot_body.get("snapshot_artifact_ref"), expected_artifact_ref
+        )
+    )
 
 
 def _next_action(decision: str, authoritative: bool) -> str:

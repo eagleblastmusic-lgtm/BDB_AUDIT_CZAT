@@ -181,6 +181,62 @@ class E3BlindCheckpointService:
                 raise ValidationError(
                     "E3_BLIND_CHECKPOINT_CUT_DIVERGENCE"
                 )
+            from ..history.authority_hooks import (
+                validate_e3_blind_checkpoint_provenance,
+            )
+
+            current = self.store.head()
+            if current is None:
+                raise ValidationError(
+                    "E3_BLIND_CHECKPOINT_REQUIRES_ACCEPTED_RESULT"
+                )
+            conn = self.store._connect()
+            try:
+                for slot, row in existing.items():
+                    job = self.batch.get_job(slot)
+                    result = _accepted_result_for_job(
+                        self.store,
+                        job,
+                        cut,
+                    )
+                    result_digest = result["ref"]["revision_digest"]
+                    sealed = row["body"].get(
+                        "sealed_output_refs",
+                        (),
+                    )
+                    if (
+                        _same_ref(
+                            row["body"].get("attempt_ref"),
+                            job.attempt_ref,
+                        )
+                        is False
+                        or row["body"].get("lane_slot") != slot
+                        or not any(
+                            isinstance(ref, dict)
+                            and ref.get("kind")
+                            == "bdb_audit_lane_result"
+                            and ref.get("revision_digest")
+                            == result_digest
+                            for ref in sealed
+                        )
+                    ):
+                        raise ValidationError(
+                            "E3_BLIND_CHECKPOINT_RESULT_BINDING_MISMATCH",
+                            slot,
+                        )
+                    checkpoint = CanonicalObject(
+                        "checkpoint",
+                        row["body"],
+                        row["ref"].get("schema_revision_ref"),
+                        row["ref"].get("logical_id"),
+                    )
+                    validate_e3_blind_checkpoint_provenance(
+                        checkpoint,
+                        current=current,
+                        con=conn,
+                    )
+            finally:
+                conn.close()
             return E3BlindCheckpointSummary(
                 campaign_id=self.batch.campaign_id,
                 checkpoint_input_history_cut=dict(

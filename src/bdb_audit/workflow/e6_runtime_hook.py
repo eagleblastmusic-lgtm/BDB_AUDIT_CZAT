@@ -19,6 +19,8 @@ def install_recursive_e6_runtime_support() -> None:
     model_cls = rm.VerifiedCampaignReadModel
     if not getattr(model_cls, "_bdb_recursive_e6_projection_installed", False):
         def project_status(self) -> dict[str, Any]:
+            from ..stop.models import validate_stage_completion_body
+
             cut = self.cut
             head = self.head
 
@@ -87,6 +89,12 @@ def install_recursive_e6_runtime_support() -> None:
 
             for row in completion_rows:
                 doc = row["body"]
+                try:
+                    validate_stage_completion_body(doc)
+                except ValidationError:
+                    # Raw legacy accepted objects cannot project a completed
+                    # stage when their blocker summary contradicts completion.
+                    continue
                 if doc.get("completion_predicate_result") != "STAGE_COMPLETED":
                     continue
                 spec_ref = doc.get("stage_spec_ref")

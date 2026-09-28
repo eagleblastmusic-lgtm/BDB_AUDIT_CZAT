@@ -8,6 +8,7 @@ import zipfile
 
 import pytest
 
+from bdb_audit.assurance.candidate_case import CandidateAssuranceCase
 from bdb_audit.adjudication.models import (
     FindingAdjudicationDecision,
     FindingAxisAssessment,
@@ -15,7 +16,7 @@ from bdb_audit.adjudication.models import (
 )
 from bdb_audit.coordinator import Coordinator
 from bdb_audit.coordinator.operations import AuditOperationApi
-from bdb_audit.core.ids import deterministic_id
+from bdb_audit.core.ids import deterministic_id, new_id
 from bdb_audit.core.errors import ValidationError
 from bdb_audit.history.objects import CanonicalObject, CommandEnvelope
 from bdb_audit.history.store import TransactionalHistoryStore
@@ -51,6 +52,7 @@ from bdb_audit.workflow.manual_stage import (
 from bdb_audit.workflow.assignments import _command_id, _current_cut, _external_ref
 from bdb_audit.workflow.source_target import ResolvedSource
 from bdb_audit.workflow.read_models import current_accepted_cut
+from bdb_audit.workflow.scope_baseline import ensure_pre_e3_scope_baseline
 from bdb_audit.workflow.inbox import E1ResultInbox
 from bdb_audit.workflow.packaging import prepare_e1_batch
 from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
@@ -430,6 +432,391 @@ def _prepare_e3_isolation_fixture(
         cut,
     )[-1]["ref"]
     return store, source, lane, source_generation
+
+
+def test_e3_blind_checkpoint_and_stage_completion_require_accepted_results(
+    tmp_path: Path,
+):
+    store, source, _, _ = _prepare_e3_isolation_fixture(
+        tmp_path,
+        seed="e3_checkpoint_canonical_provenance",
+    )
+    api = AuditOperationApi()
+    for slot in ("E3-Y", "E3-Z"):
+        api.prepare_lane(
+            store.path,
+            "E3",
+            slot,
+            required_isolation_assurance="DECLARED",
+        )
+    lanes = tuple(
+        StageLaneDefinition(slot, f"Blind novelty {slot}", "BLIND_NOVELTY")
+        for slot in ("E3-X", "E3-Y", "E3-Z")
+    )
+    batch = prepare_stage_phase_batch(
+        store=store,
+        output_dir=tmp_path / "e3-blind-provenance",
+        source_info=source,
+        stage_id="E3",
+        phase_id="E3-BLIND",
+        lane_definitions=lanes,
+        all_stage_lane_slots=tuple(lane.lane_slot for lane in lanes),
+    )
+    inbox = StageResultInbox(store, batch)
+    cut, prior_commit = _current_cut(store)
+    fake_results = []
+    fake_checkpoints = []
+    assignment_context = {}
+    for slot in batch.lane_slots:
+        job = batch.get_job(slot)
+        assignment = store.resolve_accepted(job.assignment_ref, cut)
+        attempt = store.resolve_accepted(job.attempt_ref, cut)
+        lane_run = store.resolve_accepted(attempt["body"]["lane_run_ref"], cut)
+        stage_run = store.resolve_accepted(lane_run["body"]["stage_run_ref"], cut)
+        knowledge = store.resolve_accepted(assignment["body"]["knowledge_state_ref"], cut)
+        source_record = store.resolve_accepted(
+            assignment["body"]["source_generation_ref"], cut
+        )
+        assignment_context[slot] = (assignment, attempt, lane_run, knowledge, stage_run, source_record)
+        result = CanonicalObject(
+            "bdb_audit_lane_result",
+            {
+                "kind": "bdb_audit_lane_result",
+                "version": "1",
+                "campaign_id": batch.campaign_id,
+                "stage_id": "E3",
+                "phase_id": "E3-BLIND",
+                "lane_slot": slot,
+                "source_commit_sha": job.source_commit_sha,
+                "history_cut": batch.frozen_history_cut,
+                "input_package_digest": job.package_digest,
+                "executor_profile": job.executor_profile,
+                "executor_model": job.model,
+                "assignment_ref": job.assignment_ref,
+                "attempt_ref": job.attempt_ref,
+                "findings": [],
+                "outputs": {"verdict": "INCONCLUSIVE"},
+            },
+        )
+        fake_results.append(result)
+        fake_checkpoints.append(
+            CanonicalObject(
+                "checkpoint",
+                {
+                    "checkpoint_id": f"checkpoint_e3_blind_fake_{slot.lower()}",
+                    "stage_id": "E3",
+                    "phase_id": "E3-BLIND",
+                    "lane_slot": slot,
+                    "stage_run_ref": {
+                        **stage_run["ref"],
+                        "ref_class": "PRIOR_ACCEPTED_ONLY",
+                    },
+                    "lane_run_ref": {
+                        **lane_run["ref"],
+                        "ref_class": "PRIOR_ACCEPTED_ONLY",
+                    },
+                    "attempt_ref": {
+                        **attempt["ref"],
+                        "ref_class": "PRIOR_ACCEPTED_ONLY",
+                    },
+                    "source_generation_ref": {
+                        **source_record["ref"],
+                        "ref_class": "PRIOR_ACCEPTED_ONLY",
+                    },
+                    "checkpoint_input_history_cut": cut,
+                    "knowledge_state_ref": {
+                        **knowledge["ref"],
+                        "ref_class": "PRIOR_ACCEPTED_ONLY",
+                    },
+                    "sealed_output_refs": [result.as_ref().as_dict()],
+                    "governing_policy_ref": prior_commit["governing_policy_ref"],
+                },
+            )
+        )
+
+    head_before = store.head()
+    assert head_before is not None
+    commit_count_before = len(store.commits())
+    conn = store._connect()
+    try:
+        object_count_before = conn.execute(
+            "SELECT COUNT(*) FROM immutable_objects"
+        ).fetchone()[0]
+        receipt_count_before = conn.execute(
+            "SELECT COUNT(*) FROM receipts"
+        ).fetchone()[0]
+    finally:
+        conn.close()
+    command = CommandEnvelope(
+        command_id=_command_id("e3-fake-blind-results:" + ":".join(obj.digest for obj in fake_checkpoints)),
+        command_kind="RECORD_FOUNDATION_FACT",
+        actor_ref=prior_commit.get("actor_ref", "installation-owner"),
+        expected_parent_head={"tag": "ACCEPTED_HEAD_REF", **head_before.as_dict()},
+        governing_policy_ref=prior_commit["governing_policy_ref"],
+        governing_spec_refs=tuple(prior_commit.get("governing_spec_refs", ())),
+        idempotency_scope="e3-fake-blind-results:" + ":".join(obj.digest for obj in fake_checkpoints),
+        campaign_ref=batch.campaign_id,
+    )
+    with pytest.raises(ValidationError, match="E3_BLIND_CHECKPOINT_ACCEPTED_RESULT_REQUIRED"):
+        Coordinator(store).accept(
+            command,
+            immutable_objects=[*fake_results, *fake_checkpoints],
+            expected_head=head_before,
+        )
+    assert store.head() == head_before
+    assert len(store.commits()) == commit_count_before
+    assert all(
+        store.object_record(obj.digest) is None
+        for obj in (*fake_results, *fake_checkpoints)
+    )
+    conn = store._connect()
+    try:
+        assert conn.execute("SELECT COUNT(*) FROM immutable_objects").fetchone()[0] == object_count_before
+        assert conn.execute("SELECT COUNT(*) FROM receipts").fetchone()[0] == receipt_count_before
+    finally:
+        conn.close()
+    with pytest.raises(ValidationError):
+        E3BlindCheckpointService(store, batch, inbox).seal()
+
+    zero_result_checkpoints = [
+        CanonicalObject(
+            "checkpoint",
+            {**checkpoint.body, "sealed_output_refs": []},
+            checkpoint.schema_revision_ref,
+            checkpoint.logical_id,
+            checkpoint.version,
+        )
+        for checkpoint in fake_checkpoints
+    ]
+    lane_completions = []
+    for slot in batch.lane_slots:
+        assignment, attempt, lane_run, knowledge, _stage_run, _source_record = assignment_context[slot]
+        lane_completions.append(
+            CanonicalObject(
+                "lane_completion",
+                {
+                    "lane_completion_id": new_id("lane_completion"),
+                    "lane_run_ref": {
+                        **lane_run["ref"],
+                        "ref_class": "CONTENT_OR_PRIOR",
+                    },
+                    "lane_spec_ref": {
+                        **assignment["body"]["lane_spec_ref"],
+                        "ref_class": "HISTORY_CONTEXT_BINDING",
+                    },
+                    "input_history_cut": cut,
+                    "attempt_refs": [
+                        {**attempt["ref"], "ref_class": "CONTENT_OR_PRIOR"}
+                    ],
+                    "final_knowledge_state_ref": {
+                        **knowledge["ref"],
+                        "ref_class": "CONTENT_OR_PRIOR",
+                    },
+                    "required_output_refs": [
+                        zero_result_checkpoints[
+                            batch.lane_slots.index(slot)
+                        ].as_ref().as_dict()
+                    ],
+                    "isolation_qualification_ref": {
+                        **knowledge["body"]["isolation_qualification_ref"],
+                        "ref_class": "CONTENT_OR_PRIOR",
+                    },
+                    "contamination_assessment_refs": [],
+                    "completion_predicate_result": "LANE_COMPLETED",
+                },
+            )
+        )
+    e3_stage_run = assignment_context[batch.lane_slots[0]][4]
+    e3_stage_spec = store.resolve_accepted(e3_stage_run["body"]["stage_spec_ref"], cut)
+    stage_completion = CanonicalObject(
+        "stage_completion",
+        {
+            "stage_completion_id": new_id("stage_completion"),
+            "stage_run_ref": e3_stage_run["ref"],
+            "stage_spec_ref": e3_stage_spec["ref"],
+            "input_history_cut": cut,
+            "required_lane_slot_results": [obj.as_ref().as_dict() for obj in lane_completions],
+            "required_output_refs": [
+                obj.as_ref().as_dict() for obj in zero_result_checkpoints
+            ],
+            "mandatory_obligation_summary": {
+                "required_stage_completion_outputs": e3_stage_spec["body"][
+                    "required_stage_completion_outputs"
+                ]
+            },
+            "unresolved_material_refs": [],
+            "unknown_blocked_summary": {"unknown_surfaces_count": 0},
+            "completion_predicate_result": "STAGE_COMPLETED",
+        },
+    )
+    false_completion_command = CommandEnvelope(
+        command_id=_command_id("e3-zero-results-stage-completion:" + stage_completion.digest),
+        command_kind="RECORD_FOUNDATION_FACT",
+        actor_ref=prior_commit.get("actor_ref", "installation-owner"),
+        expected_parent_head={"tag": "ACCEPTED_HEAD_REF", **head_before.as_dict()},
+        governing_policy_ref=prior_commit["governing_policy_ref"],
+        governing_spec_refs=tuple(prior_commit.get("governing_spec_refs", ())),
+        idempotency_scope="e3-zero-results-stage-completion:" + stage_completion.digest,
+        campaign_ref=batch.campaign_id,
+    )
+    with pytest.raises(ValidationError, match="LANE_COMPLETION_EXECUTION_RESULT_REQUIRED"):
+        Coordinator(store).accept(
+            false_completion_command,
+            immutable_objects=[
+                *lane_completions,
+                stage_completion,
+                *zero_result_checkpoints,
+            ],
+            expected_head=head_before,
+        )
+    assert store.head() == head_before
+    assert len(store.commits()) == commit_count_before
+    assert all(
+        store.object_record(obj.digest) is None
+        for obj in (*lane_completions, stage_completion, *zero_result_checkpoints)
+    )
+    conn = store._connect()
+    try:
+        assert conn.execute(
+            "SELECT COUNT(*) FROM immutable_objects"
+        ).fetchone()[0] == object_count_before
+        assert conn.execute(
+            "SELECT COUNT(*) FROM receipts"
+        ).fetchone()[0] == receipt_count_before
+    finally:
+        conn.close()
+
+    imported = inbox.ingest_multiple_zips(
+        [
+            _write_result(tmp_path / f"real-{slot}.zip", batch, slot)
+            for slot in batch.lane_slots
+        ]
+    )
+    assert imported.phase_complete is True
+    sealed = E3BlindCheckpointService(store, batch, inbox).seal()
+    assert sealed.already_sealed is False
+    retried = E3BlindCheckpointService(store, batch, inbox).seal()
+    assert retried.already_sealed is True
+    assert retried.checkpoint_refs == sealed.checkpoint_refs
+
+
+def test_competing_finding_claim_roots_are_admitted_but_candidate_fails_closed(
+    tmp_path: Path,
+):
+    store_path = tmp_path / "finding-claim-branch-conflict.sqlite"
+    AuditOperationApi().create_campaign(
+        store_path,
+        seed="finding-claim-branch-conflict",
+    )
+    store = TransactionalHistoryStore(store_path)
+    ensure_pre_e3_scope_baseline(store)
+    cut = current_accepted_cut(store)
+    source = store.accepted_records("source_generation", cut)[-1]
+    claim_id = deterministic_id(
+        "finding_claim_revision", "ambiguous-lineage-test"
+    )
+    roots = (
+        FindingClaimRevision(
+            statement="Competing root revision A",
+            source_generation_ref=source["ref"],
+            claim_id=claim_id,
+            claim_revision="1",
+        ).as_object(),
+        FindingClaimRevision(
+            statement="Competing root revision B",
+            source_generation_ref=source["ref"],
+            claim_id=claim_id,
+            claim_revision="1",
+        ).as_object(),
+    )
+
+    def accept(obj: CanonicalObject, label: str):
+        head = store.head()
+        assert head is not None
+        prior = store.commits()[-1]
+        command = CommandEnvelope(
+            command_id=_command_id(f"{label}:{obj.digest}"),
+            command_kind="RECORD_FOUNDATION_FACT",
+            actor_ref=prior["actor_ref"],
+            expected_parent_head={"tag": "ACCEPTED_HEAD_REF", **head.as_dict()},
+            governing_policy_ref=prior["governing_policy_ref"],
+            governing_spec_refs=tuple(prior["governing_spec_refs"]),
+            idempotency_scope=f"{label}:{obj.digest}",
+            campaign_ref=head.campaign_id,
+        )
+        return Coordinator(store).accept(
+            command,
+            immutable_objects=[obj],
+            expected_head=head,
+        )
+
+    accept(roots[0], "finding-root-a")
+    accept(roots[1], "finding-root-b")
+    cut = current_accepted_cut(store)
+    accepted_roots = [
+        row
+        for row in store.accepted_records("finding_claim_revision", cut)
+        if row["body"].get("claim_id") == claim_id
+    ]
+    assert len(accepted_roots) == 2
+
+    inventory = store.accepted_records("inventory_revision", cut)[-1]
+    head = store.head()
+    assert head is not None
+    candidate_id = new_id("candidate_assurance_case")
+    candidate_model = CandidateAssuranceCase(
+        candidate_assurance_case_id=candidate_id,
+        campaign_ref=_external_ref(
+            "campaign_ref", head.campaign_id, "PRIOR_ACCEPTED_ONLY"
+        ),
+        source_generation_ref=dict(source["ref"], ref_class="CONTENT_OR_PRIOR"),
+        candidate_input_history_cut=cut,
+        scope_inventory_ref=dict(
+            inventory["ref"], ref_class="CONTENT_OR_PRIOR"
+        ),
+        coverage_obligation_refs=(),
+        coverage_obligation_qualification_refs=(),
+        finding_claim_revision_refs=(
+            roots[0].as_ref(ref_class="CONTENT_OR_PRIOR").as_dict(),
+        ),
+        finding_adjudication_refs=(),
+        contradiction_refs=(),
+        evidence_qualification_refs=(),
+        residual_risk_refs=(),
+        assurance_claim_set_ref=_external_ref(
+            "assurance_claim_set_ref",
+            "ambiguous-lineage-test-claim-set",
+            "CONTENT_OR_PRIOR",
+        ),
+    )
+    candidate = CanonicalObject(
+        "candidate_assurance_case",
+        candidate_model.body(),
+        logical_id=candidate_id,
+    )
+    before = store.head()
+    commit_count_before = len(store.commits())
+    conn = store._connect()
+    try:
+        object_count_before = conn.execute(
+            "SELECT COUNT(*) FROM immutable_objects"
+        ).fetchone()[0]
+        receipt_count_before = conn.execute(
+            "SELECT COUNT(*) FROM receipts"
+        ).fetchone()[0]
+    finally:
+        conn.close()
+    with pytest.raises(ValidationError, match="FINDING_CLAIM_BRANCH_CONFLICT"):
+        accept(candidate, "ambiguous-finding-candidate")
+    assert store.head() == before
+    assert len(store.commits()) == commit_count_before
+    assert store.object_record(candidate.digest) is None
+    conn = store._connect()
+    try:
+        assert conn.execute("SELECT COUNT(*) FROM immutable_objects").fetchone()[0] == object_count_before
+        assert conn.execute("SELECT COUNT(*) FROM receipts").fetchone()[0] == receipt_count_before
+    finally:
+        conn.close()
 
 
 def test_e3_enforced_proof_requires_accepted_boundary_receipts(

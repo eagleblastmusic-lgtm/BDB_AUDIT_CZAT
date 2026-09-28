@@ -15,7 +15,6 @@ import hashlib
 import json
 from pathlib import Path
 import time
-from types import SimpleNamespace
 from typing import Any, Callable, Sequence
 
 from ..history.objects import CommandEnvelope
@@ -96,10 +95,7 @@ class FinalizationService:
         from ..stop.operation import _require_current_campaign_cut
 
         _require_current_campaign_cut(
-            SimpleNamespace(
-                campaign_id=stop_input_body.get("campaign_id"),
-                input_history_cut=stop_input_body.get("input_history_cut", {}),
-            ),
+            stop_input_body,
             self.store,
             authoritative=True,
             accepted_commit_seq=accepted_seq,

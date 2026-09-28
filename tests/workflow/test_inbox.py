@@ -5,9 +5,14 @@ import io
 import json
 from pathlib import Path
 import zipfile
+from uuid import uuid4
 import pytest
 
+from bdb_audit.coordinator import Coordinator
 from bdb_audit.coordinator.operations import AuditOperationApi
+from bdb_audit.core.errors import ValidationError
+from bdb_audit.core.ids import new_id
+from bdb_audit.history.objects import CanonicalObject, CommandEnvelope
 from bdb_audit.history.store import TransactionalHistoryStore
 from bdb_audit.orchestration.native_ensemble import E1_LANE_SLOTS
 from bdb_audit.workflow.source_target import ResolvedSource
@@ -109,6 +114,157 @@ def test_multi_zips_order_independent_matching(inbox_setup):
     }
     assert accepted_discoveries <= output_digests
     assert summary.completion_digest == completion["ref"]["revision_digest"]
+
+    results_by_slot = {
+        row["body"]["lane_slot"]: row
+        for row in store.accepted_records("bdb_audit_lane_result", cut)
+        if row["body"].get("stage_id") == "E1"
+    }
+    lane_completions = store.accepted_records("lane_completion", cut)
+    assert len(results_by_slot) == len(E1_LANE_SLOTS)
+    assert len(lane_completions) == len(E1_LANE_SLOTS)
+    for lane_completion in lane_completions:
+        result = next(
+            store.resolve_accepted(ref, cut)
+            for ref in lane_completion["body"]["required_output_refs"]
+            if ref.get("kind") == "bdb_audit_lane_result"
+        )
+        slot = result["body"]["lane_slot"]
+        assert result["ref"]["revision_digest"] == results_by_slot[slot]["ref"]["revision_digest"]
+        assert result["body"]["assignment_ref"]["revision_digest"] == batch.get_job(slot).assignment_ref["revision_digest"]
+
+
+def test_e1_direct_lane_completion_rejects_foreign_execution_outputs(inbox_setup):
+    store, batch, inbox, tmp = inbox_setup
+    result_path = _create_result_zip(
+        tmp / "only-e1-a.zip", _valid_manifest_for_lane(batch, "E1-A")
+    )
+    imported = inbox.ingest_multiple_zips([result_path])
+    assert imported.accepted_count == 1
+    assert imported.stage_complete is False
+
+    cut = current_accepted_cut(store)
+    accepted_results = store.accepted_records("bdb_audit_lane_result", cut)
+    assert len(accepted_results) == 1
+    result = accepted_results[0]
+    result_ref = result["ref"]
+    lane_a_completion = next(
+        row
+        for row in store.accepted_records("lane_completion", cut)
+        if any(
+            ref.get("revision_digest") == result_ref["revision_digest"]
+            for ref in row["body"].get("required_output_refs", ())
+        )
+    )
+    foreign_outputs = lane_a_completion["body"]["required_output_refs"]
+
+    fake_completions = []
+    for slot, job in batch.jobs.items():
+        if slot == "E1-A":
+            continue
+        assignment = store.resolve_accepted(job.assignment_ref, cut)
+        attempt = store.resolve_accepted(job.attempt_ref, cut)
+        lane_run = store.resolve_accepted(attempt["body"]["lane_run_ref"], cut)
+        knowledge = store.resolve_accepted(assignment["body"]["knowledge_state_ref"], cut)
+        fake_completions.append(
+            CanonicalObject(
+                "lane_completion",
+                {
+                    "lane_completion_id": new_id("lane_completion"),
+                    "lane_run_ref": {
+                        **lane_run["ref"],
+                        "ref_class": lane_a_completion["body"]["lane_run_ref"]["ref_class"],
+                    },
+                    "lane_spec_ref": {
+                        **assignment["body"]["lane_spec_ref"],
+                        "ref_class": lane_a_completion["body"]["lane_spec_ref"]["ref_class"],
+                    },
+                    "input_history_cut": cut,
+                    "attempt_refs": [
+                        {
+                            **job.attempt_ref,
+                            "ref_class": lane_a_completion["body"]["attempt_refs"][0]["ref_class"],
+                        }
+                    ],
+                    "final_knowledge_state_ref": {
+                        **assignment["body"]["knowledge_state_ref"],
+                        "ref_class": lane_a_completion["body"]["final_knowledge_state_ref"]["ref_class"],
+                    },
+                    "required_output_refs": foreign_outputs,
+                    "isolation_qualification_ref": {
+                        **knowledge["body"]["isolation_qualification_ref"],
+                        "ref_class": lane_a_completion["body"]["isolation_qualification_ref"]["ref_class"],
+                    },
+                    "contamination_assessment_refs": [],
+                    "completion_predicate_result": "LANE_COMPLETED",
+                },
+            )
+        )
+
+    stage_run = next(
+        row
+        for row in store.accepted_records("stage_run", cut)
+        if store.resolve_accepted(row["body"]["stage_spec_ref"], cut)["body"].get("stage_key") == "E1"
+    )
+    stage_spec = store.resolve_accepted(stage_run["body"]["stage_spec_ref"], cut)
+    lane_refs = [obj.as_ref().as_dict() for obj in fake_completions]
+    stage_completion = CanonicalObject(
+        "stage_completion",
+        {
+            "stage_completion_id": new_id("stage_completion"),
+            "stage_run_ref": stage_run["ref"],
+            "stage_spec_ref": stage_spec["ref"],
+            "input_history_cut": cut,
+            "required_lane_slot_results": lane_refs,
+            "required_output_refs": foreign_outputs,
+            "mandatory_obligation_summary": {
+                "required_stage_completion_outputs": stage_spec["body"][
+                    "required_stage_completion_outputs"
+                ]
+            },
+            "unresolved_material_refs": [],
+            "unknown_blocked_summary": {"unknown_surfaces_count": 0},
+            "completion_predicate_result": "STAGE_COMPLETED",
+        },
+    )
+
+    head_before = store.head()
+    commit_count_before = len(store.commits())
+    con = store._connect()
+    try:
+        object_count_before = con.execute("SELECT COUNT(*) FROM immutable_objects").fetchone()[0]
+        receipt_count_before = con.execute("SELECT COUNT(*) FROM receipts").fetchone()[0]
+    finally:
+        con.close()
+    prior_commit = store.commits()[-1]
+    command = CommandEnvelope(
+        command_id=f"command_{uuid4()}",
+        command_kind="RECORD_FOUNDATION_FACT",
+        actor_ref=prior_commit["actor_ref"],
+        expected_parent_head={"tag": "ACCEPTED_HEAD_REF", **head_before.as_dict()},
+        governing_policy_ref=prior_commit["governing_policy_ref"],
+        governing_spec_refs=tuple(prior_commit["governing_spec_refs"]),
+        idempotency_scope=f"foreign-e1-completion:{uuid4().hex}",
+        campaign_ref=head_before.campaign_id,
+    )
+
+    with pytest.raises(ValidationError, match="LANE_COMPLETION_RESULT_PROVENANCE_MISMATCH"):
+        Coordinator(store).accept(
+            command,
+            immutable_objects=[*fake_completions, stage_completion],
+            expected_head=head_before,
+        )
+
+    assert store.head() == head_before
+    assert len(store.commits()) == commit_count_before
+    con = store._connect()
+    try:
+        assert con.execute("SELECT COUNT(*) FROM immutable_objects").fetchone()[0] == object_count_before
+        assert con.execute("SELECT COUNT(*) FROM receipts").fetchone()[0] == receipt_count_before
+    finally:
+        con.close()
+    assert all(store.object_record(obj.digest) is None for obj in (*fake_completions, stage_completion))
+    assert "E1" not in AuditOperationApi().get_campaign_status(store.path)["stages_completed"]
 
 
 def test_missing_lane_reports_waiting(inbox_setup):
