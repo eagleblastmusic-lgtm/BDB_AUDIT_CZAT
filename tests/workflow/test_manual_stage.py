@@ -557,7 +557,10 @@ def test_e3_blind_checkpoint_and_stage_completion_require_accepted_results(
         idempotency_scope="e3-fake-blind-results:" + ":".join(obj.digest for obj in fake_checkpoints),
         campaign_ref=batch.campaign_id,
     )
-    with pytest.raises(ValidationError, match="E3_BLIND_CHECKPOINT_ACCEPTED_RESULT_REQUIRED"):
+    with pytest.raises(
+        ValidationError,
+        match="E3_BLIND_CHECKPOINT_ACCEPTED_RESULT_REQUIRED|SCHEMA_VALIDATION_FAILED",
+    ):
         Coordinator(store).accept(
             command,
             immutable_objects=[*fake_results, *fake_checkpoints],

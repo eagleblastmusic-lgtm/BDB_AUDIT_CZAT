@@ -38,14 +38,68 @@ class ContractRegistry:
         self.validate_definition(doc)
         # R5.3 extension contracts for orchestrator / auditor submission artifacts (v2.0.3)
         self._extension_contracts: dict[tuple[str, str], dict] = {
+            ("lane_result_admission_evidence", "1"): {
+                "authoritative_for": "canonical admission proof for external lane result ingestion",
+                "canonical_role": "PROVENANCE",
+                "consumer_roles": ["COORDINATOR", "VALIDATOR", "STORE"],
+                "identity_semantics": "BDB-CJSON-1 + BDB-OBJECT-DIGEST-1 unless RAW/EXPORT",
+                "kind": "lane_result_admission_evidence",
+                "lifecycle": "IMMUTABLE",
+                "material_refs": [
+                    {
+                        "field": "assignment_ref",
+                        "ref_class": "PRIOR_ACCEPTED_ONLY",
+                        "cardinality": "1",
+                        "allowed": ["assignment_manifest"],
+                    },
+                    {
+                        "field": "attempt_ref",
+                        "ref_class": "PRIOR_ACCEPTED_ONLY",
+                        "cardinality": "1",
+                        "allowed": ["attempt"],
+                    },
+                    {
+                        "field": "source_generation_ref",
+                        "ref_class": "PRIOR_ACCEPTED_ONLY",
+                        "cardinality": "1",
+                        "allowed": ["source_generation"],
+                    },
+                ],
+                "ordering_rules": {},
+                "producer_authority": "TRUSTED_INGESTION_BOUNDARY",
+                "reference_contract_mode": "SCHEMA_BOUND_BEFORE_FIRST_ACCEPTANCE",
+                "required_validation_layers": ["L1", "L2", "L4", "L5"],
+                "schema_ref": "BDB_SCHEMA_REGISTRY::lane_result_admission_evidence/1",
+                "validation_profile": "DERIVED",
+                "version": "1",
+            },
             ("bdb_audit_lane_result", "1"): {
                 "authoritative_for": "auditor lane result submission package",
                 "canonical_role": "PROPOSAL",
-                "consumer_roles": ["COORDINATOR", "VALIDATOR"],
+                "consumer_roles": ["COORDINATOR", "VALIDATOR", "STORE"],
                 "identity_semantics": "BDB-CJSON-1 + BDB-OBJECT-DIGEST-1 unless RAW/EXPORT",
                 "kind": "bdb_audit_lane_result",
                 "lifecycle": "IMMUTABLE",
-                "material_refs": [],
+                "material_refs": [
+                    {
+                        "field": "admission_evidence_ref",
+                        "ref_class": "PRIOR_ACCEPTED_ONLY",
+                        "cardinality": "1",
+                        "allowed": ["lane_result_admission_evidence"],
+                    },
+                    {
+                        "field": "assignment_ref",
+                        "ref_class": "PRIOR_ACCEPTED_ONLY",
+                        "cardinality": "0..1",
+                        "allowed": ["assignment_manifest"],
+                    },
+                    {
+                        "field": "attempt_ref",
+                        "ref_class": "PRIOR_ACCEPTED_ONLY",
+                        "cardinality": "0..1",
+                        "allowed": ["attempt"],
+                    },
+                ],
                 "ordering_rules": {},
                 "producer_authority": "AUDITOR_EXTERNAL",
                 "reference_contract_mode": "SCHEMA_BOUND_BEFORE_FIRST_ACCEPTANCE",
@@ -53,7 +107,7 @@ class ContractRegistry:
                 "schema_ref": "BDB_SCHEMA_REGISTRY::bdb_audit_lane_result/1",
                 "validation_profile": "DERIVED",
                 "version": "1",
-            }
+            },
         }
 
     @property
@@ -154,7 +208,8 @@ class ContractRegistry:
         return role
 
     def target(self, kind):
-        if kind not in self._doc["reference_target_classes"] and (kind, "1") not in self._contracts:
+        has_extension = hasattr(self, "_extension_contracts") and any(k == kind for k, _ in self._extension_contracts)
+        if kind not in self._doc["reference_target_classes"] and (kind, "1") not in self._contracts and not has_extension:
             raise ValidationError("UNRESOLVED_REFERENCE_TARGET", str(kind))
         return kind
 

@@ -102,7 +102,7 @@ F7_KINDS = (
     "successor_campaign_selection_decision",
 )
 
-ALL_EXECUTABLE_KINDS = tuple(dict.fromkeys((*F7_KINDS, "bdb_audit_lane_result")))
+ALL_EXECUTABLE_KINDS = tuple(dict.fromkeys((*F7_KINDS, "lane_result_admission_evidence", "bdb_audit_lane_result")))
 
 
 def executable_schema(kind, *, registry=None):

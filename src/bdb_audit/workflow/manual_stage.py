@@ -2072,6 +2072,43 @@ class StageResultInbox:
                 evidence_files
             )
 
+            # Construct canonical admission evidence
+            proposal_without_ref = dict(proposal_body)
+            result_proposal_digest = hashlib.sha256(canonical_bytes(proposal_without_ref)).hexdigest()
+            cut, _ = _current_cut(self.store)
+            assignment_record = self.store.resolve_accepted(job.assignment_ref, cut)
+            assignment = assignment_record["body"]
+            attempt_record = self.store.resolve_accepted(assignment["attempt_ref"], cut)
+            source_record = self.store.resolve_accepted(assignment["source_generation_ref"], cut)
+
+            evidence_id = deterministic_id(
+                "lane_result_admission_evidence",
+                f"{assignment_record['ref']['revision_digest']}:{raw_digest}",
+            )
+            evidence_body = {
+                "kind": "lane_result_admission_evidence",
+                "version": "1",
+                "admission_evidence_id": evidence_id,
+                "campaign_id": self.batch.campaign_id,
+                "stage_id": self.batch.stage_id,
+                "phase_id": self.batch.phase_id,
+                "lane_slot": str(slot),
+                "assignment_ref": _with_ref_class(assignment_record["ref"], "PRIOR_ACCEPTED_ONLY"),
+                "attempt_ref": _with_ref_class(attempt_record["ref"], "PRIOR_ACCEPTED_ONLY"),
+                "source_generation_ref": _with_ref_class(source_record["ref"], "PRIOR_ACCEPTED_ONLY"),
+                "source_commit_sha": job.source_commit_sha,
+                "history_cut": dict(expected_cut),
+                "input_package_digest": job.package_digest,
+                "raw_result_digest": raw_digest,
+                "raw_result_byte_length": len(raw),
+                "result_proposal_digest": result_proposal_digest,
+                "executor_profile": job.executor_profile,
+                "executor_model": job.model,
+                "evidence_files": evidence_files,
+            }
+            evidence_obj = CanonicalObject("lane_result_admission_evidence", evidence_body)
+            proposal_body["admission_evidence_ref"] = evidence_obj.as_ref(ref_class="PRIOR_ACCEPTED_ONLY").as_dict()
+
             try:
                 LayeredValidator(
                     registry=self.store.registry
@@ -2124,6 +2161,7 @@ class StageResultInbox:
             self._accept_result(
                 job=job,
                 proposal_body=proposal_body,
+                evidence_obj=evidence_obj,
                 raw_digest=raw_digest,
             )
             self._load_accepted_state()
@@ -2166,6 +2204,7 @@ class StageResultInbox:
         *,
         job: StageLaneJob,
         proposal_body: dict[str, Any],
+        evidence_obj: CanonicalObject,
         raw_digest: str,
     ) -> None:
         cut, prior_commit = _current_cut(self.store)
@@ -2180,6 +2219,35 @@ class StageResultInbox:
             raise ValidationError(
                 "ASSIGNMENT_ATTEMPT_BINDING_MISMATCH"
             )
+
+        # Step 1: Ingest lane_result_admission_evidence if not already accepted
+        accepted_evidences = [
+            row for row in self.store.accepted_records("lane_result_admission_evidence", cut)
+            if _same_ref(row["body"].get("assignment_ref"), job.assignment_ref)
+            and row["body"].get("raw_result_digest") == raw_digest
+        ]
+        if not accepted_evidences:
+            head = self.store.head()
+            if head is None:
+                raise ValidationError("CAMPAIGN_NOT_INITIALIZED")
+            evidence_command = CommandEnvelope(
+                command_id=_command_id(
+                    f"evidence:{assignment_record['ref']['revision_digest']}:{raw_digest}"
+                ),
+                command_kind="INGEST_EXTERNAL_LANE_RESULT",
+                actor_ref=prior_commit.get("actor_ref", "installation-owner"),
+                expected_parent_head={"tag": "ACCEPTED_HEAD_REF", **head.as_dict()},
+                governing_policy_ref=prior_commit["governing_policy_ref"],
+                governing_spec_refs=tuple(prior_commit.get("governing_spec_refs", ())),
+                idempotency_scope=f"evidence:{assignment_record['ref']['revision_digest']}:{raw_digest}",
+                campaign_ref=head.campaign_id,
+            )
+            self.coordinator.accept(
+                evidence_command,
+                immutable_objects=[evidence_obj],
+                expected_head=head,
+            )
+            cut, prior_commit = _current_cut(self.store)
 
         attempt_record = self.store.resolve_accepted(
             assignment["attempt_ref"], cut
