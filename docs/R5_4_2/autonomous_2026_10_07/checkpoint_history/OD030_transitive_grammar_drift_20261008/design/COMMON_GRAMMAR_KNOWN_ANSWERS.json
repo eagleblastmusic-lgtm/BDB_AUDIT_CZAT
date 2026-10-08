@@ -1,0 +1,169 @@
+{
+  "vectors": [
+    {
+      "grammar": "path",
+      "input": "src/main.py",
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "path",
+      "input": "../main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "path",
+      "input": "src/../main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "path",
+      "input": "src\\main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "path",
+      "input": "/main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "path",
+      "input": "src//main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "safe_integer",
+      "input": true,
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "safe_integer",
+      "input": 9007199254740992,
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "safe_integer",
+      "input": -9007199254740991,
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "int32",
+      "input": 2147483648,
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "accepted_event_ref",
+      "input": {
+        "accepting_commit_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "ordinal": 0
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "accepted_event_ref",
+      "input": {
+        "accepting_commit_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "ordinal": 0,
+        "trusted": true
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "scope_key",
+      "input": {
+        "scope_kind": "PATH",
+        "path": "src/main.py"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "model_state",
+      "input": {
+        "values": [
+          true,
+          true
+        ]
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "observable_selector",
+      "input": {
+        "selector_kind": "JSON_POINTER",
+        "pointer": "/~0/~1"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "observable_selector",
+      "input": {
+        "selector_kind": "JSON_POINTER",
+        "pointer": "/~2"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "observable_selector",
+      "input": {
+        "selector_kind": "EVAL",
+        "expression": "True"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "expected_value",
+      "input": {
+        "value_kind": "BOOLEAN",
+        "value": 1
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "expected_value",
+      "input": {
+        "value_kind": "INTEGER",
+        "value": true
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    }
+  ],
+  "status": "PASS",
+  "claim": "Draft syntax only; cross-object predicates and canonical mutation checks NOT_RUN"
+}

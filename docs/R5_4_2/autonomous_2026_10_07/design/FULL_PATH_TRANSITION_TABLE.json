@@ -1,0 +1,495 @@
+{
+  "profile_id": "FULL_PATH_TRANSITION_TABLE_V2",
+  "source_raw_digest": "7d967707d8f7a0d77ab84484aeb4de0119dab85ed055c31473792c8528919f75",
+  "source_section": "14.2",
+  "transitions": [
+    {
+      "aggregate_kind": "ATTEMPT",
+      "from_state": "CREATED",
+      "to_state": "CANCELLED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "ATTEMPT",
+      "from_state": "CREATED",
+      "to_state": "STARTED",
+      "guard": "ATTEMPT_START"
+    },
+    {
+      "aggregate_kind": "ATTEMPT",
+      "from_state": "CREATED",
+      "to_state": "SUPERSEDED",
+      "guard": "SUPERSEDE"
+    },
+    {
+      "aggregate_kind": "ATTEMPT",
+      "from_state": "RESULT_RECEIVED",
+      "to_state": "BLOCKED",
+      "guard": "ATTEMPT_FAILURE"
+    },
+    {
+      "aggregate_kind": "ATTEMPT",
+      "from_state": "RESULT_RECEIVED",
+      "to_state": "FAILED",
+      "guard": "ATTEMPT_FAILURE"
+    },
+    {
+      "aggregate_kind": "ATTEMPT",
+      "from_state": "RESULT_RECEIVED",
+      "to_state": "RESULT_ACCEPTED",
+      "guard": "RESULT_ACCEPT"
+    },
+    {
+      "aggregate_kind": "ATTEMPT",
+      "from_state": "RESULT_RECEIVED",
+      "to_state": "SUPERSEDED",
+      "guard": "SUPERSEDE"
+    },
+    {
+      "aggregate_kind": "ATTEMPT",
+      "from_state": "STARTED",
+      "to_state": "BLOCKED",
+      "guard": "ATTEMPT_FAILURE"
+    },
+    {
+      "aggregate_kind": "ATTEMPT",
+      "from_state": "STARTED",
+      "to_state": "CANCELLED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "ATTEMPT",
+      "from_state": "STARTED",
+      "to_state": "FAILED",
+      "guard": "ATTEMPT_FAILURE"
+    },
+    {
+      "aggregate_kind": "ATTEMPT",
+      "from_state": "STARTED",
+      "to_state": "RESULT_RECEIVED",
+      "guard": "RESULT_RECEIVE"
+    },
+    {
+      "aggregate_kind": "ATTEMPT",
+      "from_state": "STARTED",
+      "to_state": "SUPERSEDED",
+      "guard": "SUPERSEDE"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "AUDIT_RUNNING",
+      "to_state": "BLOCKED",
+      "guard": "STOP_BLOCKED"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "AUDIT_RUNNING",
+      "to_state": "CAMPAIGN_CONCLUDED",
+      "guard": "FINAL_PASS_CONCLUSION"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "AUDIT_RUNNING",
+      "to_state": "CAMPAIGN_CONCLUDED",
+      "guard": "LIMITED_CONCLUSION"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "AUDIT_RUNNING",
+      "to_state": "E6_REQUIRED",
+      "guard": "E6_REQUIRED"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "BLOCKED",
+      "to_state": "AUDIT_RUNNING",
+      "guard": "RESOLVE_CAMPAIGN_BLOCKER"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "BLOCKED",
+      "to_state": "CAMPAIGN_CONCLUDED",
+      "guard": "LIMITED_CONCLUSION"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "CAMPAIGN_CONCLUDED",
+      "to_state": "CLOSED",
+      "guard": "CAMPAIGN_CLOSE"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "CREATED",
+      "to_state": "GENESIS_ACCEPTED",
+      "guard": "GENESIS"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "E0_READY",
+      "to_state": "AUDIT_RUNNING",
+      "guard": "AUDIT_START"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "E0_READY",
+      "to_state": "BLOCKED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "E0_READY",
+      "to_state": "CANCELLED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "E6_REQUIRED",
+      "to_state": "BLOCKED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "E6_REQUIRED",
+      "to_state": "CAMPAIGN_CONCLUDED",
+      "guard": "LIMITED_CONCLUSION"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "E6_REQUIRED",
+      "to_state": "E6_RUNNING",
+      "guard": "E6_START"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "E6_RUNNING",
+      "to_state": "BLOCKED",
+      "guard": "STOP_BLOCKED"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "E6_RUNNING",
+      "to_state": "CAMPAIGN_CONCLUDED",
+      "guard": "FINAL_PASS_CONCLUSION"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "E6_RUNNING",
+      "to_state": "CAMPAIGN_CONCLUDED",
+      "guard": "LIMITED_CONCLUSION"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "E6_RUNNING",
+      "to_state": "E6_REQUIRED",
+      "guard": "E6_REQUIRED"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "GENESIS_ACCEPTED",
+      "to_state": "BLOCKED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "GENESIS_ACCEPTED",
+      "to_state": "CANCELLED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "CAMPAIGN",
+      "from_state": "GENESIS_ACCEPTED",
+      "to_state": "E0_READY",
+      "guard": "E0_READY"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "COMPLETION_CANDIDATE",
+      "to_state": "BLOCKED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "COMPLETION_CANDIDATE",
+      "to_state": "COMPLETION_ACCEPTED",
+      "guard": "COMPLETION_ACCEPT"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "COMPLETION_CANDIDATE",
+      "to_state": "RUNNING",
+      "guard": "RETURN_TO_RUNNING"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "COMPLETION_CANDIDATE",
+      "to_state": "SUPERSEDED",
+      "guard": "SUPERSEDE"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "PLANNED",
+      "to_state": "BLOCKED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "PLANNED",
+      "to_state": "CANCELLED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "PLANNED",
+      "to_state": "READY",
+      "guard": "RUN_READY"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "PLANNED",
+      "to_state": "SUPERSEDED",
+      "guard": "SUPERSEDE"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "READY",
+      "to_state": "BLOCKED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "READY",
+      "to_state": "CANCELLED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "READY",
+      "to_state": "RUNNING",
+      "guard": "RUN_START"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "READY",
+      "to_state": "SUPERSEDED",
+      "guard": "SUPERSEDE"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "RUNNING",
+      "to_state": "BLOCKED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "RUNNING",
+      "to_state": "CANCELLED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "RUNNING",
+      "to_state": "COMPLETION_CANDIDATE",
+      "guard": "COMPLETION_CANDIDATE"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "RUNNING",
+      "to_state": "SUPERSEDED",
+      "guard": "SUPERSEDE"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "RUNNING",
+      "to_state": "WAITING_RESULT",
+      "guard": "INPUT_WAIT"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "WAITING_RESULT",
+      "to_state": "BLOCKED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "WAITING_RESULT",
+      "to_state": "CANCELLED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "WAITING_RESULT",
+      "to_state": "COMPLETION_CANDIDATE",
+      "guard": "COMPLETION_CANDIDATE"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "WAITING_RESULT",
+      "to_state": "RUNNING",
+      "guard": "INPUT_WAIT"
+    },
+    {
+      "aggregate_kind": "LANE_RUN",
+      "from_state": "WAITING_RESULT",
+      "to_state": "SUPERSEDED",
+      "guard": "SUPERSEDE"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "COMPLETION_CANDIDATE",
+      "to_state": "BLOCKED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "COMPLETION_CANDIDATE",
+      "to_state": "COMPLETION_ACCEPTED",
+      "guard": "COMPLETION_ACCEPT"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "COMPLETION_CANDIDATE",
+      "to_state": "RUNNING",
+      "guard": "RETURN_TO_RUNNING"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "COMPLETION_CANDIDATE",
+      "to_state": "SUPERSEDED",
+      "guard": "SUPERSEDE"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "PLANNED",
+      "to_state": "BLOCKED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "PLANNED",
+      "to_state": "CANCELLED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "PLANNED",
+      "to_state": "READY",
+      "guard": "RUN_READY"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "PLANNED",
+      "to_state": "SUPERSEDED",
+      "guard": "SUPERSEDE"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "READY",
+      "to_state": "BLOCKED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "READY",
+      "to_state": "CANCELLED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "READY",
+      "to_state": "RUNNING",
+      "guard": "RUN_START"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "READY",
+      "to_state": "SUPERSEDED",
+      "guard": "SUPERSEDE"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "RUNNING",
+      "to_state": "BLOCKED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "RUNNING",
+      "to_state": "CANCELLED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "RUNNING",
+      "to_state": "COMPLETION_CANDIDATE",
+      "guard": "COMPLETION_CANDIDATE"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "RUNNING",
+      "to_state": "SUPERSEDED",
+      "guard": "SUPERSEDE"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "RUNNING",
+      "to_state": "WAITING_FOR_REQUIRED_INPUT",
+      "guard": "INPUT_WAIT"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "WAITING_FOR_REQUIRED_INPUT",
+      "to_state": "BLOCKED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "WAITING_FOR_REQUIRED_INPUT",
+      "to_state": "CANCELLED",
+      "guard": "BLOCK_OR_CANCEL"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "WAITING_FOR_REQUIRED_INPUT",
+      "to_state": "COMPLETION_CANDIDATE",
+      "guard": "COMPLETION_CANDIDATE"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "WAITING_FOR_REQUIRED_INPUT",
+      "to_state": "RUNNING",
+      "guard": "INPUT_WAIT"
+    },
+    {
+      "aggregate_kind": "STAGE_RUN",
+      "from_state": "WAITING_FOR_REQUIRED_INPUT",
+      "to_state": "SUPERSEDED",
+      "guard": "SUPERSEDE"
+    }
+  ],
+  "guard_contracts": {
+    "GENESIS": "Only the legal initial or successor genesis admission closure can establish identity; exact initialization namespace, roots and union-DAG rules apply.",
+    "E0_READY": "All current exact bootstrap, source, environment and E0 readiness prerequisites independently pass.",
+    "AUDIT_START": "Exact current source/policy and legally ready required ordinary-stage plan; no skipped prerequisite.",
+    "BLOCK_OR_CANCEL": "Truthful independently supported blocker/failure or authenticated administrative cancellation; no assurance upgrade.",
+    "STOP_BLOCKED": "Exact applicable prior StopEvaluation has BLOCKED at the declared intermediate/final/post-E6 context; complete reasons retained.",
+    "E6_REQUIRED": "Exact applicable prior final/post-E6 StopEvaluation has E6_REQUIRED and supplies the legally required continuation scope.",
+    "E6_START": "Prior E6_REQUIRED decision and applicable accepted continuation plan/budget/authorizations; unknown prerequisites reject.",
+    "FINAL_PASS_CONCLUSION": "Prior current final/post-E6 StopEvaluation PASS and independently lawful accepted CampaignConclusion COMPLETED, complete required stages/candidate/challengers and no omitted material blocker. Conclusion may be an earlier content dependency in the same atomic accepting command only if its exact reference class permits; STOP/context/approval prerequisites are prior-only.",
+    "LIMITED_CONCLUSION": "Exact lawful accepted limited conclusion with separate required prior owner approval and complete unresolved-material disclosure. AUDIT_RUNNING/E6_RUNNING require the exact applicable BLOCKED STOP; E6_REQUIRED requires its existing E6_REQUIRED basis; BLOCKED requires complete exact limited-conclusion basis. Only COMPLETED_LIMITED; no PASS/full assurance or false release readiness. Same-command conclusion content is allowed only by its exact reference class and acyclic atomic order, never by future reference.",
+    "RESOLVE_CAMPAIGN_BLOCKER": "Exact resolved_blocker_refs prove all blocking facts remediated; unchanged source/policy and accepted ResolveBlocker/ReopenCampaign. New STOP required before any success conclusion.",
+    "CAMPAIGN_CLOSE": "Prior accepted lawful CampaignConclusion and required finalization/report/close prerequisites; cancellation cannot fabricate conclusion authority.",
+    "RUN_READY": "Exact run/spec/source, predecessor outputs and planned slot prerequisites; independent knowledge/isolation/gate predicates pass.",
+    "RUN_START": "Ready exact run with active lawful campaign/parent, source and required authority; no terminal predecessor mutation.",
+    "INPUT_WAIT": "Current exact source/run and independently observed required-input availability state; waiting does not satisfy missing outputs.",
+    "COMPLETION_CANDIDATE": "All spec-required result/output slots supplied through their lawful accepted chains; candidate status is not completion qualification.",
+    "COMPLETION_ACCEPT": "Independent complete L1-L7 lane/stage completion predicates, current cut/source, exact slots, knowledge/isolation, required outputs, accounting and evidence applicability.",
+    "RETURN_TO_RUNNING": "Independent current evidence demonstrates completion-candidate prerequisites are not satisfied; no accepted completion revision is mutated.",
+    "SUPERSEDE": "Authenticated exact prior-run/attempt supersession with lawful reason/current cut; no replacement of historical binding/results or retroactive execution.",
+    "ATTEMPT_START": "Exact prior assignment and unique prior durable package binding in a separate earlier commit; CREATED active attempt, current source/grants/knowledge/isolation. Delivery remains separately guarded.",
+    "RESULT_RECEIVE": "Trusted independent result raw admission, exact prior assignment/binding/STARTED, active declared slot and current input cut; caller command kind/token/body assertions confer no authority.",
+    "RESULT_ACCEPT": "Prior accepted admission evidence in an earlier commit and exact independent retained-byte normalization; active slot/source/attempt and current result cut. No same-commit shortcut.",
+    "ATTEMPT_FAILURE": "Truthful supported execution failure/blocker under current exact context; cannot create result/completion authority."
+  },
+  "candidate_materialized": false,
+  "runtime": "NOT_RUN"
+}

@@ -1,0 +1,1796 @@
+{
+  "nodes": [
+    {
+      "source_key": "approval_decision/1",
+      "design_key": "approval_decision/2",
+      "review_input_digest": "10a3ea0b33d449762c7c7a8cbf44017711e4052ce83b41eaa417e3597dc52211",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MODEL_COMPLETION_AUTHORIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0d7774b642590e18ee0b038d9124f8276570cdd7f141ea2cfac2c86426c98a84"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "artifact_contract_registry/1",
+      "design_key": "artifact_contract_registry/1",
+      "review_input_digest": "91a9112e910db858d55ed51f823994ef588a403095c3cbb62c0673c3672129df",
+      "source_paragraphs": 27,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "artifact_hash_manifest/1",
+      "design_key": "artifact_hash_manifest/2",
+      "review_input_digest": "1133e0ade73fea67710a3bb09d4d3b187c8da90337c5e620e59555fc4620d790",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "assignment_manifest/1",
+      "design_key": "assignment_manifest/2",
+      "review_input_digest": "3ca7b932a50898daa8bc66ce3f31e8ef97b7b9a8281f90fc2e75d1102b2281d4",
+      "source_paragraphs": 69,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "assignment_package_binding/1",
+      "design_key": "assignment_package_binding/2",
+      "review_input_digest": "82ad57bef3d523605421b44568c938f337b47661fc335091e92d84ed86e48e8a",
+      "source_paragraphs": 75,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "assurance_claim_set/1",
+      "design_key": "assurance_claim_set/1",
+      "review_input_digest": "4b0d2c05b7e7e55feff6efe3266947df56e18ddb93e94751f96e6961b015da0c",
+      "source_paragraphs": 30,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "attempt/1",
+      "design_key": "attempt/2",
+      "review_input_digest": "4e8c83491ceb9302769374d4187e92b9ae7eed11e14db66bcb249868491e77a0",
+      "source_paragraphs": 69,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "bdb_audit_lane_result/2",
+      "design_key": "bdb_audit_lane_result/3",
+      "review_input_digest": "2a13261f10fdc95671c621aa98201bb25904cc45f0016afc9ec5d83dd1f8fc75",
+      "source_paragraphs": 75,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "blind_origin_eligibility_assessment/1",
+      "design_key": "blind_origin_eligibility_assessment/2",
+      "review_input_digest": "1fbd7bec259c46d83fe91759b1e305be0ee3a2cb0dda0aef7cc52d7a016a2739",
+      "source_paragraphs": 20,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/EVIDENCE_FINDING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "189e335927e3861c051cf27c53f0eca165053c84923ab661b8f9aba7d6ad45a8"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "bootstrap_admission_decision/1",
+      "design_key": "bootstrap_admission_decision/2",
+      "review_input_digest": "06e1660bbd439505eab01a0967fa69e2e584f6a296235e254742c8b4ba9eba19",
+      "source_paragraphs": 25,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "review_input_digest": "7ad140fe0db5d01a98803bd0a273355a55dafc630004a85785df314aa4faffaa",
+      "source_paragraphs": 7,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "bundle_manifest/2",
+      "design_key": "bundle_manifest/2",
+      "review_input_digest": "9d7b01ead27d00944512e39637a6468d5bd8b74aa3ff6797387d9f2334666b08",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "campaign_conclusion/1",
+      "design_key": "campaign_conclusion/2",
+      "review_input_digest": "94568e35541a1fc939620b4d6b226313a80ece154fda8fa50915039b397c498b",
+      "source_paragraphs": 27,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/STOP_FINALIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "677300605c35d27e15e199377ab31da8aa82b8062e647e12e76607671665c395"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "campaign_genesis/1",
+      "design_key": "campaign_genesis/2",
+      "review_input_digest": "e22f13e63f9c29b20f6d8099eb2eff1d97dc957c37dc036a468ff01518a055a1",
+      "source_paragraphs": 21,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "review_input_digest": "fff3ad9819a90709d264e37d9fbf169e58e69b9d3aeed08aa434725acba606a5",
+      "source_paragraphs": 27,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/STOP_FINALIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "677300605c35d27e15e199377ab31da8aa82b8062e647e12e76607671665c395"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "challenger_assignment/1",
+      "design_key": "challenger_assignment/2",
+      "review_input_digest": "4f93c86b218e6d2eb6bd7010d625fa2afd7b0df1c3591ee5bbcf018a5ef0dee6",
+      "source_paragraphs": 27,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/STOP_FINALIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "677300605c35d27e15e199377ab31da8aa82b8062e647e12e76607671665c395"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "challenger_result/1",
+      "design_key": "challenger_result/2",
+      "review_input_digest": "6bbf678c6e47e98de341f77dca43405dc7f72638ab9fabc25c909d92d7275deb",
+      "source_paragraphs": 27,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/STOP_FINALIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "677300605c35d27e15e199377ab31da8aa82b8062e647e12e76607671665c395"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "checkpoint/1",
+      "design_key": "checkpoint/2",
+      "review_input_digest": "b7f5319494da597f9e5fcfe160b6d58428580cb55204ffc93fc91c84392a5212",
+      "source_paragraphs": 6,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SPEC_CHECKPOINT_SNAPSHOT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "cb15033781903c8483009252fe7018241a15c37766c995cbb52f86a1fca703ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "clean_control_assessment/1",
+      "design_key": "clean_control_assessment/1",
+      "review_input_digest": "ef242de160c59870f6f3dfdb3431a734f7eb043934ac8c1781a1c8c5d7acae05",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/PURPOSE_DISPATCH_VARIANT_REVIEW.md",
+          "raw_digest": "0cfd0738b2ecbee5cfb1b44e6ae0f5bdbe6bbaa08e291d0ea374c34c848ca305"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "cleanup_result/2",
+      "design_key": "cleanup_result/2",
+      "review_input_digest": "e81f2f881cf06acee988bd9185daea61ba84f1899c6a7be7785906531ce01199",
+      "source_paragraphs": 4,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MODEL_COMPLETION_AUTHORIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0d7774b642590e18ee0b038d9124f8276570cdd7f141ea2cfac2c86426c98a84"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "review_input_digest": "26222f4945eed6da2847acd3f63e5c7359a370a29cf741457d24646ddf691cf3",
+      "source_paragraphs": 36,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "command_receipt/1",
+      "design_key": "command_receipt/2",
+      "review_input_digest": "cd77d2f93fd38c86415710b87893bf958ea6619982383fd5ea26b6f79e357d49",
+      "source_paragraphs": 36,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "commit_body/1",
+      "design_key": "commit_body/2",
+      "review_input_digest": "0c79d421b7497576885f98cba10af2c281fbb69b503b1be1f3a73b6876e1cdc5",
+      "source_paragraphs": 36,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "compatibility_fixture_assessment/1",
+      "design_key": "compatibility_fixture_assessment/2",
+      "review_input_digest": "c6f45be6039d79560325eb940007e9d011e0756a64f2114c3227205babbfc991",
+      "source_paragraphs": 10,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "compatibility_gate_result/1",
+      "design_key": "compatibility_gate_result/2",
+      "review_input_digest": "4a7c04fcd31d76401c6a370ed77a76e5a886f4d4cc6af6c24699bf6380d96d51",
+      "source_paragraphs": 10,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "contamination_assessment/1",
+      "design_key": "contamination_assessment/2",
+      "review_input_digest": "bec6455119b0b92ed51083d38d3e0cf9e4ed560e401c842aa3c0765fd0e65a97",
+      "source_paragraphs": 16,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/KNOWLEDGE_CORPUS_PROJECTION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ad485dea1156136dd85976f05b3e702a1a6a60ba6f6dac56237484af914996ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "contradiction_resolution_decision/1",
+      "design_key": "contradiction_resolution_decision/2",
+      "review_input_digest": "f509d99de61e23319c52f8aa53bd6c33f9e7a867ced7d0de3422d472d2785e70",
+      "source_paragraphs": 10,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/EVIDENCE_FINDING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "189e335927e3861c051cf27c53f0eca165053c84923ab661b8f9aba7d6ad45a8"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "contradiction_revision/1",
+      "design_key": "contradiction_revision/2",
+      "review_input_digest": "44c019d3621f2940b2dc13d5bc129126659384f6c333de26e133030f59159815",
+      "source_paragraphs": 10,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/EVIDENCE_FINDING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "189e335927e3861c051cf27c53f0eca165053c84923ab661b8f9aba7d6ad45a8"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "corpus_manifest/1",
+      "design_key": "corpus_manifest/2",
+      "review_input_digest": "9586c0d627cf1393020f224244046f02732e4c605f4ecb6f94bbe7bb6401b452",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/KNOWLEDGE_CORPUS_PROJECTION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ad485dea1156136dd85976f05b3e702a1a6a60ba6f6dac56237484af914996ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "corpus_member_admission_assessment/1",
+      "design_key": "corpus_member_admission_assessment/2",
+      "review_input_digest": "a2b2310c6e15025c450f27024232725fdef57f37884ace67be9ed20cc757441f",
+      "source_paragraphs": 7,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/KNOWLEDGE_CORPUS_PROJECTION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ad485dea1156136dd85976f05b3e702a1a6a60ba6f6dac56237484af914996ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "corpus_member_candidate/1",
+      "design_key": "corpus_member_candidate/1",
+      "review_input_digest": "40f94027a4399cac6b9db45dde86c75b097cd032b752e99f6c8e8d98513ccb48",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "review_input_digest": "8122178adde5987a139df627d4c09edc05e7f043928ed0aa01770b09252a399f",
+      "source_paragraphs": 24,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/OBLIGATION_EXPERIMENT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "c5ebcc9c6118c848ddbe2ce44c2b237ac4c26edbbf29f46261994a9a03c18857"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "coverage_obligation_key/1",
+      "design_key": "coverage_obligation_key/2",
+      "review_input_digest": "76754d1d370a06c394b43661577dcf81570caf94c015e5df0518ea5fccf56c76",
+      "source_paragraphs": 24,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/OBLIGATION_EXPERIMENT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "c5ebcc9c6118c848ddbe2ce44c2b237ac4c26edbbf29f46261994a9a03c18857"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "coverage_obligation_qualification/1",
+      "design_key": "coverage_obligation_qualification/2",
+      "review_input_digest": "7999fa36d7d3bc602ca173b6cc9540d948a88f635e4c4edf3d449b51f728270d",
+      "source_paragraphs": 24,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/OBLIGATION_EXPERIMENT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "c5ebcc9c6118c848ddbe2ce44c2b237ac4c26edbbf29f46261994a9a03c18857"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "defect_unit/1",
+      "design_key": "defect_unit/1",
+      "review_input_digest": "d0061319b0674f467d6b981fbcbff94c6c457c3d0f4c3be0241c1b66e3f015c3",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "delivery_spec/1",
+      "design_key": "delivery_spec/2",
+      "review_input_digest": "dc316538806e786fccd3e460ad0bdf278dc5a60f6a579b12746de0f7193876d1",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SPEC_CHECKPOINT_SNAPSHOT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "cb15033781903c8483009252fe7018241a15c37766c995cbb52f86a1fca703ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "dependency_independence_assessment/1",
+      "design_key": "dependency_independence_assessment/2",
+      "review_input_digest": "e5d739bf08164fef7eab70dc46e477ef87f181345285b1c505eea77d9a04084b",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/EVIDENCE_FINDING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "189e335927e3861c051cf27c53f0eca165053c84923ab661b8f9aba7d6ad45a8"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "discovery_confirmation_assessment/1",
+      "design_key": "discovery_confirmation_assessment/1",
+      "review_input_digest": "0a6963cfff44124b61fdd0b558fa88cdd01de2ce3dcb4b4138cabd147b6c31d5",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "discovery_corpus_match_assessment/1",
+      "design_key": "discovery_corpus_match_assessment/1",
+      "review_input_digest": "ce4bd781e79c7c5fabc77457c4778742506d4d7cc4e2360f2adc6cf03a35ec59",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "discovery_novelty_assessment/1",
+      "design_key": "discovery_novelty_assessment/1",
+      "review_input_digest": "b55ceebd5b99ef5026071e7903e9d3f38c750ed81a1cc0066eaaaa22485e8bc3",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "discovery_record/1",
+      "design_key": "discovery_record/2",
+      "review_input_digest": "2a1ff8202cf6cffd9fa3b71dc9360e588b30e48fc6542a502873e55f1f104647",
+      "source_paragraphs": 20,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/EVIDENCE_FINDING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "189e335927e3861c051cf27c53f0eca165053c84923ab661b8f9aba7d6ad45a8"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "discovery_tool_origin_assessment/1",
+      "design_key": "discovery_tool_origin_assessment/1",
+      "review_input_digest": "e2d304c2612a776f314360eeeb025b970c25a8e470702ca2cb903941820b133d",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "effort_results/1",
+      "design_key": "effort_results/1",
+      "review_input_digest": "9dd1df666e8b5c8ded3042fd0942b082a70243abdb6964102627f7c514180892",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "environment_record/1",
+      "design_key": "environment_record/2",
+      "review_input_digest": "054fbe83ddd613ef40ef547fcc10312285367436fd0b2369e49552cc8160b9eb",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "evidence_applicability_assessment/1",
+      "design_key": "evidence_applicability_assessment/2",
+      "review_input_digest": "167459a18a5dcdb22c758fc30b0d5c623e6916eea8b368b262a064fa81efb50a",
+      "source_paragraphs": 7,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/EVIDENCE_FINDING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "189e335927e3861c051cf27c53f0eca165053c84923ab661b8f9aba7d6ad45a8"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "evidence_dependency_graph/1",
+      "design_key": "evidence_dependency_graph/1",
+      "review_input_digest": "fd233a42bf2fd197b217749e014e589c55c2de2bbe3d7e55d8e42ecd3f02f063",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "evidence_invalidation/1",
+      "design_key": "evidence_invalidation/2",
+      "review_input_digest": "78fca62252fbb14257694694a264fef2fde3637a4ee5c33cbdbe4f51f5e643fb",
+      "source_paragraphs": 10,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/EVIDENCE_FINDING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "189e335927e3861c051cf27c53f0eca165053c84923ab661b8f9aba7d6ad45a8"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "evidence_qualification_assessment/1",
+      "design_key": "evidence_qualification_assessment/2",
+      "review_input_digest": "bb4d8d2833cfc14f95ecd9bb70d9d72042b348cbfe15a8db69ee8d30ce0b6b46",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/EVIDENCE_FINDING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "189e335927e3861c051cf27c53f0eca165053c84923ab661b8f9aba7d6ad45a8"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "execution_descriptor/1",
+      "design_key": "execution_descriptor/2",
+      "review_input_digest": "d665e4583454574383a0e01c101665c66e956ea4afb00cb6c3fa8b89ffc21733",
+      "source_paragraphs": 9,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/OBLIGATION_EXPERIMENT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "c5ebcc9c6118c848ddbe2ce44c2b237ac4c26edbbf29f46261994a9a03c18857"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "execution_result/1",
+      "design_key": "execution_result/2",
+      "review_input_digest": "8d459b18f0e28eb69a9637a7f4ba2dfbe756f5a1b04c7236aa3e0797a8491875",
+      "source_paragraphs": 9,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/OBLIGATION_EXPERIMENT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "c5ebcc9c6118c848ddbe2ce44c2b237ac4c26edbbf29f46261994a9a03c18857"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "executor_spec/1",
+      "design_key": "executor_spec/2",
+      "review_input_digest": "9bbd2f3fe94aeb2beeef5747da184c00d325e29d596aeb38f6016b50ea057582",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SPEC_CHECKPOINT_SNAPSHOT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "cb15033781903c8483009252fe7018241a15c37766c995cbb52f86a1fca703ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "review_input_digest": "c8403ef1a820f2e7ecc401998bb3dbc03d91bc3d48f124b699007be665825a23",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/OBLIGATION_EXPERIMENT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "c5ebcc9c6118c848ddbe2ce44c2b237ac4c26edbbf29f46261994a9a03c18857"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "false_negative_relationship_assessment/1",
+      "design_key": "false_negative_relationship_assessment/1",
+      "review_input_digest": "af21a9d3af8b3d9b82942751f0e1d1ad84e61f40d5054228220d727fe4356900",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "fault_run_record/2",
+      "design_key": "fault_run_record/2",
+      "review_input_digest": "8f4b15bcb4bd2aaa97c6f1c6b08907842b58e1eb38305f852c4ab99793c7fbdd",
+      "source_paragraphs": 7,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/OBLIGATION_EXPERIMENT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "c5ebcc9c6118c848ddbe2ce44c2b237ac4c26edbbf29f46261994a9a03c18857"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "fault_spec/1",
+      "design_key": "fault_spec/1",
+      "review_input_digest": "18bc8b8caaa651792252feac7b4b5293e220c48f6f46835e2e0d1905b48a812a",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "final_assurance_case/1",
+      "design_key": "final_assurance_case/2",
+      "review_input_digest": "15f8b5d16937af23915d050a9c4655a9a868db7356ffeecf672ce03b21b06980",
+      "source_paragraphs": 27,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/STOP_FINALIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "677300605c35d27e15e199377ab31da8aa82b8062e647e12e76607671665c395"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "final_technical_report/2",
+      "design_key": "final_technical_report/2",
+      "review_input_digest": "3506e9799f16cc549dff9b3a43018ae9b6d12fc5ab3cf97e171013f3cb3f464e",
+      "source_paragraphs": 7,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/STOP_FINALIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "677300605c35d27e15e199377ab31da8aa82b8062e647e12e76607671665c395"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "review_input_digest": "30ca902781f008b4841f2bd642542e75d186fe1a396033fb4c802400579bf05c",
+      "source_paragraphs": 6,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/EVIDENCE_FINDING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "189e335927e3861c051cf27c53f0eca165053c84923ab661b8f9aba7d6ad45a8"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "finding_axis_assessment/1",
+      "design_key": "finding_axis_assessment/2",
+      "review_input_digest": "98bf60c94858f3f6ff7f4419e4a4d0d3f5565603d123939a7eab0ed46f4f8424",
+      "source_paragraphs": 8,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/EVIDENCE_FINDING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "189e335927e3861c051cf27c53f0eca165053c84923ab661b8f9aba7d6ad45a8"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/PURPOSE_DISPATCH_VARIANT_REVIEW.md",
+          "raw_digest": "0cfd0738b2ecbee5cfb1b44e6ae0f5bdbe6bbaa08e291d0ea374c34c848ca305"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "finding_claim_revision/1",
+      "design_key": "finding_claim_revision/2",
+      "review_input_digest": "7f43cecd41f12ee4d0d1b762ef1cc2fb37691d66df2d9ba7131bd9b0ebafb202",
+      "source_paragraphs": 7,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/EVIDENCE_FINDING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "189e335927e3861c051cf27c53f0eca165053c84923ab661b8f9aba7d6ad45a8"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "finding_defect_match_assessment/1",
+      "design_key": "finding_defect_match_assessment/1",
+      "review_input_digest": "16d9d29d2f88316a43e2a1940e50fa8461e4a35bd4fd4d2b8f42c5b65a90351b",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/PURPOSE_DISPATCH_VARIANT_REVIEW.md",
+          "raw_digest": "0cfd0738b2ecbee5cfb1b44e6ae0f5bdbe6bbaa08e291d0ea374c34c848ca305"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "gate_decision/1",
+      "design_key": "gate_decision/1",
+      "review_input_digest": "8dc3ae21a6b7c9331193ab6723b25da22b43208714d8b25a3d57bbaee2639f03",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "grant_body/1",
+      "design_key": "grant_body/2",
+      "review_input_digest": "931995b825bf33cd2f52f30bdbea2374a78acbf48aec48e0dd79ef74b57d505a",
+      "source_paragraphs": 69,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "handoff_validation_result/1",
+      "design_key": "handoff_validation_result/1",
+      "review_input_digest": "3d4b0e8700f04562668df755c4b6c3751bf1f1c026386a64ea0b4cc7f708ca02",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "history_anchor_receipt/1",
+      "design_key": "history_anchor_receipt/2",
+      "review_input_digest": "97d0a27e20b1a5944cee7d343416b71aa335819f62fb02f4dca8a1d7ac77bad2",
+      "source_paragraphs": 21,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "history_cut/1",
+      "design_key": "history_cut/2",
+      "review_input_digest": "9922b8d1277c053d22673d5712591fd17395054b7954daec36e8c483d0c2ae9d",
+      "source_paragraphs": 36,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "holdout_exposure_assessment/1",
+      "design_key": "holdout_exposure_assessment/1",
+      "review_input_digest": "1b389538566c86bc37993702b1c212901f98d83483a9ab9f43d411f1b79bc440",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "hypothesis_revision/1",
+      "design_key": "hypothesis_revision/2",
+      "review_input_digest": "1222520b6f865787ad4db072d3088d06e1f169c4d855c704ac5b7e9a7cb7d25a",
+      "source_paragraphs": 7,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/OBLIGATION_EXPERIMENT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "c5ebcc9c6118c848ddbe2ce44c2b237ac4c26edbbf29f46261994a9a03c18857"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "input_disposition_record/2",
+      "design_key": "input_disposition_record/2",
+      "review_input_digest": "33345529d912b1d89d71e71899b7f2636bcdb459eaded5a44c7c00a4594bd7e6",
+      "source_paragraphs": 18,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/INVENTORY_ACCOUNTING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "2c7bc6319dfc77de8631fe370dc1b578675660f852a5284b3786f0b7d6ffff8c"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "installation_bootstrap_profile/1",
+      "design_key": "installation_bootstrap_profile/1",
+      "review_input_digest": "520691b68569a4c8ee959d0db06fe5ebe87074be3e7fc42e8798b6871ae62af6",
+      "source_paragraphs": 69,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/INITIAL_CONTEXT_CHRONOLOGY_REVIEW.md",
+          "raw_digest": "f6ef5698e297dc6fa4bad3268f20206a8be148f0e4d803c2da89d7edacbb8fc3"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "invariant_revision/1",
+      "design_key": "invariant_revision/2",
+      "review_input_digest": "1b6585d675e9eda424c00ce5da76374cba0562f5d045c7a70354f5e83c67bf4a",
+      "source_paragraphs": 8,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/OBLIGATION_EXPERIMENT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "c5ebcc9c6118c848ddbe2ce44c2b237ac4c26edbbf29f46261994a9a03c18857"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "review_input_digest": "ae0e39e3e7d435d8e13ba09380acc063ec7ab8e6ed09861ef0057b449041212f",
+      "source_paragraphs": 18,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/INVENTORY_ACCOUNTING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "2c7bc6319dfc77de8631fe370dc1b578675660f852a5284b3786f0b7d6ffff8c"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "isolation_baseline_profile/1",
+      "design_key": "isolation_baseline_profile/2",
+      "review_input_digest": "f452d649fee5c3f556572f2862899aab5533365ebe1e7d7046183e9dcc917c33",
+      "source_paragraphs": 16,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/KNOWLEDGE_CORPUS_PROJECTION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ad485dea1156136dd85976f05b3e702a1a6a60ba6f6dac56237484af914996ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "review_input_digest": "e25304afb4324c8f600fe2e4df8cb9da99d544a42791ba09559ed7bcd07ac106",
+      "source_paragraphs": 16,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/KNOWLEDGE_CORPUS_PROJECTION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ad485dea1156136dd85976f05b3e702a1a6a60ba6f6dac56237484af914996ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "knowledge_state/1",
+      "design_key": "knowledge_state/2",
+      "review_input_digest": "34130f1a83c75f88df40a79e1bf957f5dc66b48b553ad01eea1214e43e1a0110",
+      "source_paragraphs": 8,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/KNOWLEDGE_CORPUS_PROJECTION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ad485dea1156136dd85976f05b3e702a1a6a60ba6f6dac56237484af914996ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "lane_completion/1",
+      "design_key": "lane_completion/2",
+      "review_input_digest": "bcaa94a26eb896d192ff683b0793e92ce04b3bb94acba807fdebef99431e622f",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MODEL_COMPLETION_AUTHORIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0d7774b642590e18ee0b038d9124f8276570cdd7f141ea2cfac2c86426c98a84"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "lane_result_admission_evidence/2",
+      "design_key": "lane_result_admission_evidence/3",
+      "review_input_digest": "b8d2ce0642d0a625d1b2289e94516807af6e40dc2c0990d80340d2195d8f9010",
+      "source_paragraphs": 75,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "lane_run/1",
+      "design_key": "lane_run/2",
+      "review_input_digest": "e68ca4517b39bbe931046f9fbde1141dd1a3f4f4c3a113a5e4978765a568b6ee",
+      "source_paragraphs": 69,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "lane_spec/1",
+      "design_key": "lane_spec/2",
+      "review_input_digest": "d363123b63170e62e9bc8d8792873cfdeab2fb8b5f952f0148375685aec77521",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SPEC_CHECKPOINT_SNAPSHOT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "cb15033781903c8483009252fe7018241a15c37766c995cbb52f86a1fca703ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "legacy_exposure_reconstruction_assessment/1",
+      "design_key": "legacy_exposure_reconstruction_assessment/2",
+      "review_input_digest": "b9a61c2bfd471b69c1b2676776f3e67f615b7a3acd3822b6bba24840fdbc0c24",
+      "source_paragraphs": 25,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "legacy_mechanical_validation_assessment/1",
+      "design_key": "legacy_mechanical_validation_assessment/2",
+      "review_input_digest": "4f25897b37bfc9fbb9d6234374f9929d87047f0f4cdfb0e436207d3c5bd9ef21",
+      "source_paragraphs": 25,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "legacy_observation_mapping_assessment/1",
+      "design_key": "legacy_observation_mapping_assessment/2",
+      "review_input_digest": "def7dfa5000efe53c57b073d417351e0ec1efdea6109b728fe72448ff8ef8114",
+      "source_paragraphs": 8,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "legacy_observation_semantic_equivalence_assessment/1",
+      "design_key": "legacy_observation_semantic_equivalence_assessment/2",
+      "review_input_digest": "5963a1cca181dbd49f70b229a3b070f6c9d78bdb80a7bb5135663a0c2370c574",
+      "source_paragraphs": 25,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "legacy_raw_ref/1",
+      "design_key": "legacy_raw_ref/1",
+      "review_input_digest": "a1fc285bc6deb43a6ebd8b5d04009519325a64284bcf5aa847fa8fa1cf788cfc",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "lineage_admission_assessment/1",
+      "design_key": "lineage_admission_assessment/2",
+      "review_input_digest": "c7bef10e5645a26f85a7c5b6aa74ba25cc8339005ec947cfb2444521c52cec23",
+      "source_paragraphs": 25,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "materiality_assessment/1",
+      "design_key": "materiality_assessment/2",
+      "review_input_digest": "3f1c5ca9dadbeeadcefb5490b2c824efc60f2026286a80d6b3545e3fb9528ac0",
+      "source_paragraphs": 9,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/COLLECTOR_TOOL_PARAGRAPH_REVIEW.md",
+          "raw_digest": "068b013a1177c5ee769ed1d80de7da8891968081e0697eb5f2d5ed2d90a7b936"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MATERIALITY_PARAGRAPH_REVIEW.md",
+          "raw_digest": "42b70abcd97e7bff81e613dd5d4bcabd620d61193e10daac3d615be51bc56f38"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/PURPOSE_DISPATCH_VARIANT_REVIEW.md",
+          "raw_digest": "0cfd0738b2ecbee5cfb1b44e6ae0f5bdbe6bbaa08e291d0ea374c34c848ca305"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "model_fidelity_assessment/1",
+      "design_key": "model_fidelity_assessment/2",
+      "review_input_digest": "1cc854ff38f73fdb7e186f5fc533874648d80bd7a66398457e830c645106b8fe",
+      "source_paragraphs": 9,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MODEL_COMPLETION_AUTHORIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0d7774b642590e18ee0b038d9124f8276570cdd7f141ea2cfac2c86426c98a84"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "negative_evidence_record/1",
+      "design_key": "negative_evidence_record/2",
+      "review_input_digest": "4a32d2092d683b860975dc4131e191909ced7823f41e73bd3457cfcdef10053c",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MODEL_COMPLETION_AUTHORIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0d7774b642590e18ee0b038d9124f8276570cdd7f141ea2cfac2c86426c98a84"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "negative_opportunity_unit/1",
+      "design_key": "negative_opportunity_unit/1",
+      "review_input_digest": "29d675da586c3cdaf7350eb2ae5179f2d8c1d0092de356c3bbffe48bc72a6a1c",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "obligation_applicability_decision/1",
+      "design_key": "obligation_applicability_decision/2",
+      "review_input_digest": "6cddd9f8fa14dd81ecc102483c86bf1fc5ba0ac7dd437bf245fb1538246c3367",
+      "source_paragraphs": 24,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/OBLIGATION_EXPERIMENT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "c5ebcc9c6118c848ddbe2ce44c2b237ac4c26edbbf29f46261994a9a03c18857"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "observation/1",
+      "design_key": "observation/2",
+      "review_input_digest": "ee6f2479661d1a10a910a044bd4a0fd9239b160435d0e228f1688ecf3f9414d2",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/EVIDENCE_FINDING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "189e335927e3861c051cf27c53f0eca165053c84923ab661b8f9aba7d6ad45a8"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "observation_dependency/1",
+      "design_key": "observation_dependency/1",
+      "review_input_digest": "4583b152d55dad49d01aa426076d006b2936ab4dc1ce65b8b319475675f02700",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "policy_revision/1",
+      "design_key": "policy_revision/2",
+      "review_input_digest": "bf4da6b324bae0611dfbd412355866cff48969058e8007995de6208a81df3144",
+      "source_paragraphs": 10,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MODEL_COMPLETION_AUTHORIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0d7774b642590e18ee0b038d9124f8276570cdd7f141ea2cfac2c86426c98a84"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/INITIAL_CONTEXT_CHRONOLOGY_REVIEW.md",
+          "raw_digest": "f6ef5698e297dc6fa4bad3268f20206a8be148f0e4d803c2da89d7edacbb8fc3"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/PURPOSE_DISPATCH_VARIANT_REVIEW.md",
+          "raw_digest": "0cfd0738b2ecbee5cfb1b44e6ae0f5bdbe6bbaa08e291d0ea374c34c848ca305"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "potential_exposure_record/1",
+      "design_key": "potential_exposure_record/2",
+      "review_input_digest": "6b3c6a95c7b2b027c6006050076983b148ce49a87bb7f7d48229d8ee26d0cee0",
+      "source_paragraphs": 16,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/KNOWLEDGE_CORPUS_PROJECTION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ad485dea1156136dd85976f05b3e702a1a6a60ba6f6dac56237484af914996ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "projection_policy/1",
+      "design_key": "projection_policy/1",
+      "review_input_digest": "d435ff9b1e81fd0b22d6de4fce25b7f4ddc0d0cf68e50c78861f256d0f81bdef",
+      "source_paragraphs": 7,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/KNOWLEDGE_CORPUS_PROJECTION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ad485dea1156136dd85976f05b3e702a1a6a60ba6f6dac56237484af914996ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "public_conclusion_statement/1",
+      "design_key": "public_conclusion_statement/1",
+      "review_input_digest": "7ee528fbea8dbcbc8349ea821849a456e832f763df2df722c69b6c79cb287550",
+      "source_paragraphs": 33,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "release_qualification/1",
+      "design_key": "release_qualification/2",
+      "review_input_digest": "3eb238a5c4c58589a2f0ecc919414780376761574e0f3699c024e2efefffdca1",
+      "source_paragraphs": 27,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/STOP_FINALIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "677300605c35d27e15e199377ab31da8aa82b8062e647e12e76607671665c395"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "report_export_receipt/1",
+      "design_key": "report_export_receipt/2",
+      "review_input_digest": "f97543595a244e52af506762a9e262dadbf302f30af971a19fbb4cff0f930662",
+      "source_paragraphs": 7,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/STOP_FINALIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "677300605c35d27e15e199377ab31da8aa82b8062e647e12e76607671665c395"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "residual_risk/1",
+      "design_key": "residual_risk/1",
+      "review_input_digest": "3172eebe74f6f71b799d78a6036637fcf6e24f58bd9b211ed46e1ee0203887f2",
+      "source_paragraphs": 78,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "root_cause_revision/1",
+      "design_key": "root_cause_revision/2",
+      "review_input_digest": "7b4de60db48bca2dda731697a10ba390b199e41f0dab7fcf2caf692e4a59f991",
+      "source_paragraphs": 7,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/EVIDENCE_FINDING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "189e335927e3861c051cf27c53f0eca165053c84923ab661b8f9aba7d6ad45a8"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "review_input_digest": "b2302460ba5cc3b6f3b1f417bb9f1f5a64adf6b3e1a639e40404ef00c7ba625b",
+      "source_paragraphs": 69,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "schema_registry/2",
+      "design_key": "schema_registry/2",
+      "review_input_digest": "01b9ea075d6f58cd27b74ce9000e37524dd9a6c97e8f8257d2859213a4639b84",
+      "source_paragraphs": 75,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "scope_state_record/1",
+      "design_key": "scope_state_record/2",
+      "review_input_digest": "8ea2811c7453c8fc0b3669a2d30b702c896dc466b47025450446c58879ab492a",
+      "source_paragraphs": 18,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/INVENTORY_ACCOUNTING_PARAGRAPH_REVIEW.md",
+          "raw_digest": "2c7bc6319dfc77de8631fe370dc1b578675660f852a5284b3786f0b7d6ffff8c"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "snapshot/1",
+      "design_key": "snapshot/2",
+      "review_input_digest": "7bd267264c36ca5d5121dda726765559d613a1649e4590313323fdfcc5486189",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/KNOWLEDGE_CORPUS_PROJECTION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ad485dea1156136dd85976f05b3e702a1a6a60ba6f6dac56237484af914996ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "snapshot_export_record/1",
+      "design_key": "snapshot_export_record/2",
+      "review_input_digest": "17abd039ff2070575dc66b6fa9fc85b13344bdb50a188459fda7c945f322cf2d",
+      "source_paragraphs": 7,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SPEC_CHECKPOINT_SNAPSHOT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "cb15033781903c8483009252fe7018241a15c37766c995cbb52f86a1fca703ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "sound_claim/1",
+      "design_key": "sound_claim/2",
+      "review_input_digest": "2629a8fa6ad1aa9855bd247eef56ea82eabb774b1e754a9ee77194f2b498cbb1",
+      "source_paragraphs": 6,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MODEL_COMPLETION_AUTHORIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0d7774b642590e18ee0b038d9124f8276570cdd7f141ea2cfac2c86426c98a84"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "source_drift_impact_assessment/1",
+      "design_key": "source_drift_impact_assessment/2",
+      "review_input_digest": "785d085d61f8996ac2e56a67c285bead7a1f6783720c1c99a783c5c3c4a78ba1",
+      "source_paragraphs": 8,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "source_drift_record/1",
+      "design_key": "source_drift_record/2",
+      "review_input_digest": "898decd9811d6b2258a8c8f8f7141b70d5bf7520082c5d6b7915b128132b206a",
+      "source_paragraphs": 8,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "source_generation/1",
+      "design_key": "source_generation/2",
+      "review_input_digest": "25d508419aa0fb85664ea0460f5dbebc846196ac1ba70d3b76f2f1368fc8a299",
+      "source_paragraphs": 25,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SOURCE_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "4450244b0a3268e5371aaa1ca05ff24639ccf0c7210a586fbf98c26b4637f560"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SOURCE_AUTHORITY_MODE_PARITY_REVIEW.md",
+          "raw_digest": "2cbc5366fb8a14eacd639a04de09036ac1965fb9c98d3ef56d44d49c3306245e"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SURFACE_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0fafe5777aa491b6567b07e821a2a9b6014244bf1da5a226df84298c9b5dd198"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "source_identity/1",
+      "design_key": "source_identity/2",
+      "review_input_digest": "9ebf1a3c13436ea31fd6ea2b53fc783f1a114a2dcba2a523dd48cb862aeab457",
+      "source_paragraphs": 25,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SOURCE_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "4450244b0a3268e5371aaa1ca05ff24639ccf0c7210a586fbf98c26b4637f560"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SOURCE_AUTHORITY_MODE_PARITY_REVIEW.md",
+          "raw_digest": "2cbc5366fb8a14eacd639a04de09036ac1965fb9c98d3ef56d44d49c3306245e"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SURFACE_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0fafe5777aa491b6567b07e821a2a9b6014244bf1da5a226df84298c9b5dd198"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "source_manifest/1",
+      "design_key": "source_manifest/2",
+      "review_input_digest": "3103bf67d18e086ca137a917c5d80fc0ba478983f2efabffef6f78f3cc1ccc8b",
+      "source_paragraphs": 25,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SOURCE_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "4450244b0a3268e5371aaa1ca05ff24639ccf0c7210a586fbf98c26b4637f560"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SOURCE_AUTHORITY_MODE_PARITY_REVIEW.md",
+          "raw_digest": "2cbc5366fb8a14eacd639a04de09036ac1965fb9c98d3ef56d44d49c3306245e"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SURFACE_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0fafe5777aa491b6567b07e821a2a9b6014244bf1da5a226df84298c9b5dd198"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "source_reconciliation_assessment/1",
+      "design_key": "source_reconciliation_assessment/2",
+      "review_input_digest": "38e356dbf19c98eb41723436463537acf4de4d0b215b7e2c2f7ca96517fce6d3",
+      "source_paragraphs": 25,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "spec_revision/1",
+      "design_key": "spec_revision/2",
+      "review_input_digest": "e6f60509f2937cb0574ff42272ddbca86b979a474988afbeacb87e8d2cc27375",
+      "source_paragraphs": 10,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MODEL_COMPLETION_AUTHORIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0d7774b642590e18ee0b038d9124f8276570cdd7f141ea2cfac2c86426c98a84"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/INITIAL_CONTEXT_CHRONOLOGY_REVIEW.md",
+          "raw_digest": "f6ef5698e297dc6fa4bad3268f20206a8be148f0e4d803c2da89d7edacbb8fc3"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/PURPOSE_DISPATCH_VARIANT_REVIEW.md",
+          "raw_digest": "0cfd0738b2ecbee5cfb1b44e6ae0f5bdbe6bbaa08e291d0ea374c34c848ca305"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "review_input_digest": "fd10dcf881478024f466a8b632c12c5b98fecb627ef10502153b5fb799f881dd",
+      "source_paragraphs": 6,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MODEL_COMPLETION_AUTHORIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0d7774b642590e18ee0b038d9124f8276570cdd7f141ea2cfac2c86426c98a84"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "stage_run/1",
+      "design_key": "stage_run/2",
+      "review_input_digest": "2723169fc29fa1bb2f7526b26c5b7a8d1a2365eed444aea53b7489bd46e17835",
+      "source_paragraphs": 69,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "stage_spec/1",
+      "design_key": "stage_spec/2",
+      "review_input_digest": "e35a19205b811c158c720c447322ea66ed2b5bcf711d4b217f872895f5f370b5",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SPEC_CHECKPOINT_SNAPSHOT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "cb15033781903c8483009252fe7018241a15c37766c995cbb52f86a1fca703ca"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "standalone_payload_manifest/1",
+      "design_key": "standalone_payload_manifest/2",
+      "review_input_digest": "25fdafa9ab9398610bb08c98fd71fe1e2f6537fcf0d6584824abbe3e287e3076",
+      "source_paragraphs": 6,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "state_model/1",
+      "design_key": "state_model/1",
+      "review_input_digest": "d338b1e4dc80599c99a4b7f8c8fdb34619188e01a88e037ac173cd95834e11c9",
+      "source_paragraphs": 13,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/APPROVED_NEW_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "a3d19c853b7ad544a4d706aa3a8b9163f2ea7c3719d7bb616c41316b102f3c00"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "stop_evaluation/1",
+      "design_key": "stop_evaluation/2",
+      "review_input_digest": "45ac6f8b6fad6228e9bd1326a0a1816e1f18c0d88d2717b1abbd4361cab0f68c",
+      "source_paragraphs": 22,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/STOP_FINALIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "677300605c35d27e15e199377ab31da8aa82b8062e647e12e76607671665c395"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "stop_input/1",
+      "design_key": "stop_input/2",
+      "review_input_digest": "eec35f54b58ac7ab89f6c36a9d10a6f6a1950e5c1f40a0c1cd7d36339fa895eb",
+      "source_paragraphs": 22,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/STOP_FINALIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "677300605c35d27e15e199377ab31da8aa82b8062e647e12e76607671665c395"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "successor_campaign_genesis/1",
+      "design_key": "successor_campaign_genesis/2",
+      "review_input_digest": "11cfc8c296f5b6c45d889a8029a7b79cccb148dd3cd186b7cee56f31f64b4ec2",
+      "source_paragraphs": 69,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "successor_campaign_selection_decision/1",
+      "design_key": "successor_campaign_selection_decision/2",
+      "review_input_digest": "04704d0ead2029a1cb80e295cdb54cc4930529d79f66477d85e2ae4a3a688c44",
+      "source_paragraphs": 69,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "review_input_digest": "977b435056b7a2dcde1f13c76b4e29db65e766bf295466605e3e363edec28fba",
+      "source_paragraphs": 9,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/COLLECTOR_TOOL_PARAGRAPH_REVIEW.md",
+          "raw_digest": "068b013a1177c5ee769ed1d80de7da8891968081e0697eb5f2d5ed2d90a7b936"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MATERIALITY_PARAGRAPH_REVIEW.md",
+          "raw_digest": "42b70abcd97e7bff81e613dd5d4bcabd620d61193e10daac3d615be51bc56f38"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "surface_key/1",
+      "design_key": "surface_key/2",
+      "review_input_digest": "b1a79aa1d2167a7cb999d302ca2bd0f46fc7282f16774e14cfc4ad128df3d8fd",
+      "source_paragraphs": 25,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SOURCE_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "4450244b0a3268e5371aaa1ca05ff24639ccf0c7210a586fbf98c26b4637f560"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SOURCE_AUTHORITY_MODE_PARITY_REVIEW.md",
+          "raw_digest": "2cbc5366fb8a14eacd639a04de09036ac1965fb9c98d3ef56d44d49c3306245e"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SURFACE_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0fafe5777aa491b6567b07e821a2a9b6014244bf1da5a226df84298c9b5dd198"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "surface_record/1",
+      "design_key": "surface_record/2",
+      "review_input_digest": "aebe2d39129642781ccec335401b02efead81386534ac1b8c214cc61f9f5fb42",
+      "source_paragraphs": 25,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SOURCE_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "4450244b0a3268e5371aaa1ca05ff24639ccf0c7210a586fbf98c26b4637f560"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SOURCE_AUTHORITY_MODE_PARITY_REVIEW.md",
+          "raw_digest": "2cbc5366fb8a14eacd639a04de09036ac1965fb9c98d3ef56d44d49c3306245e"
+        },
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/SURFACE_CONTRACT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0fafe5777aa491b6567b07e821a2a9b6014244bf1da5a226df84298c9b5dd198"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "review_input_digest": "0ae1b1193e16d29d1b0c073478fa9c70b5f47ce5d735a238e1db86d9d1f9b00c",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/COLLECTOR_TOOL_PARAGRAPH_REVIEW.md",
+          "raw_digest": "068b013a1177c5ee769ed1d80de7da8891968081e0697eb5f2d5ed2d90a7b936"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "transition_authorization_proposal/1",
+      "design_key": "transition_authorization_proposal/2",
+      "review_input_digest": "5951e1959f36bdf9f29786220878ddf22b5ade922aaf0f1b3024e16689e584b7",
+      "source_paragraphs": 6,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MODEL_COMPLETION_AUTHORIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0d7774b642590e18ee0b038d9124f8276570cdd7f141ea2cfac2c86426c98a84"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "trust_profile/1",
+      "design_key": "trust_profile/1",
+      "review_input_digest": "4f02623b748930bdb8f8b4a49fb3c16d866f0b3d1d02a4665167afa80fc78fbd",
+      "source_paragraphs": 21,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/HISTORY_BOOTSTRAP_NF02_PARAGRAPH_REVIEW.md",
+          "raw_digest": "8dbd18183c19b3a0240dce385d77703c6bb0738c935e5b976193a414c37a2c12"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "trusted_predecessor_selection_decision/1",
+      "design_key": "trusted_predecessor_selection_decision/2",
+      "review_input_digest": "5bd5198f23f6ffed3847d625a62c3cfae51a368979a42c2083fc9ebb8baeda53",
+      "source_paragraphs": 25,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MIGRATION_BUILD_EXPORT_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ac0310469e0faded36c73143843369f760118f074ce479340f3848ac864c0291"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "validation_result/1",
+      "design_key": "validation_result/2",
+      "review_input_digest": "8d12480bc22ccf3f20c818b521cac52876b1440306ed4231dc711cfd2761dae6",
+      "source_paragraphs": 5,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/MODEL_COMPLETION_AUTHORIZATION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "0d7774b642590e18ee0b038d9124f8276570cdd7f141ea2cfac2c86426c98a84"
+        }
+      ],
+      "parity_closed": false
+    },
+    {
+      "source_key": "view_manifest/1",
+      "design_key": "view_manifest/2",
+      "review_input_digest": "703fb89db57d5c9c5a346e16199808f40c45e41e79f1d9011c143a0911e0d0e7",
+      "source_paragraphs": 7,
+      "proofs": [
+        {
+          "file": "docs/R5_4_2/autonomous_2026_10_07/design/KNOWLEDGE_CORPUS_PROJECTION_PARAGRAPH_REVIEW.md",
+          "raw_digest": "ad485dea1156136dd85976f05b3e702a1a6a60ba6f6dac56237484af914996ca"
+        }
+      ],
+      "parity_closed": false
+    }
+  ],
+  "mapped_paragraphs": 2696,
+  "unique_source_paragraph_hashes": 800,
+  "parity_closed_nodes": 0,
+  "qualification": false,
+  "scope": "Static source requirement mapping only; full semantic parity and execution remain open"
+}

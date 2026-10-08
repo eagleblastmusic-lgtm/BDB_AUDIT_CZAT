@@ -1,0 +1,48 @@
+# R5.4.2 — OWNER SEMANTIC CLOSURE APPROVAL
+
+Jako właściciel projektu zatwierdzam kompletny pakiet decyzji przedstawiony w:
+
+`docs/R5_4_2/R5_4_2_OWNER_DECISION_PACKAGE.md`
+
+wraz z powiązanymi proposalami i finalnym semantic-closure graph.
+
+Zatwierdzenie obejmuje wszystkie canonical semantics wymagane do osiągnięcia zadeklarowanego fixed point dla mandatory Q2–N11 path, w szczególności:
+
+- zatwierdzony model `residual_risk/1`;
+- zatwierdzoną reprezentację i contract dla `assurance_claim_set_ref`;
+- zatwierdzoną reprezentację i contract dla `public_conclusion_statement_ref`;
+- wszystkie dodatkowe Class C/D resolutions zawarte w finalnym Owner Decision Package;
+- wszystkie material-reference mappings, canonical roles, lifecycle rules, producer authorities, HistoryCut/order semantics, no-omission predicates i cross-object invariants zawarte w tym pakiecie.
+
+To zatwierdzenie NIE legalizuje żadnych wcześniejszych lokalnych overlayów ani runtime implementations samych przez się.
+
+Authority powstaje dopiero przez:
+```
+OWNER APPROVAL
+→ VERSIONED R5.4.2 NORMATIVE CONTRACT
+→ EXACT MACHINE CONTRACTS
+→ FRESH QUALIFICATION
+```
+
+Zatwierdzam model:
+```
+R5.4.1
+→ R5.4.2 successor
+```
+
+bez modyfikacji historycznych bytes R5.4.1.
+
+R5.4.1 oraz jego ważna author-only qualification pozostają immutable historical predecessor evidence.
+
+Zatwierdzam utworzenie R5.4.2 jako nowej exact successor revision.
+
+Nie zatwierdzam jeszcze:
+```
+Q2 runtime activation
+N5–N8 implementation
+N9 adversarial qualification
+N10 NF02 closure
+N11 full application qualification
+```
+
+Te etapy mogą rozpocząć się dopiero po pomyślnym fresh Q1 dla exact R5.4.2.

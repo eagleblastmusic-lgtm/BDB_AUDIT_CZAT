@@ -1,0 +1,196 @@
+# R5.4.1 governance correction
+
+The scalar verdict conflict and ambiguous count contract are removed by one Data §187.2 definition and a closed external executable record/2 schema. §192.2 references the same definition. Required prior storage/hash/owner/Registry/Golden/root bindings are retained; self_audit_report_raw_digest and explicit counts are now required. The final audit and re-audit register are the same JSON artifact, with an explicit equality predicate. The removed token appears only as the negative historical-token mutation in governance vectors.
+
+## Scope and identity propagation
+
+Runtime Registry, SchemaRegistry/2, 41 executable runtime/transport schemas, 39 bindings, canonical root objects, NF02 profiles and 149 vector structures remain byte-for-byte inherited. No governance canonical kind is added. The new external schema/descriptor/fixture are machine artifacts. Only the external installation bundle normative-set pin propagates the changed normative set. SchemaRegistry ObjectDigest therefore legitimately remains unchanged. No latest-installed authority or old campaign upgrade is introduced.
+
+## Minimal delta
+
+| Candidate file | Classification | Old SHA-256 | New SHA-256 |
+|---|---|---|---|
+| candidate/BDB_AUDIT_V2_DATA_AND_ARTIFACT_CONTRACTS_R5_4.md | GOVERNANCE_CONFLICT_CORRECTION | 0294cf6c904d0a5aa5f1af36292739b494280bff0b9d16bf6d618d0e6f37d73d | 7d967707d8f7a0d77ab84484aeb4de0119dab85ed055c31473792c8528919f75 |
+| candidate/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4.json | GOLDEN_PROPAGATION | 285816b849b8dd6942dda360b81761389965ff6df9aeaab06d412d82a290db09 | 4cebb462b647c69e6348546180900ac2a3c4806a5bf1716e5269b70ed94edb17 |
+| candidate/BDB_AUDIT_V2_TEST_AND_SELF_AUDIT_PLAN_R5_4.md | GOVERNANCE_CONFLICT_CORRECTION | 8592054b315abf98db6f6e3b21b340c9d7762905ed976e1168704196f7879e68 | 769921020e4969ccd555b2e44dfa26b7ba5b3bba95369ef1a539b49fbf87067e |
+| candidate/README_BDB_AUDIT_V2_DOCUMENTATION_R5_4.md | GOVERNANCE_CONFLICT_CORRECTION | b780bc0dabff28134305e3d66cce6c4396356aeb888ff168dc2e4d8c15851349 | d10c8dc48cba00fd4f8b23de8153f9cabf45f6263623f6d3e53581503dd00780 |
+| candidate/INSTALLATION_PIN_BUNDLE_R5_4.json | HASH_PROPAGATION | 8a67598bf54468d0f9548d5eede638ec70427d7795ebfd4fac7952aca175f60d | 5d977586cbecf28464b2615a3e92517b7fe31dd9b0618be41d668b3114629077 |
+| candidate/governance/AuthorBaselineQualificationRecord__2.schema.json | SCHEMA_PROPAGATION | NEW | 623dd1183213e8408a6155e2a3bf7cf5af4d006b9f6ca915e5502b321a988a24 |
+| candidate/governance/GOVERNANCE_CONTRACT.json | SCHEMA_PROPAGATION | NEW | 65de1955d57e043b492ef36b95b2637b563d321ca4c28124d2a427318d700ea6 |
+| candidate/governance/GOVERNANCE_VECTOR_FIXTURE.json | GOLDEN_PROPAGATION | NEW | 18998522ffdd02a176546aeddfb5c3ca4bef34f8e59b3e66d0913a4c0a9e9d35 |
+
+All other candidate bytes are proved unchanged. Complete machine delta is R5_4_TO_R5_4_1_DELTA.json. All non-candidate files are new external PROVENANCE_UPDATE artifacts; they do not enter candidate preimages. The candidate → manifest → readback → audit → owner/qualification → Q1 result DAG is acyclic. Synthetic vectors bind synthetic sets, never the containing current set.
+
+## Exact identities
+
+```json
+{
+  "predecessor": {
+    "invalid_qualification_raw_digest": "c63adbccf547428a4bbe27ed885c784546a8ef005615157b213791aea653b6fd",
+    "invalidation_raw_digest": "ba9d28d536e5577c2f39e6c9fe55dbfd30416eab2afc52a14b57d9c1752d30cd",
+    "machine_candidate_set_sha256": "a2e094538948c02f78f07265a3a0abeab90b06c0d21a126294ce97f68b7d92ce",
+    "manifest_raw_digest": "d2f38cfad4a0d4e3ae96f179addb6fd7ad817250f4998968eb5a01487dd0e3cd",
+    "normative_candidate_set_sha256": "9488a12d644f8ac17bba737af18f3bd1d6147a7051b94ead9c89923b626b2a02",
+    "revision": "R5.4"
+  },
+  "manifest_raw_digest": "15415abd7d2601698c6ff664a93077213e81575272a213c4511f6082c9d8fdef",
+  "normative_candidate_set_digest": "d11f751f729605f94bdd11dc033f700f895ee4f7091f2150424023fd4efcaf3b",
+  "machine_candidate_set_digest": "640b76678b48d1902c16775c660709101f1a0708805b7608f822af7a0604f682",
+  "registry_raw_digest": "1b9d17c46843a91053036f0370d4419dac87ce5978df61b0dc922e0e40237e2c",
+  "golden_raw_digest": "4cebb462b647c69e6348546180900ac2a3c4806a5bf1716e5269b70ed94edb17",
+  "schema_registry_object_digest": "de514548328391f271dac2f6b253b8d47ac8d6e5406e6e0781a2bfb18c9cbc1e",
+  "governance_schema_raw_digest": "623dd1183213e8408a6155e2a3bf7cf5af4d006b9f6ca915e5502b321a988a24",
+  "qualification_record_raw_digest": "3a3754d4eebac944ad40c7a49cf6db882bbbde6c55c7f14784961dbfc4df8b90",
+  "readback_raw_digest": "387bd2ef77d3c3d57e9e571d30b27c8f3b7e92f5761c949e93bfcb72d971839e",
+  "self_audit_raw_digest": "ea2b6487becdb3983d403da798f9b9d13cf956a68f9d122ca1880e8f88e3d962"
+}
+```
+
+## Fresh checks
+
+- source/HEAD/tree/branch/main/predecessor/proposal and pre-existing worktree bytes unchanged
+- complete disjoint manifest inventories, exact raw readback and both canonical set preimages
+- all 110 predecessor rows exact; four additions only; roles/reference classes/order domains preserved
+- 41 executable schemas meta-valid; exact bytes/digests/length/$id/dialect/local dependency closure; explicit ref parity
+- validator backend installed versions: {'jsonschema': '4.25.1', 'attrs': '26.1.0', 'jsonschema-specifications': '2025.9.1', 'referencing': '0.37.0', 'rpds-py': '2026.6.3'}
+- 55 full synthetic/root objects schema-valid and independent ObjectDigest/typed ref/profile identity checks
+- 39 exact SchemaRegistry/2 bindings; external schema root and all eight installation pins; normative set pin; no installation performed
+- full fixture typed-ref hash DAG acyclic; assignment/binding/evidence/result exact relation; distinct prior commits
+- seven modeled immutable history closures/parent chain/receipts and NF02 PRIOR_ACCEPTED_ONLY boundaries consistent
+- known-answer ObjectDigest preimages/raw ZIP hashes/transport schemas/member bytes/semantic checksum and repack raw separation
+- 117 inherited exact +32 complete proposal IDs and adversarial variants; negative no-state-mutation; runtime NOT_RUN
+- entire R5.4 subtree (155 files), source and owner task unchanged; invalid prior qualification excluded
+- minimal delta: 8 candidate files; all other candidate bytes exact; runtime Registry/SchemaRegistry/schema bytes unchanged
+- one parsed closed external governance schema; narrative parity; one scalar verdict; manifest-derived explicit counts; no self-hash cycle
+- 18 fresh governance vectors executed PASS; inherited 149 runtime vectors NOT_RUN
+
+Readback: 10 normative + 110 machine = 120; zero mismatches. Manifest-derived counts; 18 executed external governance vectors PASS. All 149 inherited runtime vectors NOT_RUN.
+
+Commands: `python docs/R5_4_1/tools/verify_candidate.py`, `python docs/R5_4_1/tools/finalize_delivery.py`, `python docs/R5_4_1/tools/qualify_exact_candidate.py` — PASS. `git diff --check` — exit 0. Full source/status/preservation pins are in evidence and R5_4_1_Q1_RESULT.json.
+
+## Complete exact candidate inventory
+
+| Group | File | SHA-256 | Bytes |
+|---|---|---|---:|
+| normative | ADR-006_CANONICAL_SERIALIZATION_AND_IDENTITY_PROFILE.md | 38cb55d9ce15d1ec3b51b46b6d50312f140fe9a549561990558ace24a8e69d6b | 12475 |
+| normative | BDB_AUDIT_V1_TO_V2_MIGRATION_AND_COMPATIBILITY.md | 9dc5c209e375b472b8482525721f5cbfa6413cd00e31a2ea85450667995522bb | 49745 |
+| normative | BDB_AUDIT_V2_ARCHITECTURE_SPEC_R5_4.md | 7683f14a891301d97df4f23bdfbcfe215c16fa0203fe8a4ec5c539570fa45f3a | 121971 |
+| normative | BDB_AUDIT_V2_ARTIFACT_CONTRACT_REGISTRY_R5_4.json | 1b9d17c46843a91053036f0370d4419dac87ce5978df61b0dc922e0e40237e2c | 155531 |
+| normative | BDB_AUDIT_V2_DATA_AND_ARTIFACT_CONTRACTS_R5_4.md | 7d967707d8f7a0d77ab84484aeb4de0119dab85ed055c31473792c8528919f75 | 239162 |
+| normative | BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4.json | 4cebb462b647c69e6348546180900ac2a3c4806a5bf1716e5269b70ed94edb17 | 101998 |
+| normative | BDB_AUDIT_V2_IMPLEMENTATION_ROADMAP_R5_4.md | ed519c5c968c12cf8e5d98c0bcc2b511375b8a0d2c7486e0881a9912f5dd830a | 91167 |
+| normative | BDB_AUDIT_V2_TEST_AND_SELF_AUDIT_PLAN_R5_4.md | 769921020e4969ccd555b2e44dfa26b7ba5b3bba95369ef1a539b49fbf87067e | 131594 |
+| normative | BDB_Audit_vNext_Szczegolowy_Plan_Rozwoju.md | 5338fb1589eaa8d2e3191e5b53b05c2199fa31ac7e18ccec7a560dbc198fc269 | 84999 |
+| normative | README_BDB_AUDIT_V2_DOCUMENTATION_R5_4.md | d10c8dc48cba00fd4f8b23de8153f9cabf45f6263623f6d3e53581503dd00780 | 4417 |
+| machine | INSTALLATION_PIN_BUNDLE_R5_4.json | 5d977586cbecf28464b2615a3e92517b7fe31dd9b0618be41d668b3114629077 | 5286 |
+| machine | SCHEMA_ARTIFACT_CATALOG_R5_4.json | ab05b5135ed707e759fcd1cf9dbf9380d2e9902ed50d5ef9fc1d9bbc65f6d26d | 22943 |
+| machine | fixtures/LEGACY_MODEL_INPUT.json | b4ad10e156c4be019ef4d832e7ffb2c8a03c5122af02d6c0631f7373aa2d1589 | 148 |
+| machine | fixtures/NF02_KNOWN_ANSWERS_R5_4.json | 16bf05d53e198477c7d2e7b132d64c7937ecaccda8a1af6eb324264536ee383d | 105703 |
+| machine | fixtures/NF02_OBJECT_FIXTURE_R5_4.json | f1e7a4a9f266422577b642ea4ba5c3e2c46c1abc3b5fffeebc8a9489421cbee0 | 156634 |
+| machine | fixtures/SOURCE.txt | d2b98b6daab299d64b1ab9848ab774f21340c0496660de874d72864d2c20aea3 | 33 |
+| machine | fixtures/SYNTHETIC_VALIDATION_PREMISES.json | 2dd09ead4c3dadd5a53ee03b6605b9c9f80a085b4a2e944ef6f8bd79a4a4f1e8 | 367 |
+| machine | fixtures/adversarial/NF02_BINDING_SAME_COMMIT_ASSIGNMENT_REJECT.json | 2169f4b3afec4a28e2e4532dee614d2a5615a81456024193d0e57f82378d46c4 | 5555 |
+| machine | fixtures/adversarial/NF02_CAPABILITY_FORGERY_REJECT.json | 355b60e458d1f425599e360df91a694bc630afdb3fb2239d31d35cb29c554fab | 1592 |
+| machine | fixtures/adversarial/NF02_CONCURRENT_BINDING_CAS.json | 9db99f892a567d969621a56506ed66eaee78737c1db2c5abc8ab11de68e56d59 | 4257 |
+| machine | fixtures/adversarial/NF02_DELIVERY_BEFORE_BINDING_REJECT.json | ea75d6de8caa335930665dc7fc93d2b4b1ad0730b180a67d3bf5fe8813f26c62 | 1081 |
+| machine | fixtures/adversarial/NF02_EVIDENCE_SAME_COMMIT_RESULT_REJECT.json | 4fb3795dc731c9722ad6e15c5127d540e8514114d91eb64f8a4b4234d25ec594 | 3731 |
+| machine | fixtures/adversarial/NF02_OLD_CAMPAIGN_WRITE_REJECT.json | 4b380176816ff9d5f0457a948ae499ca6bc2833870d7e96cfde2353e8eeba267 | 1184 |
+| machine | fixtures/adversarial/NF02_PACKAGE_BINDING_ACCEPT.json | f7630f501ef839cb9efc49198981c15b6d70def84183c6f8e2db71901b08129f | 896 |
+| machine | fixtures/adversarial/NF02_PACKAGE_BINDING_AFTER_DELIVERY_REJECT.json | b7e0449b986c08215b600de1ab0a887191cab19394f91721af4442483283f7c3 | 1106 |
+| machine | fixtures/adversarial/NF02_PACKAGE_BINDING_EXACT_RETRY.json | 03e6cc96046b451afcf4feed4dfdc533f819c3b01f4b6e6ac83707a04467319e | 4858 |
+| machine | fixtures/adversarial/NF02_PACKAGE_BINDING_SECOND_CONFLICT_REJECT.json | 566dd6b1f9b9e937aa0fd3929edd183b4e7169261cf7ff7dbe3ee4ade7dac0ec | 1538 |
+| machine | fixtures/adversarial/NF02_PACKAGE_RAW_SUBSTITUTION_REJECT.json | 072b46e6f884bf9826e55e33a661cc7fb6825212a968e84180c941aed212c751 | 1612 |
+| machine | fixtures/adversarial/NF02_PACKAGE_REPACK_IDENTITY_SEPARATION.json | cc6a524b38cf06e864fea5ebeb1e99ea04e6337b44e057f6c00cfc308596ee24 | 1542 |
+| machine | fixtures/adversarial/NF02_PACKAGE_RESULT_RAW_MISSING_OR_CORRUPT_REJECT.json | fd3d0f3f3e224ec891a9fd9f64c1643c6a3ef9567cbff769cb8d3788a6dd0fca | 2722 |
+| machine | fixtures/adversarial/NF02_PACKAGE_SELF_HASH_REJECT.json | c1edd45b7c2de92fb69992bfcad965095f454144f4a9de764688d7bcc0b9721c | 1521 |
+| machine | fixtures/adversarial/NF02_PACKAGE_SEMANTIC_MISMATCH_REJECT.json | afad9878e1b9e3240e0e8da82194baa5e8fba578d52a8b21fae03bf73f45a5b9 | 1140 |
+| machine | fixtures/adversarial/NF02_PACKAGE_WRONG_ASSIGNMENT_REJECT.json | 78eff01ac9c5072e13ba80afc244dd561d59c74afebf866f7b0c68ed29657c26 | 1446 |
+| machine | fixtures/adversarial/NF02_PACKAGE_WRONG_ATTEMPT_REJECT.json | 698571cbc3d441aa51d000217060af522439363f232b575879f810739206e0cf | 1119 |
+| machine | fixtures/adversarial/NF02_PACKAGE_WRONG_SOURCE_REJECT.json | 9cf8a40fad972789e1348fc9ea0f1fa11ad1f55924b854aaade9e26d91125dd4 | 1166 |
+| machine | fixtures/adversarial/NF02_PACKAGE_ZIP_JSON_ADVERSARIAL_REJECT.json | 05e66fe00d77634ab78017f195169691154b8192e25f65c0eac78ed39158f688 | 2187 |
+| machine | fixtures/adversarial/NF02_RAW_HISTORY_CRASH_ATOMICITY.json | 1c2aa2d5b9e5c92c8e4293a58af1fa75bd3059d05612f550da32aea2e1aeec82 | 1691 |
+| machine | fixtures/adversarial/NF02_RESULT_PAYLOAD_MUTATION_REJECT.json | 7e1c483082fb4af83d80ca58d6917ef94d8ffa18baa32784a35af621afeee82d | 1134 |
+| machine | fixtures/adversarial/NF02_RESULT_SLOT_CONFLICT_REJECT.json | 9d4982fabc60308494069da69c123744c0cb4753845a81a93d575a805446ee36 | 1601 |
+| machine | fixtures/adversarial/NF02_RESULT_WITHOUT_PACKAGE_BINDING_REJECT.json | 92f14076c426a7d3b182eae3f8636e4456217046d04d1c2b79cb86b4c8a580f4 | 3186 |
+| machine | fixtures/adversarial/NF02_RESULT_WRONG_PACKAGE_BINDING_REJECT.json | 4a593ae15b4c0315b94664d958f081894789315521e102bfa7413f2d14a5a3d1 | 1112 |
+| machine | fixtures/adversarial/NF02_ROLE_OR_ALIAS_REJECT.json | bcd27a1cde4870ee18f5b4be22796f0f14717f21e29235f5908728b793c76244 | 1155 |
+| machine | fixtures/adversarial/NF02_SCHEMA_BYTES_NOT_BOUND_REJECT.json | e494352d9e9cd9ca3c3d1415e0cad13fb97c0d69e6d182e83f60e894dae06ea0 | 1001 |
+| machine | fixtures/adversarial/NF02_SCHEMA_EXACT_BINDING_ACCEPT.json | ec665c35067b01a19af5d9b08015538e506d41cced900549ce8ae004c4b5e702 | 901 |
+| machine | fixtures/adversarial/NF02_SCHEMA_ROOT_SELF_AUTHORIZATION_REJECT.json | 9932ba81f833b6689163406f16997a377f44155779cf5991790844e9bc619048 | 1369 |
+| machine | fixtures/adversarial/NF02_SCHEMA_UNREGISTERED_KIND_REJECT.json | bc12dafaaf5b9feae10a769e4653cee2183eed44239425b149912ea8a8ea91ab | 1082 |
+| machine | fixtures/adversarial/NF02_SCHEMA_WRONG_DIGEST_REJECT.json | 6371dc48484a72c5b1adbd12b7d4221862b2869627eba3b04bdf8ca5de0e9a61 | 1149 |
+| machine | fixtures/adversarial/NF02_SECRET_ROTATION_HISTORY_REPLAY.json | ef9851cf727b20dfd6ff9c84aa75a80986e3bb44b278270a599e4f450db55e57 | 1188 |
+| machine | fixtures/adversarial/NF02_START_WITHOUT_PRIOR_BINDING_REJECT.json | cf75a3c947dbf733aaa0939190b7b3346c430a78c34b360c07aff11b1b5da2f8 | 3151 |
+| machine | fixtures/adversarial/duplicate_manifest_keys.json | eadf44c4bc651d23db43a79728364a0503ebabaf7b26222710a0c86c5008700f | 46 |
+| machine | fixtures/adversarial/package_trailing.zip | 559691bfb2a1bcd5bc870cdf299103671f0e6d833aa4c3aca5c8bb4de302a070 | 4464 |
+| machine | fixtures/adversarial/package_truncated.zip | f12910634c661146e3bffae2d20c6c0d347ab470404bdab67995caed68aea4dd | 4443 |
+| machine | fixtures/adversarial/result_truncated.zip | ccf3b0399405410cbe8da5f9045b47b13c151282a5c86a4f85209bfba6d65f7d | 4835 |
+| machine | fixtures/adversarial/schema_byte_substitution.json | b321ee2ed24c28a130830d5896cc206bf9814c1d3d1b0df3ed928f9922ba43cf | 8322 |
+| machine | fixtures/audit_result.zip | 4d5ef44a608a5d0ef69230378dd37f3f7b65f15fd445b1fae17f37a482f7672b | 4848 |
+| machine | fixtures/input_package.zip | 68cc3c9190999686d69e9076a3e1aea1a8df54aa2c4911b1089011ab3167bc2b | 4456 |
+| machine | fixtures/repacked_input_package.zip | d08fe2ea7a994a07916f414065c1f6adafbb02014c62bb0b5ea8dccdaa2d4ffb | 4456 |
+| machine | governance/AuthorBaselineQualificationRecord__2.schema.json | 623dd1183213e8408a6155e2a3bf7cf5af4d006b9f6ca915e5502b321a988a24 | 11074 |
+| machine | governance/GOVERNANCE_CONTRACT.json | 65de1955d57e043b492ef36b95b2637b563d321ca4c28124d2a427318d700ea6 | 913 |
+| machine | governance/GOVERNANCE_VECTOR_FIXTURE.json | 18998522ffdd02a176546aeddfb5c3ca4bef34f8e59b3e66d0913a4c0a9e9d35 | 10425 |
+| machine | objects/artifact_contract_registry__1.json | 4338395e150e21363601770f942c04d044ce8eb8f91636a5278c8e59f48a5c9f | 155883 |
+| machine | objects/installation_bootstrap_profile__1.json | a0443bd1a9fc1c54022bb9077a0775d26a14d53dfea5f6ab7d0945e1b87b8e09 | 2944 |
+| machine | objects/policy_revision__1.json | 015c9f0cdddbcec55d7befa62ca5dbd517c731b7be4dd44e093a0a166d461447 | 741 |
+| machine | objects/schema_registry__2.json | 29dce5c9e40ecebc49e79db50b1cf582e7279e587f72aa7c3349c10c573d4fbd | 16691 |
+| machine | objects/spec_revision__1.json | bf2d341320534041045cb9603c9316ab047e9bd7425646d233918e19ec33c441 | 1872 |
+| machine | objects/trust_profile__1.json | bd9da0bc716229092357cad210f1f94aedd3f159928b40b2266f1355f435d37a | 1144 |
+| machine | profiles/BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1.json | 8a3d9f48bea7db2faabb75381d75568c80f3853bb82a523d6b208cd958b1a339 | 244 |
+| machine | profiles/BDB_R5_4_BOOTSTRAP_NAMESPACE_PIN_V1.json | 8bd0e32a7d7aedf5447b5d254a84d16ac2e66ffa26533e88037ec0176d1cbb40 | 332 |
+| machine | profiles/BDB_R5_4_PROTOCOL_POLICY_BUNDLE_V1.json | 411033a7a5aa8440671947fa56487e93ffec1c32e6091ac12accada2f1e72683 | 2980 |
+| machine | profiles/BDB_R5_4_SERIALIZATION_PIN_V1.json | 90e0dccbc72c119e882ec28ce0277642c82ee16234885445c2408cf776c06ad1 | 273 |
+| machine | profiles/BDB_R5_4_SOURCE_IDENTITY_PIN_V1.json | 0aff8cd2e4e432f7ab3d72b6cf95448f14acd86083fee7b55c3a6c2405e7bfc8 | 349 |
+| machine | profiles/BDB_R5_4_VALIDATOR_PROFILE_V1.json | fe7524574b355d240032cd6f9a0b51bcbba41d0a9d3489694639029cbce34c05 | 672 |
+| machine | profiles/NF02_COMPATIBILITY_RULES_V1.json | eed04486292110844ca18cb9ef882bef2708409cbdff3e8581ede26039c244e9 | 320 |
+| machine | profiles/NF02_EXTERNAL_LANE_SLOT_V2.json | 4b7b796a65cb393d34134a612998cbfb3b9088c365b0a6bbded21eb7b5d15943 | 656 |
+| machine | profiles/NF02_INPUT_PACKAGE_TRANSPORT_V2.json | 4bd9bc0a7032333ef5626d2b11a170b3f07e69a27535de8a61bb2db92ecfdb28 | 999 |
+| machine | profiles/NF02_PACKAGE_SEMANTIC_PROFILE_V1.json | 1d40249ec16b1de00f9a18e5e8195d261cf52a9b1704411b495f580258117df9 | 469 |
+| machine | profiles/NF02_PROTOCOL_PROFILE_V2.json | 4a63f40a0da622aca2cfd2042f0c0d2be8f92db71d5058e120b442d809542fe9 | 951 |
+| machine | profiles/NF02_RESULT_NORMALIZER_V2.json | ca2ab3c1a338536f9d25858f521366d0ae02f833383435dc948b986bcf057de9 | 684 |
+| machine | profiles/NF02_RESULT_TRANSPORT_V2.json | bfd2f9715a7227927b4c87e7daeda518fd8e0d8c2e8f9c547c2cdbdf17da46ce | 986 |
+| machine | schemas/NF02_INPUT_PACKAGE_TRANSPORT_V2.schema.json | c2e4d44a17849fbfa9fe194a42ba748bf5a3228d2af7393c710859f7083934d9 | 9276 |
+| machine | schemas/NF02_RESULT_TRANSPORT_V2.schema.json | 5b892d3a69c922b525549dc6a97fe83e59a9fcd960181da35f369fe3e621b0eb | 9409 |
+| machine | schemas/artifact_contract_registry__1.schema.json | 9d3cdec806c38ea5d5af8d0ba19e8b89fed70d973b8a729fe5d5e39162f3de64 | 162896 |
+| machine | schemas/assignment_manifest__1.schema.json | 4735236024ddb060acc126e20a288ef9f7999426c322d1f67171c04023f95266 | 10110 |
+| machine | schemas/assignment_package_binding__1.schema.json | 87d841418cccadf500ac55f3d8f58fe1cf24616843a326ca5ce88fa8e063472a | 8322 |
+| machine | schemas/attempt__1.schema.json | e32e37cd64f13e7db17f8418ef2a98a1040eeb595f246dcff682b028e1402ad5 | 8973 |
+| machine | schemas/bdb_audit_lane_result__2.schema.json | d2326e808b2d525ef66e744be2bb63d8dae56e46ddfaca153e302f37264074cf | 8072 |
+| machine | schemas/bootstrap_admission_decision__1.schema.json | 27a3c8e369b3c37de1b0b00d4af697d147198c70d8dcd091389ebd9d147f6d8a | 10255 |
+| machine | schemas/campaign_genesis__1.schema.json | d1b97b7ff4847bc61aa11ce704f962e2fdbabb22ab8f1e75157c0d11b66758e4 | 9527 |
+| machine | schemas/command_envelope__1.schema.json | 792f49aeb29cebb0ccf95a95b5c75dfb2d49bb07f7efceeb8080b0759d2ae088 | 10255 |
+| machine | schemas/command_receipt__1.schema.json | 0cfaa98db5dd0476bf9d1d8360ae0b943d9984b2000df1afb7ba36d3fd425fbc | 8372 |
+| machine | schemas/commit_body__1.schema.json | 97b6eb2e663ed74ac9247da766c6874b2c6e54e28dfd4dbc98c9e9c5cf5f730d | 9357 |
+| machine | schemas/contamination_assessment__1.schema.json | 0e9cd2cb5b0a78c77df02487daf14c354107b6c6f783e3f256f03d5aeece97f0 | 9529 |
+| machine | schemas/delivery_spec__1.schema.json | 1d301c4368fde22e1511ec6d8d9c5231d570891b15360a4cd47199aff582181c | 8630 |
+| machine | schemas/executor_spec__1.schema.json | ee261b28dae02db1971a0bd8ca4052b512590c212dc0fc46a6b54981342b3fb8 | 9363 |
+| machine | schemas/grant_body__1.schema.json | 7ef53ad663166831d659340f9f87a02c0ee913a71534ec79a5b32b7d4f68a816 | 8975 |
+| machine | schemas/history_cut__1.schema.json | e1234599efffd02cd9f0c6c8baaf902738715d411583b95aec76494c234b0791 | 7691 |
+| machine | schemas/installation_bootstrap_profile__1.schema.json | 9c6dd9fcd6dbc02cdc2bc2bd588379b264137c3cd43d18de537019fffb9c1750 | 9768 |
+| machine | schemas/isolation_qualification__1.schema.json | 973d4e3cb72315e6df3a2ec276068f1b29c01e6609b740025516d33d8d1320d6 | 10717 |
+| machine | schemas/knowledge_state__1.schema.json | 108efa840ccfa3ffdb0bf8e625c00ba5188796787836df6f1fbd7d1986d492a3 | 9384 |
+| machine | schemas/lane_result_admission_evidence__2.schema.json | c2a35907c1d6bbe60a7d217fd5a645eed2a114e6f9247a11c7cf14bf646f6ea4 | 8873 |
+| machine | schemas/lane_run__1.schema.json | 29504355242ee7feb35f563c19899cf26951829689b4f9058ab3e561373b8a99 | 8751 |
+| machine | schemas/lane_spec__1.schema.json | ba40836dca948e7ee52fcedc34f7fbf2bd35e9080f28b512676158c106c5be0c | 9147 |
+| machine | schemas/legacy_exposure_reconstruction_assessment__1.schema.json | 2123bc68ef99759b20282157469ccbd7749c15cae8de20aa03f6e12a3677853e | 9113 |
+| machine | schemas/legacy_mechanical_validation_assessment__1.schema.json | 14768bebe33848163d7465cbe447dffef2c36aeea9f28f10d7c43293809d6c8a | 8856 |
+| machine | schemas/legacy_raw_ref__1.schema.json | 8db9698ac6fd6415d1f05c620625682981453b7610e299391c6c7ae4bd111d98 | 7867 |
+| machine | schemas/lineage_admission_assessment__1.schema.json | d558b1f3dd396636d9b1ffae86bdad1af426dceb52224be511302e6fa5ba3b3d | 9475 |
+| machine | schemas/policy_revision__1.schema.json | 125e48621c35e67998d12289b4cfea924adf333cf78dee9852b5026dd395523d | 7697 |
+| machine | schemas/potential_exposure_record__1.schema.json | 9ca6f0dfbd11d639bddcc964eab6ebedb91b8fbe3d66ff28290bde4faf3a41c8 | 8525 |
+| machine | schemas/projection_policy__1.schema.json | c640df3b4b2aeddfa6020afd3658a246fa891307d31ebb33985697b0caa9af35 | 7874 |
+| machine | schemas/schema_registry__2.schema.json | 1fb570f8c9f10b66f5dab4ce504db954bf3fcd9fa31328b38873c3d784e43db8 | 9159 |
+| machine | schemas/source_generation__1.schema.json | 6c6b64cdcde82c29f991b982805d38cc2919baf2c1fe069abd09722f28bae01f | 9289 |
+| machine | schemas/source_identity__1.schema.json | 8b39ef53978b2d5059f4ba3f19d47fb54597bde9c13297c8d2dfdebfaa6eb5d9 | 8428 |
+| machine | schemas/source_manifest__1.schema.json | 9360d953146ee589de29f56afbd7512b0983623c3bd6c145d55ec1f17ab2928c | 8283 |
+| machine | schemas/source_reconciliation_assessment__1.schema.json | 1c218ee1490183108a8ea2c195dbbe2410446a3361417079b49d8adbb764ba81 | 9027 |
+| machine | schemas/spec_revision__1.schema.json | f1a15cfc998eda487d39ae5770a93ea2224ce343661ea2f5667b66f16bf30130 | 8950 |
+| machine | schemas/stage_run__1.schema.json | a656f277af25f4aa8847791b669f29e3b6fa70f343bc4750ddb61eecddf2515a | 9281 |
+| machine | schemas/stage_spec__1.schema.json | a64986a6840b11186af71acb2c9f95d5e4ea93f858a5d83bcc6fb0496a59cece | 9131 |
+| machine | schemas/trust_profile__1.schema.json | 23ad1f352b792cecab983e7df2d786c0237aa634f8511eb146ea8870711fefc7 | 8104 |
+| machine | schemas/trusted_predecessor_selection_decision__1.schema.json | 3cd999e99935d3f90aa00b8afe4469c32a72b4a665865faa53a4ba33c51e340d | 9573 |
+| machine | schemas/view_manifest__1.schema.json | c4b5ea0b5bd765ff68beb807fc5260bbf5954673c6db8d4964b24badbe4d251a | 8716 |
+
+Governance schema $id/dialect/bytes/dependency closure: candidate/governance/GOVERNANCE_CONTRACT.json. Runtime schema binding table/catalog is exact inherited candidate/SCHEMA_ARTIFACT_CATALOG_R5_4.json and objects/schema_registry__2.json.

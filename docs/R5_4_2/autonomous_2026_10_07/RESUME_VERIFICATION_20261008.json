@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-08",
+  "decision_register_through": "OD-033",
+  "scope": "Actual source transport regression continuation; not full semantic closure",
+  "changed_production_files_this_resume": [],
+  "new_test_file": "tests/stage2/test_source_archive_real_git.py",
+  "new_test_raw_digest": "8f095024603d4b71d95fd246d2d6b74ee9abb21ed299d820731490088e81fc4e",
+  "targeted_result": "6 passed",
+  "affected_runtime": {
+    "file": "design/source_instance_readback/runtime_runs/1791456792026577200.json",
+    "raw_digest": "edbe815467fc3287361b406286cbed8918d8f3338a2762c2cf89db9037fa5d09",
+    "result": "112 passed, 2 warnings",
+    "exit_code": 0,
+    "input_drift": []
+  },
+  "ruff": {
+    "command": "python -m ruff check src/bdb_audit/source/archive.py src/bdb_audit/source/git_resolver.py src/bdb_audit/workflow/source_target.py tests/stage2/test_source_archive_real_git.py",
+    "exit_code": 0
+  },
+  "mypy": {
+    "command": ".venv-f2/Scripts/python.exe -m mypy --config-file pyproject.toml",
+    "exit_code": 0,
+    "source_files": 49
+  },
+  "draft": {
+    "file": "DRAFT_VERIFICATION.json",
+    "raw_digest": "92e9e70953b8683f6166c769c7e60bb7ba80cb1169a0738248357b64ab40e270",
+    "command_count": 17,
+    "all_exit_zero": true
+  },
+  "initial_failures": "Missing finite implementation delta was recorded after review; native Git export metadata assumption was corrected in fixture. Original failed runtime record retained. No acceptance criteria relaxed.",
+  "legacy_tracked_diff": false,
+  "qualification": false,
+  "candidate_materialized": false,
+  "Q1": "NOT_STARTED",
+  "Q2": "NOT_STARTED",
+  "N5_N11": "NOT_STARTED",
+  "NF02": "OPEN",
+  "external_blocker": null
+}

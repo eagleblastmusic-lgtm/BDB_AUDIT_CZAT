@@ -1,0 +1,1 @@
+{"component_rule":"NO_EMPTY_DOT_DOTDOT_COMPONENTS","duplicates":"REJECT_CANONICAL_PATH_ALIAS","ordering":"UTF8_BYTE_LEXICOGRAPHIC","path_shape":{"maxLength":512,"minLength":1,"pattern":"^(?!.*(?:^|/)\\.{1,2}(?:/|$))[^/\\\\\\x00]+(?:/[^/\\\\\\x00]+)*$","type":"string"},"profile_id":"SOURCE_PATH_PROFILE_V1","separator":"POSIX_SLASH","unsupported":"REJECT_NO_OMISSION"}

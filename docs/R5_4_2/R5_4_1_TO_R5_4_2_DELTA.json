@@ -1,0 +1,129 @@
+{
+  "schema": "BDB_R5_4_2_STOPPED_MATERIALIZATION_DELTA/1",
+  "requested_reason": "FULL_RUNTIME_SEMANTIC_AND_SCHEMA_REACHABILITY_CLOSURE",
+  "owner_approval_ref": {
+    "file": "docs/R5_4_2/OWNER_R5_4_2_SEMANTIC_CLOSURE_APPROVAL.json",
+    "raw_digest": "78cb86ad8f311e1f4db73d10b6d18e3f9567ac03d8b446a0849a15f047ea9aae"
+  },
+  "predecessor_exact_identity": {
+    "normative_candidate_set_digest": "d11f751f729605f94bdd11dc033f700f895ee4f7091f2150424023fd4efcaf3b",
+    "machine_candidate_set_digest": "640b76678b48d1902c16775c660709101f1a0708805b7608f822af7a0604f682",
+    "manifest_raw_digest": "15415abd7d2601698c6ff664a93077213e81575272a213c4511f6082c9d8fdef",
+    "registry_raw_digest": "1b9d17c46843a91053036f0370d4419dac87ce5978df61b0dc922e0e40237e2c",
+    "golden_raw_digest": "4cebb462b647c69e6348546180900ac2a3c4806a5bf1716e5269b70ed94edb17",
+    "schema_registry_object_digest": "de514548328391f271dac2f6b253b8d47ac8d6e5406e6e0781a2bfb18c9cbc1e",
+    "qualification_record_raw_digest": "3a3754d4eebac944ad40c7a49cf6db882bbbde6c55c7f14784961dbfc4df8b90",
+    "qualification_record_id": "BDB-AUTHOR-BASELINE-QUALIFICATION-R5_4_1-2026-10-06-001",
+    "registry_id": "BDB-AUDIT-V2-ARTIFACT-CONTRACT-REGISTRY-R5-4-1",
+    "golden_vector_set_id": "BDB-AUDIT-V2-FOUNDATION-GOLDEN-VECTORS-R5-4-1"
+  },
+  "predecessor_status": "VALID_AUTHOR_QUALIFIED_PREDECESSOR_UNCHANGED; implementation supersession pending successful R5.4.2 Q1",
+  "invalid_R5_4_record": "Distinct preserved premature invalid qualification; R5.4.1 is not invalidated",
+  "approved_proposed_kinds": [
+    "assurance_claim_set/1",
+    "clean_control_assessment/1",
+    "corpus_member_candidate/1",
+    "defect_unit/1",
+    "discovery_confirmation_assessment/1",
+    "discovery_corpus_match_assessment/1",
+    "discovery_novelty_assessment/1",
+    "discovery_tool_origin_assessment/1",
+    "effort_results/1",
+    "evidence_dependency_graph/1",
+    "false_negative_relationship_assessment/1",
+    "fault_spec/1",
+    "finding_defect_match_assessment/1",
+    "gate_decision/1",
+    "handoff_validation_result/1",
+    "holdout_exposure_assessment/1",
+    "negative_opportunity_unit/1",
+    "observation_dependency/1",
+    "public_conclusion_statement/1",
+    "residual_risk/1",
+    "state_model/1"
+  ],
+  "candidate_added_files": [],
+  "candidate_changed_files": [],
+  "candidate_inherited_files": [],
+  "stop_issue": {
+    "gate": "SPEC_CONFLICT",
+    "issue_id": "MATERIALIZATION_C01_COLLECTOR_RAW_TYPED_REPRESENTATION_UNSPECIFIED",
+    "kind": "surface_collector_record/1",
+    "approved_owner_package_raw_digest": "018d577290b09f1ad9a009edffe31d4f23af87ff9381d597a2a0060919aa8119",
+    "approved_graph_raw_digest": "57e16f3dc8ffdc448c62cd5ed74663c875517eb6d141f13516358069d15ea75a",
+    "owner_wrapper_rule": "an accepted wrapper must have an explicit closed body/schema and raw reference",
+    "collector_body_source": "collection_run_id\ncollector_profile_ref\nassigned_input_manifest_ref\nassigned_inputs[]\nterminal_input_dispositions[]\nemitted_surface_refs[]\nruntime_manual_additions[]\nparse_errors[]\nunsupported_capabilities[]\nresource_limit_events[]\ncompletion_status",
+    "explicit_body_completion": null,
+    "explicit_material_refs": [],
+    "inbound_typed_reference_edges": [
+      {
+        "from": "surface_record/1",
+        "to": "surface_collector_record/1",
+        "field": "provenance_refs",
+        "cardinality": "0..*",
+        "ref_class": "CONTENT_OR_PRIOR",
+        "source": "QUALIFIED_REGISTRY_WITH_PROPOSED_FINITE_TARGET_MAPPING"
+      },
+      {
+        "from": "scope_state_record/1",
+        "to": "surface_collector_record/1",
+        "field": "basis_refs",
+        "cardinality": "0..N",
+        "ref_class": "CONTENT_OR_PRIOR",
+        "source": "QUALIFIED_REGISTRY_WITH_PROPOSED_FINITE_TARGET_MAPPING"
+      },
+      {
+        "from": "inventory_revision/1",
+        "to": "surface_collector_record/1",
+        "field": "assigned_input_refs",
+        "cardinality": "0..*",
+        "ref_class": "CONTENT_OR_PRIOR",
+        "source": "QUALIFIED_REGISTRY_WITH_PROPOSED_FINITE_TARGET_MAPPING"
+      },
+      {
+        "from": "input_disposition_record/1",
+        "to": "surface_collector_record/1",
+        "field": "assigned_input_ref",
+        "cardinality": "1",
+        "ref_class": "CONTENT_OR_PRIOR",
+        "source": "QUALIFIED_REGISTRY_WITH_PROPOSED_FINITE_TARGET_MAPPING"
+      }
+    ],
+    "new_decision_required": "Exact raw-backed collector wrapper body/RawRef and reference contract, or an explicitly approved alternative consumer representation with its identity/target-map changes. Neither is chosen by this check.",
+    "predecessor_readback": {
+      "count": 120,
+      "mismatches": 0
+    },
+    "qualification_eligible": false,
+    "qualification_record_emitted": false,
+    "candidate_materialized": false
+  },
+  "prior_diagnostic_archives": [
+    {
+      "original_file": "docs/R5_4_2/R5_4_2_CANDIDATE_MANIFEST.json",
+      "archived_file": "docs/R5_4_2/materialization_attempts/2026-10-06-semantic-preflight/prior_diagnostics/R5_4_2_CANDIDATE_MANIFEST.json",
+      "raw_digest": "1a263f413b4ea502a15dcce94d4b1b0c8c6868b16da95525dc1c7a3900af1a1d"
+    },
+    {
+      "original_file": "docs/R5_4_2/R5_4_2_SELF_AUDIT.json",
+      "archived_file": "docs/R5_4_2/materialization_attempts/2026-10-06-semantic-preflight/prior_diagnostics/R5_4_2_SELF_AUDIT.json",
+      "raw_digest": "6c44002e9d9291141b97c8ac820b093d937f5fff42fd7ae5bb62a1c5c321f820"
+    },
+    {
+      "original_file": "docs/R5_4_2/R5_4_2_READBACK.json",
+      "archived_file": "docs/R5_4_2/materialization_attempts/2026-10-06-semantic-preflight/prior_diagnostics/R5_4_2_READBACK.json",
+      "raw_digest": "b174af646b416920b202a3b2724d2dd861f2b0e81c5b3b12c1ed161c2719fe30"
+    },
+    {
+      "original_file": "docs/R5_4_2/R5_4_2_Q1_QUALIFICATION_REPORT.md",
+      "archived_file": "docs/R5_4_2/materialization_attempts/2026-10-06-semantic-preflight/prior_diagnostics/R5_4_2_Q1_QUALIFICATION_REPORT.md",
+      "raw_digest": "c8a6b0e91400621cf39de4eb6ced072f9f83468b82dfcd835b9c8feadd4896d7"
+    },
+    {
+      "original_file": "docs/R5_4_2/R5_4_1_TO_R5_4_2_DELTA.json",
+      "archived_file": "docs/R5_4_2/materialization_attempts/2026-10-06-semantic-preflight/prior_diagnostics/R5_4_1_TO_R5_4_2_DELTA.json",
+      "raw_digest": "65a49ba4f8d31d3fff48d6f749483601555be25528dfe99cdfcbafa870e89f5f"
+    }
+  ],
+  "scope": "No materialized successor delta. Diagnostic documents only; all production/predecessor/approved artifacts unchanged."
+}

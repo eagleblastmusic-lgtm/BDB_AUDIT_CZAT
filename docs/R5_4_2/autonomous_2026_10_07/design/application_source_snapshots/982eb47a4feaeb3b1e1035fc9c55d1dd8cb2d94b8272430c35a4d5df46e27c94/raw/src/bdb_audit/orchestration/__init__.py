@@ -1,0 +1,106 @@
+"""Orchestration primitives, FSM, and native E1/E2 ensemble execution (WP-F4-09)."""
+
+from .fsm import (
+    CampaignState,
+    StageRunState,
+    LaneRunState,
+    AttemptState,
+    TransitionFact,
+    legal_transition,
+    project_states,
+)
+from .stages import StageSpec, StageSpecRegistry
+from .runs import LaneSpec, Attempt
+from .native_ensemble import (
+    E1_LANE_SLOTS,
+    E1_LANE_STRATEGIES,
+    build_e1_stage_spec,
+    build_e1_lane_specs,
+    build_e2_stage_spec,
+    EnsembleQuarantineBroker,
+    E1CompletionResult,
+    E2CompletionResult,
+    execute_e1_ensemble,
+    execute_e2_convergence,
+    validate_stage_transition,
+)
+from .e3 import (
+    E3_LANE_SLOTS,
+    E3_LANE_STRATEGIES,
+    FORBIDDEN_BLIND_LEAK_FIELDS,
+    build_e3_stage_spec,
+    build_e3_lane_specs,
+    create_result_slot_contract,
+    E3QuarantineBroker,
+    E3BlindAttemptContext,
+    create_e3_blind_attempt,
+    E3BlindNoveltyResult,
+    execute_e3_blind_ensemble,
+)
+from .e3_reveal import (
+    E3BlindCheckpoint,
+    create_e3_blind_checkpoint,
+    PositiveGapProjection,
+    E3RevealEvent,
+    execute_positive_gap_reveal,
+    E3GapDirectedScheduler,
+    execute_cumulative_corpus_reveal,
+    execute_holdout_reveal,
+    FalseNegativeRelationshipAssessment,
+    evaluate_false_negative_relationship,
+)
+from .e3_gate import (
+    E3StageCompletionCandidate,
+    E3IntegrationGateEvaluator,
+)
+
+__all__ = [
+    "CampaignState",
+    "StageRunState",
+    "LaneRunState",
+    "AttemptState",
+    "TransitionFact",
+    "legal_transition",
+    "project_states",
+    "StageSpec",
+    "StageSpecRegistry",
+    "LaneSpec",
+    "Attempt",
+    "E1_LANE_SLOTS",
+    "E1_LANE_STRATEGIES",
+    "build_e1_stage_spec",
+    "build_e1_lane_specs",
+    "build_e2_stage_spec",
+    "EnsembleQuarantineBroker",
+    "E1CompletionResult",
+    "E2CompletionResult",
+    "execute_e1_ensemble",
+    "execute_e2_convergence",
+    "validate_stage_transition",
+    "E3_LANE_SLOTS",
+    "E3_LANE_STRATEGIES",
+    "FORBIDDEN_BLIND_LEAK_FIELDS",
+    "build_e3_stage_spec",
+    "build_e3_lane_specs",
+    "create_result_slot_contract",
+    "E3QuarantineBroker",
+    "E3BlindAttemptContext",
+    "create_e3_blind_attempt",
+    "E3BlindNoveltyResult",
+    "execute_e3_blind_ensemble",
+    "E3BlindCheckpoint",
+    "create_e3_blind_checkpoint",
+    "PositiveGapProjection",
+    "E3RevealEvent",
+    "execute_positive_gap_reveal",
+    "E3GapDirectedScheduler",
+    "execute_cumulative_corpus_reveal",
+    "execute_holdout_reveal",
+    "FalseNegativeRelationshipAssessment",
+    "evaluate_false_negative_relationship",
+    "E3StageCompletionCandidate",
+    "E3IntegrationGateEvaluator",
+]
+
+
+

@@ -1,0 +1,11 @@
+{
+  "observed": {
+    "accepted": true,
+    "commit_seq": 2,
+    "issue": "SourceGeneration manifest differs from exact SourceIdentity manifest"
+  },
+  "database": "C:\\Projekty\\Audyty\\BDB Audit\\._nf02_current_audit\\data\\source-manifest-consistency-dc8a6dd132cf46c8847343578d47f34a\\probe.sqlite",
+  "qualification": false,
+  "canonical_user_history_modified": false,
+  "NF02": "OPEN"
+}

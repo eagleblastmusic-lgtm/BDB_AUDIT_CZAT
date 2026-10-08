@@ -1,0 +1,44 @@
+{
+  "files": [
+    {
+      "file": "DRAFT_VERIFICATION.json",
+      "raw_digest": "92e9e70953b8683f6166c769c7e60bb7ba80cb1169a0738248357b64ab40e270",
+      "bytes": 41663
+    },
+    {
+      "file": "design/EXTERNAL_PROFILE_CONTRACTS.json",
+      "raw_digest": "b6a1b4e54de18c190b15ef81efd7e0e5837b2f39fffc838c1cf134b2f68f7b61",
+      "bytes": 33933115
+    },
+    {
+      "file": "design/PROFILE_REFERENCE_CONTRACTS.json",
+      "raw_digest": "87bbe7e446cbd332a9112ed729039f14211e21bd75028566744d6e9b34253913",
+      "bytes": 62933
+    },
+    {
+      "file": "design/PAYLOAD_REFERENCE_CONTRACTS.json",
+      "raw_digest": "b6a7e92ddb5fd0b2c22de4d75e4ac17be3991545744c58a22127b0b0da42b97a",
+      "bytes": 43508
+    },
+    {
+      "file": "design/PROFILE_DESIGN_AUDIT.json",
+      "raw_digest": "91ba4bf07dbf51dbd90c51a15f437878375766cd40b087e21fd89aefe1f4c57b",
+      "bytes": 190731
+    },
+    {
+      "file": "design/PROFILE_CLOSURE_FRONTIER.json",
+      "raw_digest": "60da8fa78ee6cb9ef8c4b1bfe2611eff4ca08149167cdd8855537e7704b0aea9",
+      "bytes": 23517
+    },
+    {
+      "file": "design/SEMANTIC_OBLIGATION_QUEUE.json",
+      "raw_digest": "39c348a9ff833fa64ac18de857c6b0d76fc1ed913acaa295bdf3feb9e252b4b4",
+      "bytes": 1922049
+    }
+  ],
+  "detected_drift": [
+    "SOURCE_ZIP_TRANSPORT_V1"
+  ],
+  "initial_verifier_reject": "GENERATED_PROFILE_CATALOG_DRIFT",
+  "qualification": false
+}

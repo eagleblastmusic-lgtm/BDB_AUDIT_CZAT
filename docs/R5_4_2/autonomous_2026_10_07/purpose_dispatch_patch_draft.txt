@@ -1,0 +1,23 @@
+    purpose_catalog = read(OUT / "design/PURPOSE_CONTRACT_GRAMMARS.json")
+    purposes = list(purpose_catalog)
+    method_values = purpose_catalog["METHOD"]["parameter_schema"]["properties"]["parameters"]["properties"]["method_type"]["enum"]
+    assessor_values = purpose_catalog["ASSESSOR"]["parameter_schema"]["properties"]["parameters"]["properties"]["assessment_kind_version"]["enum"]
+    shared_context = {
+        "governing_spec_ref": ref("typed_ref"), "input_kind_versions": array(enum(keys)),
+        "predicate_contract_ref": ref("external_profile_ref"), "required_witness_kinds": array(enum(keys)),
+        "enum_values": array(ref("code")), "resource_bounds": array(object_schema({
+            "resource": enum("CPU_TIME_US WALL_TIME_US MEMORY_BYTES OUTPUT_BYTES FILE_COUNT"), "limit": number()})),
+    }
+    context_entries = {"oneOf": [
+        object_schema({"purpose": enum([p for p in purposes if p not in ("METHOD", "ASSESSOR")]),
+                       "variant": object_schema({"kind": const("DEFAULT")}), **shared_context}),
+        object_schema({"purpose": const("METHOD"), "variant": object_schema({
+            "kind": const("METHOD"), "method_type": enum(method_values)}), **shared_context}),
+        object_schema({"purpose": const("ASSESSOR"), "variant": object_schema({
+            "kind": const("ASSESSOR"), "assessment_kind_version": enum(assessor_values)}), **shared_context}),
+    ]}
+    add("FULL_PATH_CONTEXT_PARAMETERS_V1", {"entries": array(context_entries, 32)},
+        dependencies=[c.get("analysis_profile_key", c["algorithm_id"]) for c in purpose_catalog.values()],
+        rule="Successor wire FULL_PATH_CONTEXT_PARAMETERS_V2, OD036/037. Exactly one sorted unique dispatch row per exact governing spec/purpose/variant; complete 14 DEFAULT, 14 METHOD and four ASSESSOR variants per governing SpecRevision. Derive METHOD variant from the exact prior subject ExperimentSpec method_type and ASSESSOR variant from the actual registered assessment kind/version; no caller selector. Selected exact predicate parameters must equal that variant, with complete purpose input/witness/output/resource domains and mandatory prerequisites. Each governing_spec_ref is a field-specific PINNED_INSTALLATION_REF equal to the independently qualified exact initial_transition_profile_ref before empty-history initialization. At consumption require exact applicable governing spec. No fabricated pre-genesis acceptance, generic predicate or untyped expression.")
+    contracts["FULL_PATH_CONTEXT_PARAMETERS_V1"]["wire_profile_id"] = "FULL_PATH_CONTEXT_PARAMETERS_V2"
+    contracts["FULL_PATH_CONTEXT_PARAMETERS_V1"]["grammar"]["properties"]["profile_id"] = const("FULL_PATH_CONTEXT_PARAMETERS_V2")

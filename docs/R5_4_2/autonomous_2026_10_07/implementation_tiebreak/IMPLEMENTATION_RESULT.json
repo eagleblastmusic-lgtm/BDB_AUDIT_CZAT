@@ -1,0 +1,44 @@
+{
+  "authorization": "User: wprowadź to i kontynuuj",
+  "changed_files": [
+    "src/bdb_audit/history/closure.py",
+    "src/bdb_audit/history/objects.py",
+    "tests/f2/test_closure_tiebreak_regression.py"
+  ],
+  "behavior": "Normative Kahn ready-node tie-break; no unconditional command-first rule in CommitBody; exact command binding and scoped V1 bootstrap edges retained",
+  "targeted_tests": {
+    "golden_bootstrap_regressions": "12 PASS before dependent CommitBody fix",
+    "finalization_and_regressions": "4 PASS after dependent CommitBody fix"
+  },
+  "draft_verification": {
+    "commands": 15,
+    "result": "PASS"
+  },
+  "ruff": "PASS",
+  "configured_mypy": "PASS 49 files using .venv-f2",
+  "additional_direct_mypy": "2 preexisting errors, reproduced with --shadow-file original HEAD source; not covered by configured project target",
+  "baseline_mypy_log_raw_digest": "93960c744ee857b9f440880a57f52af7d542a251deb260a5409bbc649717dc38",
+  "build": {
+    "path": "implementation_tiebreak/BDB_AUDIT_TIEBREAK.py",
+    "raw_digest": "ee25594791456001d754ff3eeb4c51517d35c1b5dc9180f0728e1c5bd08a5091",
+    "self_test": "PASS 4 checks"
+  },
+  "broad_runtime": {
+    "status": "ALL_TESTS_PASS_ACROSS_BROAD_RUN_AND_TARGETED_ENVIRONMENT_RETRY",
+    "broad": "560 passed, 1 host ACL failure in 2637.48s",
+    "targeted_retry": "1 passed, unchanged resolver/test, only repo-local temp directory",
+    "result": "implementation_tiebreak/RUNTIME_VERIFICATION.json",
+    "retry": "implementation_tiebreak/RESOLVER_ENVIRONMENT_RETRY.json",
+    "qualification": false
+  },
+  "initial_broad_attempt": "INTERRUPTED after identified global-command-first defect and tmpdir ACL errors; invalidated by code correction; not gate evidence",
+  "qualification": false,
+  "candidate_materialized": false,
+  "Q1": "NOT_STARTED",
+  "Q2": "NOT_STARTED",
+  "N5_N11": "NOT_STARTED",
+  "NF02": "OPEN",
+  "commit": "NOT_CREATED",
+  "push": "NOT_PERFORMED",
+  "harness_print_failure": "After saving full JSON, stdout cp1250 rejected replacement character. Fixed stdout UTF-8; no test/result lost and no full rerun needed."
+}

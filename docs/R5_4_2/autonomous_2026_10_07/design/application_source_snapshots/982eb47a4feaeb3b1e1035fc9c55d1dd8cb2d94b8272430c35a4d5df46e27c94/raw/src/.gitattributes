@@ -1,0 +1,3 @@
+*.py text eol=lf
+*.json -text
+.gitattributes text eol=lf

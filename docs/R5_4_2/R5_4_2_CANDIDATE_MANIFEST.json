@@ -1,0 +1,31 @@
+{
+  "schema": "BDB_CANDIDATE_NOT_MATERIALIZED_NOTICE/1",
+  "requested_revision": "R5.4.2",
+  "status": "NOT_MATERIALIZED_SPEC_CONFLICT",
+  "reason": "MATERIALIZATION_C01_COLLECTOR_RAW_TYPED_REPRESENTATION_UNSPECIFIED",
+  "candidate_files": [],
+  "normative_candidate_files": [],
+  "machine_candidate_files": [],
+  "normative_candidate_set_digest": null,
+  "machine_candidate_set_digest": null,
+  "manifest_raw_digest": null,
+  "predecessor_identities": {
+    "normative_candidate_set_digest": "d11f751f729605f94bdd11dc033f700f895ee4f7091f2150424023fd4efcaf3b",
+    "machine_candidate_set_digest": "640b76678b48d1902c16775c660709101f1a0708805b7608f822af7a0604f682",
+    "manifest_raw_digest": "15415abd7d2601698c6ff664a93077213e81575272a213c4511f6082c9d8fdef",
+    "registry_raw_digest": "1b9d17c46843a91053036f0370d4419dac87ce5978df61b0dc922e0e40237e2c",
+    "golden_raw_digest": "4cebb462b647c69e6348546180900ac2a3c4806a5bf1716e5269b70ed94edb17",
+    "schema_registry_object_digest": "de514548328391f271dac2f6b253b8d47ac8d6e5406e6e0781a2bfb18c9cbc1e",
+    "qualification_record_raw_digest": "3a3754d4eebac944ad40c7a49cf6db882bbbde6c55c7f14784961dbfc4df8b90",
+    "qualification_record_id": "BDB-AUTHOR-BASELINE-QUALIFICATION-R5_4_1-2026-10-06-001",
+    "registry_id": "BDB-AUDIT-V2-ARTIFACT-CONTRACT-REGISTRY-R5-4-1",
+    "golden_vector_set_id": "BDB-AUDIT-V2-FOUNDATION-GOLDEN-VECTORS-R5-4-1"
+  },
+  "owner_approval_ref": {
+    "file": "docs/R5_4_2/OWNER_R5_4_2_SEMANTIC_CLOSURE_APPROVAL.json",
+    "raw_digest": "78cb86ad8f311e1f4db73d10b6d18e3f9567ac03d8b446a0849a15f047ea9aae"
+  },
+  "qualification_eligible": false,
+  "qualification_record_emitted": false,
+  "note": "Explicit stop notice, not identity-bearing candidate manifest. Prior abort notice retained in prior_diagnostics. No candidate directory created."
+}

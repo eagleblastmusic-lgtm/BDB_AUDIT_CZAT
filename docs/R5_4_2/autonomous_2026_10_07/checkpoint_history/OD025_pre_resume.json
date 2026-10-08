@@ -1,0 +1,32 @@
+{
+  "execution_status": "BLOCKED_BY_EXECUTION_RESOURCE_LIMIT",
+  "decision_register_through": "OD-025",
+  "NF02": "OPEN",
+  "fixed_point_reached": false,
+  "candidate_materialized": false,
+  "Q1": "NOT_STARTED",
+  "Q2": "NOT_STARTED",
+  "N5_N11": "NOT_STARTED",
+  "full_lifecycle": "NOT_QUALIFIED",
+  "current_conditional_vectors": 41,
+  "regression_tests": 5,
+  "fresh_final_full_verification": "PENDING_AFTER_LAST_SCOPE_DELTA",
+  "next_exact_operation": "Regenerate dependent profile grammars after scope conditional delta; run fresh verify_design.py to bind final tool/schema hashes; then complete exact SCOPE_EXCLUSION cross-object obligation and OD-024 bootstrap Registry/instance integration.",
+  "files": {
+    "tools/semantic_obligation_queue.py": "381830f675f4e1f121141f986f1f6ebc545cf49424e5caffeb8c52933811d4ed",
+    "tools/test_semantic_queue_retention.py": "970a3da1c9d6941961baf6ae04dae6e53e9c804badb4b9336de857c7437cb101",
+    "tools/bootstrap_precedence_design.py": "fd66e17404d1df8243890dd407ce8c8b49336988d6d4607da33d682407432d30",
+    "tools/body_grammar_frontier.py": "714bd028aad944a1d3702ec0e81a74b7afbfb2db372b2486ea333007929d59e4",
+    "tools/conditional_grammar_audit.py": "cd5d54f15b894fb161c175ad1cfa947a45c233d9f17347d5c483111bd97a341d",
+    "tools/profile_contracts.py": "4ea247df40e889732d9cf215a0e7e498e662bb0c83641f4fade3d443efc7cc8e",
+    "tools/semantic_inventory.py": "b21ec48f7550fbcd0963c68e347fcfb7884864c44e89bdf5a2a2b14ba8f0064b",
+    "tools/record_continuation.py": "03087d51d5a3ff0e2f3725be364e05545a74b5574bec22e9c775921ae0d843f0",
+    "tools/verify_design.py": "ea697247e8f61818a8e137c56fc1a66bfeaeb19711d56731d8daee484feee098",
+    "design/HISTORY_CUT_SEMANTIC_REVIEW.md": "d3f6e9cb5b90f06f82d3fa0fd51c5b8a2c082ff47647fb7db49178f8718aa256",
+    "design/BOOTSTRAP_PRECEDENCE_SUCCESSOR.json": "301d6055984712cbc3a8bf2220a8aed9976e57415ca7c6cd63d4c4a92dff0eee",
+    "design/CONDITIONAL_GRAMMAR_KNOWN_ANSWERS.json": "875f68c029154011526a62e5646f0b334d758763f9e885fe77056b226ceba807",
+    "design/body_grammars/grant_body__2.json": "8634a27e8bf12439529d7901c2ae176e205c4c409d293cc71ed3ffe5458a0923",
+    "design/body_grammars/scope_state_record__2.json": "1be6bf9aea0cd0b2cbf55ae5c0c0556f18fee0c7a7aedf344fc06b18f772e733"
+  },
+  "owner_register_digest": "bc237a0284401ef928ee46667fd387694ce5fd7146a91f553bca17b4c60b6e93"
+}

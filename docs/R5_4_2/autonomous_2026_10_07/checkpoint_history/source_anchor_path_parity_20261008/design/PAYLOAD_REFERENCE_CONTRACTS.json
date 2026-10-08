@@ -1,0 +1,1163 @@
+{
+  "material_refs": [
+    {
+      "owner": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "field": "collector_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "COLLECTOR_CAPABILITY_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "field": "assigned_input_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "field": "assigned_inputs[].source_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "field": "terminal_input_dispositions[].input_ref.source_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "field": "terminal_input_dispositions[].exclusion_decision_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "approval_decision/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "field": "emitted_surface_refs",
+      "representation": "TypedRef",
+      "targets": [
+        "surface_key/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "field": "runtime_manual_additions[].surface_key_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "surface_key/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "field": "runtime_manual_additions[].observation_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "observation/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "field": "parse_errors[].input_ref.source_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "field": "unsupported_capabilities[].input_ref.source_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "field": "resource_limit_events[].input_ref.source_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "field": "tool_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "TOOL_CAPTURE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "field": "execution_descriptor_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "execution_descriptor/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "field": "command_spec_ref",
+      "representation": "RawRef",
+      "targets": [
+        "EXECUTION_COMMAND_JSON_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "field": "input_refs",
+      "representation": "TypedRef",
+      "targets": [
+        "experiment_spec/1",
+        "source_generation/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "field": "output_raw_refs",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "field": "environment_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "environment_record/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "field": "resource_limit_events[].input_ref.source_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "FAULT_RUN_RECORD_JSON_V1",
+      "field": "fault_revision_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "fault_spec/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "FAULT_RUN_RECORD_JSON_V1",
+      "field": "execution_descriptor_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "execution_descriptor/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "FAULT_RUN_RECORD_JSON_V1",
+      "field": "activation_evidence_refs",
+      "representation": "TypedRef",
+      "targets": [
+        "observation/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "FAULT_RUN_RECORD_JSON_V1",
+      "field": "scope",
+      "representation": "TypedRef",
+      "targets": [
+        "invariant_revision/1",
+        "scope_state_record/1",
+        "surface_record/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "FAULT_RUN_RECORD_JSON_V1",
+      "field": "cleanup_result_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "cleanup_result/2"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+      "field": "capture_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "OBSERVATION_CAPTURE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+      "field": "expected_value.raw_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "EXECUTION_COMMAND_JSON_V1",
+      "field": "executable_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "EXECUTION_COMMAND_JSON_V1",
+      "field": "working_directory.source_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "MODEL_ARTIFACT_V1",
+      "field": "transitions[].source_anchors[].source_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "IMPLEMENTATION_MAPPING_V1",
+      "field": "source_generation_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_generation/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "IMPLEMENTATION_MAPPING_V1",
+      "field": "variable_mappings[].source_anchors[].source_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "IMPLEMENTATION_MAPPING_V1",
+      "field": "transition_mappings[].source_anchors[].source_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "SNAPSHOT_EXPORT_V2",
+      "field": "snapshot_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "snapshot/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "SNAPSHOT_EXPORT_V2",
+      "field": "payload.objects[].ref",
+      "representation": "TypedRef",
+      "targets": [
+        "approval_decision/1",
+        "attempt/1",
+        "campaign_genesis/1",
+        "candidate_assurance_case/1",
+        "challenger_result/1",
+        "contradiction_revision/1",
+        "coverage_obligation/1",
+        "coverage_obligation_qualification/1",
+        "delivery_spec/1",
+        "effort_results/1",
+        "evidence_applicability_assessment/1",
+        "evidence_invalidation/1",
+        "evidence_qualification_assessment/1",
+        "executor_spec/1",
+        "finding_adjudication_decision/1",
+        "finding_claim_revision/1",
+        "inventory_revision/2",
+        "isolation_baseline_profile/1",
+        "lane_run/1",
+        "obligation_applicability_decision/1",
+        "observation/1",
+        "residual_risk/1",
+        "scope_state_record/1",
+        "stage_completion/1",
+        "stage_run/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "SNAPSHOT_EXPORT_V2",
+      "field": "payload.transition_event_refs[]",
+      "representation": "AcceptedEventRef",
+      "targets": [],
+      "ref_class": "HISTORY_INPUT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "field": "binding.campaign_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "campaign_genesis/1",
+        "successor_campaign_genesis/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "field": "binding.source_generation_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_generation/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "field": "binding.final_assurance_case_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "final_assurance_case/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "field": "binding.stop_evaluation_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "stop_evaluation/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "field": "binding.campaign_conclusion_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "campaign_conclusion/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "field": "binding.release_qualification_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "release_qualification/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "field": "binding.report_as_of_head",
+      "representation": "AcceptedHead",
+      "targets": [],
+      "ref_class": "HISTORY_INPUT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "field": "machine_objects[].ref",
+      "representation": "TypedRef",
+      "targets": [
+        "approval_decision/1",
+        "artifact_contract_registry/1",
+        "artifact_hash_manifest/1",
+        "assignment_manifest/1",
+        "assignment_package_binding/1",
+        "assurance_claim_set/1",
+        "attempt/1",
+        "bdb_audit_lane_result/2",
+        "blind_origin_eligibility_assessment/1",
+        "bootstrap_admission_decision/1",
+        "build_manifest/1",
+        "bundle_manifest/2",
+        "campaign_conclusion/1",
+        "campaign_genesis/1",
+        "candidate_assurance_case/1",
+        "challenger_assignment/1",
+        "challenger_result/1",
+        "checkpoint/1",
+        "clean_control_assessment/1",
+        "cleanup_result/2",
+        "command_envelope/1",
+        "command_receipt/1",
+        "commit_body/1",
+        "compatibility_fixture_assessment/1",
+        "compatibility_gate_result/1",
+        "contamination_assessment/1",
+        "contradiction_resolution_decision/1",
+        "contradiction_revision/1",
+        "corpus_manifest/1",
+        "corpus_member_admission_assessment/1",
+        "corpus_member_candidate/1",
+        "coverage_obligation/1",
+        "coverage_obligation_key/1",
+        "coverage_obligation_qualification/1",
+        "defect_unit/1",
+        "delivery_spec/1",
+        "dependency_independence_assessment/1",
+        "discovery_confirmation_assessment/1",
+        "discovery_corpus_match_assessment/1",
+        "discovery_novelty_assessment/1",
+        "discovery_record/1",
+        "discovery_tool_origin_assessment/1",
+        "effort_results/1",
+        "environment_record/1",
+        "evidence_applicability_assessment/1",
+        "evidence_dependency_graph/1",
+        "evidence_invalidation/1",
+        "evidence_qualification_assessment/1",
+        "execution_descriptor/1",
+        "execution_result/1",
+        "executor_spec/1",
+        "experiment_spec/1",
+        "false_negative_relationship_assessment/1",
+        "fault_run_record/2",
+        "fault_spec/1",
+        "final_assurance_case/1",
+        "finding_adjudication_decision/1",
+        "finding_axis_assessment/1",
+        "finding_claim_revision/1",
+        "finding_defect_match_assessment/1",
+        "gate_decision/1",
+        "grant_body/1",
+        "handoff_validation_result/1",
+        "history_anchor_receipt/1",
+        "history_cut/1",
+        "holdout_exposure_assessment/1",
+        "hypothesis_revision/1",
+        "input_disposition_record/2",
+        "installation_bootstrap_profile/1",
+        "invariant_revision/1",
+        "inventory_revision/2",
+        "isolation_baseline_profile/1",
+        "isolation_qualification/1",
+        "knowledge_state/1",
+        "lane_completion/1",
+        "lane_result_admission_evidence/2",
+        "lane_run/1",
+        "lane_spec/1",
+        "legacy_exposure_reconstruction_assessment/1",
+        "legacy_mechanical_validation_assessment/1",
+        "legacy_observation_mapping_assessment/1",
+        "legacy_observation_semantic_equivalence_assessment/1",
+        "legacy_raw_ref/1",
+        "lineage_admission_assessment/1",
+        "materiality_assessment/1",
+        "model_fidelity_assessment/1",
+        "negative_evidence_record/1",
+        "negative_opportunity_unit/1",
+        "obligation_applicability_decision/1",
+        "observation/1",
+        "observation_dependency/1",
+        "policy_revision/1",
+        "potential_exposure_record/1",
+        "projection_policy/1",
+        "public_conclusion_statement/1",
+        "release_qualification/1",
+        "residual_risk/1",
+        "root_cause_revision/1",
+        "run_manifest/1",
+        "schema_registry/2",
+        "scope_state_record/1",
+        "snapshot/1",
+        "snapshot_export_record/1",
+        "sound_claim/1",
+        "source_drift_impact_assessment/1",
+        "source_drift_record/1",
+        "source_generation/1",
+        "source_identity/1",
+        "source_manifest/1",
+        "source_reconciliation_assessment/1",
+        "spec_revision/1",
+        "stage_completion/1",
+        "stage_run/1",
+        "stage_spec/1",
+        "standalone_payload_manifest/1",
+        "state_model/1",
+        "stop_evaluation/1",
+        "stop_input/1",
+        "successor_campaign_genesis/1",
+        "successor_campaign_selection_decision/1",
+        "surface_collector_record/2",
+        "surface_key/1",
+        "surface_record/1",
+        "tool_execution_record/2",
+        "transition_authorization_proposal/1",
+        "trust_profile/1",
+        "trusted_predecessor_selection_decision/1",
+        "validation_result/1",
+        "view_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "PUBLIC_CONCLUSION_RENDER_V1",
+      "field": "campaign_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "campaign_genesis/1",
+        "successor_campaign_genesis/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "PUBLIC_CONCLUSION_RENDER_V1",
+      "field": "source_generation_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_generation/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "PUBLIC_CONCLUSION_RENDER_V1",
+      "field": "conclusion_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "campaign_conclusion/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "PUBLIC_CONCLUSION_RENDER_V1",
+      "field": "stop_evaluation_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "stop_evaluation/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "PUBLIC_CONCLUSION_RENDER_V1",
+      "field": "scope_inventory_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "inventory_revision/2"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "PUBLIC_CONCLUSION_RENDER_V1",
+      "field": "residual_risks[].risk_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "residual_risk/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "PUBLIC_CONCLUSION_RENDER_V1",
+      "field": "limited_basis_refs[]",
+      "representation": "TypedRef",
+      "targets": [
+        "stage_completion/1",
+        "coverage_obligation/1",
+        "coverage_obligation_qualification/1",
+        "evidence_invalidation/1",
+        "contradiction_revision/1",
+        "residual_risk/1",
+        "stop_evaluation/1",
+        "approval_decision/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "finding_or_claim_revision_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "finding_claim_revision/1",
+        "finding_adjudication_decision/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "subject_baseline_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_generation/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "environment_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "ENVIRONMENT_PROFILE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "dependency_set_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXECUTION_DEPENDENCY_PLAN_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "harness_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXECUTION_HARNESS_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "fixture_refs[]",
+      "representation": "RawRef",
+      "targets": [
+        "FIXTURE_INPUT_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "seed_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "SEED_PROFILE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "generator_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXECUTION_RUNNER_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "command_spec",
+      "representation": "RawRef",
+      "targets": [
+        "EXECUTION_COMMAND_JSON_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "expected_invariant_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "invariant_revision/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "expected_observable",
+      "representation": "RawRef",
+      "targets": [
+        "CLEANUP_EXPECTED_OBSERVABLE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "observer_requirements[].capture_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "OBSERVATION_CAPTURE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "cleanup_spec",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "CLEANUP_ASSESSMENT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "producer_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "PRINCIPAL_AUTHORIZATION_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "artifact_raw_refs[]",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "field": "target_claim_or_invariant_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "finding_claim_revision/1",
+        "invariant_revision/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "field": "target_location.source_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "field": "activation_predicate",
+      "representation": "RawRef",
+      "targets": [
+        "CLEANUP_EXPECTED_OBSERVABLE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "field": "expected_detector_or_observer",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "OBSERVATION_CAPTURE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "field": "positive_control_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "experiment_spec/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "field": "negative_control_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "experiment_spec/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "field": "clean_target_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXECUTION_VARIANT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "field": "known_defective_target_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXECUTION_VARIANT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ORACLE_CHALLENGE_CASE_V1",
+      "field": "target_claim_or_invariant_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "finding_claim_revision/1",
+        "invariant_revision/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ORACLE_CHALLENGE_CASE_V1",
+      "field": "target_location.source_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "source_manifest/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ORACLE_CHALLENGE_CASE_V1",
+      "field": "activation_predicate",
+      "representation": "RawRef",
+      "targets": [
+        "CLEANUP_EXPECTED_OBSERVABLE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ORACLE_CHALLENGE_CASE_V1",
+      "field": "expected_detector_or_observer",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "OBSERVATION_CAPTURE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ORACLE_CHALLENGE_CASE_V1",
+      "field": "positive_control_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "experiment_spec/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ORACLE_CHALLENGE_CASE_V1",
+      "field": "negative_control_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "experiment_spec/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ORACLE_CHALLENGE_CASE_V1",
+      "field": "clean_target_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXECUTION_VARIANT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ORACLE_CHALLENGE_CASE_V1",
+      "field": "known_defective_target_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXECUTION_VARIANT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ORACLE_CHALLENGE_CASE_V1",
+      "field": "strong_oracle_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXECUTION_HARNESS_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ORACLE_CHALLENGE_CASE_V1",
+      "field": "weakened_oracle_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXECUTION_HARNESS_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "TEMPORAL_MODEL_CLAIM_V1",
+      "field": "model_revision_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "state_model/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "TEMPORAL_MODEL_CLAIM_V1",
+      "field": "invariant_revision_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "invariant_revision/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "TEMPORAL_MODEL_CLAIM_V1",
+      "field": "implementation_scope_refs[]",
+      "representation": "TypedRef",
+      "targets": [
+        "surface_record/1",
+        "surface_key/1",
+        "invariant_revision/1",
+        "finding_claim_revision/1",
+        "coverage_obligation/1",
+        "scope_state_record/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "CAUSAL_CHAIN_V1",
+      "field": "state_transition_refs[]",
+      "representation": "AcceptedEventRef",
+      "targets": [],
+      "ref_class": "HISTORY_INPUT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "CAUSAL_CHAIN_V1",
+      "field": "observation_refs[]",
+      "representation": "TypedRef",
+      "targets": [
+        "observation/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "CAUSAL_CHAIN_V1",
+      "field": "impact_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "finding_axis_assessment/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "CAUSAL_CHAIN_V1",
+      "field": "scope[]",
+      "representation": "TypedRef",
+      "targets": [
+        "surface_record/1",
+        "surface_key/1",
+        "invariant_revision/1",
+        "finding_claim_revision/1",
+        "coverage_obligation/1",
+        "scope_state_record/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "CAUSAL_CHAIN_V1",
+      "field": "evidence_qualification_refs[]",
+      "representation": "TypedRef",
+      "targets": [
+        "evidence_qualification_assessment/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ENDURANCE_OBSERVATION_V1",
+      "field": "duration_workload_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "ENDURANCE_WORKLOAD_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ENDURANCE_OBSERVATION_V1",
+      "field": "environment_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "environment_record/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ENDURANCE_OBSERVATION_V1",
+      "field": "monitoring_path_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "OBSERVATION_CAPTURE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "ENDURANCE_OBSERVATION_V1",
+      "field": "observation_refs[]",
+      "representation": "TypedRef",
+      "targets": [
+        "observation/1"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "BUILD_PROVENANCE_RECEIPT_V1",
+      "field": "build_input_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "build_manifest/1"
+      ],
+      "ref_class": "PINNED_INSTALLATION_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance",
+      "delegated_decision_id": "OD-027"
+    },
+    {
+      "owner": "BUILD_PROVENANCE_RECEIPT_V1",
+      "field": "final_output_raw_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance"
+    },
+    {
+      "owner": "BUILD_PROVENANCE_RECEIPT_V1",
+      "field": "build_environment_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "environment_record/1"
+      ],
+      "ref_class": "PINNED_INSTALLATION_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance",
+      "delegated_decision_id": "OD-027"
+    },
+    {
+      "owner": "BUILD_PROVENANCE_RECEIPT_V1",
+      "field": "verification_refs[]",
+      "representation": "TypedRef",
+      "targets": [
+        "validation_result/1"
+      ],
+      "ref_class": "PINNED_INSTALLATION_REF",
+      "assertion_authority": "NONE; independently resolve and compare exact retained/prior context before semantic acceptance",
+      "delegated_decision_id": "OD-027"
+    }
+  ],
+  "pending": [],
+  "profile_catalog_raw_digest": "2414627a9e7ad29a0de5b3e2255dc5b8a38564070556f9297bcb80d0619a5e03",
+  "fixed_point_reached": false,
+  "producer_and_cross_object_validation": "PENDING_EXECUTABLE_PREDICATE_PARITY",
+  "claim": "Explicit raw payload material refs are context assertions, never canonical authority by themselves"
+}

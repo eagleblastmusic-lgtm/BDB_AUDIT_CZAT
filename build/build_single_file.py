@@ -158,7 +158,9 @@ def collect_runtime_files(requirements: dict[str, str] | None = None) -> list[tu
                 continue
             located = Path(str(dist.locate_file(package_path)))
             if not located.is_file():
-                continue
+                raise RuntimeError(
+                    f"Declared runtime input missing or not a file: {dist_name}=={expected_version}: {rel}"
+                )
             data = located.read_bytes()
             previous = collected.get(rel)
             if previous is not None and previous != data:

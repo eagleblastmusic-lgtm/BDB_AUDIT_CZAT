@@ -1,0 +1,108 @@
+{
+  "record_type": "EXTERNAL_DIRECT_HUMAN_OWNER_SEMANTIC_APPROVAL",
+  "decision_id": "BDB-OWNER-R5-4-2-SEMANTIC-CLOSURE-APPROVAL-2026-10-06-001",
+  "decision": "APPROVED_FOR_VERSIONED_SUCCESSOR_MATERIALIZATION",
+  "authority_basis": "Direct project-owner message in current conversation; local record is a transcription/evidence pin, not self-issued governance authority or cryptographic signature.",
+  "human_request_storage_id": "docs/R5_4_2/evidence/OWNER_SEMANTIC_CLOSURE_APPROVAL.txt",
+  "human_request_raw_digest": "554d2f497a92820a6962d87be103e89cbefc44ba03ba0469bdd42b5e94647ec0",
+  "transcription_encoding": "UTF-8, LF; hash identifies retained local transcription bytes, not original chat transport bytes",
+  "approved_artifacts": [
+    {
+      "file": "docs/R5_4_2/R5_4_2_OWNER_DECISION_PACKAGE.md",
+      "bytes": 85031,
+      "raw_digest": "018d577290b09f1ad9a009edffe31d4f23af87ff9381d597a2a0060919aa8119"
+    },
+    {
+      "file": "docs/R5_4_2/R5_4_2_RESIDUAL_RISK_CONTRACT_DECISION_PROPOSAL.md",
+      "bytes": 35108,
+      "raw_digest": "696dfeaf883462aed4c95b81820d95ad87cc7177ed6edf1bb99fd1f30888b66b"
+    },
+    {
+      "file": "docs/R5_4_2/R5_4_2_ASSURANCE_CLAIM_SET_CONTRACT_PROPOSAL.md",
+      "bytes": 9403,
+      "raw_digest": "6ee0e4237ed0d0fe2a6515c397e09430fa7c2b0e8c58a834814db3f32e497c56"
+    },
+    {
+      "file": "docs/R5_4_2/R5_4_2_PUBLIC_CONCLUSION_CONTRACT_PROPOSAL.md",
+      "bytes": 10523,
+      "raw_digest": "77665fee86e10cc59c2543b6d18d4677090b8cb118be8b215dc6bc40f4890db7"
+    },
+    {
+      "file": "docs/R5_4_2/R5_4_2_SEMANTIC_CLOSURE_GRAPH.json",
+      "bytes": 4372832,
+      "raw_digest": "57e16f3dc8ffdc448c62cd5ed74663c875517eb6d141f13516358069d15ea75a"
+    },
+    {
+      "file": "docs/R5_4_2/R5_4_2_FULL_SEMANTIC_CLOSURE_REPORT.md",
+      "bytes": 17091,
+      "raw_digest": "2abd0f09aad0d97e843649bc1ecc6e5378fd67aca83fc9037739dbfeb4e70ea3"
+    },
+    {
+      "file": "docs/R5_4_2/R5_4_2_RUNTIME_SCHEMA_REACHABILITY.json",
+      "bytes": 1161613,
+      "raw_digest": "d1dfaf07a6f77d8e75ef449d5568d3a2c4814b0691e5630c25e7c47c978139de"
+    },
+    {
+      "file": "docs/R5_4_2/RESIDUAL_RISK_NORMATIVE_USAGE_INVENTORY.json",
+      "bytes": 543498,
+      "raw_digest": "685c5ffd1ba4f02ed7b1bc25e6e5e9501fb06d6629b55c977c0896b8f5462a55"
+    }
+  ],
+  "approved_graph_counts": {
+    "reachable_canonical_kinds": 131,
+    "registered_in_r5_4_1": 110,
+    "new_proposed_canonical_kinds": 21,
+    "currently_schema_bound": 39,
+    "missing_executable_bindings": 92,
+    "semantic_complete_design": 131,
+    "semantic_incomplete_design": 0,
+    "unresolved_abstract_ref_targets": 0,
+    "unresolved_Class_C": 0,
+    "unresolved_Class_D": 0
+  },
+  "approved_scope": [
+    "all semantic decisions and models in exact pinned owner package and linked proposals",
+    "all Class C/D resolutions, finite reference representations and temporal/no-omission invariants in exact pinned graph",
+    "R5.4.1 to R5.4.2 immutable successor creation"
+  ],
+  "predecessor": {
+    "normative_candidate_set_digest": "d11f751f729605f94bdd11dc033f700f895ee4f7091f2150424023fd4efcaf3b",
+    "machine_candidate_set_digest": "640b76678b48d1902c16775c660709101f1a0708805b7608f822af7a0604f682",
+    "manifest_raw_digest": "15415abd7d2601698c6ff664a93077213e81575272a213c4511f6082c9d8fdef",
+    "registry_raw_digest": "1b9d17c46843a91053036f0370d4419dac87ce5978df61b0dc922e0e40237e2c",
+    "golden_raw_digest": "4cebb462b647c69e6348546180900ac2a3c4806a5bf1716e5269b70ed94edb17",
+    "schema_registry_object_digest": "de514548328391f271dac2f6b253b8d47ac8d6e5406e6e0781a2bfb18c9cbc1e",
+    "qualification_record_raw_digest": "3a3754d4eebac944ad40c7a49cf6db882bbbde6c55c7f14784961dbfc4df8b90",
+    "qualification_record_id": "BDB-AUTHOR-BASELINE-QUALIFICATION-R5_4_1-2026-10-06-001",
+    "registry_id": "BDB-AUDIT-V2-ARTIFACT-CONTRACT-REGISTRY-R5-4-1",
+    "golden_vector_set_id": "BDB-AUDIT-V2-FOUNDATION-GOLDEN-VECTORS-R5-4-1"
+  },
+  "authority_chain": [
+    "OWNER_APPROVAL",
+    "VERSIONED_R5_4_2_NORMATIVE_CONTRACT",
+    "EXACT_MACHINE_CONTRACTS",
+    "FRESH_QUALIFICATION"
+  ],
+  "not_authorized": [
+    "Q2 runtime activation",
+    "N5–N8 implementation",
+    "N9 adversarial qualification",
+    "N10 NF02 closure",
+    "N11 full application qualification"
+  ],
+  "no_overlay_authorization": true,
+  "runtime_start_condition": "Successful fresh Q1 for exact R5.4.2; approval does not authorize earlier local overlays or implementations",
+  "source": {
+    "head": "b7051472909075bb4c83a9a510e298fcca2a6bd5",
+    "tree": "3bc05685293d2fade72735e43a2ccc96be26f3f7",
+    "main": "dcd8bd6ef5f7e3f7b5803ade6843c6217f16f044"
+  },
+  "predecessor_readback": {
+    "file_count": 120,
+    "mismatch_count": 0
+  },
+  "candidate_materialized": false,
+  "fresh_Q1": "NOT_STARTED",
+  "independent_freeze_claimed": false,
+  "NF02": "OPEN"
+}
