@@ -1,0 +1,6220 @@
+{
+  "catalog_raw_digest": "b6a1b4e54de18c190b15ef81efd7e0e5837b2f39fffc838c1cf134b2f68f7b61",
+  "wire_identities": {
+    "STAGE_COMPLETION_V1": "STAGE_COMPLETION_V1",
+    "LANE_COMPLETION_V1": "LANE_COMPLETION_V1",
+    "EXECUTOR_ELIGIBILITY_V1": "EXECUTOR_ELIGIBILITY_V1",
+    "NF02_DELIVERY_AUTHORIZATION_V1": "NF02_DELIVERY_AUTHORIZATION_V1",
+    "COLLECTOR_ACCOUNTING_V1": "COLLECTOR_ACCOUNTING_V1",
+    "METHOD_QUALIFICATION_V1": "METHOD_QUALIFICATION_V2",
+    "DISCOVERY_CONFIRMATION_V1": "DISCOVERY_CONFIRMATION_V1",
+    "EXACT_SCOPED_MATCH_V1": "EXACT_SCOPED_MATCH_V1",
+    "CORPUS_RELATIVE_NOVELTY_V1": "CORPUS_RELATIVE_NOVELTY_V1",
+    "PRIOR_FALSE_NEGATIVE_V1": "PRIOR_FALSE_NEGATIVE_V1",
+    "CLAIM_RELATIVE_ASSESSMENT_V1": "CLAIM_RELATIVE_ASSESSMENT_V1",
+    "FINITE_MODEL_FIDELITY_V1": "FINITE_MODEL_FIDELITY_V1",
+    "QUALIFIED_ACTIVATION_V1": "QUALIFIED_ACTIVATION_V1",
+    "FINAL_CHAIN_RELEASE_V1": "FINAL_CHAIN_RELEASE_V1",
+    "OBSERVED_EFFORT_V1": "OBSERVED_EFFORT_V2",
+    "EXACT_DURABLE_RECOVERY_V1": "EXACT_DURABLE_RECOVERY_V1",
+    "COLLECTOR_CAPABILITY_V2": "COLLECTOR_CAPABILITY_V2",
+    "TOOL_CAPTURE_V2": "TOOL_CAPTURE_V3",
+    "CLEANUP_ASSESSMENT_V2": "CLEANUP_ASSESSMENT_V2",
+    "SURFACE_COLLECTOR_RECORD_JSON_V1": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+    "TOOL_EXECUTION_RECORD_JSON_V1": "TOOL_EXECUTION_RECORD_JSON_V1",
+    "FAULT_RUN_RECORD_JSON_V1": "FAULT_RUN_RECORD_JSON_V1",
+    "CLEANUP_EXPECTED_OBSERVABLE_V1": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+    "OBSERVATION_CAPTURE_V2": "OBSERVATION_CAPTURE_V2",
+    "EXECUTION_COMMAND_JSON_V1": "EXECUTION_COMMAND_JSON_V1",
+    "FILESYSTEM_BOUNDARY_V2": "FILESYSTEM_BOUNDARY_V2",
+    "NETWORK_BOUNDARY_V2": "NETWORK_BOUNDARY_V2",
+    "TOOL_BOUNDARY_V2": "TOOL_BOUNDARY_V2",
+    "MODEL_AGENT_BOUNDARY_V2": "MODEL_AGENT_BOUNDARY_V2",
+    "OS_ENVIRONMENT_V2": "OS_ENVIRONMENT_V2",
+    "RUNTIME_ENVIRONMENT_V2": "RUNTIME_ENVIRONMENT_V2",
+    "BROWSER_ENVIRONMENT_V2": "BROWSER_ENVIRONMENT_V2",
+    "EXTERNAL_SERVICE_V2": "EXTERNAL_SERVICE_V2",
+    "CLOCK_PROFILE_V1": "CLOCK_PROFILE_V1",
+    "SANDBOX_PROFILE_V1": "SANDBOX_PROFILE_V1",
+    "SEED_PROFILE_V1": "SEED_PROFILE_V1",
+    "EXECUTION_DEPENDENCY_PLAN_V1": "EXECUTION_DEPENDENCY_PLAN_V1",
+    "ENVIRONMENT_PROFILE_V2": "ENVIRONMENT_PROFILE_V2",
+    "EXECUTION_RUNNER_V2": "EXECUTION_RUNNER_V2",
+    "EXECUTION_HARNESS_V2": "EXECUTION_HARNESS_V2",
+    "EXECUTOR_TOOL_V2": "EXECUTOR_TOOL_V2",
+    "EXECUTION_VARIANT_V2": "EXECUTION_VARIANT_V2",
+    "PRINCIPAL_AUTHORIZATION_V1": "PRINCIPAL_AUTHORIZATION_V2",
+    "SOURCE_AUTHORITY_V1": "SOURCE_AUTHORITY_V1",
+    "SOURCE_IDENTITY_V2": "SOURCE_IDENTITY_V3",
+    "BOOTSTRAP_NAMESPACE_V2": "BOOTSTRAP_NAMESPACE_V2",
+    "BOOTSTRAP_ADMISSION_V2": "BOOTSTRAP_ADMISSION_V2",
+    "TRUSTED_PREDECESSOR_PIN_V2": "TRUSTED_PREDECESSOR_PIN_V2",
+    "LINEAGE_ADMISSION_V2": "LINEAGE_ADMISSION_V2",
+    "EXACT_COMPATIBILITY_V2": "EXACT_COMPATIBILITY_V2",
+    "CHALLENGER_FRESHNESS_V2": "CHALLENGER_FRESHNESS_V2",
+    "MANDATORY_STAGE_SET_V2": "MANDATORY_STAGE_SET_V2",
+    "MANDATORY_LANE_SLOT_V1": "MANDATORY_LANE_SLOT_V1",
+    "GATE_ELIGIBILITY_PROFILE_V1": "GATE_ELIGIBILITY_PROFILE_V1",
+    "TRANSITION_POLICY_V2": "TRANSITION_POLICY_V2",
+    "COVERAGE_OBLIGATION_POLICY_V2": "COVERAGE_OBLIGATION_POLICY_V2",
+    "OBLIGATION_ACCEPTANCE_V2": "OBLIGATION_ACCEPTANCE_V2",
+    "OBLIGATION_APPLICABILITY_V2": "OBLIGATION_APPLICABILITY_V2",
+    "ORACLE_INDEPENDENCE_V2": "ORACLE_INDEPENDENCE_V2",
+    "QUALIFIED_TECHNIQUE_V2": "QUALIFIED_TECHNIQUE_V2",
+    "KNOWLEDGE_POLICY_V2": "KNOWLEDGE_POLICY_V2",
+    "CAPABILITY_BOUNDARY_V2": "CAPABILITY_BOUNDARY_V2",
+    "POSITIVE_VIEW_PROJECTION_V2": "POSITIVE_VIEW_PROJECTION_V2",
+    "PUBLIC_REDACTION_V2": "PUBLIC_REDACTION_V2",
+    "DELIVERY_RETRY_V2": "DELIVERY_RETRY_V2",
+    "DELIVERY_IDEMPOTENCY_V2": "DELIVERY_IDEMPOTENCY_V2",
+    "EXPLORATION_POLICY_V2": "EXPLORATION_POLICY_V2",
+    "SOURCE_DRIFT_POLICY_V2": "SOURCE_DRIFT_POLICY_V2",
+    "SOURCE_RECONCILIATION_V2": "SOURCE_RECONCILIATION_V2",
+    "SOURCE_PATH_PROFILE_V1": "SOURCE_PATH_PROFILE_V1",
+    "SOURCE_MANIFEST_ENTRY_PROFILE_V1": "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+    "SURFACE_KEY_PROFILE_V2": "SURFACE_KEY_PROFILE_V2",
+    "STRICT_JSON_CAPTURE_V1": "STRICT_JSON_CAPTURE_V1",
+    "RETAINED_OPAQUE_BYTES_V1": "RETAINED_OPAQUE_BYTES_V1",
+    "RETAINED_PRODUCER_CODE_V1": "RETAINED_PRODUCER_CODE_V1",
+    "FIXTURE_INPUT_V1": "FIXTURE_INPUT_V1",
+    "LEGACY_OBSERVATION_RAW_V1": "LEGACY_OBSERVATION_RAW_V1",
+    "BDB_CJSON_1": "BDB_CJSON_1",
+    "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1": "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+    "NF02_PACKAGE_TRANSPORT_V2": "NF02_INPUT_PACKAGE_TRANSPORT_V2",
+    "NF02_RESULT_TRANSPORT_V2": "NF02_RESULT_TRANSPORT_V2",
+    "NF02_RESULT_NORMALIZER_V2": "NF02_RESULT_NORMALIZER_V2",
+    "NF02_PACKAGE_SEMANTIC_PROFILE_V1": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+    "NF02_EXTERNAL_LANE_SLOT_V2": "NF02_EXTERNAL_LANE_SLOT_V3",
+    "NF02_PROTOCOL_PROFILE_V2": "NF02_PROTOCOL_PROFILE_V3",
+    "FULL_PATH_CONTEXT_PARAMETERS_V1": "FULL_PATH_CONTEXT_PARAMETERS_V1",
+    "MODEL_ARTIFACT_V1": "MODEL_ARTIFACT_V1",
+    "IMPLEMENTATION_MAPPING_V1": "IMPLEMENTATION_MAPPING_V1",
+    "CALIBRATION_GROUND_TRUTH_PROFILE_V1": "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+    "COMPATIBILITY_FIXTURE_V2": "COMPATIBILITY_FIXTURE_V2",
+    "COMPATIBILITY_GATE_V2": "COMPATIBILITY_GATE_V2",
+    "LEGACY_SCHEMA_PIN_V2": "LEGACY_SCHEMA_PIN_V2",
+    "LEGACY_MECHANICAL_VALIDATION_V2": "LEGACY_MECHANICAL_VALIDATION_V2",
+    "LEGACY_OBSERVATION_MAPPING_V2": "LEGACY_OBSERVATION_MAPPING_V2",
+    "LEGACY_EXPOSURE_RECONSTRUCTION_V2": "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+    "SNAPSHOT_PROJECTION_V2": "SNAPSHOT_PROJECTION_V2",
+    "SNAPSHOT_EXPORT_V2": "SNAPSHOT_EXPORT_V2",
+    "FINAL_TECHNICAL_REPORT_JSON_V1": "FINAL_TECHNICAL_REPORT_JSON_V1",
+    "FINAL_TECHNICAL_REPORT_TEXT_V1": "FINAL_TECHNICAL_REPORT_TEXT_V1",
+    "PUBLIC_CONCLUSION_RENDER_V1": "PUBLIC_CONCLUSION_RENDER_V1",
+    "BUNDLE_MEMBERSHIP_V2": "BUNDLE_MEMBERSHIP_V2",
+    "HASH_MANIFEST_V2": "HASH_MANIFEST_V2",
+    "SOURCE_ARCHIVE_V2": "SOURCE_ARCHIVE_V2",
+    "SOURCE_ZIP_TRANSPORT_V1": "SOURCE_ZIP_TRANSPORT_V1",
+    "HANDOFF_TRANSPORT_V2": "HANDOFF_TRANSPORT_V2",
+    "HISTORY_ANCHOR_V2": "HISTORY_ANCHOR_V2",
+    "BUILD_RECIPE_V2": "BUILD_RECIPE_V2",
+    "DETERMINISTIC_BUILD_SETTINGS_V2": "DETERMINISTIC_BUILD_SETTINGS_V2",
+    "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+    "QUALIFIED_VALIDATOR_V2": "QUALIFIED_VALIDATOR_V2",
+    "FULL_PATH_TRANSITION_TABLE_V2": "FULL_PATH_TRANSITION_TABLE_V2",
+    "FULL_PATH_SEMANTIC_V1": "FULL_PATH_SEMANTIC_V1",
+    "CLAIM_SET_CLOSURE_V1": "CLAIM_SET_CLOSURE_V1",
+    "DEPENDENCY_CLOSURE_V1": "DEPENDENCY_CLOSURE_V1",
+    "FULL_FINALIZATION_PROFILE_V1": "FULL_FINALIZATION_PROFILE_V1",
+    "CHANNEL_CAPTURE_PROFILE_V1": "CHANNEL_CAPTURE_PROFILE_V1",
+    "REPORT_EXPORT_PROFILE_V1": "REPORT_EXPORT_PROFILE_V1",
+    "INSTALLATION_FULL_PATH_PROFILE_V1": "INSTALLATION_FULL_PATH_PROFILE_V2",
+    "RECOVERY_REFERENCE_PROFILE_V1": "RECOVERY_REFERENCE_PROFILE_V1",
+    "REPLAY_CAPSULE_V1": "REPLAY_CAPSULE_V1",
+    "IMPLEMENTATION_MUTATION_CASE_V1": "IMPLEMENTATION_MUTATION_CASE_V1",
+    "ORACLE_CHALLENGE_CASE_V1": "ORACLE_CHALLENGE_CASE_V1",
+    "TEMPORAL_MODEL_CLAIM_V1": "TEMPORAL_MODEL_CLAIM_V1",
+    "CAUSAL_CHAIN_V1": "CAUSAL_CHAIN_V1",
+    "ENDURANCE_OBSERVATION_V1": "ENDURANCE_OBSERVATION_V1",
+    "ENDURANCE_WORKLOAD_V1": "ENDURANCE_WORKLOAD_V1",
+    "BUILD_PROVENANCE_RECEIPT_V1": "BUILD_PROVENANCE_RECEIPT_V2"
+  },
+  "wire_identity_controls": [
+    {
+      "case": "EXACT_DECLARED_SUCCESSOR_WIRE_SET",
+      "result": "PASS"
+    },
+    {
+      "case": "RECOVERY_ID_LEAK_IN_NONPURPOSE_PROFILE",
+      "result": "PASS",
+      "expected_reject": "PROFILE_WIRE_IDENTITY_MISMATCH"
+    },
+    {
+      "case": "IMPLICIT_SUCCESSOR_ALIAS",
+      "result": "PASS",
+      "expected_reject": "PROFILE_WIRE_IDENTITY_MISMATCH"
+    },
+    {
+      "case": "DUPLICATE_ID_WITH_MATCHING_GRAMMAR",
+      "result": "PASS",
+      "expected_reject": "DUPLICATE_PROFILE_WIRE_IDENTITY"
+    }
+  ],
+  "profile_count": 127,
+  "dependency_topological_order": [
+    "BDB_CJSON_1",
+    "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+    "BOOTSTRAP_NAMESPACE_V2",
+    "CHALLENGER_FRESHNESS_V2",
+    "CLAIM_SET_CLOSURE_V1",
+    "CLOCK_PROFILE_V1",
+    "COLLECTOR_ACCOUNTING_V1",
+    "CORPUS_RELATIVE_NOVELTY_V1",
+    "DEPENDENCY_CLOSURE_V1",
+    "DETERMINISTIC_BUILD_SETTINGS_V2",
+    "DISCOVERY_CONFIRMATION_V1",
+    "EXACT_COMPATIBILITY_V2",
+    "EXACT_DURABLE_RECOVERY_V1",
+    "EXACT_SCOPED_MATCH_V1",
+    "EXECUTOR_ELIGIBILITY_V1",
+    "FILESYSTEM_BOUNDARY_V2",
+    "FINITE_MODEL_FIDELITY_V1",
+    "FIXTURE_INPUT_V1",
+    "FULL_PATH_TRANSITION_TABLE_V2",
+    "GATE_ELIGIBILITY_PROFILE_V1",
+    "KNOWLEDGE_POLICY_V2",
+    "LANE_COMPLETION_V1",
+    "LEGACY_OBSERVATION_RAW_V1",
+    "MANDATORY_STAGE_SET_V2",
+    "METHOD_QUALIFICATION_V1",
+    "MODEL_AGENT_BOUNDARY_V2",
+    "NF02_DELIVERY_AUTHORIZATION_V1",
+    "NF02_PACKAGE_TRANSPORT_V2",
+    "NF02_RESULT_TRANSPORT_V2",
+    "OBLIGATION_APPLICABILITY_V2",
+    "OBSERVED_EFFORT_V1",
+    "ORACLE_INDEPENDENCE_V2",
+    "OS_ENVIRONMENT_V2",
+    "PRIOR_FALSE_NEGATIVE_V1",
+    "RETAINED_OPAQUE_BYTES_V1",
+    "RETAINED_PRODUCER_CODE_V1",
+    "SEED_PROFILE_V1",
+    "SOURCE_PATH_PROFILE_V1",
+    "STAGE_COMPLETION_V1",
+    "STRICT_JSON_CAPTURE_V1",
+    "TRANSITION_POLICY_V2",
+    "QUALIFIED_VALIDATOR_V2",
+    "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+    "PRINCIPAL_AUTHORIZATION_V1",
+    "RECOVERY_REFERENCE_PROFILE_V1",
+    "CAPABILITY_BOUNDARY_V2",
+    "EXPLORATION_POLICY_V2",
+    "QUALIFIED_TECHNIQUE_V2",
+    "DELIVERY_IDEMPOTENCY_V2",
+    "DELIVERY_RETRY_V2",
+    "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+    "NF02_RESULT_NORMALIZER_V2",
+    "OBLIGATION_ACCEPTANCE_V2",
+    "EXECUTION_VARIANT_V2",
+    "HANDOFF_TRANSPORT_V2",
+    "HASH_MANIFEST_V2",
+    "POSITIVE_VIEW_PROJECTION_V2",
+    "LEGACY_SCHEMA_PIN_V2",
+    "OBSERVATION_CAPTURE_V2",
+    "SURFACE_KEY_PROFILE_V2",
+    "SOURCE_ZIP_TRANSPORT_V1",
+    "EXECUTION_COMMAND_JSON_V1",
+    "FINAL_TECHNICAL_REPORT_JSON_V1",
+    "MODEL_ARTIFACT_V1",
+    "PUBLIC_CONCLUSION_RENDER_V1",
+    "SNAPSHOT_PROJECTION_V2",
+    "FULL_PATH_SEMANTIC_V1",
+    "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+    "CLAIM_RELATIVE_ASSESSMENT_V1",
+    "FINAL_CHAIN_RELEASE_V1",
+    "HISTORY_ANCHOR_V2",
+    "SOURCE_AUTHORITY_V1",
+    "NF02_EXTERNAL_LANE_SLOT_V2",
+    "COVERAGE_OBLIGATION_POLICY_V2",
+    "PUBLIC_REDACTION_V2",
+    "BOOTSTRAP_ADMISSION_V2",
+    "LEGACY_MECHANICAL_VALIDATION_V2",
+    "TRUSTED_PREDECESSOR_PIN_V2",
+    "CAUSAL_CHAIN_V1",
+    "CHANNEL_CAPTURE_PROFILE_V1",
+    "CLEANUP_EXPECTED_OBSERVABLE_V1",
+    "ENDURANCE_WORKLOAD_V1",
+    "EXTERNAL_SERVICE_V2",
+    "LEGACY_OBSERVATION_MAPPING_V2",
+    "EXECUTION_DEPENDENCY_PLAN_V1",
+    "TOOL_CAPTURE_V2",
+    "FINAL_TECHNICAL_REPORT_TEXT_V1",
+    "TEMPORAL_MODEL_CLAIM_V1",
+    "SNAPSHOT_EXPORT_V2",
+    "COMPATIBILITY_FIXTURE_V2",
+    "FULL_FINALIZATION_PROFILE_V1",
+    "SOURCE_IDENTITY_V2",
+    "MANDATORY_LANE_SLOT_V1",
+    "NF02_PROTOCOL_PROFILE_V2",
+    "LINEAGE_ADMISSION_V2",
+    "CLEANUP_ASSESSMENT_V2",
+    "ENDURANCE_OBSERVATION_V1",
+    "NETWORK_BOUNDARY_V2",
+    "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+    "BUILD_RECIPE_V2",
+    "RUNTIME_ENVIRONMENT_V2",
+    "EXECUTOR_TOOL_V2",
+    "TOOL_EXECUTION_RECORD_JSON_V1",
+    "COMPATIBILITY_GATE_V2",
+    "IMPLEMENTATION_MAPPING_V1",
+    "SOURCE_ARCHIVE_V2",
+    "SOURCE_DRIFT_POLICY_V2",
+    "SOURCE_RECONCILIATION_V2",
+    "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+    "QUALIFIED_ACTIVATION_V1",
+    "BROWSER_ENVIRONMENT_V2",
+    "BUILD_PROVENANCE_RECEIPT_V1",
+    "BUNDLE_MEMBERSHIP_V2",
+    "TOOL_BOUNDARY_V2",
+    "FAULT_RUN_RECORD_JSON_V1",
+    "FULL_PATH_CONTEXT_PARAMETERS_V1",
+    "REPORT_EXPORT_PROFILE_V1",
+    "SANDBOX_PROFILE_V1",
+    "INSTALLATION_FULL_PATH_PROFILE_V1",
+    "ENVIRONMENT_PROFILE_V2",
+    "EXECUTION_HARNESS_V2",
+    "EXECUTION_RUNNER_V2",
+    "IMPLEMENTATION_MUTATION_CASE_V1",
+    "ORACLE_CHALLENGE_CASE_V1",
+    "COLLECTOR_CAPABILITY_V2",
+    "REPLAY_CAPSULE_V1",
+    "SURFACE_COLLECTOR_RECORD_JSON_V1"
+  ],
+  "cyclic_profiles": [],
+  "vectors": [
+    {
+      "profile": "STAGE_COMPLETION_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STAGE_COMPLETION_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STAGE_COMPLETION_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STAGE_COMPLETION_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STAGE_COMPLETION_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STAGE_COMPLETION_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LANE_COMPLETION_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LANE_COMPLETION_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LANE_COMPLETION_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LANE_COMPLETION_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LANE_COMPLETION_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LANE_COMPLETION_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTOR_ELIGIBILITY_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTOR_ELIGIBILITY_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTOR_ELIGIBILITY_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTOR_ELIGIBILITY_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTOR_ELIGIBILITY_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTOR_ELIGIBILITY_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_DELIVERY_AUTHORIZATION_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_DELIVERY_AUTHORIZATION_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_DELIVERY_AUTHORIZATION_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_DELIVERY_AUTHORIZATION_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_DELIVERY_AUTHORIZATION_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_DELIVERY_AUTHORIZATION_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_ACCOUNTING_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_ACCOUNTING_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_ACCOUNTING_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_ACCOUNTING_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_ACCOUNTING_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_ACCOUNTING_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "METHOD_QUALIFICATION_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "METHOD_QUALIFICATION_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "METHOD_QUALIFICATION_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "METHOD_QUALIFICATION_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "METHOD_QUALIFICATION_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "METHOD_QUALIFICATION_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DISCOVERY_CONFIRMATION_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DISCOVERY_CONFIRMATION_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DISCOVERY_CONFIRMATION_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DISCOVERY_CONFIRMATION_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DISCOVERY_CONFIRMATION_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DISCOVERY_CONFIRMATION_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_SCOPED_MATCH_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_SCOPED_MATCH_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_SCOPED_MATCH_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_SCOPED_MATCH_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_SCOPED_MATCH_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_SCOPED_MATCH_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CORPUS_RELATIVE_NOVELTY_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CORPUS_RELATIVE_NOVELTY_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CORPUS_RELATIVE_NOVELTY_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CORPUS_RELATIVE_NOVELTY_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CORPUS_RELATIVE_NOVELTY_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CORPUS_RELATIVE_NOVELTY_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRIOR_FALSE_NEGATIVE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRIOR_FALSE_NEGATIVE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRIOR_FALSE_NEGATIVE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRIOR_FALSE_NEGATIVE_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRIOR_FALSE_NEGATIVE_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRIOR_FALSE_NEGATIVE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLAIM_RELATIVE_ASSESSMENT_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLAIM_RELATIVE_ASSESSMENT_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLAIM_RELATIVE_ASSESSMENT_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLAIM_RELATIVE_ASSESSMENT_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLAIM_RELATIVE_ASSESSMENT_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLAIM_RELATIVE_ASSESSMENT_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINITE_MODEL_FIDELITY_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINITE_MODEL_FIDELITY_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINITE_MODEL_FIDELITY_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINITE_MODEL_FIDELITY_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINITE_MODEL_FIDELITY_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINITE_MODEL_FIDELITY_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_ACTIVATION_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_ACTIVATION_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_ACTIVATION_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_ACTIVATION_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_ACTIVATION_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_ACTIVATION_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_CHAIN_RELEASE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_CHAIN_RELEASE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_CHAIN_RELEASE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_CHAIN_RELEASE_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_CHAIN_RELEASE_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_CHAIN_RELEASE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVED_EFFORT_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVED_EFFORT_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVED_EFFORT_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVED_EFFORT_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVED_EFFORT_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVED_EFFORT_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_DURABLE_RECOVERY_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_DURABLE_RECOVERY_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_DURABLE_RECOVERY_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_DURABLE_RECOVERY_V1",
+      "case": "MISSING_REQUIRED_algorithm_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_DURABLE_RECOVERY_V1",
+      "case": "MISSING_REQUIRED_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_DURABLE_RECOVERY_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_CAPABILITY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_CAPABILITY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_CAPABILITY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_CAPABILITY_V2",
+      "case": "MISSING_REQUIRED_collector_revision_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_CAPABILITY_V2",
+      "case": "MISSING_REQUIRED_command_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_CAPABILITY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_CAPABILITY_V2",
+      "case": "MISSING_REQUIRED_source_identity_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COLLECTOR_CAPABILITY_V2",
+      "case": "MISSING_REQUIRED_supported_input_classes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_CAPTURE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_CAPTURE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_CAPTURE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_CAPTURE_V2",
+      "case": "MISSING_REQUIRED_capture_code_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_CAPTURE_V2",
+      "case": "MISSING_REQUIRED_environment_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_CAPTURE_V2",
+      "case": "MISSING_REQUIRED_experiment_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_CAPTURE_V2",
+      "case": "MISSING_REQUIRED_output_contract_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_CAPTURE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_ASSESSMENT_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_ASSESSMENT_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_ASSESSMENT_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_ASSESSMENT_V2",
+      "case": "MISSING_REQUIRED_descriptor_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_ASSESSMENT_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_ASSESSMENT_V2",
+      "case": "MISSING_REQUIRED_required_checks",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FAULT_RUN_RECORD_JSON_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FAULT_RUN_RECORD_JSON_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FAULT_RUN_RECORD_JSON_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FAULT_RUN_RECORD_JSON_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FAULT_RUN_RECORD_JSON_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FAULT_RUN_RECORD_JSON_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FAULT_RUN_RECORD_JSON_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FAULT_RUN_RECORD_JSON_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVATION_CAPTURE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVATION_CAPTURE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVATION_CAPTURE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVATION_CAPTURE_V2",
+      "case": "MISSING_REQUIRED_capture_code_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVATION_CAPTURE_V2",
+      "case": "MISSING_REQUIRED_context_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVATION_CAPTURE_V2",
+      "case": "MISSING_REQUIRED_observation_kind",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVATION_CAPTURE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBSERVATION_CAPTURE_V2",
+      "case": "MISSING_REQUIRED_value_contract",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_COMMAND_JSON_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_COMMAND_JSON_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_COMMAND_JSON_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_COMMAND_JSON_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_COMMAND_JSON_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_COMMAND_JSON_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_COMMAND_JSON_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_COMMAND_JSON_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FILESYSTEM_BOUNDARY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FILESYSTEM_BOUNDARY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FILESYSTEM_BOUNDARY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FILESYSTEM_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_allowed_roots",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FILESYSTEM_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_default_access",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FILESYSTEM_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FILESYSTEM_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_symlink_policy",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NETWORK_BOUNDARY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NETWORK_BOUNDARY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NETWORK_BOUNDARY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NETWORK_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_allowed_endpoint_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NETWORK_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_default_access",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NETWORK_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_BOUNDARY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_BOUNDARY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_BOUNDARY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_allowed_tool_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_default_access",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TOOL_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_AGENT_BOUNDARY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_AGENT_BOUNDARY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_AGENT_BOUNDARY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_AGENT_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_memory_policy",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_AGENT_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_model_identity",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_AGENT_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_AGENT_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_session_policy",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OS_ENVIRONMENT_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OS_ENVIRONMENT_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OS_ENVIRONMENT_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OS_ENVIRONMENT_V2",
+      "case": "MISSING_REQUIRED_architecture",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OS_ENVIRONMENT_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OS_ENVIRONMENT_V2",
+      "case": "MISSING_REQUIRED_system_name",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OS_ENVIRONMENT_V2",
+      "case": "MISSING_REQUIRED_system_version",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RUNTIME_ENVIRONMENT_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RUNTIME_ENVIRONMENT_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RUNTIME_ENVIRONMENT_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RUNTIME_ENVIRONMENT_V2",
+      "case": "MISSING_REQUIRED_dependency_plan_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RUNTIME_ENVIRONMENT_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RUNTIME_ENVIRONMENT_V2",
+      "case": "MISSING_REQUIRED_runtime_code_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RUNTIME_ENVIRONMENT_V2",
+      "case": "MISSING_REQUIRED_version",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BROWSER_ENVIRONMENT_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BROWSER_ENVIRONMENT_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BROWSER_ENVIRONMENT_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BROWSER_ENVIRONMENT_V2",
+      "case": "MISSING_REQUIRED_browser_code_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BROWSER_ENVIRONMENT_V2",
+      "case": "MISSING_REQUIRED_network_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BROWSER_ENVIRONMENT_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BROWSER_ENVIRONMENT_V2",
+      "case": "MISSING_REQUIRED_version",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXTERNAL_SERVICE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXTERNAL_SERVICE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXTERNAL_SERVICE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXTERNAL_SERVICE_V2",
+      "case": "MISSING_REQUIRED_endpoint",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXTERNAL_SERVICE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXTERNAL_SERVICE_V2",
+      "case": "MISSING_REQUIRED_service_identity",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXTERNAL_SERVICE_V2",
+      "case": "MISSING_REQUIRED_version",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXTERNAL_SERVICE_V2",
+      "case": "MISSING_REQUIRED_witness_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLOCK_PROFILE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLOCK_PROFILE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLOCK_PROFILE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLOCK_PROFILE_V1",
+      "case": "MISSING_REQUIRED_authority",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLOCK_PROFILE_V1",
+      "case": "MISSING_REQUIRED_clock_kind",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLOCK_PROFILE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLOCK_PROFILE_V1",
+      "case": "MISSING_REQUIRED_unit",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SANDBOX_PROFILE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SANDBOX_PROFILE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SANDBOX_PROFILE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SANDBOX_PROFILE_V1",
+      "case": "MISSING_REQUIRED_default_access",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SANDBOX_PROFILE_V1",
+      "case": "MISSING_REQUIRED_filesystem_boundary_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SANDBOX_PROFILE_V1",
+      "case": "MISSING_REQUIRED_network_boundary_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SANDBOX_PROFILE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SANDBOX_PROFILE_V1",
+      "case": "MISSING_REQUIRED_tool_boundary_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SEED_PROFILE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SEED_PROFILE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SEED_PROFILE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SEED_PROFILE_V1",
+      "case": "MISSING_REQUIRED_algorithm",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SEED_PROFILE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SEED_PROFILE_V1",
+      "case": "MISSING_REQUIRED_replay_rule",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SEED_PROFILE_V1",
+      "case": "MISSING_REQUIRED_seed",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_DEPENDENCY_PLAN_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_DEPENDENCY_PLAN_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_DEPENDENCY_PLAN_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_DEPENDENCY_PLAN_V1",
+      "case": "MISSING_REQUIRED_command_spec_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_DEPENDENCY_PLAN_V1",
+      "case": "MISSING_REQUIRED_dependencies",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_DEPENDENCY_PLAN_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_DEPENDENCY_PLAN_V1",
+      "case": "MISSING_REQUIRED_resolution",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENVIRONMENT_PROFILE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENVIRONMENT_PROFILE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENVIRONMENT_PROFILE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENVIRONMENT_PROFILE_V2",
+      "case": "MISSING_REQUIRED_clock_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENVIRONMENT_PROFILE_V2",
+      "case": "MISSING_REQUIRED_external_service_profile_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENVIRONMENT_PROFILE_V2",
+      "case": "MISSING_REQUIRED_filesystem_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENVIRONMENT_PROFILE_V2",
+      "case": "MISSING_REQUIRED_network_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENVIRONMENT_PROFILE_V2",
+      "case": "MISSING_REQUIRED_os_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENVIRONMENT_PROFILE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENVIRONMENT_PROFILE_V2",
+      "case": "MISSING_REQUIRED_runtime_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENVIRONMENT_PROFILE_V2",
+      "case": "MISSING_REQUIRED_sandbox_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_RUNNER_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_RUNNER_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_RUNNER_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_RUNNER_V2",
+      "case": "MISSING_REQUIRED_context_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_RUNNER_V2",
+      "case": "MISSING_REQUIRED_dependency_profile_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_RUNNER_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_RUNNER_V2",
+      "case": "MISSING_REQUIRED_runner_code_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_HARNESS_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_HARNESS_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_HARNESS_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_HARNESS_V2",
+      "case": "MISSING_REQUIRED_context_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_HARNESS_V2",
+      "case": "MISSING_REQUIRED_dependency_profile_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_HARNESS_V2",
+      "case": "MISSING_REQUIRED_harness_code_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_HARNESS_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTOR_TOOL_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTOR_TOOL_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTOR_TOOL_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTOR_TOOL_V2",
+      "case": "MISSING_REQUIRED_context_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTOR_TOOL_V2",
+      "case": "MISSING_REQUIRED_dependency_profile_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTOR_TOOL_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTOR_TOOL_V2",
+      "case": "MISSING_REQUIRED_tool_code_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_VARIANT_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_VARIANT_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_VARIANT_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_VARIANT_V2",
+      "case": "MISSING_REQUIRED_implementation_raw_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_VARIANT_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_VARIANT_V2",
+      "case": "MISSING_REQUIRED_source_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXECUTION_VARIANT_V2",
+      "case": "MISSING_REQUIRED_variant_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRINCIPAL_AUTHORIZATION_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRINCIPAL_AUTHORIZATION_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRINCIPAL_AUTHORIZATION_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRINCIPAL_AUTHORIZATION_V1",
+      "case": "MISSING_REQUIRED_approval_request_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRINCIPAL_AUTHORIZATION_V1",
+      "case": "MISSING_REQUIRED_namespace_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRINCIPAL_AUTHORIZATION_V1",
+      "case": "MISSING_REQUIRED_permitted_approval_purposes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRINCIPAL_AUTHORIZATION_V1",
+      "case": "MISSING_REQUIRED_permitted_operations",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRINCIPAL_AUTHORIZATION_V1",
+      "case": "MISSING_REQUIRED_principal_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRINCIPAL_AUTHORIZATION_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PRINCIPAL_AUTHORIZATION_V1",
+      "case": "MISSING_REQUIRED_role",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_AUTHORITY_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_AUTHORITY_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_AUTHORITY_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_AUTHORITY_V1",
+      "case": "MISSING_REQUIRED_authority_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_AUTHORITY_V1",
+      "case": "MISSING_REQUIRED_authority_mode",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_AUTHORITY_V1",
+      "case": "MISSING_REQUIRED_authorizing_principal_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_AUTHORITY_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_AUTHORITY_V1",
+      "case": "MISSING_REQUIRED_repository_or_snapshot_identity",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "MISSING_REQUIRED_authority_parameters",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "MISSING_REQUIRED_authority_profile_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "MISSING_REQUIRED_identity_algorithm",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "MISSING_REQUIRED_incomplete_lfs_or_submodules",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "MISSING_REQUIRED_lfs_policy",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "MISSING_REQUIRED_manifest_entry_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "MISSING_REQUIRED_mode_policy",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "MISSING_REQUIRED_path_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "MISSING_REQUIRED_submodule_policy",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "MISSING_REQUIRED_surface_key_profile_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "case": "MISSING_REQUIRED_symlink_policy",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BOOTSTRAP_NAMESPACE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BOOTSTRAP_NAMESPACE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BOOTSTRAP_NAMESPACE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BOOTSTRAP_NAMESPACE_V2",
+      "case": "MISSING_REQUIRED_history_namespace_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BOOTSTRAP_NAMESPACE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BOOTSTRAP_NAMESPACE_V2",
+      "case": "MISSING_REQUIRED_reuse",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BOOTSTRAP_ADMISSION_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BOOTSTRAP_ADMISSION_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BOOTSTRAP_ADMISSION_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BOOTSTRAP_ADMISSION_V2",
+      "case": "MISSING_REQUIRED_authority_mode",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BOOTSTRAP_ADMISSION_V2",
+      "case": "MISSING_REQUIRED_historical_parser_profile_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BOOTSTRAP_ADMISSION_V2",
+      "case": "MISSING_REQUIRED_mode",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BOOTSTRAP_ADMISSION_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRUSTED_PREDECESSOR_PIN_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRUSTED_PREDECESSOR_PIN_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRUSTED_PREDECESSOR_PIN_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRUSTED_PREDECESSOR_PIN_V2",
+      "case": "MISSING_REQUIRED_authorization_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRUSTED_PREDECESSOR_PIN_V2",
+      "case": "MISSING_REQUIRED_predecessor_contract_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRUSTED_PREDECESSOR_PIN_V2",
+      "case": "MISSING_REQUIRED_predecessor_raw_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRUSTED_PREDECESSOR_PIN_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LINEAGE_ADMISSION_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LINEAGE_ADMISSION_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LINEAGE_ADMISSION_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LINEAGE_ADMISSION_V2",
+      "case": "MISSING_REQUIRED_branch_rule",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LINEAGE_ADMISSION_V2",
+      "case": "MISSING_REQUIRED_predecessor_pin_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LINEAGE_ADMISSION_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LINEAGE_ADMISSION_V2",
+      "case": "MISSING_REQUIRED_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_COMPATIBILITY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_COMPATIBILITY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_COMPATIBILITY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_COMPATIBILITY_V2",
+      "case": "MISSING_REQUIRED_aliases",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_COMPATIBILITY_V2",
+      "case": "MISSING_REQUIRED_historical_read",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_COMPATIBILITY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_COMPATIBILITY_V2",
+      "case": "MISSING_REQUIRED_retroactive_authority",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_COMPATIBILITY_V2",
+      "case": "MISSING_REQUIRED_writer_revision",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXACT_COMPATIBILITY_V2",
+      "case": "MISSING_REQUIRED_writes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHALLENGER_FRESHNESS_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHALLENGER_FRESHNESS_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHALLENGER_FRESHNESS_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHALLENGER_FRESHNESS_V2",
+      "case": "MISSING_REQUIRED_candidate_change",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHALLENGER_FRESHNESS_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHALLENGER_FRESHNESS_V2",
+      "case": "MISSING_REQUIRED_required_roles",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHALLENGER_FRESHNESS_V2",
+      "case": "MISSING_REQUIRED_scoped_reuse",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_STAGE_SET_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_STAGE_SET_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_STAGE_SET_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_STAGE_SET_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_STAGE_SET_V2",
+      "case": "MISSING_REQUIRED_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_STAGE_SET_V2",
+      "case": "MISSING_REQUIRED_stage_spec_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_LANE_SLOT_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_LANE_SLOT_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_LANE_SLOT_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_LANE_SLOT_V1",
+      "case": "MISSING_REQUIRED_completion_contract_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_LANE_SLOT_V1",
+      "case": "MISSING_REQUIRED_lane_role",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_LANE_SLOT_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_LANE_SLOT_V1",
+      "case": "MISSING_REQUIRED_result_slot_contract_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MANDATORY_LANE_SLOT_V1",
+      "case": "MISSING_REQUIRED_slot_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "GATE_ELIGIBILITY_PROFILE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "GATE_ELIGIBILITY_PROFILE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "GATE_ELIGIBILITY_PROFILE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "GATE_ELIGIBILITY_PROFILE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "GATE_ELIGIBILITY_PROFILE_V1",
+      "case": "MISSING_REQUIRED_required_basis_kinds",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "GATE_ELIGIBILITY_PROFILE_V1",
+      "case": "MISSING_REQUIRED_scope_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "GATE_ELIGIBILITY_PROFILE_V1",
+      "case": "MISSING_REQUIRED_unknown_behavior",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRANSITION_POLICY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRANSITION_POLICY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRANSITION_POLICY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRANSITION_POLICY_V2",
+      "case": "MISSING_REQUIRED_governing_spec_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRANSITION_POLICY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRANSITION_POLICY_V2",
+      "case": "MISSING_REQUIRED_proposal_use",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TRANSITION_POLICY_V2",
+      "case": "MISSING_REQUIRED_skip_states",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COVERAGE_OBLIGATION_POLICY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COVERAGE_OBLIGATION_POLICY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COVERAGE_OBLIGATION_POLICY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COVERAGE_OBLIGATION_POLICY_V2",
+      "case": "MISSING_REQUIRED_acceptance_contract_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COVERAGE_OBLIGATION_POLICY_V2",
+      "case": "MISSING_REQUIRED_applicability_contract_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COVERAGE_OBLIGATION_POLICY_V2",
+      "case": "MISSING_REQUIRED_denominator",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COVERAGE_OBLIGATION_POLICY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COVERAGE_OBLIGATION_POLICY_V2",
+      "case": "MISSING_REQUIRED_unknown_materiality",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_ACCEPTANCE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_ACCEPTANCE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_ACCEPTANCE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_ACCEPTANCE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_ACCEPTANCE_V2",
+      "case": "MISSING_REQUIRED_require_all_controls",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_ACCEPTANCE_V2",
+      "case": "MISSING_REQUIRED_require_current_applicability",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_ACCEPTANCE_V2",
+      "case": "MISSING_REQUIRED_require_oracle_independence",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_ACCEPTANCE_V2",
+      "case": "MISSING_REQUIRED_required_qualification",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_APPLICABILITY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_APPLICABILITY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_APPLICABILITY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_APPLICABILITY_V2",
+      "case": "MISSING_REQUIRED_context_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_APPLICABILITY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_APPLICABILITY_V2",
+      "case": "MISSING_REQUIRED_scope_rule",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "OBLIGATION_APPLICABILITY_V2",
+      "case": "MISSING_REQUIRED_unknown_behavior",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_INDEPENDENCE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_INDEPENDENCE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_INDEPENDENCE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_INDEPENDENCE_V2",
+      "case": "MISSING_REQUIRED_declaration_as_enforcement",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_INDEPENDENCE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_INDEPENDENCE_V2",
+      "case": "MISSING_REQUIRED_required_dimensions",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_TECHNIQUE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_TECHNIQUE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_TECHNIQUE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_TECHNIQUE_V2",
+      "case": "MISSING_REQUIRED_context_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_TECHNIQUE_V2",
+      "case": "MISSING_REQUIRED_method_contract_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_TECHNIQUE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_TECHNIQUE_V2",
+      "case": "MISSING_REQUIRED_required_control_experiment_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "KNOWLEDGE_POLICY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "KNOWLEDGE_POLICY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "KNOWLEDGE_POLICY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "KNOWLEDGE_POLICY_V2",
+      "case": "MISSING_REQUIRED_allowed_corpus_roles",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "KNOWLEDGE_POLICY_V2",
+      "case": "MISSING_REQUIRED_exposure_rule",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "KNOWLEDGE_POLICY_V2",
+      "case": "MISSING_REQUIRED_forbidden_corpus_roles",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "KNOWLEDGE_POLICY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "KNOWLEDGE_POLICY_V2",
+      "case": "MISSING_REQUIRED_transitive_resolver_rule",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAPABILITY_BOUNDARY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAPABILITY_BOUNDARY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAPABILITY_BOUNDARY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAPABILITY_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_permitted_operations",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAPABILITY_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAPABILITY_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_scope",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAPABILITY_BOUNDARY_V2",
+      "case": "MISSING_REQUIRED_secret_in_canonical_body",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "POSITIVE_VIEW_PROJECTION_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "POSITIVE_VIEW_PROJECTION_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "POSITIVE_VIEW_PROJECTION_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "POSITIVE_VIEW_PROJECTION_V2",
+      "case": "MISSING_REQUIRED_membership",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "POSITIVE_VIEW_PROJECTION_V2",
+      "case": "MISSING_REQUIRED_metadata",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "POSITIVE_VIEW_PROJECTION_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "POSITIVE_VIEW_PROJECTION_V2",
+      "case": "MISSING_REQUIRED_transitive_access",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_REDACTION_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_REDACTION_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_REDACTION_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_REDACTION_V2",
+      "case": "MISSING_REQUIRED_assurance_rewrite",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_REDACTION_V2",
+      "case": "MISSING_REQUIRED_metadata",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_REDACTION_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_REDACTION_V2",
+      "case": "MISSING_REQUIRED_projection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DELIVERY_RETRY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DELIVERY_RETRY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DELIVERY_RETRY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DELIVERY_RETRY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DELIVERY_RETRY_V2",
+      "case": "MISSING_REQUIRED_retry",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DELIVERY_RETRY_V2",
+      "case": "MISSING_REQUIRED_revalidate",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DELIVERY_IDEMPOTENCY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DELIVERY_IDEMPOTENCY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DELIVERY_IDEMPOTENCY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DELIVERY_IDEMPOTENCY_V2",
+      "case": "MISSING_REQUIRED_accepted_retry",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DELIVERY_IDEMPOTENCY_V2",
+      "case": "MISSING_REQUIRED_different_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DELIVERY_IDEMPOTENCY_V2",
+      "case": "MISSING_REQUIRED_key",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DELIVERY_IDEMPOTENCY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXPLORATION_POLICY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXPLORATION_POLICY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXPLORATION_POLICY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXPLORATION_POLICY_V2",
+      "case": "MISSING_REQUIRED_confirmation",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXPLORATION_POLICY_V2",
+      "case": "MISSING_REQUIRED_method_contract_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXPLORATION_POLICY_V2",
+      "case": "MISSING_REQUIRED_planning_modes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "EXPLORATION_POLICY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_DRIFT_POLICY_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_DRIFT_POLICY_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_DRIFT_POLICY_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_DRIFT_POLICY_V2",
+      "case": "MISSING_REQUIRED_comparison",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_DRIFT_POLICY_V2",
+      "case": "MISSING_REQUIRED_history_reinterpretation",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_DRIFT_POLICY_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_DRIFT_POLICY_V2",
+      "case": "MISSING_REQUIRED_qualification_reuse",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_RECONCILIATION_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_RECONCILIATION_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_RECONCILIATION_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_RECONCILIATION_V2",
+      "case": "MISSING_REQUIRED_equality",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_RECONCILIATION_V2",
+      "case": "MISSING_REQUIRED_identity_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_RECONCILIATION_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_RECONCILIATION_V2",
+      "case": "MISSING_REQUIRED_raw_identifier_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_PATH_PROFILE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_PATH_PROFILE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_PATH_PROFILE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_component_rule",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_duplicates",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_ordering",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_path_shape",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_separator",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_unsupported",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+      "case": "MISSING_REQUIRED_entry_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+      "case": "MISSING_REQUIRED_member_readback",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+      "case": "MISSING_REQUIRED_schema_key",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+      "case": "MISSING_REQUIRED_source_manifest_schema_raw_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_KEY_PROFILE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_KEY_PROFILE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_KEY_PROFILE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_KEY_PROFILE_V2",
+      "case": "MISSING_REQUIRED_ambiguity",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_KEY_PROFILE_V2",
+      "case": "MISSING_REQUIRED_anchor_kind",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_KEY_PROFILE_V2",
+      "case": "MISSING_REQUIRED_canonical_surface_category",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_KEY_PROFILE_V2",
+      "case": "MISSING_REQUIRED_category_meaning",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_KEY_PROFILE_V2",
+      "case": "MISSING_REQUIRED_language",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_KEY_PROFILE_V2",
+      "case": "MISSING_REQUIRED_normalizer_code_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_KEY_PROFILE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_KEY_PROFILE_V2",
+      "case": "MISSING_REQUIRED_runtime_class",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SURFACE_KEY_PROFILE_V2",
+      "case": "MISSING_REQUIRED_source_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STRICT_JSON_CAPTURE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STRICT_JSON_CAPTURE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STRICT_JSON_CAPTURE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STRICT_JSON_CAPTURE_V1",
+      "case": "MISSING_REQUIRED_duplicate_keys",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STRICT_JSON_CAPTURE_V1",
+      "case": "MISSING_REQUIRED_encoding",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STRICT_JSON_CAPTURE_V1",
+      "case": "MISSING_REQUIRED_floats",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STRICT_JSON_CAPTURE_V1",
+      "case": "MISSING_REQUIRED_lone_surrogates",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STRICT_JSON_CAPTURE_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STRICT_JSON_CAPTURE_V1",
+      "case": "MISSING_REQUIRED_max_depth",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "STRICT_JSON_CAPTURE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RETAINED_OPAQUE_BYTES_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RETAINED_OPAQUE_BYTES_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RETAINED_OPAQUE_BYTES_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RETAINED_OPAQUE_BYTES_V1",
+      "case": "MISSING_REQUIRED_interpretation",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RETAINED_OPAQUE_BYTES_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RETAINED_OPAQUE_BYTES_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RETAINED_PRODUCER_CODE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RETAINED_PRODUCER_CODE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RETAINED_PRODUCER_CODE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RETAINED_PRODUCER_CODE_V1",
+      "case": "MISSING_REQUIRED_interpretation",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RETAINED_PRODUCER_CODE_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RETAINED_PRODUCER_CODE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FIXTURE_INPUT_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FIXTURE_INPUT_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FIXTURE_INPUT_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FIXTURE_INPUT_V1",
+      "case": "MISSING_REQUIRED_interpretation",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FIXTURE_INPUT_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FIXTURE_INPUT_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_RAW_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_RAW_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_RAW_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_RAW_V1",
+      "case": "MISSING_REQUIRED_interpretation",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_RAW_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_RAW_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_CJSON_1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_CJSON_1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_CJSON_1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_CJSON_1",
+      "case": "MISSING_REQUIRED_adr_raw_digest",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_CJSON_1",
+      "case": "MISSING_REQUIRED_canonical_profile",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_CJSON_1",
+      "case": "MISSING_REQUIRED_object_digest_profile",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_CJSON_1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+      "case": "MISSING_REQUIRED_dialect",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+      "case": "MISSING_REQUIRED_identity",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+      "case": "MISSING_REQUIRED_media_type",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+      "case": "MISSING_REQUIRED_offline_only",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+      "case": "MISSING_REQUIRED_self_digest_in_body",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_checksum_self_reference",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_manifest_member",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_media_type",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_mime_mapping",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_path_grammar",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_quotas",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_representation_claim",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_schema_key",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_version",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_wire_role",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_zip_format",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_checksum_self_reference",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_manifest_member",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_media_type",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_mime_mapping",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_path_grammar",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_quotas",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_representation_claim",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_schema_key",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_version",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_wire_role",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_zip_format",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "MISSING_REQUIRED_canonical_output",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "MISSING_REQUIRED_count",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "MISSING_REQUIRED_evidence_member_paths",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "MISSING_REQUIRED_finding_fields",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "MISSING_REQUIRED_findings_order",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "MISSING_REQUIRED_input",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "MISSING_REQUIRED_material_typed_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "MISSING_REQUIRED_metadata",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "MISSING_REQUIRED_notes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "MISSING_REQUIRED_output_names",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "case": "MISSING_REQUIRED_severity_authority",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "case": "MISSING_REQUIRED_algorithm",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "case": "MISSING_REQUIRED_all_other_members_included",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "case": "MISSING_REQUIRED_excluded_members",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "case": "MISSING_REQUIRED_identity_type",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "case": "MISSING_REQUIRED_manifest_excluded_fields",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "case": "MISSING_REQUIRED_member_fields",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "case": "MISSING_REQUIRED_member_sort",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "case": "MISSING_REQUIRED_object_digest_domain",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "case": "MISSING_REQUIRED_own_raw_digest",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_EXTERNAL_LANE_SLOT_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_EXTERNAL_LANE_SLOT_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_EXTERNAL_LANE_SLOT_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_EXTERNAL_LANE_SLOT_V2",
+      "case": "MISSING_REQUIRED_empty_findings",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_EXTERNAL_LANE_SLOT_V2",
+      "case": "MISSING_REQUIRED_normalizer_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_EXTERNAL_LANE_SLOT_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_EXTERNAL_LANE_SLOT_V2",
+      "case": "MISSING_REQUIRED_result_schema_key",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_EXTERNAL_LANE_SLOT_V2",
+      "case": "MISSING_REQUIRED_transport_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_EXTERNAL_LANE_SLOT_V2",
+      "case": "MISSING_REQUIRED_uniqueness",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PROTOCOL_PROFILE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PROTOCOL_PROFILE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PROTOCOL_PROFILE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PROTOCOL_PROFILE_V2",
+      "case": "MISSING_REQUIRED_binding_before_start_and_delivery",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PROTOCOL_PROFILE_V2",
+      "case": "MISSING_REQUIRED_capability",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PROTOCOL_PROFILE_V2",
+      "case": "MISSING_REQUIRED_foundation_revision",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PROTOCOL_PROFILE_V2",
+      "case": "MISSING_REQUIRED_input_transport_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PROTOCOL_PROFILE_V2",
+      "case": "MISSING_REQUIRED_normalizer_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PROTOCOL_PROFILE_V2",
+      "case": "MISSING_REQUIRED_package_semantic_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PROTOCOL_PROFILE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PROTOCOL_PROFILE_V2",
+      "case": "MISSING_REQUIRED_result_slot_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "NF02_PROTOCOL_PROFILE_V2",
+      "case": "MISSING_REQUIRED_result_transport_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_CONTEXT_PARAMETERS_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_CONTEXT_PARAMETERS_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_CONTEXT_PARAMETERS_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_CONTEXT_PARAMETERS_V1",
+      "case": "MISSING_REQUIRED_entries",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_CONTEXT_PARAMETERS_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_ARTIFACT_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_ARTIFACT_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_ARTIFACT_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_ARTIFACT_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_ARTIFACT_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_ARTIFACT_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_ARTIFACT_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "MODEL_ARTIFACT_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MAPPING_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MAPPING_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MAPPING_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MAPPING_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MAPPING_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MAPPING_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MAPPING_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MAPPING_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_authorizing_principal_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_ground_truth_raw_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_independence_contract_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_scope_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_FIXTURE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_FIXTURE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_FIXTURE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_FIXTURE_V2",
+      "case": "MISSING_REQUIRED_current_contract_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_FIXTURE_V2",
+      "case": "MISSING_REQUIRED_fixture_input_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_FIXTURE_V2",
+      "case": "MISSING_REQUIRED_ground_truth_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_FIXTURE_V2",
+      "case": "MISSING_REQUIRED_independent_expected_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_FIXTURE_V2",
+      "case": "MISSING_REQUIRED_legacy_contract_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_FIXTURE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_GATE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_GATE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_GATE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_GATE_V2",
+      "case": "MISSING_REQUIRED_correctness_axis",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_GATE_V2",
+      "case": "MISSING_REQUIRED_preservation_axis",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_GATE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_GATE_V2",
+      "case": "MISSING_REQUIRED_qualification",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "COMPATIBILITY_GATE_V2",
+      "case": "MISSING_REQUIRED_required_fixture_contract_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_SCHEMA_PIN_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_SCHEMA_PIN_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_SCHEMA_PIN_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_SCHEMA_PIN_V2",
+      "case": "MISSING_REQUIRED_extraction_paths",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_SCHEMA_PIN_V2",
+      "case": "MISSING_REQUIRED_original_parser_code_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_SCHEMA_PIN_V2",
+      "case": "MISSING_REQUIRED_original_schema_raw_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_SCHEMA_PIN_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_SCHEMA_PIN_V2",
+      "case": "MISSING_REQUIRED_stage_values",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_SCHEMA_PIN_V2",
+      "case": "MISSING_REQUIRED_variant_values",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_MECHANICAL_VALIDATION_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_MECHANICAL_VALIDATION_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_MECHANICAL_VALIDATION_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_MECHANICAL_VALIDATION_V2",
+      "case": "MISSING_REQUIRED_current_promotion",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_MECHANICAL_VALIDATION_V2",
+      "case": "MISSING_REQUIRED_legacy_schema_pin_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_MECHANICAL_VALIDATION_V2",
+      "case": "MISSING_REQUIRED_parser_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_MECHANICAL_VALIDATION_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_MAPPING_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_MAPPING_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_MAPPING_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_MAPPING_V2",
+      "case": "MISSING_REQUIRED_current_observation_contract_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_MAPPING_V2",
+      "case": "MISSING_REQUIRED_legacy_schema_pin_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_MAPPING_V2",
+      "case": "MISSING_REQUIRED_locator_grammar",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_MAPPING_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+      "case": "MISSING_REQUIRED_legacy_mapping_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+      "case": "MISSING_REQUIRED_missing_witness",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+      "case": "MISSING_REQUIRED_potential_exposure_rule",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_PROJECTION_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_PROJECTION_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_PROJECTION_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_PROJECTION_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_PROJECTION_V2",
+      "case": "MISSING_REQUIRED_projection_code_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_PROJECTION_V2",
+      "case": "MISSING_REQUIRED_purpose",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_PROJECTION_V2",
+      "case": "MISSING_REQUIRED_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_EXPORT_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_EXPORT_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_EXPORT_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_EXPORT_V2",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_EXPORT_V2",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_EXPORT_V2",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_EXPORT_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SNAPSHOT_EXPORT_V2",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "case": "REPORT_CANONICAL_BODY_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "case": "REPORT_MISSING_OFFLINE_SCHEMA",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_TEXT_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_TEXT_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_TEXT_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_TEXT_V1",
+      "case": "MISSING_REQUIRED_json_report_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_TEXT_V1",
+      "case": "MISSING_REQUIRED_new_narrative",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_TEXT_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_TEXT_V1",
+      "case": "MISSING_REQUIRED_rendering",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_CONCLUSION_RENDER_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_CONCLUSION_RENDER_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_CONCLUSION_RENDER_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_CONCLUSION_RENDER_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_CONCLUSION_RENDER_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_CONCLUSION_RENDER_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_CONCLUSION_RENDER_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "PUBLIC_CONCLUSION_RENDER_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUNDLE_MEMBERSHIP_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUNDLE_MEMBERSHIP_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUNDLE_MEMBERSHIP_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUNDLE_MEMBERSHIP_V2",
+      "case": "MISSING_REQUIRED_bundle_type",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUNDLE_MEMBERSHIP_V2",
+      "case": "MISSING_REQUIRED_member_contract_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUNDLE_MEMBERSHIP_V2",
+      "case": "MISSING_REQUIRED_metadata_exclusions",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUNDLE_MEMBERSHIP_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUNDLE_MEMBERSHIP_V2",
+      "case": "MISSING_REQUIRED_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HASH_MANIFEST_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HASH_MANIFEST_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HASH_MANIFEST_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HASH_MANIFEST_V2",
+      "case": "MISSING_REQUIRED_excluded_metadata",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HASH_MANIFEST_V2",
+      "case": "MISSING_REQUIRED_line_format",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HASH_MANIFEST_V2",
+      "case": "MISSING_REQUIRED_ordering",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HASH_MANIFEST_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ARCHIVE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ARCHIVE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ARCHIVE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ARCHIVE_V2",
+      "case": "MISSING_REQUIRED_all_members",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ARCHIVE_V2",
+      "case": "MISSING_REQUIRED_manifest_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ARCHIVE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ARCHIVE_V2",
+      "case": "MISSING_REQUIRED_transport_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "MISSING_REQUIRED_container",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "MISSING_REQUIRED_directory_entries",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "MISSING_REQUIRED_encryption_duplicates_aliases",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "MISSING_REQUIRED_max_entries",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "MISSING_REQUIRED_max_expanded_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "MISSING_REQUIRED_max_raw_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "MISSING_REQUIRED_member_validation",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "MISSING_REQUIRED_path_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "MISSING_REQUIRED_source_manifest_key",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "case": "MISSING_REQUIRED_symlink_handling",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HANDOFF_TRANSPORT_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HANDOFF_TRANSPORT_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HANDOFF_TRANSPORT_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HANDOFF_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_no_future_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HANDOFF_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HANDOFF_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_required_member_contract_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HANDOFF_TRANSPORT_V2",
+      "case": "MISSING_REQUIRED_transport_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HISTORY_ANCHOR_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HISTORY_ANCHOR_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HISTORY_ANCHOR_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HISTORY_ANCHOR_V2",
+      "case": "MISSING_REQUIRED_anchor_mode",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HISTORY_ANCHOR_V2",
+      "case": "MISSING_REQUIRED_content",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HISTORY_ANCHOR_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "HISTORY_ANCHOR_V2",
+      "case": "MISSING_REQUIRED_witness_authority_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_RECIPE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_RECIPE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_RECIPE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_RECIPE_V2",
+      "case": "MISSING_REQUIRED_builder_code_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_RECIPE_V2",
+      "case": "MISSING_REQUIRED_command_spec_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_RECIPE_V2",
+      "case": "MISSING_REQUIRED_dependency_plan_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_RECIPE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_RECIPE_V2",
+      "case": "MISSING_REQUIRED_settings_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DETERMINISTIC_BUILD_SETTINGS_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DETERMINISTIC_BUILD_SETTINGS_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DETERMINISTIC_BUILD_SETTINGS_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DETERMINISTIC_BUILD_SETTINGS_V2",
+      "case": "MISSING_REQUIRED_archive_time",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DETERMINISTIC_BUILD_SETTINGS_V2",
+      "case": "MISSING_REQUIRED_comments",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DETERMINISTIC_BUILD_SETTINGS_V2",
+      "case": "MISSING_REQUIRED_member_order",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DETERMINISTIC_BUILD_SETTINGS_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DETERMINISTIC_BUILD_SETTINGS_V2",
+      "case": "MISSING_REQUIRED_regular_file_mode",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DETERMINISTIC_BUILD_SETTINGS_V2",
+      "case": "MISSING_REQUIRED_source_date_epoch",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "MISSING_REQUIRED_artifact_contract_registry_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "MISSING_REQUIRED_foundation_revision",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "MISSING_REQUIRED_governing_policy_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "MISSING_REQUIRED_migration_boundary",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "MISSING_REQUIRED_namespace_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "MISSING_REQUIRED_protocol_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "MISSING_REQUIRED_schema_registry_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "MISSING_REQUIRED_serialization_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "MISSING_REQUIRED_source_identity_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "MISSING_REQUIRED_transition_spec_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "case": "MISSING_REQUIRED_trust_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_VALIDATOR_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_VALIDATOR_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_VALIDATOR_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_VALIDATOR_V2",
+      "case": "MISSING_REQUIRED_backend",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_VALIDATOR_V2",
+      "case": "MISSING_REQUIRED_canonical_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_VALIDATOR_V2",
+      "case": "MISSING_REQUIRED_dialect",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_VALIDATOR_V2",
+      "case": "MISSING_REQUIRED_layers",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_VALIDATOR_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_VALIDATOR_V2",
+      "case": "MISSING_REQUIRED_remote_resolution",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "QUALIFIED_VALIDATOR_V2",
+      "case": "MISSING_REQUIRED_resolution",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_TRANSITION_TABLE_V2",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_TRANSITION_TABLE_V2",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_TRANSITION_TABLE_V2",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_TRANSITION_TABLE_V2",
+      "case": "MISSING_REQUIRED_failure_rule",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_TRANSITION_TABLE_V2",
+      "case": "MISSING_REQUIRED_guard_contracts",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_TRANSITION_TABLE_V2",
+      "case": "MISSING_REQUIRED_no_transition_stop_decisions",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_TRANSITION_TABLE_V2",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_TRANSITION_TABLE_V2",
+      "case": "MISSING_REQUIRED_transitions",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_SEMANTIC_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_SEMANTIC_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_SEMANTIC_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_SEMANTIC_V1",
+      "case": "MISSING_REQUIRED_layers",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_SEMANTIC_V1",
+      "case": "MISSING_REQUIRED_missing_proof",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_PATH_SEMANTIC_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLAIM_SET_CLOSURE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLAIM_SET_CLOSURE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLAIM_SET_CLOSURE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLAIM_SET_CLOSURE_V1",
+      "case": "MISSING_REQUIRED_fork_behavior",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLAIM_SET_CLOSURE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLAIM_SET_CLOSURE_V1",
+      "case": "MISSING_REQUIRED_rejected_claims",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CLAIM_SET_CLOSURE_V1",
+      "case": "MISSING_REQUIRED_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DEPENDENCY_CLOSURE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DEPENDENCY_CLOSURE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DEPENDENCY_CLOSURE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DEPENDENCY_CLOSURE_V1",
+      "case": "MISSING_REQUIRED_missing_capture",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DEPENDENCY_CLOSURE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "DEPENDENCY_CLOSURE_V1",
+      "case": "MISSING_REQUIRED_selection",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_FINALIZATION_PROFILE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_FINALIZATION_PROFILE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_FINALIZATION_PROFILE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_FINALIZATION_PROFILE_V1",
+      "case": "MISSING_REQUIRED_material_drift",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_FINALIZATION_PROFILE_V1",
+      "case": "MISSING_REQUIRED_no_omission",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_FINALIZATION_PROFILE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "FULL_FINALIZATION_PROFILE_V1",
+      "case": "MISSING_REQUIRED_waived_as_satisfied",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHANNEL_CAPTURE_PROFILE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHANNEL_CAPTURE_PROFILE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHANNEL_CAPTURE_PROFILE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHANNEL_CAPTURE_PROFILE_V1",
+      "case": "MISSING_REQUIRED_capture_code_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHANNEL_CAPTURE_PROFILE_V1",
+      "case": "MISSING_REQUIRED_capture_context",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHANNEL_CAPTURE_PROFILE_V1",
+      "case": "MISSING_REQUIRED_channel",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CHANNEL_CAPTURE_PROFILE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPORT_EXPORT_PROFILE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPORT_EXPORT_PROFILE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPORT_EXPORT_PROFILE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPORT_EXPORT_PROFILE_V1",
+      "case": "MISSING_REQUIRED_json_report_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPORT_EXPORT_PROFILE_V1",
+      "case": "MISSING_REQUIRED_membership_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPORT_EXPORT_PROFILE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPORT_EXPORT_PROFILE_V1",
+      "case": "MISSING_REQUIRED_text_report_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_application_build_manifest_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_application_build_provenance_raw_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_bundle_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_context_parameters_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_qualification_manifest_raw_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_qualification_record_raw_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "case": "MISSING_REQUIRED_write_rule",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RECOVERY_REFERENCE_PROFILE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RECOVERY_REFERENCE_PROFILE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RECOVERY_REFERENCE_PROFILE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RECOVERY_REFERENCE_PROFILE_V1",
+      "case": "MISSING_REQUIRED_cache_authority",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RECOVERY_REFERENCE_PROFILE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "RECOVERY_REFERENCE_PROFILE_V1",
+      "case": "MISSING_REQUIRED_recovery_contract_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPLAY_CAPSULE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPLAY_CAPSULE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPLAY_CAPSULE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPLAY_CAPSULE_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPLAY_CAPSULE_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPLAY_CAPSULE_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPLAY_CAPSULE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "REPLAY_CAPSULE_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_CHALLENGE_CASE_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_CHALLENGE_CASE_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_CHALLENGE_CASE_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_CHALLENGE_CASE_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_CHALLENGE_CASE_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_CHALLENGE_CASE_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_CHALLENGE_CASE_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ORACLE_CHALLENGE_CASE_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TEMPORAL_MODEL_CLAIM_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TEMPORAL_MODEL_CLAIM_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TEMPORAL_MODEL_CLAIM_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TEMPORAL_MODEL_CLAIM_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TEMPORAL_MODEL_CLAIM_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TEMPORAL_MODEL_CLAIM_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TEMPORAL_MODEL_CLAIM_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "TEMPORAL_MODEL_CLAIM_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAUSAL_CHAIN_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAUSAL_CHAIN_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAUSAL_CHAIN_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAUSAL_CHAIN_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAUSAL_CHAIN_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAUSAL_CHAIN_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAUSAL_CHAIN_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "CAUSAL_CHAIN_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_OBSERVATION_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_OBSERVATION_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_OBSERVATION_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_OBSERVATION_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_OBSERVATION_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_OBSERVATION_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_OBSERVATION_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_OBSERVATION_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_WORKLOAD_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_WORKLOAD_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_WORKLOAD_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_WORKLOAD_V1",
+      "case": "MISSING_REQUIRED_minimum_observed_duration_us",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_WORKLOAD_V1",
+      "case": "MISSING_REQUIRED_minimum_work_units",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_WORKLOAD_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_WORKLOAD_V1",
+      "case": "MISSING_REQUIRED_required_capture_profile_refs",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "ENDURANCE_WORKLOAD_V1",
+      "case": "MISSING_REQUIRED_work_unit",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_PROVENANCE_RECEIPT_V1",
+      "case": "EXACT_DRAFT_PROFILE_GRAMMAR",
+      "grammar_result": "ACCEPT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_PROVENANCE_RECEIPT_V1",
+      "case": "CALLER_TRUST_FLAG",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_PROVENANCE_RECEIPT_V1",
+      "case": "WRONG_WIRE_PROFILE_ID",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_PROVENANCE_RECEIPT_V1",
+      "case": "MISSING_REQUIRED_max_bytes",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_PROVENANCE_RECEIPT_V1",
+      "case": "MISSING_REQUIRED_parser_profile_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_PROVENANCE_RECEIPT_V1",
+      "case": "MISSING_REQUIRED_payload_schema_ref",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_PROVENANCE_RECEIPT_V1",
+      "case": "MISSING_REQUIRED_profile_id",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "profile": "BUILD_PROVENANCE_RECEIPT_V1",
+      "case": "RAW_PAYLOAD_EXTRA_AUTHORITY_FIELD",
+      "grammar_result": "REJECT",
+      "canonical_runtime": "NOT_RUN"
+    }
+  ],
+  "fixture_pending": [],
+  "cross_object_semantic_review": "NOT_COMPLETED",
+  "canonical_runtime": "NOT_RUN",
+  "fixed_point_reached": false,
+  "fixture_schema_context": "FINITE_EXPLICIT_DRAFT_CATALOG_ONLY_NOT_QUALIFIED_SCHEMAS",
+  "scope": "Draft grammar and declared profile dependency graph only, not accepted instance DAG, qualification, authority or atomicity"
+}

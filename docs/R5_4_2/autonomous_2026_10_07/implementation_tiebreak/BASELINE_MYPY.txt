@@ -1,0 +1,3 @@
+src\bdb_audit\history\closure.py:49: error: Argument "revision_digest" to "ClosureNode" has incompatible type "Any | None"; expected "str"  [arg-type]
+src\bdb_audit\history\closure.py:146: error: Need type annotation for "adjacency"  [var-annotated]
+Found 2 errors in 1 file (checked 1 source file)

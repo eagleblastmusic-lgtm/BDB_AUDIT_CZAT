@@ -37,17 +37,18 @@ class AssuranceProjectionSnapshot:
         return result
 
 
-def _ref_identity(ref: Mapping[str, Any]) -> tuple[str, str, str, str]:
+def _ref_identity(ref: Mapping[str, Any]) -> tuple[str, str, bytes, str, str]:
     return (
         str(ref.get("kind", "")),
         str(ref.get("revision_digest", "")),
-        str(ref.get("schema_revision_ref", "")),
+        canonical_bytes(ref.get("schema_revision_ref", "")),
         str(ref.get("logical_id", "")),
+        str(ref.get("digest_profile", "")),
     )
 
 
 def _dedupe_refs(refs: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    unique: dict[tuple[str, str, str, str], dict[str, Any]] = {}
+    unique: dict[tuple[str, str, bytes, str, str], dict[str, Any]] = {}
     for ref in refs:
         unique[_ref_identity(ref)] = dict(ref)
     return [unique[key] for key in sorted(unique)]
@@ -104,7 +105,7 @@ def _accepted_ref_by_digest(
     *,
     kind: str | None = None,
 ) -> dict[str, Any]:
-    matches: dict[tuple[str, str, str, str], dict[str, Any]] = {}
+    matches: dict[tuple[str, str, bytes, str, str], dict[str, Any]] = {}
     limit = cut.get("accepted_head_seq")
     if type(limit) is not int or limit < 1:
         raise ValidationError("ACCEPTED_HISTORY_CUT_REQUIRED")

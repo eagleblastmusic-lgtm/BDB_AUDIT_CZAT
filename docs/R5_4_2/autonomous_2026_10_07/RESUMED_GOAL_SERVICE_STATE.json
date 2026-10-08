@@ -1,0 +1,13 @@
+{
+  "goal": {
+    "threadId": "01a11680-99d0-7161-bc6a-76a4bbae8eab",
+    "objective": "Resume autonomous NF02 closure from the exact persisted continuation under owner delegation; preserve predecessor and user changes, complete semantic closure and R5.4.2 Q1/Q2/N5–N11 to NF02_CLOSED_AND_FULL_APPLICATION_LIFECYCLE_QUALIFIED; no commit or push. On reported execution-resource limit persist exact state and return BLOCKED_BY_EXECUTION_RESOURCE_LIMIT.",
+    "status": "usageLimited",
+    "tokensUsed": 71539,
+    "timeUsedSeconds": 521,
+    "createdAt": 1791389971,
+    "updatedAt": 1791390492
+  },
+  "remainingTokens": null,
+  "completionBudgetReport": null
+}

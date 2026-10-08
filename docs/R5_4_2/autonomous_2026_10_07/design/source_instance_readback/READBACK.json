@@ -1,0 +1,49 @@
+{
+  "source_HEAD": "b7051472909075bb4c83a9a510e298fcca2a6bd5",
+  "identity": {
+    "repository": "C:\\Projekty\\Audyty\\BDB Audit",
+    "requested_ref": "HEAD",
+    "commit_object_id": "b7051472909075bb4c83a9a510e298fcca2a6bd5",
+    "tree_object_id": "3bc05685293d2fade72735e43a2ccc96be26f3f7",
+    "object_format": "sha1"
+  },
+  "entry_count": 499,
+  "completeness_state": "COMPLETE_SOURCE",
+  "limitations": [],
+  "predecessor_errors": [
+    {
+      "path": [
+        "entries",
+        0,
+        "repo_relative_posix_path"
+      ],
+      "message": "'.gitattributes' does not match '^[A-Za-z0-9][A-Za-z0-9._/-]*$'"
+    },
+    {
+      "path": [
+        "entries",
+        1,
+        "repo_relative_posix_path"
+      ],
+      "message": "'.github/workflows/v2-0-3-qualification.yml' does not match '^[A-Za-z0-9][A-Za-z0-9._/-]*$'"
+    },
+    {
+      "path": [
+        "entries",
+        2,
+        "repo_relative_posix_path"
+      ],
+      "message": "'.gitignore' does not match '^[A-Za-z0-9][A-Za-z0-9._/-]*$'"
+    }
+  ],
+  "successor_errors": [],
+  "schema_raw_digest": "fd1c0ab331521b184d009e1c944ebe4dae6c5de2e0e1652add32d860e0b5a415",
+  "body_raw_digest": "2ece60fdd52c6e1351361fe0131f9e471b629ab4d4737c0774fc84e14dbf972d",
+  "source_manifest_object_digest_v2": "94e781fa9e6615d09e6748c6695e9b190bde75cae808800a55e9863426f20189",
+  "materializer_raw_digest": "635904a91eaaf37456872c13b077d013d221881ec82a0fc0baa8f9a9cd1e29bf",
+  "dataset": "Real exact committed source test input; different from dirty application build inputs",
+  "materialization": "REUSED_EXACT_RETAINED_INPUT",
+  "qualification": false,
+  "accepted_instance": false,
+  "trusted_installation_authority": "NOT_PROVEN"
+}

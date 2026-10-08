@@ -1,0 +1,343 @@
+{
+  "decision": "OD-026",
+  "controls": [
+    {
+      "case": "SOURCE_MEMBER_PRIOR_RECORD_APPROVAL_THEN_EXCLUSION",
+      "expected": "ALLOW",
+      "result": "PASS",
+      "reason": null,
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "MISSING_DECISION",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "RECORD_GRAMMAR",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "REJECTED_DECISION",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "DECISION_PURPOSE_RESULT",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "WRONG_PURPOSE_COVERAGE_OBLIGATION_WAIVER",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "DECISION_PURPOSE_RESULT",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "WRONG_PURPOSE_RESIDUAL_RISK_ACCEPTANCE",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "DECISION_PURPOSE_RESULT",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "WRONG_PURPOSE_DESTRUCTIVE_ACTION",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "DECISION_PURPOSE_RESULT",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "WRONG_PURPOSE_LIVE_ACTION",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "DECISION_PURPOSE_RESULT",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "WRONG_PURPOSE_CONTINUATION_BUDGET",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "DECISION_PURPOSE_RESULT",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "WRONG_PURPOSE_LIMITED_CONCLUSION",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "DECISION_PURPOSE_RESULT",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "SAME_COMMIT_DECISION",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "PRIOR_ACCEPTANCE",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "UNACCEPTED_DECISION",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "PRIOR_ACCEPTANCE",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "FOREIGN_CAMPAIGN_DECISION",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "FACT_CONTEXT",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "FOREIGN_NAMESPACE_DECISION",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "FACT_CONTEXT",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "SCHEMA_SUBSTITUTION",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "EXACT_REFERENCE_MISSING",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "BODY_MUTATION_WITHOUT_REHASH",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "OBJECT_HASH",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "LOGICAL_ID_ALIAS_TO_SAME_BODY",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "LOGICAL_ID_BODY_BINDING",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "MEMBER_NAME_SUBSTITUTION",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "EXACT_SOURCE_MEMBER",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "WRONG_SOURCE_APPLICABILITY",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "SOURCE_APPLICABILITY",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "MISSING_AUTHENTICATED_REQUEST",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "AUTHENTICATED_REQUEST",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "ACTION_CHANGED",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "AUTHENTICATED_ACTION_SCOPE",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "SCOPE_CHANGED",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "AUTHENTICATED_ACTION_SCOPE",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "ACTOR_SPOOFING",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "AUTHENTICATED_REQUEST",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "STALE_POLICY_ELIGIBILITY",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "CURRENT_POLICY_APPLICABILITY",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "PARENT_DRIFT",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "PARENT_CHANGED",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "APPROVAL_INPUT_NOT_PRIOR",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "APPROVAL_INPUT_PRIOR",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "CUT_WRONG_HASH",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "CUT_BINDING",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "EMPTY_CUT_AFTER_GENESIS",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "CUT_CAMPAIGN",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "GENERAL_APPROVE_WITHOUT_PURPOSE",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "AUTHORITY_CLASS",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "WRONG_AUTHORITY_PURPOSE",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "AUTHORITY_CLASS",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "PURPOSE_WITHOUT_APPROVE",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "AUTHORITY_CLASS",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "AUTHORITY_FOR_DIFFERENT_PRINCIPAL",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "PRINCIPAL_MISMATCH",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "UNINSTALLED_AUTHORITY",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "INSTALLATION_PIN",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "EXISTING_MEMBER_OUTSIDE_APPROVED_SCOPE",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "EXACT_APPROVED_SCOPE",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "SCOPE_ONLY_ACCEPTED_AFTER_APPROVAL_INPUT",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "PRIOR_ACCEPTANCE",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "COMPLETE_MULTI_SUBJECT_AUTHENTICATED_SCOPE",
+      "expected": "ALLOW",
+      "result": "PASS",
+      "reason": null,
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "UNSORTED_SCOPE_SET",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "SCOPE_SET_ORDER",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "EXACT_CANONICAL_SUBJECT",
+      "expected": "ALLOW",
+      "result": "PASS",
+      "reason": null,
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "ELIGIBILITY_NOT_TRANSFERABLE_TO_OTHER_EXACT_KEY",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "CURRENT_POLICY_APPLICABILITY",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "NONEXCLUDED_WITH_DECISION",
+      "expected": "REJECT",
+      "result": "PASS",
+      "reason": "RECORD_GRAMMAR",
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "case": "NONEXCLUDED_NOT_COVERAGE_APPROVAL",
+      "expected": "NOT_APPLICABLE",
+      "result": "PASS",
+      "reason": null,
+      "model_state_unchanged": true,
+      "canonical_runtime": "NOT_RUN"
+    }
+  ],
+  "source_digests": {
+    "F1_QUALIFICATION/inputs/BDB_AUDIT_V2_DATA_AND_ARTIFACT_CONTRACTS.md": "658f8866ca1a1330db9be582b13b47e87381de2208c53ee64ed9e47a8d3e15ee",
+    "docs/R5_4_1/candidate/BDB_AUDIT_V2_DATA_AND_ARTIFACT_CONTRACTS_R5_4.md": "7d967707d8f7a0d77ab84484aeb4de0119dab85ed055c31473792c8528919f75"
+  },
+  "implementation_dependencies": {
+    "src/bdb_audit/core/canonical_json.py": "62dfa640d32fdea9025ae167eb1c8a1c7a3bdde6d3b913677aad517ebdea37ac",
+    "src/bdb_audit/core/errors.py": "fd22fd0097c928833d63439c665e3dca4a9faa9fad7914ad3354c4715f8d4140"
+  },
+  "model_assumptions": [
+    "trusted accepted-history snapshots",
+    "qualified installation profiles",
+    "authenticated human request",
+    "independently derived current policy/source eligibility"
+  ],
+  "qualification": false,
+  "canonical_runtime": "NOT_RUN",
+  "durable_reject_atomicity": "NOT_PROVEN",
+  "semantic_review": "NARROW_AUTHORIZATION_DESIGN; FULL_PER_KIND_PARITY_PENDING"
+}

@@ -153,6 +153,8 @@ def _resolve(
         or obj.logical_id != ref.get("logical_id")
     ):
         raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
+    from ..history.raw_artifacts import retained_raw_for_object
+    retained_raw_for_object(con, obj)
     return {"body": obj.body, "accepted_seq": membership["accepted_seq"], "ref": accepted_ref}
 
 

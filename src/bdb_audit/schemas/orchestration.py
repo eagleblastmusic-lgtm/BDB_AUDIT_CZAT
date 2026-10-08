@@ -14,7 +14,7 @@ OPTIONAL = {
     "stage_run": ("successor_of_stage_run_ref",), "lane_run": ("successor_of_lane_run_ref",),
     "attempt": ("retry_of_attempt_ref", "retry_reason_ref"),
     "lane_result_admission_evidence": (
-        "phase_id", "source_tree_sha", "evidence_files",
+        "phase_id", "source_tree_sha", "evidence_files", "ingestion_capability", "package_zip_sha256",
     ),
     "bdb_audit_lane_result": (
         "phase_id", "outputs", "findings_count", "notes", "evidence_files",
@@ -61,6 +61,8 @@ def orchestration_schema(kind):
         properties["raw_result_digest"] = {"type": "string", "format": "bdb-sha256"}
         properties["result_proposal_digest"] = {"type": "string", "format": "bdb-sha256"}
         properties["input_package_digest"] = {"type": "string", "format": "bdb-sha256"}
+        properties["package_zip_sha256"] = {"type": "string", "format": "bdb-sha256"}
+        properties["ingestion_capability"] = {"type": "string", "minLength": 64, "maxLength": 64}
         properties["history_cut"] = {"type": "object"}
         properties["raw_result_byte_length"] = {"type": "integer", "minimum": 0}
     if kind == "bdb_audit_lane_result":

@@ -444,8 +444,6 @@ class CommitBody:
             raise ValidationError("DUPLICATE_CONTENT_REFERENCE")
         if self.command_ref.revision_digest not in digests:
             raise ValidationError("COMMAND_NOT_IN_CLOSURE")
-        if self.immutable_object_refs and self.immutable_object_refs[0] != self.command_ref:
-            raise ValidationError("COMMAND_MUST_PRECEDE_DOMAIN_OBJECTS")
         if any(ref.ref_class != "CONTENT_OBJECT" for ref in self.immutable_object_refs):
             raise ValidationError("CONTENT_REFERENCE_CLASS_INVALID")
         if type(self.governing_spec_refs) not in (tuple, list) or not self.governing_spec_refs:

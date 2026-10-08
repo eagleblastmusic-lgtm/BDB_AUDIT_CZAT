@@ -51,7 +51,7 @@ def bootstrap_fixture():
         "source_generation_id": "source_gen_fixture",
         "source_identity_ref": ref(source_identity),
         "source_identity_profile_ref": external("source_identity_profile_pin", "source-profile", "PINNED_PROFILE_REF"),
-        "repository_authority_ref": external("repository_or_snapshot_authority_ref", "repo", "SOURCE_AUTHORITY_REF"),
+        "snapshot_authority_ref": external("repository_or_snapshot_authority_ref", "repo", "SOURCE_AUTHORITY_REF"),
         "materialized_source_manifest_ref": ref(source_manifest),
         "representation_refs": [],
     })

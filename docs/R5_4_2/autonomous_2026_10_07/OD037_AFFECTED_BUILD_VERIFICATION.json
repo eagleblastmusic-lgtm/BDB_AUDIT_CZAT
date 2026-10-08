@@ -1,0 +1,76 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "C:\\Projekty\\Audyty\\BDB Audit\\docs\\R5_4_2\\autonomous_2026_10_07\\tools\\registry_build_candidate.py"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"registry_build_readback\": \"PASS\", \"registered_keys\": 131, \"raw_digest\": \"fc4793f76034defdfbaaabe96640548ba8f5601b6726036616a3a8c41873a451\", \"pending_fields\": 0, \"qualification\": false}\n",
+      "stderr": "",
+      "duration_seconds": 1.403108
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "C:\\Projekty\\Audyty\\BDB Audit\\docs\\R5_4_2\\autonomous_2026_10_07\\tools\\build_time_candidates.py"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"materialized_and_read_back\": 275, \"build_digest\": \"7a8aaee05b40160ba0fa906783596098558d53e01813daa0d791d845d09053c1\", \"qualification\": false, \"semantic_pending_nodes\": 131}\n",
+      "stderr": "",
+      "duration_seconds": 191.654813
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "C:\\Projekty\\Audyty\\BDB Audit\\docs\\R5_4_2\\autonomous_2026_10_07\\tools\\schema_registry_build_candidate.py"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"schema_registry_build_readback\": \"PASS\", \"bound_keys\": 131, \"build_digest\": \"2e885f218363ec1b23fa8cf7432663fa1a373d0fdf52e07324808df1491bfdfd\", \"qualification\": false}\n",
+      "stderr": "",
+      "duration_seconds": 2.627658
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "C:\\Projekty\\Audyty\\BDB Audit\\docs\\R5_4_2\\autonomous_2026_10_07\\tools\\initial_protocol_build_candidate.py"
+      ],
+      "exit_code": 0,
+      "stdout": "PASS initial protocol build readback: 8 files; no qualification\n",
+      "stderr": "",
+      "duration_seconds": 3.63307
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "C:\\Projekty\\Audyty\\BDB Audit\\docs\\R5_4_2\\autonomous_2026_10_07\\tools\\build_schema_fixtures.py"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"build_schema_fixtures\": \"PASS\", \"schemas\": 275, \"vectors\": 2452, \"qualification\": false}\n",
+      "stderr": "",
+      "duration_seconds": 18.395858
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "C:\\Projekty\\Audyty\\BDB Audit\\docs\\R5_4_2\\autonomous_2026_10_07\\tools\\golden_build_candidate.py"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"golden_build_readback\": \"PASS\", \"inherited_vectors\": 167, \"schema_vectors\": 2452, \"unexecuted_canonical_designs\": 182}\n",
+      "stderr": "",
+      "duration_seconds": 4.177759
+    },
+    {
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "C:\\Projekty\\Audyty\\BDB Audit\\docs\\R5_4_2\\autonomous_2026_10_07\\tools\\normative_build_candidate.py"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"normative_build_readback\": \"PASS\", \"files\": 10, \"inherited_exact_files\": 3, \"semantic_parity_pending\": 131, \"qualification\": false}\n",
+      "stderr": "",
+      "duration_seconds": 6.335484
+    }
+  ],
+  "qualification": false,
+  "scope": "Affected build component regeneration after OD037; full semantic/runtime qualification not claimed"
+}

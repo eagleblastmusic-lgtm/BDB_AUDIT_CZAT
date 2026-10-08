@@ -1,0 +1,92 @@
+{
+  "schema": "BDB_R5_4_2_RAW_BOUNDARY_DESIGN_VERIFICATION/1",
+  "static_verification": "PASS",
+  "final_gate": "SEMANTIC_CLOSURE_INCOMPLETE",
+  "semantic_readiness": "INCOMPLETE; static PASS is not semantic closure",
+  "predecessor_readback": {
+    "count": 120,
+    "mismatches": 0
+  },
+  "protected_files_checked": 674,
+  "preservation_mismatches": 0,
+  "counts": {
+    "reachable_active_schema_keys": 131,
+    "historical_read_only_schema_keys": 8,
+    "registered_in_r5_4_1_active": 102,
+    "proposed_not_registered_active": 29,
+    "currently_predecessor_schema_bound": 39,
+    "missing_predecessor_bindings": 92,
+    "V2_exact_successor_boundary_proposals": 8,
+    "semantic_complete": null,
+    "unresolved_abstract_canonical_edge_targets": 0,
+    "unresolved_Class_D_purpose_contract_families": 16,
+    "semantic_incomplete": "NOT_FULLY_ENUMERATED_BY_FIELD_LEVEL_BODY_AUDIT"
+  },
+  "runtime_vector_status": "NOT_RUN",
+  "candidate_materialized": false,
+  "qualification_record_emitted": false,
+  "production_runtime_modified": false,
+  "Q1_Q2_N5_N11": "NOT_EXECUTED",
+  "commands": [
+    {
+      "command": "python -m ruff check \"C:\\Projekty\\Audyty\\BDB Audit\\docs\\R5_4_2\\surface_collector_resolution_v2\\build_design.py\" \"C:\\Projekty\\Audyty\\BDB Audit\\docs\\R5_4_2\\surface_collector_resolution_v2\\verify_design.py\"",
+      "exit_code": 0,
+      "duration_seconds": 0.119,
+      "stdout": "All checks passed!\n",
+      "warnings": ""
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "duration_seconds": 0.082,
+      "stdout": "",
+      "warnings": ""
+    },
+    {
+      "command": "git status --short",
+      "exit_code": 0,
+      "duration_seconds": 0.049,
+      "stdout": " M src/bdb_audit/history/authority_hooks.py\n M src/bdb_audit/history/store.py\n M src/bdb_audit/schemas/orchestration.py\n M src/bdb_audit/stop/authority.py\n M src/bdb_audit/workflow/inbox.py\n M src/bdb_audit/workflow/manual_stage.py\n M src/bdb_audit/workflow/package_resume.py\n M src/bdb_audit/workflow/packaging.py\n M src/bdb_audit/workflow/stage_resume.py\n M tests/workflow/test_nf02_synthetic_lane_result_authority.py\n?? ._nf02_current_audit/\n?? ._nf02_raw_durability_20261002/\n?? NF02_CURRENT_STATE_AND_REMEDIATION_PLAN.md\n?? docs/NF02_CURRENT_VERIFICATION_2026_10_02.json\n?? docs/NF02_IMPLEMENTATION_PLAN_2026_10_02.md\n?? docs/NF02_IMPLEMENTATION_RESULT_2026_10_02.md\n?? docs/NF02_IMPLEMENTATION_VERIFICATION_2026_10_02.json\n?? docs/NF02_INDEPENDENT_SECOND_PASS_REAUDIT.md\n?? docs/NF02_NORMATIVE_CONTRACT_DECISION_PROPOSAL.md\n?? docs/NF02_RAW_DURABILITY_PLAN_2026_10_02.md\n?? docs/NF02_RAW_DURABILITY_VERIFICATION_2026_10_02.json\n?? docs/NF02_REMEDIATION_AND_CLOSURE_REPORT.md\n?? docs/NF02_SECOND_PASS_REMEDIATION_PLAN.md\n?? docs/NF02_THIRD_PASS_REMEDIATION_AND_REAUDIT.md\n?? docs/R5_4/\n?? docs/R5_4_1/\n?? docs/R5_4_2/\n?? src/bdb_audit/history/raw_artifacts.py\n?? src/bdb_audit/workflow/result_proposal.py\n?? tests/workflow/nf02_raw_crash_worker.py\n?? tests/workflow/test_nf02_raw_derivation.py\n?? tests/workflow/test_nf02_raw_durability.py\n",
+      "warnings": "warning: could not open directory '.codex-pytest-tmp/': Permission denied\n"
+    },
+    {
+      "command": "git branch --show-current",
+      "exit_code": 0,
+      "duration_seconds": 0.036,
+      "stdout": "fix/nf02-lane-result-authority\n",
+      "warnings": ""
+    },
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "duration_seconds": 0.034,
+      "stdout": "b7051472909075bb4c83a9a510e298fcca2a6bd5\n",
+      "warnings": ""
+    },
+    {
+      "command": "git rev-parse HEAD^{tree}",
+      "exit_code": 0,
+      "duration_seconds": 0.037,
+      "stdout": "3bc05685293d2fade72735e43a2ccc96be26f3f7\n",
+      "warnings": ""
+    },
+    {
+      "command": "git rev-parse main",
+      "exit_code": 0,
+      "duration_seconds": 0.035,
+      "stdout": "dcd8bd6ef5f7e3f7b5803ade6843c6217f16f044\n",
+      "warnings": ""
+    }
+  ],
+  "output_raw_pins": {
+    "docs/R5_4_2/R5_4_2_SURFACE_COLLECTOR_CONTRACT_PROPOSAL.md": "36d258029beff175fdb71957d98130a89a2c508fa73cb9c53b2fb18a309b36af",
+    "docs/R5_4_2/R5_4_2_OWNER_DECISION_PACKAGE_V2.md": "715b4596edce37998dd1179533791d3b6581cb3492265b817680372a9a68d442",
+    "docs/R5_4_2/R5_4_2_FULL_SEMANTIC_CLOSURE_REPORT_V2.md": "b9209b0256699f7ebbd2100985cc97a5a52ed52ad404b9ee37b7b157958cb698",
+    "docs/R5_4_2/R5_4_2_SEMANTIC_CLOSURE_GRAPH_V2.json": "0bc7cefb3b39beccb06ccca4b8c3bc8f093c4790bd3c0114a02e92611ec00444",
+    "docs/R5_4_2/surface_collector_resolution_v2/ADDITIONAL_PROFILE_CONTRACT_PROPOSALS.md": "45f56f674e243dd36237bfcfb040b2dc74f18c96cdb1f8e1dd42baf0cc291ed6",
+    "docs/R5_4_2/surface_collector_resolution_v2/SUCCESSOR_CONTRACT_PROPOSALS.json": "fd7d9c0460fe58dffc617d27e31fa7856bdd568fcc4b5f666b34ef79560e2e10",
+    "docs/R5_4_2/surface_collector_resolution_v2/build_design.py": "217b58fdc98ef4f941286b24f90b4ec5c65696fef0bcd9a63860d5cf38c8c10a",
+    "docs/R5_4_2/surface_collector_resolution_v2/verify_design.py": "650959ec65d5ac64d084ebc6faf91f1c2f8fe943114af3470e1adfc63995a98c",
+    "docs/R5_4_2/surface_collector_resolution_v2/PRESERVATION_BASELINE.json": "03ddbe4b664a3e9b4b8757d28e7e1de0480070d4e8453e5b14fdb27c4b83a539"
+  }
+}

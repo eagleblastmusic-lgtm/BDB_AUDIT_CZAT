@@ -1,0 +1,6 @@
+{
+  "session": 79166,
+  "result": "INTERRUPTED_NOT_EVIDENCE",
+  "reason": "Restore incoming docstring bytes after diff detected accidental encoding change before exact-input terminal verification",
+  "qualification": false
+}

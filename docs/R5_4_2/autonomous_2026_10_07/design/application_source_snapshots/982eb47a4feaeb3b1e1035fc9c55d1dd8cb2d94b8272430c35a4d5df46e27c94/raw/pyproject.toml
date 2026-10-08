@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bdb-audit"
+dynamic = ["version"]
+description = "BDB Audit v2 foundation reference implementation"
+requires-python = ">=3.12"
+dependencies = ["jsonschema==4.25.1"]
+
+[project.scripts]
+bdb-audit = "bdb_audit.cli:main"
+bdb-audit-release-validator = "bdb_audit.release_validator_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"bdb_audit.core" = ["*.json"]
+
+[tool.setuptools.dynamic]
+version = {attr = "bdb_audit.version.__version__"}
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+addopts = "-p no:cacheprovider"
+testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "3.12"
+mypy_path = "src"
+files = [
+    "src/bdb_audit/release_validator.py",
+    "src/bdb_audit/release_validator_cli.py",
+    "src/bdb_audit/self_audit.py",
+    "src/bdb_audit/coordinator/operations.py",
+    "src/bdb_audit/cli.py",
+    "src/bdb_audit/ui.py",
+    "src/bdb_audit/orchestration/templates.py",
+    "src/bdb_audit/orchestration/compiler.py",
+    "src/bdb_audit/__main__.py",
+    "src/bdb_audit/version.py",
+    "src/bdb_audit/workflow",
+    "build/build_single_file.py",
+]
+ignore_missing_imports = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
+follow_imports = "silent"
+explicit_package_bases = true
+
+[tool.ruff]
+src = ["src", "build"]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501", "F401", "F841", "W291", "W293", "F402", "F541", "E402", "E702"]

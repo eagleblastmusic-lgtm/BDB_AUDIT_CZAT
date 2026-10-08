@@ -1,0 +1,150 @@
+{
+  "decision": "OD-024",
+  "source_registry_raw_digest": "1b9d17c46843a91053036f0370d4419dac87ce5978df61b0dc922e0e40237e2c",
+  "replacement_fragments": {
+    "order_only_precedence_profiles": {
+      "BDB_BOOTSTRAP_PRECEDENCE_V2": {
+        "activation_semantics": "Exact scope match and exact pinned profile identity are required. No prose-derived, latest, wildcard, fallback, or non-initialization activation is allowed.",
+        "edge_semantics": "ORDER_ONLY: participates in canonical closure ordering and union-graph cycle detection only; does not create a typed/content/history ref, reachability, authority, provenance, schema satisfaction, or required material-ref/cardinality satisfaction; cannot be persisted as an inferred object-body field.",
+        "group_precedence_semantics": "For every two present groups i<j, every same-commit node whose exact kind is in group i has an order-only edge to every same-commit node whose exact kind is in group j. Missing optional groups create no nodes/edges. Within one group and for nodes not ordered by this profile, normal Kahn zero-indegree typed tie-break applies.",
+        "legacy_raw_ref_semantics": "legacy_raw_ref remains EXPLICIT_COMPLETE without source_generation_ref; source_generation-before-legacy_raw_ref is an order-only bootstrap constraint, not a content reference.",
+        "ordered_kind_groups": [
+          [
+            "source_generation"
+          ],
+          [
+            "legacy_raw_ref"
+          ],
+          [
+            "legacy_mechanical_validation_assessment"
+          ],
+          [
+            "source_reconciliation_assessment"
+          ],
+          [
+            "lineage_admission_assessment"
+          ],
+          [
+            "legacy_exposure_reconstruction_assessment"
+          ],
+          [
+            "trusted_predecessor_selection_decision"
+          ],
+          [
+            "bootstrap_admission_decision"
+          ],
+          [
+            "campaign_genesis"
+          ]
+        ],
+        "scope": {
+          "command_kind": "INITIALIZE_CAMPAIGN_FROM_LEGACY",
+          "commit_seq": 1,
+          "expected_parent": "EMPTY_HISTORY"
+        },
+        "union_graph_semantics": "canonical closure graph edges = typed same-commit content-reference dependency edges UNION active order-only precedence edges; cycle in union graph rejects; exactly one Kahn sort is run over the union."
+      }
+    },
+    "global_invariants.initialization_bootstrap": "seq=1 only: exact independently qualified INSTALLATION_BOOTSTRAP_PROFILE_V1 pin; EMPTY_HISTORY history input; BDB_BOOTSTRAP_PRECEDENCE_V2 imposes machine-readable order-only domain-group precedence SourceGeneration→legacy raw→mechanical→source reconciliation→lineage→optional exposure→selection→bootstrap admission→CampaignGenesis. CommandEnvelope/2 follows its actual inline payload content dependencies, not command-first order-only edges. Authenticate command against external installation pins before acceptance; dependency order supplies no authority or prior provenance. All typed-ref edges remain mandatory; one union graph Kahn sort must be acyclic; blocked admission forbids genesis; no synthetic H0 or V1 fallback.",
+    "profiles.INSTALLATION_BOOTSTRAP_PROFILE_V1": {
+      "allowed_initial_command_kind": "INITIALIZE_CAMPAIGN_FROM_LEGACY",
+      "authority_boundary": "external LOCAL_PINNED installation trust root used only to validate the first accepted commit; not mutable campaign state authority",
+      "order_only_precedence_profile_ref": "BDB_BOOTSTRAP_PRECEDENCE_V2",
+      "post_seq1_rule": "EMPTY_HISTORY and initialization command forbidden; current policy/schema/trust resolved from accepted exact revisions",
+      "required_pins": [
+        "initial_schema_registry_ref",
+        "initial_artifact_contract_registry_ref",
+        "initial_serialization_profile_ref",
+        "initial_governing_policy_ref",
+        "initial_transition_profile_ref",
+        "initial_trust_profile_ref",
+        "allowed_history_namespace_ref",
+        "initial_source_identity_profile_ref"
+      ],
+      "source_rule": "actual target SourceGeneration is command content input validated under pinned source identity profile; BDB_BOOTSTRAP_PRECEDENCE_V2 orders SourceGeneration before every bootstrap legacy_raw_ref and later bootstrap assessment/admission/genesis domain group without adding raw-object references; CommandEnvelope/2 is ordered only by its actual content dependencies. The exact qualified installation's initial_artifact_contract_registry_ref selects this embedded Registry profile."
+    }
+  },
+  "normative_replacement_requirements": {
+    "Data_14_6": "Versioned V2 domain-only order; remove CommandEnvelope-before-domain arrow; append command after its complete actual payload closure. Retain authorization-before-acceptance, all typed edges, initial cut pin equality, admission guards and atomic initialization.",
+    "Data_15_2": "Active successor local precedence profile is BDB_BOOTSTRAP_PRECEDENCE_V2 under exact installed Registry; no V1 fallback; union Kahn/tie-break/byte equality unchanged.",
+    "Architecture_6_10": "Same V2 domain-only precedence and content-before-command chronology, with exact qualification/installation boundary unchanged."
+  },
+  "normative_source_digests": {
+    "docs/R5_4_1/candidate/BDB_AUDIT_V2_DATA_AND_ARTIFACT_CONTRACTS_R5_4.md": "7d967707d8f7a0d77ab84484aeb4de0119dab85ed055c31473792c8528919f75",
+    "docs/R5_4_1/candidate/BDB_AUDIT_V2_ARCHITECTURE_SPEC_R5_4.md": "7683f14a891301d97df4f23bdfbcfe215c16fa0203fe8a4ec5c539570fa45f3a"
+  },
+  "controls": [
+    {
+      "case": "EXACT_EMBEDDED_PROFILE_AND_INSTALLATION_SELECTION",
+      "result": "PASS"
+    },
+    {
+      "case": "ALL_DOMAIN_PRECEDENCE_RETAINED",
+      "result": "PASS"
+    },
+    {
+      "case": "CONTRACT_ROWS_AND_MATERIAL_REFS_UNCHANGED",
+      "result": "PASS"
+    },
+    {
+      "case": "UNPINNED_REGISTRY",
+      "result": "PASS",
+      "expected_reject": "REGISTRY_PIN"
+    },
+    {
+      "case": "WRONG_SCOPE_command_kind",
+      "result": "PASS",
+      "expected_reject": "ACTIVATION_SCOPE"
+    },
+    {
+      "case": "WRONG_SCOPE_commit_seq",
+      "result": "PASS",
+      "expected_reject": "ACTIVATION_SCOPE"
+    },
+    {
+      "case": "WRONG_SCOPE_expected_parent",
+      "result": "PASS",
+      "expected_reject": "ACTIVATION_SCOPE"
+    },
+    {
+      "case": "BOOLEAN_SEQUENCE_COERCION",
+      "result": "PASS",
+      "expected_reject": "ACTIVATION_SCOPE"
+    },
+    {
+      "case": "EXTRA_SCOPE_FIELD",
+      "result": "PASS",
+      "expected_reject": "ACTIVATION_SCOPE"
+    },
+    {
+      "case": "REGISTRY_PROFILE_SUBSTITUTION",
+      "result": "PASS",
+      "expected_reject": "REGISTRY_PIN"
+    },
+    {
+      "case": "V1_FALLBACK_EVEN_WITH_MATCHING_MODEL_DIGEST",
+      "result": "PASS",
+      "expected_reject": "PRECEDENCE_PIN"
+    },
+    {
+      "case": "DOMAIN_GROUP_OMISSION",
+      "result": "PASS",
+      "expected_reject": "DELTA_SCOPE"
+    },
+    {
+      "case": "PREDECESSOR_SOURCE_DRIFT",
+      "result": "PASS",
+      "expected_reject": "SOURCE_DRIFT"
+    },
+    {
+      "case": "PREDECESSOR_BODY_DRIFT",
+      "result": "PASS",
+      "expected_reject": "SOURCE_BODY_DRIFT"
+    }
+  ],
+  "status": "DESIGN_DELTA_VERIFIED_NOT_MATERIALIZED",
+  "candidate_registry_identity": "NOT_CREATED",
+  "qualification": false,
+  "accepted_instance_DAG": "NOT_PROVEN",
+  "durable_guard_execution": "NOT_RUN"
+}

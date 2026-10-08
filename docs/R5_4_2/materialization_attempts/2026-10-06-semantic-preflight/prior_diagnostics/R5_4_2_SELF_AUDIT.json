@@ -1,0 +1,165 @@
+{
+  "schema": "BDB_SCHEMA_CLOSURE_SELF_AUDIT/1",
+  "gate": "SPEC_CONFLICT",
+  "S1": "STOPPED_CLASS_C_INCOMPLETE_FIXED_POINT",
+  "S2": "NOT_STARTED",
+  "S3": "NOT_STARTED",
+  "S4": "PREDECESSOR_READBACK_ONLY_NO_SUCCESSOR",
+  "S5": "NOT_STARTED_NOT_ELIGIBLE",
+  "checks": [
+    {
+      "name": "exact_predecessor_artifact_self_audit",
+      "command": "python docs/R5_4_1/tools/verify_candidate.py",
+      "exit_code": 0,
+      "result": "PASS_ARTIFACT_SELF_AUDIT_N1_N4_ONLY",
+      "warning": "Ignored .codex-pytest-tmp/ Permission denied; not task blocker"
+    },
+    {
+      "name": "independent_complete_predecessor_readback",
+      "result": "PASS",
+      "entries": 120,
+      "mismatches": 0
+    },
+    {
+      "name": "known_minimum_completion_bindings",
+      "result": "MISSING",
+      "keys": [
+        "BDB_SCHEMA_REGISTRY::lane_completion/1",
+        "BDB_SCHEMA_REGISTRY::stage_completion/1"
+      ]
+    },
+    {
+      "name": "material_residual_risk_registry_contract",
+      "result": "SPEC_CONFLICT_CLASS_C",
+      "registered": false,
+      "canonical_semantics_source": "Data section 79",
+      "consumer_refs": [
+        {
+          "consumer": "candidate_assurance_case/1",
+          "allowed": [
+            "residual_risk_ref"
+          ],
+          "cardinality": "0..N",
+          "field": "residual_risk_refs",
+          "ref_class": "CONTENT_OR_PRIOR"
+        },
+        {
+          "consumer": "stop_input/1",
+          "allowed": [
+            "residual_risk_ref"
+          ],
+          "cardinality": "0..N",
+          "field": "residual_risk_refs",
+          "ref_class": "CONTENT_OR_PRIOR"
+        },
+        {
+          "consumer": "campaign_conclusion/1",
+          "allowed": [
+            "residual_risk_ref"
+          ],
+          "cardinality": "0..N",
+          "field": "residual_risk_refs",
+          "ref_class": "PRIOR_ACCEPTED_ONLY"
+        },
+        {
+          "consumer": "final_assurance_case/1",
+          "allowed": [
+            "residual_risk_ref"
+          ],
+          "cardinality": "0..N",
+          "field": "residual_risk_refs",
+          "ref_class": "PRIOR_ACCEPTED_ONLY"
+        },
+        {
+          "consumer": "release_qualification/1",
+          "allowed": [
+            "residual_risk_ref"
+          ],
+          "cardinality": "0..N",
+          "field": "accepted_residual_risk_refs",
+          "ref_class": "PRIOR_ACCEPTED_ONLY"
+        },
+        {
+          "consumer": "release_qualification/1",
+          "allowed": [
+            "finding_or_risk_ref"
+          ],
+          "cardinality": "0..N",
+          "field": "blocking_finding_or_risk_refs",
+          "ref_class": "PRIOR_ACCEPTED_ONLY"
+        }
+      ]
+    },
+    {
+      "name": "runtime_schema_reachability_fixed_point",
+      "result": "NOT_REACHED_CLASS_C_STOP"
+    },
+    {
+      "name": "qualification_eligibility",
+      "result": "REJECT",
+      "record_emitted": false
+    }
+  ],
+  "counts": {
+    "established_reachable_kind_lower_bound": 51,
+    "established_registered_kind_lower_bound": 50,
+    "already_bound_in_r5_4_1_established": 39,
+    "missing_bindings_in_r5_4_1_established": 11,
+    "added_in_r5_4_2": 0,
+    "unregistered_reachable_kinds_found": 1,
+    "semantically_incomplete_kinds_found": 0,
+    "semantic_completeness_proven": false,
+    "registered_established_without_executable_schema": 11,
+    "registered_established_without_binding": 11,
+    "final_complete_closure_counts": null
+  },
+  "runtime_tests": "NOT_RUN_OUT_OF_SCOPE",
+  "candidate_generation": "NOT_RUN_PROHIBITED_AFTER_C",
+  "governance_regressions": "NOT_ADDED_NO_SUCCESSOR_CANDIDATE",
+  "read_scope": "Scoped complete conflicting sections/consumer rows read; full baseline narrative read was not completed before mandated C stop",
+  "closeout": {
+    "checks": [
+      {
+        "check": "source_raw_pins",
+        "result": "PASS",
+        "count": 504
+      },
+      {
+        "check": "protected_tracked_pins",
+        "result": "PASS",
+        "count": 437
+      },
+      {
+        "check": "R5.4.1_entire_subtree_unchanged",
+        "result": "PASS",
+        "count": 144
+      },
+      {
+        "check": "only_new_R5.4.2_diagnostics_in_status_delta",
+        "result": "PASS"
+      }
+    ],
+    "commands": [
+      {
+        "command": "git diff --check",
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": "git status --short",
+        "exit_code": 0,
+        "stdout": " M src/bdb_audit/history/authority_hooks.py\n M src/bdb_audit/history/store.py\n M src/bdb_audit/schemas/orchestration.py\n M src/bdb_audit/stop/authority.py\n M src/bdb_audit/workflow/inbox.py\n M src/bdb_audit/workflow/manual_stage.py\n M src/bdb_audit/workflow/package_resume.py\n M src/bdb_audit/workflow/packaging.py\n M src/bdb_audit/workflow/stage_resume.py\n M tests/workflow/test_nf02_synthetic_lane_result_authority.py\n?? ._nf02_current_audit/\n?? ._nf02_raw_durability_20261002/\n?? NF02_CURRENT_STATE_AND_REMEDIATION_PLAN.md\n?? docs/NF02_CURRENT_VERIFICATION_2026_10_02.json\n?? docs/NF02_IMPLEMENTATION_PLAN_2026_10_02.md\n?? docs/NF02_IMPLEMENTATION_RESULT_2026_10_02.md\n?? docs/NF02_IMPLEMENTATION_VERIFICATION_2026_10_02.json\n?? docs/NF02_INDEPENDENT_SECOND_PASS_REAUDIT.md\n?? docs/NF02_NORMATIVE_CONTRACT_DECISION_PROPOSAL.md\n?? docs/NF02_RAW_DURABILITY_PLAN_2026_10_02.md\n?? docs/NF02_RAW_DURABILITY_VERIFICATION_2026_10_02.json\n?? docs/NF02_REMEDIATION_AND_CLOSURE_REPORT.md\n?? docs/NF02_SECOND_PASS_REMEDIATION_PLAN.md\n?? docs/NF02_THIRD_PASS_REMEDIATION_AND_REAUDIT.md\n?? docs/R5_4/\n?? docs/R5_4_1/\n?? docs/R5_4_2/\n?? src/bdb_audit/history/raw_artifacts.py\n?? src/bdb_audit/workflow/result_proposal.py\n?? tests/workflow/nf02_raw_crash_worker.py\n?? tests/workflow/test_nf02_raw_derivation.py\n?? tests/workflow/test_nf02_raw_durability.py\n",
+        "stderr": "warning: could not open directory '.codex-pytest-tmp/': Permission denied\n"
+      },
+      {
+        "command": "git diff --name-only -- legacy/v1_4_4/",
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    ],
+    "successor_candidate_absent": true,
+    "qualification_record_absent": true
+  }
+}

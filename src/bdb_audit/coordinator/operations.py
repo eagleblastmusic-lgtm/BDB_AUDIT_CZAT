@@ -147,7 +147,8 @@ class AuditOperationApi:
             "source_generation_id": f"source_gen_{cid}",
             "source_identity_ref": source_identity.as_ref().as_dict(),
             "source_identity_profile_ref": ext("source_identity_profile_pin", f"profile-{seed}", "PINNED_PROFILE_REF"),
-            "repository_authority_ref": ext("repository_or_snapshot_authority_ref", repo_authority_id, "SOURCE_AUTHORITY_REF"),
+            ("repository_authority_ref" if has_real_git else "snapshot_authority_ref"):
+                ext("repository_or_snapshot_authority_ref", repo_authority_id, "SOURCE_AUTHORITY_REF"),
             "materialized_source_manifest_ref": source_manifest.as_ref().as_dict(),
             "representation_refs": [],
         })

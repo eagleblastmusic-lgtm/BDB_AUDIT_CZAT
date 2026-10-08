@@ -243,12 +243,19 @@ def load_e1_batch(
         if assignment.get("assignment_input_history_cut") != assignment_input:
             raise ValidationError("RESUME_ASSIGNMENT_CUT_DIVERGENCE", slot)
 
+    batch_ticket = store.issue_batch_ticket(
+        campaign_id=campaign_id,
+        stage_id="E1",
+        cut=assignment_input,
+    )
+
     return E1Batch(
         campaign_id=campaign_id,
         stage_id="E1",
         frozen_history_cut=dict(assignment_input),
         jobs=jobs,
         assignment_accepted_history_cut={},
+        batch_ticket=batch_ticket,
     ), source
 
 

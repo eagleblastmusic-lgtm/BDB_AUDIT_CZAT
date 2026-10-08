@@ -1,0 +1,139 @@
+{
+  "controls": [
+    {
+      "case": "EXACT_TARGET_BYTES_2e2e2f65787465726e616c2d746172676574",
+      "result": "PASS",
+      "manifest": {
+        "entries": [
+          {
+            "repo_relative_posix_path": "link",
+            "entry_type": "SYMLINK",
+            "relevant_mode": "120000",
+            "byte_length": 18,
+            "content_raw_digest": "c90c562353886a30785265d1cba81ecc3cfd0fd78a0493733bb0a7121966dc37",
+            "symlink_target": "Li4vZXh0ZXJuYWwtdGFyZ2V0",
+            "symlink_target_encoding": "base64"
+          }
+        ]
+      },
+      "runtime_input": "Controlled Git command responses, no actual authenticated tree"
+    },
+    {
+      "case": "MISSING_symlink_target_2e2e2f65787465726e616c2d746172676574",
+      "result": "PASS"
+    },
+    {
+      "case": "MISSING_symlink_target_encoding_2e2e2f65787465726e616c2d746172676574",
+      "result": "PASS"
+    },
+    {
+      "case": "MISSING_byte_length_2e2e2f65787465726e616c2d746172676574",
+      "result": "PASS"
+    },
+    {
+      "case": "MISSING_content_raw_digest_2e2e2f65787465726e616c2d746172676574",
+      "result": "PASS"
+    },
+    {
+      "case": "WRONG_ENCODING_2e2e2f65787465726e616c2d746172676574",
+      "result": "PASS"
+    },
+    {
+      "case": "ENCODING_ON_REGULAR_FILE_2e2e2f65787465726e616c2d746172676574",
+      "result": "PASS"
+    },
+    {
+      "case": "EXACT_TARGET_BYTES_fffe2d746172676574",
+      "result": "PASS",
+      "manifest": {
+        "entries": [
+          {
+            "repo_relative_posix_path": "link",
+            "entry_type": "SYMLINK",
+            "relevant_mode": "120000",
+            "byte_length": 9,
+            "content_raw_digest": "87b4022d32ffaf817389fd6ac4adda7ccd03782a459ba18e489298d83790dc17",
+            "symlink_target": "//4tdGFyZ2V0",
+            "symlink_target_encoding": "base64"
+          }
+        ]
+      },
+      "runtime_input": "Controlled Git command responses, no actual authenticated tree"
+    },
+    {
+      "case": "MISSING_symlink_target_fffe2d746172676574",
+      "result": "PASS"
+    },
+    {
+      "case": "MISSING_symlink_target_encoding_fffe2d746172676574",
+      "result": "PASS"
+    },
+    {
+      "case": "MISSING_byte_length_fffe2d746172676574",
+      "result": "PASS"
+    },
+    {
+      "case": "MISSING_content_raw_digest_fffe2d746172676574",
+      "result": "PASS"
+    },
+    {
+      "case": "WRONG_ENCODING_fffe2d746172676574",
+      "result": "PASS"
+    },
+    {
+      "case": "ENCODING_ON_REGULAR_FILE_fffe2d746172676574",
+      "result": "PASS"
+    },
+    {
+      "case": "EXACT_TARGET_BYTES_7461726765740a776974682d6e65776c696e65",
+      "result": "PASS",
+      "manifest": {
+        "entries": [
+          {
+            "repo_relative_posix_path": "link",
+            "entry_type": "SYMLINK",
+            "relevant_mode": "120000",
+            "byte_length": 19,
+            "content_raw_digest": "06fd09662dcdd34c916d8d2d9c40c35a48aee1e6ceb8475703188de19b09503d",
+            "symlink_target": "dGFyZ2V0CndpdGgtbmV3bGluZQ==",
+            "symlink_target_encoding": "base64"
+          }
+        ]
+      },
+      "runtime_input": "Controlled Git command responses, no actual authenticated tree"
+    },
+    {
+      "case": "MISSING_symlink_target_7461726765740a776974682d6e65776c696e65",
+      "result": "PASS"
+    },
+    {
+      "case": "MISSING_symlink_target_encoding_7461726765740a776974682d6e65776c696e65",
+      "result": "PASS"
+    },
+    {
+      "case": "MISSING_byte_length_7461726765740a776974682d6e65776c696e65",
+      "result": "PASS"
+    },
+    {
+      "case": "MISSING_content_raw_digest_7461726765740a776974682d6e65776c696e65",
+      "result": "PASS"
+    },
+    {
+      "case": "WRONG_ENCODING_7461726765740a776974682d6e65776c696e65",
+      "result": "PASS"
+    },
+    {
+      "case": "ENCODING_ON_REGULAR_FILE_7461726765740a776974682d6e65776c696e65",
+      "result": "PASS"
+    }
+  ],
+  "schema_raw_digest": "fd1c0ab331521b184d009e1c944ebe4dae6c5de2e0e1652add32d860e0b5a415",
+  "retained_actual_manifest_body_raw_digest": "2ece60fdd52c6e1351361fe0131f9e471b629ab4d4737c0774fc84e14dbf972d",
+  "retained_actual_manifest_current_schema": "PASS_ALL_499_ENTRIES_NO_REMATERIALIZATION",
+  "materializer_raw_digest": "635904a91eaaf37456872c13b077d013d221881ec82a0fc0baa8f9a9cd1e29bf",
+  "qualification": false,
+  "trusted_actual_input": "NOT_PROVEN",
+  "canonical_base64_and_raw_reconciliation_guard": "NOT_IMPLEMENTED_BY_SCHEMA",
+  "symlink_transport_and_durable_admission": "NOT_PROVEN",
+  "NF02": "OPEN"
+}

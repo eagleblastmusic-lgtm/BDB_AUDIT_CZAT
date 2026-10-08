@@ -1,0 +1,11 @@
+{
+  "target": "tests/workflow/test_review_blockers.py::test_github_resolver_never_uses_cwd_fallback",
+  "exit_code": 0,
+  "duration_seconds": 3.2617167999851517,
+  "environment_change": "Ordinary repo-local temp directory; no resolver/network/result mock or production change",
+  "tool_raw_digest": "0761ffeadc6db7a5297a0f6a0f3bcf27884d0b39622f38a3e2c24307dfd2968e",
+  "test_raw_digest": "53a4564f37c4e2752a2604b24f48c83397371f0f1007970c89aadd2b9c2c2629",
+  "original_broad_result": "560 passed; one host TemporaryDirectory ACL failure",
+  "qualification": false,
+  "NF02": "OPEN"
+}

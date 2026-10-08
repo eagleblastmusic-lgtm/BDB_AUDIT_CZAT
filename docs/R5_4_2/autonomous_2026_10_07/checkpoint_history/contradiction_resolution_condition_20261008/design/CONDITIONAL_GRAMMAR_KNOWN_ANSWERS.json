@@ -1,0 +1,3928 @@
+{
+  "vectors": [
+    {
+      "schema_key": "source_generation/2",
+      "case": "AUTHORITY_MISSING",
+      "input": {
+        "materialized_source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "representation_refs": [],
+        "source_generation_id": "TEST_0",
+        "source_identity_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "source_identity_ref": {
+          "kind": "source_identity",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "source_generation/2",
+      "case": "EXACT_REPOSITORY_BRANCH",
+      "input": {
+        "materialized_source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "representation_refs": [],
+        "source_generation_id": "TEST_0",
+        "source_identity_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "source_identity_ref": {
+          "kind": "source_identity",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "repository_authority_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "source_generation/2",
+      "case": "BOTH_AUTHORITIES",
+      "input": {
+        "materialized_source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "representation_refs": [],
+        "source_generation_id": "TEST_0",
+        "source_identity_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "source_identity_ref": {
+          "kind": "source_identity",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "repository_authority_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "snapshot_authority_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "source_generation/2",
+      "case": "EXACT_SNAPSHOT_BRANCH",
+      "input": {
+        "materialized_source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "representation_refs": [],
+        "source_generation_id": "TEST_0",
+        "source_identity_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "source_identity_ref": {
+          "kind": "source_identity",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "snapshot_authority_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "history_cut/2",
+      "case": "EXACT_EMPTY_CUT",
+      "input": {
+        "kind": "EMPTY_HISTORY_CUT",
+        "history_namespace_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "governing_policy_ref": {
+          "kind": "policy_revision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "governing_spec_refs": [
+          {
+            "kind": "spec_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ]
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "history_cut/2",
+      "case": "EXACT_ACCEPTED_CUT",
+      "input": {
+        "campaign_id": "TEST_0",
+        "accepted_head_seq": 1,
+        "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+        "governing_policy_ref": {
+          "kind": "policy_revision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "governing_spec_refs": [
+          {
+            "kind": "spec_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ]
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "history_cut/2",
+      "case": "HYBRID_EMPTY_ACCEPTED_CUT",
+      "input": {
+        "kind": "EMPTY_HISTORY_CUT",
+        "history_namespace_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "governing_policy_ref": {
+          "kind": "policy_revision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "governing_spec_refs": [
+          {
+            "kind": "spec_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ],
+        "campaign_id": "TEST_0",
+        "accepted_head_seq": 1,
+        "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "history_cut/2",
+      "case": "MISSING_ACCEPTED_CUT_campaign_id",
+      "input": {
+        "accepted_head_seq": 1,
+        "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+        "governing_policy_ref": {
+          "kind": "policy_revision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "governing_spec_refs": [
+          {
+            "kind": "spec_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ]
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "history_cut/2",
+      "case": "MISSING_ACCEPTED_CUT_accepted_head_hash",
+      "input": {
+        "campaign_id": "TEST_0",
+        "accepted_head_seq": 1,
+        "governing_policy_ref": {
+          "kind": "policy_revision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "governing_spec_refs": [
+          {
+            "kind": "spec_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ]
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "history_cut/2",
+      "case": "MISSING_ACCEPTED_CUT_accepted_head_seq",
+      "input": {
+        "campaign_id": "TEST_0",
+        "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+        "governing_policy_ref": {
+          "kind": "policy_revision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "governing_spec_refs": [
+          {
+            "kind": "spec_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ]
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "history_cut/2",
+      "case": "GOVERNANCE_ONLY_WITHOUT_HEAD_OR_NAMESPACE",
+      "input": {
+        "governing_policy_ref": {
+          "kind": "policy_revision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "governing_spec_refs": [
+          {
+            "kind": "spec_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ]
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "source_identity/2",
+      "case": "REQUIRED_CONTEXT_PRESENT",
+      "input": {
+        "authority_mode": "AUTHORIZED_GIT",
+        "authorized_repository_or_snapshot_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "completeness_state": "COMPLETE_SOURCE",
+        "materialized_source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "git_commit_object_id": "TEST_0",
+        "git_tree_object_id": "TEST_0"
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "source_identity/2",
+      "case": "REQUIRED_CONTEXT_MISSING_git_commit_object_id",
+      "input": {
+        "authority_mode": "AUTHORIZED_GIT",
+        "authorized_repository_or_snapshot_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "completeness_state": "COMPLETE_SOURCE",
+        "materialized_source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "git_tree_object_id": "TEST_0"
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "source_identity/2",
+      "case": "REQUIRED_CONTEXT_MISSING_git_tree_object_id",
+      "input": {
+        "authority_mode": "AUTHORIZED_GIT",
+        "authorized_repository_or_snapshot_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "completeness_state": "COMPLETE_SOURCE",
+        "materialized_source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "git_commit_object_id": "TEST_0"
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "trusted_predecessor_selection_decision/2",
+      "case": "REQUIRED_CONTEXT_PRESENT",
+      "input": {
+        "candidate_legacy_refs": [
+          {
+            "kind": "legacy_raw_ref",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ],
+        "decision": "SELECTED",
+        "lineage_admission_assessment_ref": {
+          "kind": "lineage_admission_assessment",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "predecessor_pin_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "reason_codes": [],
+        "selection_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "selection_policy_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "source_reconciliation_assessment_ref": {
+          "kind": "source_reconciliation_assessment",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "trusted_predecessor_selection_decision_id": "TEST_0",
+        "selected_legacy_ref": {
+          "kind": "legacy_raw_ref",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "trusted_predecessor_selection_decision/2",
+      "case": "REQUIRED_CONTEXT_MISSING_selected_legacy_ref",
+      "input": {
+        "candidate_legacy_refs": [
+          {
+            "kind": "legacy_raw_ref",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ],
+        "decision": "SELECTED",
+        "lineage_admission_assessment_ref": {
+          "kind": "lineage_admission_assessment",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "predecessor_pin_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "reason_codes": [],
+        "selection_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "selection_policy_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "source_reconciliation_assessment_ref": {
+          "kind": "source_reconciliation_assessment",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "trusted_predecessor_selection_decision_id": "TEST_0"
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "bootstrap_admission_decision/2",
+      "case": "REQUIRED_CONTEXT_PRESENT",
+      "input": {
+        "admission_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "admission_policy_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "bootstrap_admission_decision_id": "TEST_0",
+        "legacy_ref": {
+          "kind": "legacy_raw_ref",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "limitations": [],
+        "lineage_admission_assessment_ref": {
+          "kind": "lineage_admission_assessment",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "mechanical_validation_assessment_ref": {
+          "kind": "legacy_mechanical_validation_assessment",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "reason_codes": [],
+        "requested_role": "CANONICAL_PREDECESSOR",
+        "result": "CANONICAL_BOOTSTRAP_ADMITTED",
+        "source_reconciliation_assessment_ref": {
+          "kind": "source_reconciliation_assessment",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "trusted_predecessor_selection_ref": {
+          "kind": "trusted_predecessor_selection_decision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "bootstrap_admission_decision/2",
+      "case": "REQUIRED_CONTEXT_MISSING_trusted_predecessor_selection_ref",
+      "input": {
+        "admission_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "admission_policy_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "bootstrap_admission_decision_id": "TEST_0",
+        "legacy_ref": {
+          "kind": "legacy_raw_ref",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "limitations": [],
+        "lineage_admission_assessment_ref": {
+          "kind": "lineage_admission_assessment",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "mechanical_validation_assessment_ref": {
+          "kind": "legacy_mechanical_validation_assessment",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "reason_codes": [],
+        "requested_role": "CANONICAL_PREDECESSOR",
+        "result": "CANONICAL_BOOTSTRAP_ADMITTED",
+        "source_reconciliation_assessment_ref": {
+          "kind": "source_reconciliation_assessment",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "input_disposition_record/2",
+      "case": "TERMINAL_SOURCE_MEMBER_WITHOUT_CAPTURE",
+      "input": {
+        "assigned_input_ref": {
+          "input_kind": "SOURCE_MEMBER",
+          "source_member": {
+            "member_path": "src/main.py",
+            "source_manifest_ref": {
+              "kind": "source_manifest",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        },
+        "disposition": "COLLECTED",
+        "disposition_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "input_disposition_record_id": "input_disposition_record_00000000-0000-4000-8000-000000000001",
+        "reason_codes": []
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "input_disposition_record/2",
+      "case": "TERMINAL_SOURCE_MEMBER_WITH_CAPTURE",
+      "input": {
+        "assigned_input_ref": {
+          "input_kind": "SOURCE_MEMBER",
+          "source_member": {
+            "member_path": "src/main.py",
+            "source_manifest_ref": {
+              "kind": "source_manifest",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        },
+        "disposition": "COLLECTED",
+        "disposition_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "input_disposition_record_id": "input_disposition_record_00000000-0000-4000-8000-000000000001",
+        "reason_codes": [],
+        "collector_record_ref": {
+          "kind": "surface_collector_record",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "input_disposition_record/2",
+      "case": "PROVISIONAL_WITHOUT_CAPTURE",
+      "input": {
+        "assigned_input_ref": {
+          "input_kind": "SOURCE_MEMBER",
+          "source_member": {
+            "member_path": "src/main.py",
+            "source_manifest_ref": {
+              "kind": "source_manifest",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        },
+        "disposition": "PROVISIONAL",
+        "disposition_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "input_disposition_record_id": "input_disposition_record_00000000-0000-4000-8000-000000000001",
+        "reason_codes": []
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "grant_body/2",
+      "case": "INITIAL_KNOWLEDGE_NULL_SENTINEL",
+      "input": {
+        "attempt_ref": {
+          "kind": "attempt",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "channel_class": "TEST_0",
+        "delivery_profile_ref": {
+          "kind": "delivery_spec",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "forbidden_knowledge_policy_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "grant_id": "TEST_0",
+        "grant_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "previous_knowledge_state_ref": null,
+        "view_manifest_ref": {
+          "kind": "view_manifest",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "grant_body/2",
+      "case": "OMITTED_KNOWLEDGE_SENTINEL",
+      "input": {
+        "attempt_ref": {
+          "kind": "attempt",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "channel_class": "TEST_0",
+        "delivery_profile_ref": {
+          "kind": "delivery_spec",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "forbidden_knowledge_policy_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "grant_id": "TEST_0",
+        "grant_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "view_manifest_ref": {
+          "kind": "view_manifest",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "grant_body/2",
+      "case": "SUCCESSOR_KNOWLEDGE_REFERENCE_SYNTAX",
+      "input": {
+        "attempt_ref": {
+          "kind": "attempt",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "channel_class": "TEST_0",
+        "delivery_profile_ref": {
+          "kind": "delivery_spec",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "forbidden_knowledge_policy_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "grant_id": "TEST_0",
+        "grant_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "previous_knowledge_state_ref": {
+          "kind": "knowledge_state",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "view_manifest_ref": {
+          "kind": "view_manifest",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "grant_body/2",
+      "case": "WRONG_KNOWLEDGE_REFERENCE_KIND",
+      "input": {
+        "attempt_ref": {
+          "kind": "attempt",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "channel_class": "TEST_0",
+        "delivery_profile_ref": {
+          "kind": "delivery_spec",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "forbidden_knowledge_policy_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "grant_id": "TEST_0",
+        "grant_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "previous_knowledge_state_ref": {
+          "kind": "attempt",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "view_manifest_ref": {
+          "kind": "view_manifest",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "EXCLUDED_SCOPE_WITHOUT_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "EXCLUDED_SCOPE"
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "EXCLUDED_SCOPE_WITH_DECISION_SYNTAX",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "EXCLUDED_SCOPE",
+        "scope_decision_ref": {
+          "kind": "approval_decision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "KNOWN_SURFACE_WITH_FORBIDDEN_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "KNOWN_SURFACE",
+        "scope_decision_ref": {
+          "kind": "approval_decision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "KNOWN_SURFACE_WITHOUT_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "KNOWN_SURFACE"
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "KNOWN_UNOBSERVED_SCOPE_WITH_FORBIDDEN_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "KNOWN_UNOBSERVED_SCOPE",
+        "scope_decision_ref": {
+          "kind": "approval_decision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "KNOWN_UNOBSERVED_SCOPE_WITHOUT_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "KNOWN_UNOBSERVED_SCOPE"
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "UNSUPPORTED_SCOPE_WITH_FORBIDDEN_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "UNSUPPORTED_SCOPE",
+        "scope_decision_ref": {
+          "kind": "approval_decision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "UNSUPPORTED_SCOPE_WITHOUT_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "UNSUPPORTED_SCOPE"
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "COLLECTION_FAILED_WITH_FORBIDDEN_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "COLLECTION_FAILED",
+        "scope_decision_ref": {
+          "kind": "approval_decision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "COLLECTION_FAILED_WITHOUT_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "COLLECTION_FAILED"
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "PARSING_FAILED_WITH_FORBIDDEN_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "PARSING_FAILED",
+        "scope_decision_ref": {
+          "kind": "approval_decision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "PARSING_FAILED_WITHOUT_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "PARSING_FAILED"
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "PROVISIONAL_SCOPE_WITH_FORBIDDEN_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "PROVISIONAL_SCOPE",
+        "scope_decision_ref": {
+          "kind": "approval_decision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "PROVISIONAL_SCOPE_WITHOUT_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "PROVISIONAL_SCOPE"
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "UNKNOWN_SCOPE_WITH_FORBIDDEN_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "UNKNOWN_SCOPE",
+        "scope_decision_ref": {
+          "kind": "approval_decision",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "scope_state_record/2",
+      "case": "UNKNOWN_SCOPE_WITHOUT_SCOPE_DECISION",
+      "input": {
+        "basis_refs": [],
+        "reason_codes": [],
+        "scope_key": {
+          "scope_kind": "CANONICAL_SUBJECT",
+          "subject_ref": {
+            "kind": "surface_record",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        },
+        "scope_state_input_history_cut": {
+          "campaign_id": "TEST_0",
+          "accepted_head_seq": 1,
+          "accepted_head_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+          "governing_policy_ref": {
+            "kind": "policy_revision",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          "governing_spec_refs": [
+            {
+              "kind": "spec_revision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          ]
+        },
+        "scope_state_record_id": "scope_state_record_00000000-0000-4000-8000-000000000001",
+        "state": "UNKNOWN_SCOPE"
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_CANONICAL_EXACT_BRANCH",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "CANONICAL",
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_CANONICAL_MISSING_REF",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "CANONICAL"
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_CANONICAL_MIXED_WITH_RAW",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "CANONICAL",
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            },
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_CANONICAL_MIXED_WITH_PROFILE",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "CANONICAL",
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            },
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_CANONICAL_DUPLICATE_ENTRY",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "CANONICAL",
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          },
+          {
+            "input_kind": "CANONICAL",
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_RAW_EXACT_BRANCH",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "RAW",
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_RAW_MISSING_REF",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "RAW"
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_RAW_MIXED_WITH_CANONICAL",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "RAW",
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            },
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_RAW_MIXED_WITH_PROFILE",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "RAW",
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            },
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_RAW_DUPLICATE_ENTRY",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "RAW",
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          },
+          {
+            "input_kind": "RAW",
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_PROFILE_EXACT_BRANCH",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "PROFILE",
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_PROFILE_MISSING_REF",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "PROFILE"
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_PROFILE_MIXED_WITH_CANONICAL",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "PROFILE",
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            },
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_PROFILE_MIXED_WITH_RAW",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "PROFILE",
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            },
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "ordered_input_refs_PROFILE_DUPLICATE_ENTRY",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [
+          {
+            "input_kind": "PROFILE",
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          {
+            "input_kind": "PROFILE",
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_CANONICAL_EXACT_BRANCH",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "CANONICAL",
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_CANONICAL_MISSING_REF",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "CANONICAL"
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_CANONICAL_MIXED_WITH_RAW",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "CANONICAL",
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            },
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_CANONICAL_MIXED_WITH_PROFILE",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "CANONICAL",
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            },
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_CANONICAL_DUPLICATE_ENTRY",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "CANONICAL",
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          },
+          {
+            "input_kind": "CANONICAL",
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_RAW_EXACT_BRANCH",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "RAW",
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_RAW_MISSING_REF",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "RAW"
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_RAW_MIXED_WITH_CANONICAL",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "RAW",
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            },
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_RAW_MIXED_WITH_PROFILE",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "RAW",
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            },
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_RAW_DUPLICATE_ENTRY",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "RAW",
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          },
+          {
+            "input_kind": "RAW",
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_PROFILE_EXACT_BRANCH",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "PROFILE",
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "ACCEPT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_PROFILE_MISSING_REF",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "PROFILE"
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_PROFILE_MIXED_WITH_CANONICAL",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "PROFILE",
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            },
+            "object_ref": {
+              "kind": "approval_decision",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "schema_revision_ref": {
+                "kind": "schema",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_PROFILE_MIXED_WITH_RAW",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "PROFILE",
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            },
+            "raw_ref": {
+              "raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+              "byte_length": 0,
+              "media_type": "TEST_0",
+              "artifact_contract_ref": {
+                "profile_id": "src/main.py",
+                "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            }
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "embedded_resource_refs_PROFILE_DUPLICATE_ENTRY",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [
+          {
+            "input_kind": "PROFILE",
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          },
+          {
+            "input_kind": "PROFILE",
+            "profile_ref": {
+              "profile_id": "src/main.py",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "schema_key": "build_manifest/2",
+      "case": "FINAL_OUTPUT_HASH_IN_FROZEN_BUILD_INPUT",
+      "input": {
+        "application_source_generation_ref": {
+          "kind": "source_generation",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "builder_recipe_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "builder_tool_raw_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+        "builder_tool_version": "TEST_0",
+        "deterministic_settings_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "embedded_resource_refs": [],
+        "ordered_input_refs": [],
+        "schema_set_ref": {
+          "kind": "schema_registry",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        },
+        "stage_lane_policy_refs": [],
+        "toolchain_runtime_profile_ref": {
+          "profile_id": "src/main.py",
+          "revision_digest": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "final_output_raw_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expected": "REJECT",
+      "grammar_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    }
+  ],
+  "retained_vectors_replayed": 72,
+  "status": "PASS",
+  "qualification": false,
+  "claim": "Draft root/branch syntax only; producer, source, HistoryCut applicability and no-mutation checks NOT_RUN"
+}

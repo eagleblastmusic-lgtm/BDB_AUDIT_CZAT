@@ -1,0 +1,18 @@
+{
+  "status": "SOURCE_BOUND_SUCCESSOR_DELTA_CONTROLS_PASS",
+  "controls": [
+    "independent-kind-tie-break-input-order-invariant",
+    "independent-kind-tie-break-input-order-invariant",
+    "logical-id-then-digest",
+    "typed-dependency-outranks-tie-break",
+    "command-first-independent-sequence-rejected",
+    "cycle-remains-rejected"
+  ],
+  "source_raw_digest": "4c6baa8461380e9d295a603266bfbda8cb3333545e0bd0e87011d34b8e4735ad",
+  "patch_raw_digest": "9c8ee42ba76aaa55523ec5e8645882f49c01d6f220c171462622cdd44866caa9",
+  "implementation_edited": true,
+  "current_runtime": "TARGETED_CORRECTION_PASS",
+  "qualification": false,
+  "full_accepted_instance_DAG": "NOT_PROVEN",
+  "remaining": "Apply in successor implementation phase, run affected history/bootstrap/Golden/build checks and fresh qualification; no historical proof reuse"
+}

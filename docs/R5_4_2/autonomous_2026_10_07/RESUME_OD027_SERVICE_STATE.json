@@ -1,0 +1,13 @@
+{
+  "goal": {
+    "threadId": "01a1173a-4cf2-7fe1-ad93-38bcab26217f",
+    "objective": "Autonomicznie zamknąć NF02 od docs/R5_4_2/autonomous_2026_10_07/CONTINUATION_REPORT.md i RESUMED_WORK_CHECKPOINT.json, zachowując delegację właściciela, OD-001–OD-025 i historyczne bytes; kontynuować niezakończone semantic parity, materializację i wymagane Q1/Q2/N5–N11, bez commitu i push.",
+    "status": "usageLimited",
+    "tokensUsed": 275315,
+    "timeUsedSeconds": 2676,
+    "createdAt": 1791391251,
+    "updatedAt": 1791393928
+  },
+  "remainingTokens": null,
+  "completionBudgetReport": null
+}

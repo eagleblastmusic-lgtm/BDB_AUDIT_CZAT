@@ -1,0 +1,108 @@
+{
+  "status": "TEN_SOURCE_NORMATIVE_BUILD_DRAFT_READ_BACK_NOT_FROZEN_NOT_QUALIFIED",
+  "directory": "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/cf7a9990ddd212adc615940c78d4a805c44b545ddddf6033dfb363c6051efb2b",
+  "normative_build_set_digest": "cf7a9990ddd212adc615940c78d4a805c44b545ddddf6033dfb363c6051efb2b",
+  "entries": [
+    {
+      "file": "ADR-006_CANONICAL_SERIALIZATION_AND_IDENTITY_PROFILE.md",
+      "bytes": 12475,
+      "sha256": "38cb55d9ce15d1ec3b51b46b6d50312f140fe9a549561990558ace24a8e69d6b"
+    },
+    {
+      "file": "BDB_AUDIT_V1_TO_V2_MIGRATION_AND_COMPATIBILITY.md",
+      "bytes": 49745,
+      "sha256": "9dc5c209e375b472b8482525721f5cbfa6413cd00e31a2ea85450667995522bb"
+    },
+    {
+      "file": "BDB_AUDIT_V2_ARCHITECTURE_SPEC_R5_4_2.md",
+      "bytes": 123319,
+      "sha256": "e398214d1cede757a68f110ea75f1ab8a654ccf69e7a6410747cc08cbde951e6"
+    },
+    {
+      "file": "BDB_AUDIT_V2_ARTIFACT_CONTRACT_REGISTRY_R5_4_2.json",
+      "bytes": 560149,
+      "sha256": "fc4793f76034defdfbaaabe96640548ba8f5601b6726036616a3a8c41873a451"
+    },
+    {
+      "file": "BDB_AUDIT_V2_DATA_AND_ARTIFACT_CONTRACTS_R5_4_2.md",
+      "bytes": 20647166,
+      "sha256": "e662fb70d9caaf58d483d5ff12b1dd4770834c417871eaa3467397b33c4f11cb"
+    },
+    {
+      "file": "BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+      "bytes": 59852781,
+      "sha256": "b7285281dcb90735ad52e424f2ff6ed45b888acd18053be868ec1405b23b568d"
+    },
+    {
+      "file": "BDB_AUDIT_V2_IMPLEMENTATION_ROADMAP_R5_4_2.md",
+      "bytes": 92515,
+      "sha256": "74132e521372ad943d3dcf4dc044b9f3404a180096a97738d55ec334d71d27b6"
+    },
+    {
+      "file": "BDB_AUDIT_V2_TEST_AND_SELF_AUDIT_PLAN_R5_4_2.md",
+      "bytes": 132942,
+      "sha256": "588d6e60157e830c478f8f97c1911cd224e28f0c32300cc05a34a15b938bf136"
+    },
+    {
+      "file": "BDB_Audit_vNext_Szczegolowy_Plan_Rozwoju.md",
+      "bytes": 84999,
+      "sha256": "5338fb1589eaa8d2e3191e5b53b05c2199fa31ac7e18ccec7a560dbc198fc269"
+    },
+    {
+      "file": "README_BDB_AUDIT_V2_DOCUMENTATION_R5_4_2.md",
+      "bytes": 5765,
+      "sha256": "80fb2de3a53fb9026d50486caf5294d4c5b137a6cb15a82dce7e863f2cd63f65"
+    }
+  ],
+  "inherited_exact_files": [
+    "ADR-006_CANONICAL_SERIALIZATION_AND_IDENTITY_PROFILE.md",
+    "BDB_AUDIT_V1_TO_V2_MIGRATION_AND_COMPATIBILITY.md",
+    "BDB_Audit_vNext_Szczegolowy_Plan_Rozwoju.md"
+  ],
+  "sources": {
+    "docs/R5_4_2/autonomous_2026_10_07/tools/normative_build_candidate.py": "efe6f7084fc4d1ad990d594662ac95db555059baa2c66bf047e25d9a106c393b",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/execution.py": "333402e50b22c4d3cdce19d31f6246bde11bb86c07435ac2d106c38e74738dfe",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/build_time_candidates.py": "632c21cb7879448bfe3c98ede1c0356f9dc5fccb2f8421d442c0942e534d4654",
+    "docs/R5_4_2/autonomous_2026_10_07/BUILD_TIME_CANDIDATE_READBACK.json": "3a3d9099ef515c17ce71461d0dc649989b1f5171d650919111960888f3accebc",
+    "docs/R5_4_2/autonomous_2026_10_07/REGISTRY_BUILD_CANDIDATE_READBACK.json": "9e0234a92e9dde1acbe41ba4a0e2c794924e98c35e6d6d6e8389205860b88f90",
+    "docs/R5_4_2/autonomous_2026_10_07/GOLDEN_BUILD_CANDIDATE_READBACK.json": "4146738de825d75cebe7bd3c91ab9e8c854702a9459a6e20008c73f39299e98d",
+    "docs/R5_4_2/autonomous_2026_10_07/design/VERSION_IMPACT_PLAN.json": "2687b9377ef6772bec410b15a22239ea24000e72e2b8b3726f80372412e9250d",
+    "docs/R5_4_2/autonomous_2026_10_07/OWN_REFERENCE_RESOLUTIONS.json": "6992a12ceeae4c66fdcca6aa6978528e93b5030819f60cf66e8caec10942343d",
+    "docs/R5_4_2/autonomous_2026_10_07/design/EXTERNAL_PROFILE_CONTRACTS.json": "1970001655794ec564aebec738de5e95948c0212a4ed85c4728bc3de3423a6bf",
+    "docs/R5_4_2/OWNER_R5_4_2_SEMANTIC_CLOSURE_APPROVAL.json": "78cb86ad8f311e1f4db73d10b6d18e3f9567ac03d8b446a0849a15f047ea9aae",
+    "docs/R5_4_2/OWNER_DELEGATED_DECISION_REGISTER.md": "1525987e850c83342c76621496d322288a8fd623dd850d521c6df815a9c0f34f",
+    "docs/R5_4_2/autonomous_2026_10_07/design/COMMON_BODY_GRAMMARS.md": "6a591fd4983189a287e66222a362d891df8d5c722dff557e1de9a170c3425045",
+    "docs/R5_4_2/autonomous_2026_10_07/design/PURPOSE_PREDICATE_CONTRACTS.md": "4eb6b212f663f6f07cb11640c15f2acfb4dd38370379711d5c7cbbb2e2d3a0ad",
+    "docs/R5_4_2/autonomous_2026_10_07/design/COMMAND_EVENT_CONTRACT.md": "0bde4bd298312f4c830e0d445d14920a3ffa933e0a529a96a03296f17a99f1cd",
+    "docs/R5_4_1/R5_4_1_CANDIDATE_MANIFEST.json": "15415abd7d2601698c6ff664a93077213e81575272a213c4511f6082c9d8fdef",
+    "docs/R5_4_1/candidate/ADR-006_CANONICAL_SERIALIZATION_AND_IDENTITY_PROFILE.md": "38cb55d9ce15d1ec3b51b46b6d50312f140fe9a549561990558ace24a8e69d6b",
+    "docs/R5_4_1/candidate/BDB_AUDIT_V1_TO_V2_MIGRATION_AND_COMPATIBILITY.md": "9dc5c209e375b472b8482525721f5cbfa6413cd00e31a2ea85450667995522bb",
+    "docs/R5_4_1/candidate/BDB_AUDIT_V2_ARCHITECTURE_SPEC_R5_4.md": "7683f14a891301d97df4f23bdfbcfe215c16fa0203fe8a4ec5c539570fa45f3a",
+    "docs/R5_4_1/candidate/BDB_AUDIT_V2_ARTIFACT_CONTRACT_REGISTRY_R5_4.json": "1b9d17c46843a91053036f0370d4419dac87ce5978df61b0dc922e0e40237e2c",
+    "docs/R5_4_1/candidate/BDB_AUDIT_V2_DATA_AND_ARTIFACT_CONTRACTS_R5_4.md": "7d967707d8f7a0d77ab84484aeb4de0119dab85ed055c31473792c8528919f75",
+    "docs/R5_4_1/candidate/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4.json": "4cebb462b647c69e6348546180900ac2a3c4806a5bf1716e5269b70ed94edb17",
+    "docs/R5_4_1/candidate/BDB_AUDIT_V2_IMPLEMENTATION_ROADMAP_R5_4.md": "ed519c5c968c12cf8e5d98c0bcc2b511375b8a0d2c7486e0881a9912f5dd830a",
+    "docs/R5_4_1/candidate/BDB_AUDIT_V2_TEST_AND_SELF_AUDIT_PLAN_R5_4.md": "769921020e4969ccd555b2e44dfa26b7ba5b3bba95369ef1a539b49fbf87067e",
+    "docs/R5_4_1/candidate/BDB_Audit_vNext_Szczegolowy_Plan_Rozwoju.md": "5338fb1589eaa8d2e3191e5b53b05c2199fa31ac7e18ccec7a560dbc198fc269",
+    "docs/R5_4_1/candidate/README_BDB_AUDIT_V2_DOCUMENTATION_R5_4.md": "d10c8dc48cba00fd4f8b23de8153f9cabf45f6263623f6d3e53581503dd00780",
+    "docs/R5_4_2/R5_4_2_OWNER_DECISION_PACKAGE.md": "018d577290b09f1ad9a009edffe31d4f23af87ff9381d597a2a0060919aa8119",
+    "docs/R5_4_2/R5_4_2_RESIDUAL_RISK_CONTRACT_DECISION_PROPOSAL.md": "696dfeaf883462aed4c95b81820d95ad87cc7177ed6edf1bb99fd1f30888b66b",
+    "docs/R5_4_2/R5_4_2_ASSURANCE_CLAIM_SET_CONTRACT_PROPOSAL.md": "6ee0e4237ed0d0fe2a6515c397e09430fa7c2b0e8c58a834814db3f32e497c56",
+    "docs/R5_4_2/R5_4_2_PUBLIC_CONCLUSION_CONTRACT_PROPOSAL.md": "77665fee86e10cc59c2543b6d18d4677090b8cb118be8b215dc6bc40f4890db7",
+    "docs/R5_4_2/R5_4_2_SEMANTIC_CLOSURE_GRAPH.json": "57e16f3dc8ffdc448c62cd5ed74663c875517eb6d141f13516358069d15ea75a",
+    "docs/R5_4_2/R5_4_2_FULL_SEMANTIC_CLOSURE_REPORT.md": "2abd0f09aad0d97e843649bc1ecc6e5378fd67aca83fc9037739dbfeb4e70ea3",
+    "docs/R5_4_2/R5_4_2_RUNTIME_SCHEMA_REACHABILITY.json": "d1dfaf07a6f77d8e75ef449d5568d3a2c4814b0691e5630c25e7c47c978139de",
+    "docs/R5_4_2/RESIDUAL_RISK_NORMATIVE_USAGE_INVENTORY.json": "685c5ffd1ba4f02ed7b1bc25e6e5e9501fb06d6629b55c977c0896b8f5462a55",
+    "docs/R5_4_2/autonomous_2026_10_07/registry_build_candidate/fc4793f76034defdfbaaabe96640548ba8f5601b6726036616a3a8c41873a451/BDB_AUDIT_V2_ARTIFACT_CONTRACT_REGISTRY_R5_4_2.json": "fc4793f76034defdfbaaabe96640548ba8f5601b6726036616a3a8c41873a451",
+    "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/b7285281dcb90735ad52e424f2ff6ed45b888acd18053be868ec1405b23b568d/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json": "b7285281dcb90735ad52e424f2ff6ed45b888acd18053be868ec1405b23b568d"
+  },
+  "input_drift": [],
+  "mismatch_count": 0,
+  "semantic_parity_pending_nodes": 131,
+  "full_successor_candidate_materialized": false,
+  "qualification": false,
+  "frozen": false,
+  "Q1": "NOT_STARTED",
+  "Q2": "NOT_STARTED",
+  "NF02": "OPEN"
+}

@@ -1,0 +1,6 @@
+{
+  "session": 34411,
+  "result": "INTERRUPTED_NOT_EVIDENCE",
+  "reason": "Real durable probes exposed missing SourceGeneration/SourceIdentity manifest/profile/authority equality; implement normative guards before terminal run",
+  "qualification": false
+}

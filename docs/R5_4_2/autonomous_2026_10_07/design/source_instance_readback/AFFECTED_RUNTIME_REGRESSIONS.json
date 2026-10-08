@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "-p",
+    "no:cacheprovider",
+    "tests/stage2/test_source_archive_reconciliation.py",
+    "-q",
+    "--tb=short"
+  ],
+  "exit_code": 0,
+  "duration_seconds": 1.2404156000120565,
+  "source_HEAD": "b7051472909075bb4c83a9a510e298fcca2a6bd5",
+  "repository_HEAD_unchanged": true,
+  "test_inputs": {
+    "tests/stage2/test_source_archive_reconciliation.py": "38c224867f35d34de8393127b3fdb6cd95a9ef00d65167b3222c21a4c9657ae1"
+  },
+  "tool_raw_digest": "09594e9e73621769295108709af9a52fee67526d6b0adbb95b797a65a41870cd",
+  "implementation_inputs": {
+    "src/bdb_audit/source/git_resolver.py": "5bca8d24778871d7999e0c0af62918b556422d3bcbe0c157d1a5c8eea2cafd59",
+    "src/bdb_audit/source/materializer.py": "635904a91eaaf37456872c13b077d013d221881ec82a0fc0baa8f9a9cd1e29bf",
+    "src/bdb_audit/core/hashing.py": "286dee6109409661624572e4c3e87935d33f22c9a0e3a7bfad8dabbf471248f1",
+    "src/bdb_audit/core/errors.py": "fd22fd0097c928833d63439c665e3dca4a9faa9fad7914ad3354c4715f8d4140"
+  },
+  "environment": "Existing repo-local tmp fixtures; real Git operations in isolated fixture repos",
+  "qualification": false,
+  "trusted_profile_selection": "NOT_PROVEN",
+  "NF02": "OPEN"
+}

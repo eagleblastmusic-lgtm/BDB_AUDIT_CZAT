@@ -1,0 +1,82 @@
+{
+  "controls": [
+    {
+      "case": "UNCHANGED",
+      "outcome": "ACCEPTED",
+      "reason": "unchanged diagnostic inputs",
+      "tool_drift": false,
+      "input_drift": [],
+      "inventory_drift": [],
+      "result": "PASS"
+    },
+    {
+      "case": "SOURCE_BYTES",
+      "outcome": "REJECTED",
+      "reason": "Inputs changed during runtime verification; retained result is not terminal evidence",
+      "tool_drift": false,
+      "input_drift": [
+        "src/bdb_audit/source/git_resolver.py"
+      ],
+      "inventory_drift": [],
+      "result": "PASS"
+    },
+    {
+      "case": "TEST_HELPER",
+      "outcome": "REJECTED",
+      "reason": "Inputs changed during runtime verification; retained result is not terminal evidence",
+      "tool_drift": false,
+      "input_drift": [
+        "tests/helper.py"
+      ],
+      "inventory_drift": [],
+      "result": "PASS"
+    },
+    {
+      "case": "CONFIG",
+      "outcome": "REJECTED",
+      "reason": "Inputs changed during runtime verification; retained result is not terminal evidence",
+      "tool_drift": false,
+      "input_drift": [
+        "pyproject.toml"
+      ],
+      "inventory_drift": [],
+      "result": "PASS"
+    },
+    {
+      "case": "HARNESS",
+      "outcome": "REJECTED",
+      "reason": "Runtime verifier changed during execution",
+      "tool_drift": true,
+      "input_drift": [],
+      "inventory_drift": [],
+      "result": "PASS"
+    },
+    {
+      "case": "ADDED",
+      "outcome": "REJECTED",
+      "reason": "Implementation/test file set changed during execution",
+      "tool_drift": false,
+      "input_drift": [],
+      "inventory_drift": [
+        "src/new_input.py"
+      ],
+      "result": "PASS"
+    },
+    {
+      "case": "DELETED",
+      "outcome": "REJECTED",
+      "reason": "Implementation/test file set changed during execution",
+      "tool_drift": false,
+      "input_drift": [
+        "tests/helper.py"
+      ],
+      "inventory_drift": [
+        "tests/helper.py"
+      ],
+      "result": "PASS"
+    }
+  ],
+  "harness_raw_digest": "769d3751c356a4f39312f474795eb1be7c0812550fefeaa5a0b67dc65433308d",
+  "qualification": false,
+  "scope": "Verifier mutation detection only; pytest execution is deliberately stubbed in isolated copies"
+}

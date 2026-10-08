@@ -1,0 +1,26 @@
+{
+  "snapshot_manifest_raw_digest": "982eb47a4feaeb3b1e1035fc9c55d1dd8cb2d94b8272430c35a4d5df46e27c94",
+  "directory": "docs/R5_4_2/autonomous_2026_10_07/design/application_source_snapshots/982eb47a4feaeb3b1e1035fc9c55d1dd8cb2d94b8272430c35a4d5df46e27c94",
+  "source_files": 257,
+  "retained_files": 512,
+  "builder_raw_digest": "9669cd90a6c7589958dce860a04874feb780d4db965d231f65bc203defc82827",
+  "source_inventory_and_bytes_drift": [],
+  "readback": "PASS",
+  "source_authorization": "NOT_ESTABLISHED",
+  "qualification": false,
+  "successor_application_identity": false,
+  "source_inputs": [
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/tools/application_source_snapshot.py",
+      "raw_digest": "01a272fb720448c84bc364823a016384f0a3da0e8c94df3ad733a9d05de9650e"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/tools/execution.py",
+      "raw_digest": "333402e50b22c4d3cdce19d31f6246bde11bb86c07435ac2d106c38e74738dfe"
+    },
+    {
+      "file": "build/build_single_file.py",
+      "raw_digest": "9669cd90a6c7589958dce860a04874feb780d4db965d231f65bc203defc82827"
+    }
+  ]
+}

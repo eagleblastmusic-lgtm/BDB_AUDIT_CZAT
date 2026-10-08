@@ -18,7 +18,7 @@ from urllib.parse import parse_qsl, urlsplit
 
 from ..core.errors import ValidationError
 
-_HEX_OBJECT = re.compile(r"^[0-9a-fA-F]{40,64}$")
+_HEX_OBJECT = re.compile(r"^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$")
 _SENSITIVE_QUERY_KEYS = {
     "access_token", "token", "auth", "authorization", "password", "passwd",
     "secret", "key", "api_key", "apikey", "credential", "credentials",
@@ -80,16 +80,19 @@ def _run_git(repo: Path | None, args: list[str], *, timeout: int = 30) -> str:
 
 
 def _verify_commit(repo: Path, requested: str) -> tuple[str, str]:
+    object_format = _run_git(repo, ["rev-parse", "--show-object-format"])
+    lengths = {"sha1": 40, "sha256": 64}
+    if object_format not in lengths:
+        raise ValidationError("INVALID_GIT_OBJECT_ID", "Unsupported repository object format")
     commit = _run_git(repo, ["rev-parse", "--verify", f"{requested}^{{commit}}"]).lower()
-    if not _HEX_OBJECT.fullmatch(commit):
+    if not _HEX_OBJECT.fullmatch(commit) or len(commit) != lengths[object_format]:
         raise ValidationError("INVALID_GIT_OBJECT_ID", "Resolved commit has unsupported object-id syntax")
     obj_type = _run_git(repo, ["cat-file", "-t", commit])
     if obj_type != "commit":
         raise ValidationError("GIT_OBJECT_NOT_COMMIT", obj_type)
     tree = _run_git(repo, ["rev-parse", "--verify", f"{commit}^{{tree}}"]).lower()
-    if not _HEX_OBJECT.fullmatch(tree):
+    if not _HEX_OBJECT.fullmatch(tree) or len(tree) != lengths[object_format]:
         raise ValidationError("INVALID_GIT_TREE_OBJECT_ID")
-    object_format = "sha1" if len(commit) == 40 else "sha256"
     return commit, tree
 
 
