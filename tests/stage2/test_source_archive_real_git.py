@@ -26,6 +26,10 @@ def source_repo(tmp_path, request):
     repo = tmp_path / "source"
     repo.mkdir()
     git(repo, "init", "--object-format=" + request.param)
+    # Archive honors checkout conversion, including inherited Windows defaults.
+    # This fixture tests exact blob bytes, so pin its own conversion policy.
+    git(repo, "config", "core.autocrlf", "false")
+    git(repo, "config", "core.eol", "lf")
     git(repo, "config", "user.name", "Source contract fixture")
     git(repo, "config", "user.email", "source@example.invalid")
     return repo, request.param
