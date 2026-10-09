@@ -1,0 +1,23 @@
+{
+  "file": "docs/R5_4_2/autonomous_2026_10_07/build_schema_fixtures/a9104e8446803bdb90d06d0ae14416890bf8113fc037379111f5ff7d514c0773/BUILD_SCHEMA_KNOWN_ANSWERS.json",
+  "raw_digest": "a9104e8446803bdb90d06d0ae14416890bf8113fc037379111f5ff7d514c0773",
+  "byte_length": 65233191,
+  "schema_build_digest": "333b137bd402941e9c6b05dfd105a74e129fff8db7ec7ce4e1d9a3122078490a",
+  "schemas_checked": 277,
+  "vectors_replayed": 2537,
+  "source_branches": 136,
+  "sources": {
+    "docs/R5_4_2/autonomous_2026_10_07/BUILD_TIME_CANDIDATE_READBACK.json": "1aff26d762eb2f963299ce6171a66e984bbeaf7bc04e13b24d49199cec766c62",
+    "docs/R5_4_2/autonomous_2026_10_07/design/CONDITIONAL_GRAMMAR_KNOWN_ANSWERS.json": "aa4ed440ad358e6adb616dc99cf6c0754574b9a6734dce9b31c28172b504eff8",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/build_schema_fixtures.py": "fa05e1913442327d1d7903b0a649d89961333a69758284b2de2d39e02406cf7c",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/build_time_candidates.py": "89a9f7e0bd1c57486fe498b79bbb7e6f334d6a6fc77dd308344004b8370e3250",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/profile_design_audit.py": "297a97aa86f42c7cb851ea4db239a164ca3e895a85803ecd2ca668e865c213ac",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/execution.py": "333402e50b22c4d3cdce19d31f6246bde11bb86c07435ac2d106c38e74738dfe"
+  },
+  "status": "EXACT_OFFLINE_SCHEMA_FIXTURES_PASS_NOT_QUALIFIED",
+  "input_drift": [],
+  "qualification": false,
+  "frozen": false,
+  "canonical_runtime": "NOT_RUN",
+  "NF02": "OPEN"
+}

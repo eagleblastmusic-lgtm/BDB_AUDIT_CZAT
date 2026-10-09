@@ -1,0 +1,23 @@
+{
+  "previous_delta_file": "docs\\R5_4_2\\autonomous_2026_10_07\\checkpoint_history\\AUTHORIZED_DELTA_OD033_pre_resume_20261008.json",
+  "previous_delta_raw_digest": "e5838a57fbba4f6e5587a709ca593eddc01de8dbfaad20115ae16f7763302106",
+  "reason": "Checkpoint OD031 lags existing OD032/033 production/test changes; verifier rejects omitted source_target delta. Existing changes preserved; reviewed finite delta recorded; fresh verification required.",
+  "new_file_readback": [
+    {
+      "file": "src/bdb_audit/source/archive.py",
+      "previous_recorded_raw_digest": "6765f95ed7a6627867857ac8c8b2b284feda59ea432222a1e825f2cceac16a5c",
+      "reviewed_current_raw_digest": "6765f95ed7a6627867857ac8c8b2b284feda59ea432222a1e825f2cceac16a5c"
+    },
+    {
+      "file": "tests/stage2/test_source_archive_reconciliation.py",
+      "previous_recorded_raw_digest": "a622dc088588d0f53c7827390a90e7a451837934cae3c257104092b0bdbf6430",
+      "reviewed_current_raw_digest": "a622dc088588d0f53c7827390a90e7a451837934cae3c257104092b0bdbf6430"
+    },
+    {
+      "file": "tests/stage2/test_source_object_format_regression.py",
+      "previous_recorded_raw_digest": "2b97937755bb8d666326011fe6dafcff235a8afbfd70b9f0ba74884f22d041f9",
+      "reviewed_current_raw_digest": "ff78b7cf6564a399ac152ece5c6675663ddf2481867a98e19116d60ee635b7da"
+    }
+  ],
+  "qualification": false
+}

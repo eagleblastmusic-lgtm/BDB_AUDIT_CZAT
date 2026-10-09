@@ -1,0 +1,51 @@
+{
+  "reason": "GitHub single-file size boundary; exact original bytes remain locally unchanged and are losslessly represented in these published gzip archives",
+  "qualification": false,
+  "entries": [
+    {
+      "original_path": "docs/R5_4_2/autonomous_2026_10_07/checkpoint_history/optimized_execution/nf02-context-6756afd0f4d25fbfafe217090b0c607eb1de0c861ced993ce5972c7f134b5cd7.json",
+      "original_bytes": 648361725,
+      "original_sha256": "6756afd0f4d25fbfafe217090b0c607eb1de0c861ced993ce5972c7f134b5cd7",
+      "archive_path": "docs/R5_4_2/review_evidence_archives/nf02-context-6756afd0f4d25fbfafe217090b0c607eb1de0c861ced993ce5972c7f134b5cd7.json.gz",
+      "archive_bytes": 47844090,
+      "archive_sha256": "ebac26a1cac2b9d975c649b09cdc9984d8a83b96e4e6657d379f8e505c165a39",
+      "roundtrip": "PASS"
+    },
+    {
+      "original_path": "docs/R5_4_2/autonomous_2026_10_07/checkpoint_history/optimized_execution/nf02-context-dag-b05b91375ff554216091a230bf023a83ef4961864940c0a534d3350585b8bc5a.json",
+      "original_bytes": 265943658,
+      "original_sha256": "b05b91375ff554216091a230bf023a83ef4961864940c0a534d3350585b8bc5a",
+      "archive_path": "docs/R5_4_2/review_evidence_archives/nf02-context-dag-b05b91375ff554216091a230bf023a83ef4961864940c0a534d3350585b8bc5a.json.gz",
+      "archive_bytes": 19745386,
+      "archive_sha256": "3de5fab030af63821cfee78e893735abec43ab7ba70d593d4be08771968738d6",
+      "roundtrip": "PASS"
+    },
+    {
+      "original_path": "docs/R5_4_2/autonomous_2026_10_07/checkpoint_history/optimized_execution/nf02-context-state-493661d2d20a6cbd8959220dc3096e18f6894b6d1332323cdff0bbd414513477.json",
+      "original_bytes": 205837075,
+      "original_sha256": "493661d2d20a6cbd8959220dc3096e18f6894b6d1332323cdff0bbd414513477",
+      "archive_path": "docs/R5_4_2/review_evidence_archives/nf02-context-state-493661d2d20a6cbd8959220dc3096e18f6894b6d1332323cdff0bbd414513477.json.gz",
+      "archive_bytes": 15307540,
+      "archive_sha256": "ef3628a3205d873d2601f6071fb52beafb6ab842169ee1171bd429787893516f",
+      "roundtrip": "PASS"
+    },
+    {
+      "original_path": "docs/R5_4_2/autonomous_2026_10_07/checkpoint_history/semantic_reviews/0c85cfbd784aff35247191d1f185e015c69b4a68b41e874609aa1976cd19826a.json",
+      "original_bytes": 136154542,
+      "original_sha256": "0c85cfbd784aff35247191d1f185e015c69b4a68b41e874609aa1976cd19826a",
+      "archive_path": "docs/R5_4_2/review_evidence_archives/0c85cfbd784aff35247191d1f185e015c69b4a68b41e874609aa1976cd19826a.json.gz",
+      "archive_bytes": 11103426,
+      "archive_sha256": "d10fc53c1cda1886e93f45140b0eb3fae558e85876f079f8f3885026e34ff41a",
+      "roundtrip": "PASS"
+    },
+    {
+      "original_path": "docs/R5_4_2/autonomous_2026_10_07/checkpoint_history/semantic_reviews/1cbc0a91ff5797a84bf99fa36c19a4c38b5deb1cd89daf4aa45184837db8571e.json",
+      "original_bytes": 135884942,
+      "original_sha256": "1cbc0a91ff5797a84bf99fa36c19a4c38b5deb1cd89daf4aa45184837db8571e",
+      "archive_path": "docs/R5_4_2/review_evidence_archives/1cbc0a91ff5797a84bf99fa36c19a4c38b5deb1cd89daf4aa45184837db8571e.json.gz",
+      "archive_bytes": 11091559,
+      "archive_sha256": "f7344d34a33c5e1a28a8f1a4c8d90bfd2abc7aefa61dae23993789b915bde71a",
+      "roundtrip": "PASS"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "session": 41440,
+  "result": "INTERRUPTED_NOT_EVIDENCE",
+  "reason": "Additional affected structured schema comparison fixes found before terminal verification; batch repairs before rerunning required checks",
+  "qualification": false
+}

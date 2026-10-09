@@ -1,0 +1,600 @@
+{
+  "issues": [
+    {
+      "id": "V2_D_CONTEXT_STAGE",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/STAGE",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_LANE",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/LANE",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_EXECUTOR",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/EXECUTOR",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_DELIVERY",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/DELIVERY",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_COLLECTOR",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/COLLECTOR",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_METHOD",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/METHOD",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_CONFIRMATION",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/CONFIRMATION",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_MATCHING",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/MATCHING",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_NOVELTY",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/NOVELTY",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_RELATIONSHIP",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/RELATIONSHIP",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_ASSESSOR",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/ASSESSOR",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_MODEL",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/MODEL",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_FAULT",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/FAULT",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_RELEASE",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/RELEASE",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_EFFORT",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/EFFORT",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "V2_D_CONTEXT_RECOVERY",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "PurposeEntry wire template is proposed; its exact purpose-specific predicate_contract_ref closed contract is not specified by that template or by a profile name",
+      "target": "FULL_PATH_CONTEXT_PARAMETERS_V1/RECOVERY",
+      "resolution": "Closed purpose-specific draft grammar, finite domains and decision text; candidate materialization/runtime qualification remain separate",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "ACTUAL_BODY_MATERIAL_REFS_65",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "Independent actual-body traversal discovered 65 omitted material-reference paths",
+      "resolution": "Explicit field-specific decisions OD-018; 844 actual paths now all declared",
+      "evidence": [
+        "design/EXHAUSTIVE_REFERENCE_AUDIT.json"
+      ]
+    },
+    {
+      "id": "TRANSITIVE_ENVIRONMENT_CAPTURE_CYCLE",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "Environment/Sandbox/ToolBoundary/ExecutorTool/ToolCapture dependency cycle",
+      "resolution": "OD-019 TOOL_CAPTURE_V3 selects exact prior descriptor environment; zero declared profile dependency cycles",
+      "evidence": [
+        "design/PROFILE_DESIGN_AUDIT.json"
+      ]
+    },
+    {
+      "id": "EXTERNAL_PROFILE_FIELD_TARGET_AND_SEMANTIC_PARITY",
+      "status": "OPEN",
+      "class": "D",
+      "problem": "122 draft profile grammars/dependency nodes exist; all own nested field targets and semantic parity still require independent complete review",
+      "progress": "127 draft profiles; 155 installed-profile and 98 raw-payload paths declared. Semantic/producer/context review remains OPEN."
+    },
+    {
+      "id": "CANONICAL_CROSS_OBJECT_PREDICATE_COMPLETION",
+      "status": "OPEN",
+      "class": "D",
+      "problem": "Actual body grammar/ref discovery does not prove all producer/cut/source/FSM/uniqueness/finalization predicates",
+      "progress": "131 per-kind review entries retain 2696 source paragraphs. Empty type/profile queues are not accepted-instance chronology or semantic predicate parity.",
+      "latest_concrete_finding": "All 16 purpose metadata input_domain values are absent/None; exact direct input and conditional witness domain closure remains required before freeze.",
+      "latest_finding_evidence": "design/PURPOSE_INPUT_DOMAIN_FINDING.md"
+    },
+    {
+      "id": "CARDINALITY_CONDITIONAL_SCHEMA_PARITY",
+      "status": "OPEN",
+      "class": "D",
+      "problem": "Apply every explicit material-reference bound and conditional obligation to schema and semantic predicates; do not infer completion from meta-validation",
+      "progress": "861 material paths with 0 local multiplicity issues; 69 conditional/cross-object obligations remain explicit. 90 draft conditional grammar controls PASS; no runtime gate advanced.",
+      "current_counts": {
+        "paths": 861,
+        "local_issues": 0,
+        "conditional_obligations": 69
+      }
+    },
+    {
+      "id": "EXACT_BOUND_REPORT_FIXTURE",
+      "status": "OPEN",
+      "class": "B",
+      "problem": "Two raw projection grammar fixtures require exact offline bound canonical body fixtures; no placeholder fixture is accepted as proof",
+      "progress": "Report syntax fixture now resolves finite explicit DRAFT schemas offline, including missing-dependency and extra-field rejection. Exact qualified binding execution remains NOT_RUN; this issue stays OPEN until materialization/Q1."
+    },
+    {
+      "id": "FULL_CANDIDATE_MATERIALIZATION_AND_Q1",
+      "status": "OPEN",
+      "class": "A",
+      "problem": "Candidate/schema/profile bytes, exact bindings/hash propagation/readback/fresh Q1 not yet performed"
+    },
+    {
+      "id": "ROOT_CONDITIONAL_ASSERTIONS_DROPPED",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "Field-only schema reconstruction omitted original root conditionals/XOR and allowed partial HistoryCuts",
+      "resolution": "OD-021 root assertion preservation and exact cut branches; 21 draft grammar KATs PASS. Canonical execution remains pending.",
+      "evidence": [
+        "design/CONDITIONAL_GRAMMAR_KNOWN_ANSWERS.json"
+      ]
+    },
+    {
+      "id": "FULL_PATH_FSM_REPRESENTATION",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "Spec lacked one exact complete FSM table",
+      "resolution": "OD-022 required transition_contract_ref and FULL_PATH_TRANSITION_TABLE_V2; guard runtime/parity execution remains pending.",
+      "evidence": [
+        "design/FULL_PATH_TRANSITION_TABLE.json"
+      ]
+    },
+    {
+      "id": "INSTALLATION_FUTURE_METHOD_EFFORT_BACKLINKS",
+      "status": "RESOLVED",
+      "class": "D",
+      "problem": "Initial policy context selected purpose profiles containing future experiment/stage facts",
+      "resolution": "OD-023 METHOD_QUALIFICATION_V2 and OBSERVED_EFFORT_V2 select independent exact prior subject context without future fact pins.",
+      "evidence": [
+        "design/PURPOSE_CONTRACT_GRAMMARS.json",
+        "design/PURPOSE_PREDICATE_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "SEMANTIC_QUEUE_REGENERATION_RESETS_REVIEWS",
+      "class": "B",
+      "status": "RESOLVED",
+      "problem": "Queue regeneration discarded review annotations without binding their inputs",
+      "resolution": "Exact design/source/body/tool/owner-decision binding; retain unchanged reviews and invalidate changed or unbound reviews with historical paragraph evidence. Five targeted regressions and unchanged-regeneration byte parity PASS. No semantic closure is implied.",
+      "evidence": [
+        "tools/semantic_obligation_queue.py",
+        "tools/test_semantic_queue_retention.py",
+        "DRAFT_VERIFICATION.json"
+      ]
+    },
+    {
+      "id": "COMMAND_PAYLOAD_BOOTSTRAP_PRECEDENCE_CYCLE",
+      "status": "OPEN",
+      "class": "D",
+      "problem": "OD-016 proposed_object_refs and artifact event refs create content dependencies from new bootstrap facts to their consuming CommandEnvelope, while inherited Data 14.6 bootstrap order requires command_envelope before those facts; union graph has a two-node cycle. profile_contracts.py also states Bootstrap precedence unchanged.",
+      "evidence": [
+        "design/COMMAND_EVENT_CONTRACT.md",
+        "tools/event_grammars.py",
+        "tools/profile_contracts.py",
+        "docs/R5_4_1/candidate/BDB_AUDIT_V2_DATA_AND_ARTIFACT_CONTRACTS_R5_4.md section 14.6",
+        "design/BOOTSTRAP_PRECEDENCE_SUCCESSOR.json",
+        "tools/bootstrap_precedence_design.py"
+      ],
+      "next_operation": "Reproduce using exact pinned machine bootstrap precedence and actual instance edges; design versioned successor precedence preserving domain order while removing command-first order-only edges incompatible with payload content dependencies; record delegated decision and regenerate dependent evidence. Do not remove material edges or claim DAG PASS.",
+      "progress": "OD-024 V2 contract-order witness and 14 exact Registry/installation-selection delta controls PASS. All domain precedence retained; V1 fallback/source drift/wrong activation reject. Normative candidate materialization, actual complete instance DAG and durable guards remain OPEN."
+    },
+    {
+      "id": "SCOPE_STATE_EXCLUSION_CONDITIONAL_GRAMMAR",
+      "status": "RESOLVED_GRAMMAR_ONLY",
+      "class": "D",
+      "problem": "Data 28 requires scope_decision_ref for EXCLUDED_SCOPE; draft grammar previously did not enforce the state conditional",
+      "resolution": "Draft schema now requires decision for EXCLUDED_SCOPE and forbids it for all other states; 16 added grammar controls PASS. Exact SCOPE_EXCLUSION purpose, subject scope equality, prior acceptance, policy eligibility and reject atomicity remain within OPEN cross-object/guard obligations. No semantic closure claimed.",
+      "evidence": [
+        "tools/body_grammar_frontier.py",
+        "tools/conditional_grammar_audit.py",
+        "design/CONDITIONAL_GRAMMAR_KNOWN_ANSWERS.json"
+      ],
+      "progress": "OD-026 contextual review plus 40 read-only model controls PASS; explicit PRINCIPAL_AUTHORIZATION_V2 purpose class and prior source-member scope-record chronology defined. Trusted replay, complete per-kind semantic parity and durable rejection/crash/race atomicity NOT_PROVEN."
+    },
+    {
+      "id": "SCOPE_EXCLUSION_CONTEXT_AND_AUTHORITY",
+      "status": "OPEN_RUNTIME_AND_PARITY",
+      "class": "D",
+      "problem": "Exclusion requires exact prior approved purpose/scope, proper human authority class and independent current applicability, not only decision-ref syntax",
+      "decision": "OD-026",
+      "evidence": [
+        "design/SCOPE_EXCLUSION_SEMANTIC_REVIEW.md",
+        "design/SCOPE_EXCLUSION_DESIGN_CONTROLS.json"
+      ],
+      "remaining": "Complete all affected source paragraphs/profile dependencies; actual trusted replay and durable atomic operation controls before qualification"
+    },
+    {
+      "id": "EXTERNAL_PROFILE_WIRE_IDENTITY_LEAK",
+      "status": "RESOLVED_GENERATOR_AND_DRAFT_CONTROLS",
+      "class": "B",
+      "problem": "Generic add() captured the last purpose item and assigned RECOVERY wire_profile_id to 99 unrelated external profiles; syntax-only fixture checks did not detect metadata mismatch",
+      "resolution": "Remove generic captured-item mapping; explicit purpose/successor mappings only. All 124 metadata/grammar wire identities agree and are unique; exact eight delegated wire mappings checked. Recovery leak, implicit successor and duplicate identity regressions reject.",
+      "evidence": [
+        "tools/profile_contracts.py",
+        "tools/profile_design_audit.py",
+        "design/PROFILE_DESIGN_AUDIT.json"
+      ],
+      "qualification": "NOT_RUN; generated candidate pins still pending",
+      "current_verified_wire_mapping_count": 10
+    },
+    {
+      "id": "CANONICAL_KAHN_COMMAND_PRIORITY",
+      "status": "IMPLEMENTATION_CORRECTED_QUALIFICATION_OPEN",
+      "class": "B",
+      "problem": "Actual canonical_order adds command-first priority before normative typed tie-break and rejects normative independent-node sequence",
+      "evidence": [
+        "design/CLOSURE_TIEBREAK_RUNTIME_DIVERGENCE.json",
+        "design/CLOSURE_TIEBREAK_RUNTIME_CURRENT.json",
+        "AUTHORIZED_IMPLEMENTATION_DELTA.json",
+        "tests/f2/test_closure_tiebreak_regression.py"
+      ],
+      "remaining": "Affected runtime broad check in progress; fresh successor semantic closure/materialization/Q1/Q2/N5-N11 remains pending. No qualified evidence reuse.",
+      "resolution": "Normative ready-node tie-break applied in closure.py; removed contradictory global command-first assertion from CommitBody. Command binding and scoped bootstrap edges remain enforced."
+    },
+    {
+      "id": "BUILD_CONTEXT_PREGENESIS_ACCEPTANCE_CONTRADICTION",
+      "status": "DESIGN_CORRECTION_CONTROLS_PASS_RUNTIME_OPEN",
+      "class": "D",
+      "problem": "Application build source/config required prior campaign acceptance before first EMPTY_HISTORY initialization; receipt also allowed history-dependent compatibility/export witnesses",
+      "decision": "OD-027",
+      "evidence": [
+        "design/BUILD_INSTALLATION_CONTEXT_REVIEW.md",
+        "design/BUILD_INSTALLATION_CONTEXT_CONTROLS.json"
+      ],
+      "remaining": "Complete actual source/build/input/output/qualification/activation closure and transitive backlink rejection; prove qualified running output and durable initialization"
+    },
+    {
+      "id": "SOURCE_COMPLETENESS_OPEN_SCALAR",
+      "status": "DESIGN_CORRECTION_PASS_TRUSTED_DERIVATION_OPEN",
+      "class": "D",
+      "decision": "OD-028",
+      "problem": "SourceIdentity completeness_state accepted arbitrary strings",
+      "resolution": "Finite COMPLETE_SOURCE/BOUNDED_SOURCE; neither declaration is independent completeness proof",
+      "evidence": [
+        "design/SOURCE_IDENTITY_DESIGN_CONTROLS.json",
+        "design/SOURCE_IDENTITY_SEMANTIC_REVIEW.md",
+        "design/source_instance_readback/READBACK.json"
+      ],
+      "remaining": "Full trusted source/context/schema/profile/instance-DAG/durable parity and fresh qualification"
+    },
+    {
+      "id": "SOURCE_PROFILE_MISSING_EXPLICIT_PARAMETERS",
+      "status": "DESIGN_CORRECTION_PASS_RUNTIME_OPEN",
+      "class": "D",
+      "decision": "OD-029",
+      "problem": "Data8.1 path/entry and source-type/algorithm parameters were implicit",
+      "resolution": "Exact path/entry profile pins, closed source-type policies and authenticated-authority parameter mapping; actual trusted matching pending",
+      "evidence": [
+        "design/SOURCE_IDENTITY_DESIGN_CONTROLS.json",
+        "design/SOURCE_IDENTITY_SEMANTIC_REVIEW.md",
+        "design/source_instance_readback/READBACK.json"
+      ],
+      "remaining": "Full trusted source/context/schema/profile/instance-DAG/durable parity and fresh qualification"
+    },
+    {
+      "id": "SOURCE_MANIFEST_DOT_PREFIX_REJECTED",
+      "status": "SUCCESSOR_SCHEMA_AND_REAL_MANIFEST_PASS_QUALIFICATION_OPEN",
+      "class": "B",
+      "decision": "OD-030",
+      "problem": "Inherited /1 rejects three legitimate hidden source paths in real 499-member HEAD source",
+      "resolution": "SourceManifest/2 exact canonical paths; historical /1 preserved; complete actual real manifest validates /2 with zero errors",
+      "evidence": [
+        "design/SOURCE_IDENTITY_DESIGN_CONTROLS.json",
+        "design/SOURCE_IDENTITY_SEMANTIC_REVIEW.md",
+        "design/source_instance_readback/READBACK.json"
+      ],
+      "remaining": "Full trusted source/context/schema/profile/instance-DAG/durable parity and fresh qualification"
+    },
+    {
+      "id": "SOURCE_ARCHIVE_PREGENESIS_AND_TRANSPORT_CONTEXT",
+      "status": "DESIGN_AND_REAL_REGULAR_ARCHIVE_PASS_RUNTIME_OPEN",
+      "class": "D",
+      "decision": "OD-031",
+      "problem": "Source archive imposed prior accepted manifest at first bootstrap and used NF02 transport instead of source semantics",
+      "resolution": "Exact content-or-prior source manifest selection and separate source ZIP profile; retained real 499-member byte/mode readback PASS, special source-type/authority/durable tests pending",
+      "evidence": [
+        "design/SOURCE_IDENTITY_DESIGN_CONTROLS.json",
+        "design/SOURCE_IDENTITY_SEMANTIC_REVIEW.md",
+        "design/source_instance_readback/READBACK.json"
+      ],
+      "remaining": "Full trusted source/context/schema/profile/instance-DAG/durable parity and fresh qualification"
+    },
+    {
+      "id": "SOURCE_SYMLINK_ENCODING_SCHEMA_PARITY",
+      "status": "SUCCESSOR_SCHEMA_AND_CONTROLLED_BRANCH_PASS_QUALIFICATION_OPEN",
+      "class": "B",
+      "decision": "OD-032",
+      "problem": "Closed inherited entry grammar rejects current materializer's exact symlink target encoding field",
+      "resolution": "SourceManifest/2 requires exact base64 encoding plus length/digest; 21 controlled branch/schema vectors PASS; original /1 preserved",
+      "evidence": [
+        "design/SOURCE_IDENTITY_DESIGN_CONTROLS.json",
+        "design/SOURCE_IDENTITY_SEMANTIC_REVIEW.md",
+        "design/source_instance_readback/READBACK.json"
+      ],
+      "remaining": "Full trusted source/context/schema/profile/instance-DAG/durable parity and fresh qualification"
+    },
+    {
+      "id": "SOURCE_ARCHIVE_EXACT_RUNTIME_RECONCILIATION",
+      "status": "LOCAL_IMPLEMENTATION_PASS_INSTALLATION_AND_ADMISSION_OPEN",
+      "class": "D",
+      "decision": "OD-033",
+      "problem": "Generic NF02 transport rejects legitimate source symlink/colon names and cannot stand in for qualified source reconciliation",
+      "resolution": "Separate source-only original ZIP reconciliation; exact code/dependency/schema/profile and operational budget pins. 35 targeted regressions and real 499 regular members PASS; no source authority or activation",
+      "evidence": [
+        "design/SOURCE_IDENTITY_DESIGN_CONTROLS.json",
+        "design/SOURCE_IDENTITY_SEMANTIC_REVIEW.md",
+        "design/source_instance_readback/READBACK.json"
+      ],
+      "remaining": "Full trusted source/context/schema/profile/instance-DAG/durable parity and fresh qualification"
+    },
+    {
+      "id": "SOURCE_SNAPSHOT_GIT_IDENTITY_HYBRID",
+      "class": "B",
+      "status": "SUCCESSOR_BRANCH_CORRECTION_PASS_TRUSTED_ADMISSION_OPEN",
+      "problem": "Inherited conditional requires IDs for Git but accepted Git identity fields on an authorized snapshot",
+      "decision": "OD-029 / full Data 8.1",
+      "resolution": "SourceIdentity/2 snapshot branch forbids each and both Git IDs; original /1 preserved; three regressions PASS",
+      "evidence": [
+        "design/SOURCE_IDENTITY_DESIGN_CONTROLS.json",
+        "design/SOURCE_IDENTITY_SEMANTIC_REVIEW.md"
+      ],
+      "remaining": "Qualified exact snapshot/source authority, materialization reconciliation, alias mapping and durable admission; no gate promotion"
+    },
+    {
+      "id": "STRUCTURED_SCHEMA_REFERENCE_RUNTIME_IDENTITY",
+      "status": "OPEN_AFFECTED_CONSUMER_INTEGRATION",
+      "class": "D",
+      "problem": "Successor schema_revision_ref is structured. Hash and sort keys must compare its full canonical identity independently of dictionary insertion order.",
+      "completed": [
+        "Canonical full schema identity in typed history keys, finalization sorting and assurance deduplication",
+        "Assurance digest_profile retained",
+        "13 targeted regressions PASS; mypy 2 modules PASS"
+      ],
+      "remaining": [
+        "Required broad affected verification",
+        "qualified schema bindings and complete successor consumer execution"
+      ],
+      "evidence": [
+        "design/SOURCE_ALIAS_AUTHORITY_SEMANTIC_REVIEW.md",
+        "tests/stage2/test_source_generation_alias_guard.py"
+      ]
+    },
+    {
+      "id": "SOURCE_GENERATION_IDENTITY_CONTEXT_CONTRADICTION",
+      "status": "RUNTIME_GUARD_TARGETED_PASS_BROAD_PENDING",
+      "class": "D",
+      "problem": "SourceGeneration could contradict the exact SourceIdentity manifest/profile/authority and still be durably accepted",
+      "completed": [
+        "Resolve exact SourceIdentity and compare complete manifest/profile/authority refs before durability",
+        "Six same-closure/prior-history substitution controls within 19 focused tests PASS",
+        "95 affected source/bootstrap regressions PASS",
+        "Four prior-history alias durability controls PASS"
+      ],
+      "remaining": [
+        "Required broad regression",
+        "Trusted independent profile/source authority and successor installation/context binding",
+        "Full semantic node parity and fresh qualification"
+      ],
+      "evidence": [
+        "design/SOURCE_GENERATION_MANIFEST_CONSISTENCY_PROBE.json",
+        "design/SOURCE_GENERATION_PROFILE_AUTHORITY_CONSISTENCY_PROBE.json",
+        "design/SOURCE_ALIAS_AUTHORITY_SEMANTIC_REVIEW.md"
+      ]
+    },
+    {
+      "id": "REVIEW_EVIDENCE_VOLATILE_DEPENDENCY_AND_UNBOUND_PROOFS",
+      "class": "D",
+      "status": "CORRECTED_TARGETED_PASS_FULL_DESIGN_RUN_PENDING",
+      "problem": "New diagnostic runs invalidated unchanged reviews, while completed reviews could retain unstructured evidence claims without verifying exact proof bytes",
+      "resolution": "Bind actual code/schema/Registry/fixture/environment inputs; hash each explicitly referenced evidence file on retention; remove latest-run and append-only runtime directory as semantic model dependencies; deterministic proof output with separate diagnostic locators",
+      "evidence": [
+        "tools/semantic_obligation_queue.py",
+        "tools/test_semantic_queue_retention.py",
+        "design/REVIEW_INPUT_STABILITY_CONTROLS.json"
+      ],
+      "controls": {
+        "review_retention": 8,
+        "actual_stability": 2
+      }
+    },
+    {
+      "id": "CONDITIONAL_VECTOR_MUTABLE_INPUT_ALIAS",
+      "class": "D",
+      "status": "CORRECTED_ALL_72_RETAINED_VECTORS_REPLAY_PASS",
+      "problem": "Recorded conditional-vector inputs aliased mutable bodies subsequently changed by later cases",
+      "resolution": "Deep-copy each tested input; replay every retained input after all fixture mutations",
+      "evidence": [
+        "tools/conditional_grammar_audit.py",
+        "design/CONDITIONAL_GRAMMAR_KNOWN_ANSWERS.json"
+      ]
+    },
+    {
+      "id": "CANDIDATE_ACTIVATION_PHASE_ORDER_INVERSION",
+      "class": "D",
+      "status": "EXECUTION_ORDER_CORRECTED_NO_GATE_WAIVER",
+      "problem": "Checkpoint demanded an already qualified activated successor context before constructing its candidate bytes",
+      "resolution": "Follow Data192.D.3 steps3–8 and explicit materialization approval; review and build-time candidates precede qualification/installation/activation; all real trust and runtime qualification obligations retained",
+      "evidence": [
+        "design/CANDIDATE_QUALIFICATION_ORDER_REVIEW.md"
+      ]
+    },
+    {
+      "id": "SOURCE_GENERATION_AUTHORITY_MODE_BRANCH_CONTRADICTION",
+      "status": "LOCAL_FIX_AND_240_AFFECTED_TESTS_PASS_BROADER_RUN_ACTIVE",
+      "class": "B",
+      "problem": "Generation and coordinator used repository authority branch for exact snapshot identity; equality of reference targets did not detect mode contradiction",
+      "resolution": "Require branch matching exact identity mode before durability; correct coordinator and shared snapshot fixture; 23 focused tests included in 240 affected PASS",
+      "evidence": [
+        "design/SOURCE_AUTHORITY_MODE_PARITY_REVIEW.md",
+        "design/source_instance_readback/runtime_runs/1791469562017144700.json"
+      ],
+      "remaining": "Fresh broader workflow/F7/stage4/F3 evidence, candidate/installed-context qualification"
+    },
+    {
+      "id": "ASSESSOR_CONTEXT_DOMAIN_DROPPED_BY_PROFILE_GENERATOR",
+      "status": "RESOLVED_GENERATOR_AND_DRAFT_CONTROLS",
+      "class": "B",
+      "problem": "Purpose ASSESSOR per-context output domains were omitted from the generated external-profile metadata, leaving only a union domain.",
+      "resolution": "Deep-copy the complete output_domain_by_context into the exact generated profile; reject omitted materiality context, union substitution and cross-context NON_MATERIAL leakage. Refresh dependent input-digest catalogs.",
+      "evidence": [
+        "tools/profile_contracts.py",
+        "tools/profile_design_audit.py",
+        "design/EXTERNAL_PROFILE_CONTRACTS.json",
+        "design/PROFILE_DESIGN_AUDIT.json"
+      ],
+      "qualification": "NOT_RUN; actual context execution and candidate qualification pending"
+    }
+  ],
+  "scope": "Autonomous execution design and subsequent full pipeline; historical diagnostic register preserved separately",
+  "runtime_qualification": "NOT_RUN"
+}

@@ -1,0 +1,60 @@
+{
+  "directory": "docs/R5_4_2/autonomous_2026_10_07/source_profile_build_candidate/f5bd3c1b60a84ba3b397f9ce447864e914413576077d6535a2a6c8a9ce6e82a8",
+  "build_digest": "f5bd3c1b60a84ba3b397f9ce447864e914413576077d6535a2a6c8a9ce6e82a8",
+  "entries": [
+    {
+      "file": "historical/objects/trust_profile__1.json",
+      "raw_digest": "bd9da0bc716229092357cad210f1f94aedd3f159928b40b2266f1355f435d37a",
+      "byte_length": 1144
+    },
+    {
+      "file": "historical/schemas/trust_profile__1.schema.json",
+      "raw_digest": "23ad1f352b792cecab983e7df2d786c0237aa634f8511eb146ea8870711fefc7",
+      "byte_length": 8104
+    },
+    {
+      "file": "profiles/BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1.json",
+      "raw_digest": "8a3d9f48bea7db2faabb75381d75568c80f3853bb82a523d6b208cd958b1a339",
+      "byte_length": 244
+    },
+    {
+      "file": "profiles/SOURCE_MANIFEST_ENTRY_PROFILE_V1.json",
+      "raw_digest": "de4d3cea9f6989298062b4286c59d4fd7119d3d7d3ae5e1cfa7604eaf7b80b31",
+      "byte_length": 545
+    },
+    {
+      "file": "profiles/SOURCE_PATH_PROFILE_V1.json",
+      "raw_digest": "4038372ba5b80dbb5e73d6833e8abbba1a1e16c295c7e79a2c840a889ac5b96e",
+      "byte_length": 369
+    }
+  ],
+  "schema_build_digest": "dab5361967c377022ec2d5e3518c7a883901a298d65ed9d8a3e04319fe7e0a69",
+  "source_inputs": {
+    "docs/R5_4_2/autonomous_2026_10_07/tools/source_profile_build_candidate.py": "69c470b1ee3a57d6219cdfcef24e29d9ba9bac55a00608037563d2556054d057",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/execution.py": "333402e50b22c4d3cdce19d31f6246bde11bb86c07435ac2d106c38e74738dfe",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/build_time_candidates.py": "89a9f7e0bd1c57486fe498b79bbb7e6f334d6a6fc77dd308344004b8370e3250",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/schema_registry_build_candidate.py": "35746b9cd7b385b559dc60ca8ee6239234a85955b45d12c08bed3c4b244039f0",
+    "docs/R5_4_2/autonomous_2026_10_07/BUILD_TIME_CANDIDATE_READBACK.json": "f4dbdcefa2d869ca47365fa51b3edee852a7fcc2b2dea0eaca39c0626fc5f457",
+    "docs/R5_4_2/autonomous_2026_10_07/SCHEMA_REGISTRY_BUILD_READBACK.json": "6c6c67d48681794dbfb5e2e9befe8b614275c8fe480409e3bd61d9a630c70807",
+    "docs/R5_4_2/autonomous_2026_10_07/design/EXTERNAL_PROFILE_CONTRACTS.json": "b5a0a24f475b00b69b76ff9e9ec271693610039ae521859ec837bf957dd42bbc",
+    "docs/R5_4_1/R5_4_1_CANDIDATE_MANIFEST.json": "15415abd7d2601698c6ff664a93077213e81575272a213c4511f6082c9d8fdef",
+    "docs/R5_4_1/candidate/objects/trust_profile__1.json": "bd9da0bc716229092357cad210f1f94aedd3f159928b40b2266f1355f435d37a",
+    "docs/R5_4_1/candidate/schemas/trust_profile__1.schema.json": "23ad1f352b792cecab983e7df2d786c0237aa634f8511eb146ea8870711fefc7",
+    "src/bdb_audit/core/hashing.py": "286dee6109409661624572e4c3e87935d33f22c9a0e3a7bfad8dabbf471248f1",
+    "src/bdb_audit/core/canonical_json.py": "62dfa640d32fdea9025ae167eb1c8a1c7a3bdde6d3b913677aad517ebdea37ac"
+  },
+  "input_drift": [],
+  "qualification": false,
+  "installed": false,
+  "status": "SOURCE_LEAVES_AND_ISOLATED_HISTORICAL_TRUST_READ_BACK_NOT_QUALIFIED",
+  "remaining": [
+    "independently authenticated principal and source authority",
+    "exact namespace",
+    "independently authorized actual successor trust_profile/2 instance; historical /1 is never active",
+    "complete source identity profile",
+    "complete policy and bootstrap roots",
+    "Q1",
+    "Q2",
+    "N5-N11"
+  ]
+}

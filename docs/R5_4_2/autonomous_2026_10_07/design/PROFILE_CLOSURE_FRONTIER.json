@@ -1,0 +1,886 @@
+{
+  "roots": [
+    "BDB_CJSON_1",
+    "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+    "BOOTSTRAP_ADMISSION_V2",
+    "BOOTSTRAP_NAMESPACE_V2",
+    "BROWSER_ENVIRONMENT_V2",
+    "BUILD_PROVENANCE_RECEIPT_V1",
+    "BUILD_RECIPE_V2",
+    "BUNDLE_MEMBERSHIP_V2",
+    "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+    "CAPABILITY_BOUNDARY_V2",
+    "CAUSAL_CHAIN_V1",
+    "CHALLENGER_FRESHNESS_V2",
+    "CHANNEL_CAPTURE_PROFILE_V1",
+    "CLAIM_RELATIVE_ASSESSMENT_V1",
+    "CLAIM_SET_CLOSURE_V1",
+    "CLEANUP_ASSESSMENT_V2",
+    "CLEANUP_EXPECTED_OBSERVABLE_V1",
+    "CLOCK_PROFILE_V1",
+    "COLLECTOR_ACCOUNTING_V1",
+    "COLLECTOR_CAPABILITY_V2",
+    "COMPATIBILITY_FIXTURE_V2",
+    "COMPATIBILITY_GATE_V2",
+    "CORPUS_RELATIVE_NOVELTY_V1",
+    "COVERAGE_OBLIGATION_POLICY_V2",
+    "DELIVERY_IDEMPOTENCY_V2",
+    "DELIVERY_RETRY_V2",
+    "DEPENDENCY_CLOSURE_V1",
+    "DETERMINISTIC_BUILD_SETTINGS_V2",
+    "DISCOVERY_CONFIRMATION_V1",
+    "ENDURANCE_OBSERVATION_V1",
+    "ENDURANCE_WORKLOAD_V1",
+    "ENVIRONMENT_PROFILE_V2",
+    "EXACT_COMPATIBILITY_V2",
+    "EXACT_DURABLE_RECOVERY_V1",
+    "EXACT_SCOPED_MATCH_V1",
+    "EXECUTION_COMMAND_JSON_V1",
+    "EXECUTION_DEPENDENCY_PLAN_V1",
+    "EXECUTION_HARNESS_V2",
+    "EXECUTION_RUNNER_V2",
+    "EXECUTION_VARIANT_V2",
+    "EXECUTOR_ELIGIBILITY_V1",
+    "EXECUTOR_TOOL_V2",
+    "EXPLORATION_POLICY_V2",
+    "EXTERNAL_SERVICE_V2",
+    "FAULT_RUN_RECORD_JSON_V1",
+    "FILESYSTEM_BOUNDARY_V2",
+    "FINAL_CHAIN_RELEASE_V1",
+    "FINAL_TECHNICAL_REPORT_JSON_V1",
+    "FINAL_TECHNICAL_REPORT_TEXT_V1",
+    "FINITE_MODEL_FIDELITY_V1",
+    "FIXTURE_INPUT_V1",
+    "FULL_FINALIZATION_PROFILE_V1",
+    "FULL_PATH_CONTEXT_PARAMETERS_V1",
+    "FULL_PATH_SEMANTIC_V1",
+    "FULL_PATH_TRANSITION_TABLE_V2",
+    "GATE_ELIGIBILITY_PROFILE_V1",
+    "HANDOFF_TRANSPORT_V2",
+    "HASH_MANIFEST_V2",
+    "HISTORY_ANCHOR_V2",
+    "IMPLEMENTATION_MAPPING_V1",
+    "IMPLEMENTATION_MUTATION_CASE_V1",
+    "INSTALLATION_FULL_PATH_PROFILE_V1",
+    "KNOWLEDGE_POLICY_V2",
+    "LANE_COMPLETION_V1",
+    "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+    "LEGACY_MECHANICAL_VALIDATION_V2",
+    "LEGACY_OBSERVATION_MAPPING_V2",
+    "LEGACY_OBSERVATION_RAW_V1",
+    "LEGACY_SCHEMA_PIN_V2",
+    "LINEAGE_ADMISSION_V2",
+    "MANDATORY_LANE_SLOT_V1",
+    "MANDATORY_STAGE_SET_V2",
+    "METHOD_QUALIFICATION_V1",
+    "MODEL_AGENT_BOUNDARY_V2",
+    "MODEL_ARTIFACT_V1",
+    "NETWORK_BOUNDARY_V2",
+    "NF02_DELIVERY_AUTHORIZATION_V1",
+    "NF02_EXTERNAL_LANE_SLOT_V2",
+    "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+    "NF02_PACKAGE_TRANSPORT_V2",
+    "NF02_PROTOCOL_PROFILE_V2",
+    "NF02_RESULT_NORMALIZER_V2",
+    "NF02_RESULT_TRANSPORT_V2",
+    "OBLIGATION_ACCEPTANCE_V2",
+    "OBLIGATION_APPLICABILITY_V2",
+    "OBSERVATION_CAPTURE_V2",
+    "OBSERVED_EFFORT_V1",
+    "ORACLE_CHALLENGE_CASE_V1",
+    "ORACLE_INDEPENDENCE_V2",
+    "OS_ENVIRONMENT_V2",
+    "POSITIVE_VIEW_PROJECTION_V2",
+    "PRINCIPAL_AUTHORIZATION_V1",
+    "PRIOR_FALSE_NEGATIVE_V1",
+    "PUBLIC_CONCLUSION_RENDER_V1",
+    "PUBLIC_REDACTION_V2",
+    "QUALIFIED_ACTIVATION_V1",
+    "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+    "QUALIFIED_TECHNIQUE_V2",
+    "QUALIFIED_VALIDATOR_V2",
+    "RECOVERY_REFERENCE_PROFILE_V1",
+    "REPLAY_CAPSULE_V1",
+    "REPORT_EXPORT_PROFILE_V1",
+    "RETAINED_OPAQUE_BYTES_V1",
+    "RETAINED_PRODUCER_CODE_V1",
+    "RUNTIME_ENVIRONMENT_V2",
+    "SANDBOX_PROFILE_V1",
+    "SEED_PROFILE_V1",
+    "SNAPSHOT_EXPORT_V2",
+    "SNAPSHOT_PROJECTION_V2",
+    "SOURCE_ARCHIVE_V2",
+    "SOURCE_AUTHORITY_V1",
+    "SOURCE_DRIFT_POLICY_V2",
+    "SOURCE_IDENTITY_V2",
+    "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+    "SOURCE_PATH_PROFILE_V1",
+    "SOURCE_RECONCILIATION_V2",
+    "SOURCE_ZIP_TRANSPORT_V1",
+    "STAGE_COMPLETION_V1",
+    "STRICT_JSON_CAPTURE_V1",
+    "SURFACE_COLLECTOR_RECORD_JSON_V1",
+    "SURFACE_KEY_PROFILE_V2",
+    "TEMPORAL_MODEL_CLAIM_V1",
+    "TOOL_BOUNDARY_V2",
+    "TOOL_CAPTURE_V2",
+    "TOOL_EXECUTION_RECORD_JSON_V1",
+    "TRANSITION_POLICY_V2",
+    "TRUSTED_PREDECESSOR_PIN_V2"
+  ],
+  "traversal": [
+    {
+      "profile": "BDB_CJSON_1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "BOOTSTRAP_ADMISSION_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "BOOTSTRAP_NAMESPACE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "BROWSER_ENVIRONMENT_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "BUILD_PROVENANCE_RECEIPT_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "BUILD_RECIPE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "BUNDLE_MEMBERSHIP_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "CAPABILITY_BOUNDARY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "CAUSAL_CHAIN_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "CHALLENGER_FRESHNESS_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "CHANNEL_CAPTURE_PROFILE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "CLAIM_RELATIVE_ASSESSMENT_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "CLAIM_SET_CLOSURE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "CLEANUP_ASSESSMENT_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "CLOCK_PROFILE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "COLLECTOR_ACCOUNTING_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "COLLECTOR_CAPABILITY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "COMPATIBILITY_FIXTURE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "COMPATIBILITY_GATE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "CORPUS_RELATIVE_NOVELTY_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "COVERAGE_OBLIGATION_POLICY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "DELIVERY_IDEMPOTENCY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "DELIVERY_RETRY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "DEPENDENCY_CLOSURE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "DETERMINISTIC_BUILD_SETTINGS_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "DISCOVERY_CONFIRMATION_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "ENDURANCE_OBSERVATION_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "ENDURANCE_WORKLOAD_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "ENVIRONMENT_PROFILE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "EXACT_COMPATIBILITY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "EXACT_DURABLE_RECOVERY_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "EXACT_SCOPED_MATCH_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "EXECUTION_COMMAND_JSON_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "EXECUTION_DEPENDENCY_PLAN_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "EXECUTION_HARNESS_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "EXECUTION_RUNNER_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "EXECUTION_VARIANT_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "EXECUTOR_ELIGIBILITY_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "EXECUTOR_TOOL_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "EXPLORATION_POLICY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "EXTERNAL_SERVICE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "FAULT_RUN_RECORD_JSON_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "FILESYSTEM_BOUNDARY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "FINAL_CHAIN_RELEASE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "FINAL_TECHNICAL_REPORT_TEXT_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "FINITE_MODEL_FIDELITY_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "FIXTURE_INPUT_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "FULL_FINALIZATION_PROFILE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "FULL_PATH_CONTEXT_PARAMETERS_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "FULL_PATH_SEMANTIC_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "FULL_PATH_TRANSITION_TABLE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "GATE_ELIGIBILITY_PROFILE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "HANDOFF_TRANSPORT_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "HASH_MANIFEST_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "HISTORY_ANCHOR_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "IMPLEMENTATION_MAPPING_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "KNOWLEDGE_POLICY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "LANE_COMPLETION_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "LEGACY_MECHANICAL_VALIDATION_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_MAPPING_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "LEGACY_OBSERVATION_RAW_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "LEGACY_SCHEMA_PIN_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "LINEAGE_ADMISSION_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "MANDATORY_LANE_SLOT_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "MANDATORY_STAGE_SET_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "METHOD_QUALIFICATION_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "MODEL_AGENT_BOUNDARY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "MODEL_ARTIFACT_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "NETWORK_BOUNDARY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "NF02_DELIVERY_AUTHORIZATION_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "NF02_EXTERNAL_LANE_SLOT_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "NF02_PACKAGE_TRANSPORT_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "NF02_PROTOCOL_PROFILE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "NF02_RESULT_NORMALIZER_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "NF02_RESULT_TRANSPORT_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "OBLIGATION_ACCEPTANCE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "OBLIGATION_APPLICABILITY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "OBSERVATION_CAPTURE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "OBSERVED_EFFORT_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "ORACLE_CHALLENGE_CASE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "ORACLE_INDEPENDENCE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "OS_ENVIRONMENT_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "POSITIVE_VIEW_PROJECTION_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "PRINCIPAL_AUTHORIZATION_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "PRIOR_FALSE_NEGATIVE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "PUBLIC_CONCLUSION_RENDER_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "PUBLIC_REDACTION_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "QUALIFIED_ACTIVATION_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "QUALIFIED_TECHNIQUE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "QUALIFIED_VALIDATOR_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "RECOVERY_REFERENCE_PROFILE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "REPLAY_CAPSULE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "REPORT_EXPORT_PROFILE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "RETAINED_OPAQUE_BYTES_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "RETAINED_PRODUCER_CODE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "RUNTIME_ENVIRONMENT_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SANDBOX_PROFILE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SEED_PROFILE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SNAPSHOT_EXPORT_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SNAPSHOT_PROJECTION_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SOURCE_ARCHIVE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SOURCE_AUTHORITY_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SOURCE_DRIFT_POLICY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SOURCE_IDENTITY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SOURCE_PATH_PROFILE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SOURCE_RECONCILIATION_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SOURCE_ZIP_TRANSPORT_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "STAGE_COMPLETION_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "STRICT_JSON_CAPTURE_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "SURFACE_KEY_PROFILE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "TEMPORAL_MODEL_CLAIM_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "TOOL_BOUNDARY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "TOOL_CAPTURE_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "defined_grammar": true
+    },
+    {
+      "profile": "TRANSITION_POLICY_V2",
+      "defined_grammar": true
+    },
+    {
+      "profile": "TRUSTED_PREDECESSOR_PIN_V2",
+      "defined_grammar": true
+    }
+  ],
+  "reachable_profiles": [
+    "BDB_CJSON_1",
+    "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1",
+    "BOOTSTRAP_ADMISSION_V2",
+    "BOOTSTRAP_NAMESPACE_V2",
+    "BROWSER_ENVIRONMENT_V2",
+    "BUILD_PROVENANCE_RECEIPT_V1",
+    "BUILD_RECIPE_V2",
+    "BUNDLE_MEMBERSHIP_V2",
+    "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+    "CAPABILITY_BOUNDARY_V2",
+    "CAUSAL_CHAIN_V1",
+    "CHALLENGER_FRESHNESS_V2",
+    "CHANNEL_CAPTURE_PROFILE_V1",
+    "CLAIM_RELATIVE_ASSESSMENT_V1",
+    "CLAIM_SET_CLOSURE_V1",
+    "CLEANUP_ASSESSMENT_V2",
+    "CLEANUP_EXPECTED_OBSERVABLE_V1",
+    "CLOCK_PROFILE_V1",
+    "COLLECTOR_ACCOUNTING_V1",
+    "COLLECTOR_CAPABILITY_V2",
+    "COMPATIBILITY_FIXTURE_V2",
+    "COMPATIBILITY_GATE_V2",
+    "CORPUS_RELATIVE_NOVELTY_V1",
+    "COVERAGE_OBLIGATION_POLICY_V2",
+    "DELIVERY_IDEMPOTENCY_V2",
+    "DELIVERY_RETRY_V2",
+    "DEPENDENCY_CLOSURE_V1",
+    "DETERMINISTIC_BUILD_SETTINGS_V2",
+    "DISCOVERY_CONFIRMATION_V1",
+    "ENDURANCE_OBSERVATION_V1",
+    "ENDURANCE_WORKLOAD_V1",
+    "ENVIRONMENT_PROFILE_V2",
+    "EXACT_COMPATIBILITY_V2",
+    "EXACT_DURABLE_RECOVERY_V1",
+    "EXACT_SCOPED_MATCH_V1",
+    "EXECUTION_COMMAND_JSON_V1",
+    "EXECUTION_DEPENDENCY_PLAN_V1",
+    "EXECUTION_HARNESS_V2",
+    "EXECUTION_RUNNER_V2",
+    "EXECUTION_VARIANT_V2",
+    "EXECUTOR_ELIGIBILITY_V1",
+    "EXECUTOR_TOOL_V2",
+    "EXPLORATION_POLICY_V2",
+    "EXTERNAL_SERVICE_V2",
+    "FAULT_RUN_RECORD_JSON_V1",
+    "FILESYSTEM_BOUNDARY_V2",
+    "FINAL_CHAIN_RELEASE_V1",
+    "FINAL_TECHNICAL_REPORT_JSON_V1",
+    "FINAL_TECHNICAL_REPORT_TEXT_V1",
+    "FINITE_MODEL_FIDELITY_V1",
+    "FIXTURE_INPUT_V1",
+    "FULL_FINALIZATION_PROFILE_V1",
+    "FULL_PATH_CONTEXT_PARAMETERS_V1",
+    "FULL_PATH_SEMANTIC_V1",
+    "FULL_PATH_TRANSITION_TABLE_V2",
+    "GATE_ELIGIBILITY_PROFILE_V1",
+    "HANDOFF_TRANSPORT_V2",
+    "HASH_MANIFEST_V2",
+    "HISTORY_ANCHOR_V2",
+    "IMPLEMENTATION_MAPPING_V1",
+    "IMPLEMENTATION_MUTATION_CASE_V1",
+    "INSTALLATION_FULL_PATH_PROFILE_V1",
+    "KNOWLEDGE_POLICY_V2",
+    "LANE_COMPLETION_V1",
+    "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+    "LEGACY_MECHANICAL_VALIDATION_V2",
+    "LEGACY_OBSERVATION_MAPPING_V2",
+    "LEGACY_OBSERVATION_RAW_V1",
+    "LEGACY_SCHEMA_PIN_V2",
+    "LINEAGE_ADMISSION_V2",
+    "MANDATORY_LANE_SLOT_V1",
+    "MANDATORY_STAGE_SET_V2",
+    "METHOD_QUALIFICATION_V1",
+    "MODEL_AGENT_BOUNDARY_V2",
+    "MODEL_ARTIFACT_V1",
+    "NETWORK_BOUNDARY_V2",
+    "NF02_DELIVERY_AUTHORIZATION_V1",
+    "NF02_EXTERNAL_LANE_SLOT_V2",
+    "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+    "NF02_PACKAGE_TRANSPORT_V2",
+    "NF02_PROTOCOL_PROFILE_V2",
+    "NF02_RESULT_NORMALIZER_V2",
+    "NF02_RESULT_TRANSPORT_V2",
+    "OBLIGATION_ACCEPTANCE_V2",
+    "OBLIGATION_APPLICABILITY_V2",
+    "OBSERVATION_CAPTURE_V2",
+    "OBSERVED_EFFORT_V1",
+    "ORACLE_CHALLENGE_CASE_V1",
+    "ORACLE_INDEPENDENCE_V2",
+    "OS_ENVIRONMENT_V2",
+    "POSITIVE_VIEW_PROJECTION_V2",
+    "PRINCIPAL_AUTHORIZATION_V1",
+    "PRIOR_FALSE_NEGATIVE_V1",
+    "PUBLIC_CONCLUSION_RENDER_V1",
+    "PUBLIC_REDACTION_V2",
+    "QUALIFIED_ACTIVATION_V1",
+    "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+    "QUALIFIED_TECHNIQUE_V2",
+    "QUALIFIED_VALIDATOR_V2",
+    "RECOVERY_REFERENCE_PROFILE_V1",
+    "REPLAY_CAPSULE_V1",
+    "REPORT_EXPORT_PROFILE_V1",
+    "RETAINED_OPAQUE_BYTES_V1",
+    "RETAINED_PRODUCER_CODE_V1",
+    "RUNTIME_ENVIRONMENT_V2",
+    "SANDBOX_PROFILE_V1",
+    "SEED_PROFILE_V1",
+    "SNAPSHOT_EXPORT_V2",
+    "SNAPSHOT_PROJECTION_V2",
+    "SOURCE_ARCHIVE_V2",
+    "SOURCE_AUTHORITY_V1",
+    "SOURCE_DRIFT_POLICY_V2",
+    "SOURCE_IDENTITY_V2",
+    "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+    "SOURCE_PATH_PROFILE_V1",
+    "SOURCE_RECONCILIATION_V2",
+    "SOURCE_ZIP_TRANSPORT_V1",
+    "STAGE_COMPLETION_V1",
+    "STRICT_JSON_CAPTURE_V1",
+    "SURFACE_COLLECTOR_RECORD_JSON_V1",
+    "SURFACE_KEY_PROFILE_V2",
+    "TEMPORAL_MODEL_CLAIM_V1",
+    "TOOL_BOUNDARY_V2",
+    "TOOL_CAPTURE_V2",
+    "TOOL_EXECUTION_RECORD_JSON_V1",
+    "TRANSITION_POLICY_V2",
+    "TRUSTED_PREDECESSOR_PIN_V2"
+  ],
+  "draft_contracts": 127,
+  "missing_profile_contracts": [],
+  "semantic_review_pending": [
+    "BDB_CJSON_1",
+    "BOOTSTRAP_ADMISSION_V2",
+    "BOOTSTRAP_NAMESPACE_V2",
+    "BROWSER_ENVIRONMENT_V2",
+    "BUILD_PROVENANCE_RECEIPT_V1",
+    "BUILD_RECIPE_V2",
+    "BUNDLE_MEMBERSHIP_V2",
+    "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+    "CAPABILITY_BOUNDARY_V2",
+    "CAUSAL_CHAIN_V1",
+    "CHALLENGER_FRESHNESS_V2",
+    "CHANNEL_CAPTURE_PROFILE_V1",
+    "CLAIM_SET_CLOSURE_V1",
+    "CLEANUP_ASSESSMENT_V2",
+    "CLEANUP_EXPECTED_OBSERVABLE_V1",
+    "CLOCK_PROFILE_V1",
+    "COLLECTOR_CAPABILITY_V2",
+    "COMPATIBILITY_FIXTURE_V2",
+    "COMPATIBILITY_GATE_V2",
+    "COVERAGE_OBLIGATION_POLICY_V2",
+    "DELIVERY_IDEMPOTENCY_V2",
+    "DELIVERY_RETRY_V2",
+    "DEPENDENCY_CLOSURE_V1",
+    "DETERMINISTIC_BUILD_SETTINGS_V2",
+    "ENDURANCE_OBSERVATION_V1",
+    "ENDURANCE_WORKLOAD_V1",
+    "ENVIRONMENT_PROFILE_V2",
+    "EXACT_COMPATIBILITY_V2",
+    "EXECUTION_COMMAND_JSON_V1",
+    "EXECUTION_DEPENDENCY_PLAN_V1",
+    "EXECUTION_HARNESS_V2",
+    "EXECUTION_RUNNER_V2",
+    "EXECUTION_VARIANT_V2",
+    "EXECUTOR_TOOL_V2",
+    "EXPLORATION_POLICY_V2",
+    "EXTERNAL_SERVICE_V2",
+    "FAULT_RUN_RECORD_JSON_V1",
+    "FILESYSTEM_BOUNDARY_V2",
+    "FINAL_TECHNICAL_REPORT_JSON_V1",
+    "FINAL_TECHNICAL_REPORT_TEXT_V1",
+    "FIXTURE_INPUT_V1",
+    "FULL_FINALIZATION_PROFILE_V1",
+    "FULL_PATH_CONTEXT_PARAMETERS_V1",
+    "FULL_PATH_SEMANTIC_V1",
+    "FULL_PATH_TRANSITION_TABLE_V2",
+    "GATE_ELIGIBILITY_PROFILE_V1",
+    "HANDOFF_TRANSPORT_V2",
+    "HASH_MANIFEST_V2",
+    "HISTORY_ANCHOR_V2",
+    "IMPLEMENTATION_MAPPING_V1",
+    "IMPLEMENTATION_MUTATION_CASE_V1",
+    "INSTALLATION_FULL_PATH_PROFILE_V1",
+    "KNOWLEDGE_POLICY_V2",
+    "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+    "LEGACY_MECHANICAL_VALIDATION_V2",
+    "LEGACY_OBSERVATION_MAPPING_V2",
+    "LEGACY_OBSERVATION_RAW_V1",
+    "LEGACY_SCHEMA_PIN_V2",
+    "LINEAGE_ADMISSION_V2",
+    "MANDATORY_LANE_SLOT_V1",
+    "MANDATORY_STAGE_SET_V2",
+    "MODEL_AGENT_BOUNDARY_V2",
+    "MODEL_ARTIFACT_V1",
+    "NETWORK_BOUNDARY_V2",
+    "NF02_EXTERNAL_LANE_SLOT_V2",
+    "NF02_PROTOCOL_PROFILE_V2",
+    "OBLIGATION_ACCEPTANCE_V2",
+    "OBLIGATION_APPLICABILITY_V2",
+    "OBSERVATION_CAPTURE_V2",
+    "ORACLE_CHALLENGE_CASE_V1",
+    "ORACLE_INDEPENDENCE_V2",
+    "OS_ENVIRONMENT_V2",
+    "POSITIVE_VIEW_PROJECTION_V2",
+    "PRINCIPAL_AUTHORIZATION_V1",
+    "PUBLIC_CONCLUSION_RENDER_V1",
+    "PUBLIC_REDACTION_V2",
+    "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+    "QUALIFIED_TECHNIQUE_V2",
+    "QUALIFIED_VALIDATOR_V2",
+    "RECOVERY_REFERENCE_PROFILE_V1",
+    "REPLAY_CAPSULE_V1",
+    "REPORT_EXPORT_PROFILE_V1",
+    "RETAINED_OPAQUE_BYTES_V1",
+    "RETAINED_PRODUCER_CODE_V1",
+    "RUNTIME_ENVIRONMENT_V2",
+    "SANDBOX_PROFILE_V1",
+    "SEED_PROFILE_V1",
+    "SNAPSHOT_EXPORT_V2",
+    "SNAPSHOT_PROJECTION_V2",
+    "SOURCE_ARCHIVE_V2",
+    "SOURCE_AUTHORITY_V1",
+    "SOURCE_DRIFT_POLICY_V2",
+    "SOURCE_IDENTITY_V2",
+    "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+    "SOURCE_PATH_PROFILE_V1",
+    "SOURCE_RECONCILIATION_V2",
+    "SOURCE_ZIP_TRANSPORT_V1",
+    "STRICT_JSON_CAPTURE_V1",
+    "SURFACE_COLLECTOR_RECORD_JSON_V1",
+    "SURFACE_KEY_PROFILE_V2",
+    "TEMPORAL_MODEL_CLAIM_V1",
+    "TOOL_BOUNDARY_V2",
+    "TOOL_CAPTURE_V2",
+    "TOOL_EXECUTION_RECORD_JSON_V1",
+    "TRANSITION_POLICY_V2",
+    "TRUSTED_PREDECESSOR_PIN_V2"
+  ],
+  "fixed_point_reached": false,
+  "candidate_materialized": false,
+  "inputs": {
+    "own_reference_resolutions_raw_digest": "eb0275b80e713d5ad542b77966ade52a8d11dcf443a8bf80a409b4559fef54a1",
+    "common_grammar_raw_digest": "a36c374dcc13e98835428950dd9a198a02339d6280ecf7dd158b78e3e8e3e4fc"
+  }
+}

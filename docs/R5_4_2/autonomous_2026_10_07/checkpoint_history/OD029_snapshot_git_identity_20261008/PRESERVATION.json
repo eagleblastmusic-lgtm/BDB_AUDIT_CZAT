@@ -1,0 +1,5 @@
+{
+  "file": "design/body_grammars/source_identity__2.json",
+  "raw_digest": "55d5a47eb099b239085f19b2ecf6d58e08b5d070149ee35b79b2f330a570122c",
+  "reason": "Inherited Git-required branch omitted snapshot Git-ID prohibition; Data8.1 and OD029 require separate snapshot identity"
+}

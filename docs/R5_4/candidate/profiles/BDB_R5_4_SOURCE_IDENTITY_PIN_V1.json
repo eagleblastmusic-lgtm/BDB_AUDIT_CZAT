@@ -1,0 +1,1 @@
+{"authority_modes":["AUTHORIZED_GIT","AUTHORIZED_SNAPSHOT"],"incomplete_lfs_or_submodules":"FAIL_CLOSED","profile_id":"BDB_R5_4_SOURCE_IDENTITY_PIN_V1","source_authority_self_bootstrap":"FORBIDDEN","source_rule":"Exact independently authorized repository/snapshot identity and complete materialized SourceManifest; commit/tree IDs when applicable"}

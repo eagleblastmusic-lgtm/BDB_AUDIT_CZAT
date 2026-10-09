@@ -1,0 +1,40 @@
+{
+  "checkpoint": "bb3834f45181a2bac3dce07c04c3a9b9c1169285",
+  "local_head": "b7051472909075bb4c83a9a510e298fcca2a6bd5",
+  "identical_files": 4511,
+  "changed_files": [
+    {
+      "file": "F2_QUALIFICATION/CURRENT_IMPLEMENTATION_STATUS.json",
+      "checkpoint_sha256": "107f91b010aa84efba0e99a57a702e9374425e68a2848037adb10d5120304fd8",
+      "local_sha256": "9ed9e704c90394b5c6dcc1075cdbf041424024a1b8a65f378ca8802268001650",
+      "line_ending_only": true
+    },
+    {
+      "file": "F2_QUALIFICATION/F2_STATUS.json",
+      "checkpoint_sha256": "107f91b010aa84efba0e99a57a702e9374425e68a2848037adb10d5120304fd8",
+      "local_sha256": "9ed9e704c90394b5c6dcc1075cdbf041424024a1b8a65f378ca8802268001650",
+      "line_ending_only": true
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/tools/semantic_obligation_queue.py",
+      "checkpoint_sha256": "3b498fb3e581ad96170ffb4a4df29e4cbbfb6e81ea2cb25a0718434bf19e2c9e",
+      "local_sha256": "053051ee0bd3d0c9df194a33e3e904be2ce680369abc4fb34897bea165e3e82e",
+      "origin": "CURRENT_OPT2_EDITS_OBSERVED_DURING_RUNNING_COMPARISON; NOT_PREEXISTING_DRIFT"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/tools/test_semantic_queue_retention.py",
+      "checkpoint_sha256": "4e9f6567ab66f74cd26bf8626f37052ab5767e20bc6a3858a5b033ce5067cc24",
+      "local_sha256": "c5638fc0f943b2cac2a57ce7a7a135c4cf19b4f23e8d6314d736420aacb58fb3",
+      "origin": "CURRENT_OPT2_EDITS_OBSERVED_DURING_RUNNING_COMPARISON; NOT_PREEXISTING_DRIFT"
+    },
+    {
+      "file": "pyproject.toml",
+      "checkpoint_sha256": "e434023125f3af61f3cc6c1ce19a4e67eedf3125ce182aca7a039d2c8a6afa75",
+      "local_sha256": "91f77cd3fe57d119db7390a8ab5a98885bb0e8283ad1fde00e3b51089a890212",
+      "line_ending_only": true
+    }
+  ],
+  "missing_files": [],
+  "qualification": false,
+  "comparison_note": "File-by-file read ran concurrently with later OPT2 edits; changed tool hashes are this run, not evidence of preexisting changes. No file was replaced from checkpoint."
+}

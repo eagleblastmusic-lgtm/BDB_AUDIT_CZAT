@@ -1,0 +1,529 @@
+# BDB Audit v2 — R5.4 GOVERNANCE CONTRACT CORRECTION + FRESH Q1
+
+Exact R5.4 candidate failed governance qualification.
+
+Current gates:
+
+```text
+Q1 = R5_4_QUALIFICATION_FAILED
+FINAL = SPEC_CONFLICT
+Q2 = NOT_STARTED
+N5_N8 = NOT_STARTED
+```
+
+Do NOT continue to Q2 or N5–N8.
+
+This task is a narrowly scoped normative correction.
+
+---
+
+# 1. PRESERVE FAILED R5.4 CANDIDATE
+
+The failed candidate is immutable historical provenance.
+
+Do not edit it in place.
+
+Preserve exactly:
+
+```text
+normative_candidate_set_sha256 =
+9488a12d644f8ac17bba737af18f3bd1d6147a7051b94ead9c89923b626b2a02
+
+machine_candidate_set_sha256 =
+a2e094538948c02f78f07265a3a0abeab90b06c0d21a126294ce97f68b7d92ce
+
+manifest RawDigest =
+d2f38cfad4a0d4e3ae96f179addb6fd7ad817250f4998968eb5a01487dd0e3cd
+
+SchemaRegistry/2 ObjectDigest =
+de514548328391f271dac2f6b253b8d47ac8d6e5406e6e0781a2bfb18c9cbc1e
+
+Data raw SHA256 =
+0294cf6c904d0a5aa5f1af36292739b494280bff0b9d16bf6d618d0e6f37d73d
+```
+
+The premature invalid qualification record must also remain immutable forensic evidence:
+
+```text
+invalid qualification RawDigest =
+c63adbccf547428a4bbe27ed885c784546a8ef005615157b213791aea653b6fd
+
+invalidation RawDigest =
+ba9d28d536e5577c2f39e6c9fe55dbfd30416eab2afc52a14b57d9c1752d30cd
+```
+
+Never reuse the invalid PASS/YES record as authority.
+
+---
+
+# 2. CREATE A SUCCESSOR CORRECTION
+
+Create a new exact successor candidate:
+
+```text
+R5.4.1
+```
+
+or equivalently an explicitly identified:
+
+```text
+R5.4-CORR1
+```
+
+Prefer `R5.4.1` if existing project versioning permits it.
+
+The new candidate must bind the failed R5.4 candidate as its direct predecessor.
+
+Do not rewrite the predecessor.
+
+---
+
+# 3. ROOT CONFLICT TO CORRECT
+
+The failed R5.4 candidate contains two incompatible mandatory predicates for the same:
+
+```text
+AuthorBaselineQualificationRecord/2
+```
+
+Conflict A:
+
+```text
+author_verdict =
+R5_4_N1_N4_AUTHOR_SELF_AUDIT_PASS
+```
+
+Conflict B:
+
+```text
+author_verdict =
+R5_4_AUTHOR_NORMATIVE_FINAL_SELF_AUDIT_PASS
+```
+
+A single scalar cannot satisfy both.
+
+The failed candidate also gives two incompatible meanings to:
+
+```text
+readback_verified_file_count
+```
+
+One requires:
+
+```text
+10
+```
+
+for normative candidate files.
+
+Another requires:
+
+```text
+117
+```
+
+for normative + machine candidate files.
+
+Do not resolve this in validator code.
+
+Resolve the normative contract.
+
+---
+
+# 4. OWNER-APPROVED CORRECTION DECISION
+
+Apply this exact semantic decision.
+
+## 4.1 Author verdict
+
+`AuthorBaselineQualificationRecord/2` has exactly one author verdict token:
+
+```text
+author_verdict =
+R5_4_AUTHOR_NORMATIVE_FINAL_SELF_AUDIT_PASS
+```
+
+Remove:
+
+```text
+R5_4_N1_N4_AUTHOR_SELF_AUDIT_PASS
+```
+
+from all mandatory `/2` qualification predicates.
+
+The removed token may remain only in historical/provenance material describing the earlier N1–N4 task.
+
+It must not be accepted as an alternative `/2` governance verdict.
+
+No arrays.
+
+No aliases.
+
+No “either token accepted”.
+
+---
+
+# 5. READBACK COUNT MODEL
+
+Remove the ambiguous governance meaning of:
+
+```text
+readback_verified_file_count
+```
+
+from `AuthorBaselineQualificationRecord/2`.
+
+Use explicit fields:
+
+```text
+readback_verified_normative_file_count
+readback_verified_machine_file_count
+readback_verified_total_file_count
+readback_mismatch_count
+readback_entries[]
+```
+
+For the current candidate structure the expected values are:
+
+```text
+readback_verified_normative_file_count = 10
+readback_verified_machine_file_count = 107
+readback_verified_total_file_count = 117
+readback_mismatch_count = 0
+```
+
+But validators MUST derive these counts from the exact qualified manifest.
+
+Do not hard-code `10`, `107`, or `117` as universal protocol constants.
+
+Required invariant:
+
+```text
+normative_count
+  = count(manifest.normative_candidate_entries)
+
+machine_count
+  = count(manifest.machine_candidate_entries)
+
+total_count
+  = normative_count + machine_count
+
+len(readback_entries)
+  = total_count
+```
+
+Every entry must bind:
+
+```text
+file identity
+expected RawDigest
+observed RawDigest
+result = PASS
+stable/readback storage identity where required
+candidate group = normative | machine
+```
+
+No duplicate candidate entry.
+
+No omitted candidate entry.
+
+No extra governance/provenance file counted as candidate content.
+
+---
+
+# 6. GOVERNANCE / PROVENANCE FILES
+
+Qualification records, invalidation records, self-audit evidence and governance decisions remain external to the qualified candidate-set preimage unless the existing manifest contract explicitly classifies them otherwise.
+
+Do not introduce a self-hash cycle.
+
+Do not include a qualification record inside the exact candidate set that it qualifies.
+
+---
+
+# 7. CONSISTENCY CORRECTION
+
+Find every occurrence of the affected predicates across the successor candidate, including at least:
+
+```text
+Data & Artifact Contracts
+Architecture if referenced
+Registry contract for AuthorBaselineQualificationRecord/2
+SchemaRegistry/executable schema
+Golden Vectors
+Test & Self-Audit Plan
+README/governance index
+manifest/schema documentation
+qualification tool expectations
+governance templates
+```
+
+Make them all express one identical `/2` contract.
+
+Do not change unrelated NF02/C1/C2 semantics.
+
+This is a governance-contract correction, not a redesign.
+
+---
+
+# 8. AUTHORBASELINEQUALIFICATIONRECORD/2 EXACT CONTRACT
+
+The corrected `/2` must have one authoritative schema/body definition.
+
+At minimum it must bind:
+
+```text
+author_baseline_qualification_id
+
+normative_candidate_set_digest
+machine_candidate_set_digest
+
+candidate_manifest_raw_digest
+candidate_manifest_schema
+
+self_audit_report_raw_digest
+
+readback_storage_provider
+
+readback_verified_normative_file_count
+readback_verified_machine_file_count
+readback_verified_total_file_count
+readback_mismatch_count
+
+readback_entries[]
+
+author_verdict =
+R5_4_AUTHOR_NORMATIVE_FINAL_SELF_AUDIT_PASS
+
+owner_assurance_decision =
+IMPLEMENTATION_MAY_PROCEED_UNDER_AUTHOR_ONLY_ASSURANCE
+
+governance_actor_ref
+
+independent_assurance = false
+foundation_spec_baseline_frozen = false
+
+reason_codes[]
+created_at informational
+```
+
+If the already-approved `/2` design includes other required fields, preserve them unless they conflict with this correction.
+
+Do not silently remove unrelated governance bindings.
+
+---
+
+# 9. INVALID PREVIOUS RECORD
+
+The previously emitted qualification record remains:
+
+```text
+INVALID
+```
+
+The existing external invalidation must continue to resolve it as:
+
+```text
+NO_VALID_QUALIFICATION
+```
+
+A corrected successor candidate MUST receive a new qualification record with a new identity after fresh Q1.
+
+Do not mutate or delete the old record.
+
+Do not reuse its object ID/digest.
+
+---
+
+# 10. UPDATE SCHEMA AND GOLDEN CONTRACTS
+
+Because candidate bytes change:
+
+- regenerate affected executable schema bytes;
+- recompute RawDigests;
+- update SchemaRegistry/2 binding if its bound schema bytes changed;
+- recompute SchemaRegistry ObjectDigest if its body changes;
+- update Golden expected bytes/digests affected by the contract;
+- update candidate manifest;
+- recompute normative candidate-set digest;
+- recompute machine candidate-set digest;
+- create new exact predecessor/successor provenance.
+
+Do not carry forward any old hash that no longer identifies exact bytes.
+
+---
+
+# 11. MINIMALITY CHECK
+
+Before finalizing R5.4.1, prove that the correction delta contains no unrelated semantic change.
+
+Produce a machine-readable delta classification:
+
+```text
+GOVERNANCE_CONFLICT_CORRECTION
+HASH_PROPAGATION
+SCHEMA_PROPAGATION
+GOLDEN_PROPAGATION
+PROVENANCE_UPDATE
+```
+
+Anything outside these categories must be separately justified or rejected from this task.
+
+---
+
+# 12. FRESH SELF-AUDIT
+
+Run a fresh zero-based parity audit against the corrected exact candidate.
+
+Specifically search for:
+
+```text
+AuthorBaselineQualificationRecord/2
+author_verdict
+R5_4_N1_N4_AUTHOR_SELF_AUDIT_PASS
+R5_4_AUTHOR_NORMATIVE_FINAL_SELF_AUDIT_PASS
+readback_verified_file_count
+readback_verified_normative_file_count
+readback_verified_machine_file_count
+readback_verified_total_file_count
+```
+
+Required results:
+
+```text
+one mandatory /2 verdict token
+zero conflicting mandatory verdict predicates
+zero ambiguous readback count fields
+all narrative/schema/Registry/Golden/tool predicates identical
+```
+
+Do not rely only on grep.
+
+Parse machine contracts and execute semantic consistency checks.
+
+---
+
+# 13. MATERIALIZE NEW EXACT CANDIDATE
+
+Produce a new successor candidate identity.
+
+Record:
+
+```text
+predecessor R5.4 normative digest
+predecessor R5.4 machine digest
+predecessor manifest RawDigest
+
+new R5.4.1 normative candidate digest
+new R5.4.1 machine candidate digest
+new manifest RawDigest
+new Registry RawDigest
+new Golden RawDigest
+new SchemaRegistry ObjectDigest
+changed executable schema RawDigests
+```
+
+Read all produced bytes back from disk/storage.
+
+Zero mismatch required.
+
+---
+
+# 14. FRESH Q1 — DO NOT REUSE OLD PASS
+
+After the corrected candidate is completely finalized, rerun the full exact-candidate Q1 from zero.
+
+At minimum:
+
+```text
+python docs/R5_4/tools/verify_candidate.py
+python docs/R5_4/tools/finalize_delivery.py
+python docs/R5_4/tools/qualify_exact_candidate.py
+```
+
+Use the corrected successor tool paths if the correction places them under R5.4.1.
+
+Qualification must re-check:
+
+```text
+exact candidate identity
+manifest parity
+normative/machine set membership
+Registry parity
+SchemaRegistry parity
+schema-byte bindings
+Golden inventory
+readback
+self-audit
+governance predicates
+owner authority
+invalid prior record exclusion
+```
+
+---
+
+# 15. ONLY AFTER SUCCESSFUL Q1
+
+If and only if the fresh corrected candidate obtains:
+
+```text
+R5_4_AUTHOR_QUALIFIED_FOR_IMPLEMENTATION
+```
+
+then the next task may proceed to:
+
+```text
+Q2 activation
+→ N5
+→ N6
+→ N7
+→ N8
+```
+
+Do not execute them in this correction task unless explicitly authorized separately.
+
+---
+
+# 16. REQUIRED OUTPUTS
+
+Create:
+
+```text
+docs/R5_4_1/R5_4_1_GOVERNANCE_CORRECTION_REPORT.md
+docs/R5_4_1/R5_4_1_CANDIDATE_MANIFEST.json
+docs/R5_4_1/R5_4_1_SELF_AUDIT.json
+docs/R5_4_1/R5_4_1_READBACK.json
+docs/R5_4_1/R5_4_1_Q1_QUALIFICATION_REPORT.md
+```
+
+plus all corrected successor normative/machine artifacts required by the candidate.
+
+Also produce a concise machine-readable:
+
+```text
+R5_4_TO_R5_4_1_DELTA.json
+```
+
+showing every changed file and why.
+
+---
+
+# 17. FINAL GATE
+
+Return exactly one:
+
+```text
+R5_4_1_AUTHOR_QUALIFIED_FOR_IMPLEMENTATION
+R5_4_1_QUALIFICATION_FAILED
+R5_4_1_CANDIDATE_DRIFT
+SPEC_CONFLICT
+BLOCKED_BY_ENVIRONMENT
+```
+
+Do not claim:
+
+```text
+NF02_CLOSED
+```
+
+Do not start N5–N8 unless a subsequent explicitly authorized task permits it.

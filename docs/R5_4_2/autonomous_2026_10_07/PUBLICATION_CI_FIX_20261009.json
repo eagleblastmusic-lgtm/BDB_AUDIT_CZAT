@@ -1,0 +1,13 @@
+{
+  "publication_PR": "https://github.com/eagleblastmusic-lgtm/BDB_AUDIT_CZAT/pull/45",
+  "initial_snapshot": "d76d4b75ae636353ce87f52a5482575fff265aeb",
+  "CI_run": 37858048758,
+  "CI_result": "2 failed, 1251 passed, 1 skipped in 1532.32s",
+  "root_cause": "Real Git archive fixture inherited Windows core.autocrlf=true; archive transformed LF blob bytes into CRLF. Fixture source conversion policy was not isolated.",
+  "fix": "Fixture source repositories explicitly pin core.autocrlf=false and core.eol=lf; exact byte comparison retained.",
+  "targeted_verification": "6 PASS under original environment; 6 PASS under explicit global autocrlf=true/eol=crlf; Ruff PASS",
+  "production_changed": false,
+  "full_CI_after_fix": "PENDING",
+  "NF02": "OPEN",
+  "Q1": "NOT_STARTED"
+}

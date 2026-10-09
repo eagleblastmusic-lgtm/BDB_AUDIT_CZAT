@@ -1,0 +1,138 @@
+{
+  "decision": "OD-027",
+  "controls": [
+    {
+      "case": "build_manifest/1.application_source_generation_ref_EXACT_EXTERNAL_CONTEXT",
+      "result": "PASS"
+    },
+    {
+      "case": "build_manifest/1.stage_lane_policy_refs_EXACT_EXTERNAL_CONTEXT",
+      "result": "PASS"
+    },
+    {
+      "case": "campaign_genesis/1.application_generation_ref_EXACT_EXTERNAL_CONTEXT",
+      "result": "PASS"
+    },
+    {
+      "case": "OLD_PREGENESIS_PRIOR_ACCEPTANCE_CONTRADICTION",
+      "result": "PASS",
+      "accepted_campaign_seq_before_first": []
+    },
+    {
+      "case": "ORDINARY_RUNTIME_PARENT_NOT_GLOBALLY_WAIVED",
+      "result": "PASS"
+    },
+    {
+      "case": "NO_INVENTED_SUCCESSOR_APPLICATION_FIELD",
+      "result": "PASS"
+    },
+    {
+      "case": "ACTIVATION_BUILD_PIN_IS_EXTERNAL_NOT_PRIOR_CAMPAIGN",
+      "result": "PASS"
+    },
+    {
+      "case": "CLOSED_V2_ACTIVATION_GRAMMAR",
+      "result": "PASS",
+      "qualified_instance": "NOT_CREATED"
+    },
+    {
+      "case": "MISSING_application_build_manifest_ref",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "MISSING_application_build_provenance_raw_ref",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "SOURCE_AS_APPLICATION_BUILD_ALIAS",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "NO_V1_ACTIVATION_ALIAS",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "RECEIPT_build_input_manifest_ref_BUILD_CONTEXT",
+      "result": "PASS"
+    },
+    {
+      "case": "RECEIPT_build_environment_ref_BUILD_CONTEXT",
+      "result": "PASS"
+    },
+    {
+      "case": "RECEIPT_verification_refs[]_BUILD_CONTEXT",
+      "result": "PASS"
+    },
+    {
+      "case": "HISTORY_DEPENDENT_VERIFICATION_compatibility_gate_result",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "HISTORY_DEPENDENT_VERIFICATION_artifact_hash_manifest",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "RECEIPT_SCHEMA_TARGET_CONTRACT_PARITY",
+      "result": "PASS"
+    },
+    {
+      "case": "ACYCLIC_EXTERNAL_ACTIVATION_PHASE_WITNESS",
+      "result": "PASS"
+    },
+    {
+      "case": "ACTIVATION_BACKLINK_IN_CANDIDATE",
+      "result": "PASS",
+      "expected": "REJECT_CYCLE"
+    },
+    {
+      "case": "ACTIVATION_BACKLINK_IN_BUILD_INPUT_FREEZE",
+      "result": "PASS",
+      "expected": "REJECT_CYCLE"
+    },
+    {
+      "case": "ACTIVATION_BACKLINK_IN_BUILD_OUTPUT",
+      "result": "PASS",
+      "expected": "REJECT_CYCLE"
+    },
+    {
+      "case": "RECEIPT_BACKLINK_IN_CANDIDATE",
+      "result": "PASS",
+      "expected": "REJECT_CYCLE"
+    },
+    {
+      "case": "RECEIPT_BACKLINK_IN_BUILD_INPUT_FREEZE",
+      "result": "PASS",
+      "expected": "REJECT_CYCLE"
+    }
+  ],
+  "external_phase_witness": [
+    "CANDIDATE",
+    "Q1",
+    "BUILD_INPUT_FREEZE",
+    "BUILD_OUTPUT",
+    "OUTPUT_VERIFICATION",
+    "RECEIPT",
+    "ACTIVATION",
+    "INITIALIZE"
+  ],
+  "source_digests": {
+    "F1_QUALIFICATION/inputs/BDB_AUDIT_V2_DATA_AND_ARTIFACT_CONTRACTS.md": "658f8866ca1a1330db9be582b13b47e87381de2208c53ee64ed9e47a8d3e15ee",
+    "docs/R5_4_1/candidate/BDB_AUDIT_V2_DATA_AND_ARTIFACT_CONTRACTS_R5_4.md": "7d967707d8f7a0d77ab84484aeb4de0119dab85ed055c31473792c8528919f75"
+  },
+  "inputs": {
+    "OWN_REFERENCE_RESOLUTIONS.json": "eb0275b80e713d5ad542b77966ade52a8d11dcf443a8bf80a409b4559fef54a1",
+    "design/EXTERNAL_PROFILE_CONTRACTS.json": "5369c2ce8acffd4b066d1317546d2ba5bd53401b3a072057d96462799b750043",
+    "design/BUILD_INSTALLATION_CONTEXT_REVIEW.md": "80c5e370f10743748f86a835e7c283bfb6d880aa52d3bbaa39a2cc9f3ce5a19c"
+  },
+  "qualification": false,
+  "actual_instance_DAG": "NOT_PROVEN",
+  "build_output": "NOT_CREATED",
+  "durable_initialization": "NOT_RUN",
+  "remaining": "Complete exact actual source/build/schema/profile/input/output/qualification closure and activation provenance with transitive backlink checks; no gate advances from contract/phase controls"
+}

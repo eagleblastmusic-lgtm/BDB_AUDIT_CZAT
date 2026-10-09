@@ -1,0 +1,164 @@
+{
+  "directory": "docs/R5_4_2/autonomous_2026_10_07/source_profile_build_candidate/0135f15ca94567a2b4d8a1ff66dbaed9f3874924d2c539b70bf368393ea703ae",
+  "build_digest": "0135f15ca94567a2b4d8a1ff66dbaed9f3874924d2c539b70bf368393ea703ae",
+  "entries": [
+    {
+      "file": "historical/objects/trust_profile__1.json",
+      "raw_digest": "bd9da0bc716229092357cad210f1f94aedd3f159928b40b2266f1355f435d37a",
+      "byte_length": 1144
+    },
+    {
+      "file": "historical/schemas/trust_profile__1.schema.json",
+      "raw_digest": "23ad1f352b792cecab983e7df2d786c0237aa634f8511eb146ea8870711fefc7",
+      "byte_length": 8104
+    },
+    {
+      "file": "objects/trust_profile__2.json",
+      "raw_digest": "851a68df5fd1683229fe52c9f1f0adf3bb31dac14e2d6b7da9282094812fe825",
+      "byte_length": 1332
+    },
+    {
+      "file": "profiles/BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1.json",
+      "raw_digest": "8a3d9f48bea7db2faabb75381d75568c80f3853bb82a523d6b208cd958b1a339",
+      "byte_length": 244
+    },
+    {
+      "file": "profiles/BOOTSTRAP_NAMESPACE_V2.json",
+      "raw_digest": "b19fe59f09116db0bd703afe14b7e2f9dbedd0d7b7a1569aa0b8d84ec598ce76",
+      "byte_length": 151
+    },
+    {
+      "file": "profiles/COORDINATOR.json",
+      "raw_digest": "db7eafddddf1d1d46477192757abfd3e925a88f81c934c9e368d08d3abb0ae1f",
+      "byte_length": 431
+    },
+    {
+      "file": "profiles/EXACT_DURABLE_RECOVERY_V1.json",
+      "raw_digest": "3c8e97222c1576327f811283a9e9df37e4705b1f700bc7de8b9141f4b09567d2",
+      "byte_length": 247
+    },
+    {
+      "file": "profiles/RECOVERY_REFERENCE_PROFILE_V1.json",
+      "raw_digest": "1289ccf2f629639283d006bc6c4364db91d276d44721b5140c8d894510e48b66",
+      "byte_length": 229
+    },
+    {
+      "file": "profiles/SOURCE_AUTHORITY_V1.json",
+      "raw_digest": "8d289305460fa25946dd085164ca79fc959dedaf197fb5240c0086f6febda4e6",
+      "byte_length": 356
+    },
+    {
+      "file": "profiles/SOURCE_IDENTITY_V3.json",
+      "raw_digest": "d42882d12fc3f1b758f720a6426916a239ded6a1cbcb30e5e6b70447138b4631",
+      "byte_length": 1092
+    },
+    {
+      "file": "profiles/SOURCE_MANIFEST_ENTRY_PROFILE_V1.json",
+      "raw_digest": "de4d3cea9f6989298062b4286c59d4fd7119d3d7d3ae5e1cfa7604eaf7b80b31",
+      "byte_length": 545
+    },
+    {
+      "file": "profiles/SOURCE_OWNER.json",
+      "raw_digest": "88cb9afcd1fbcac0fdc29d8cd7fe8f35a2101e3448d02d21e97802bceec8120c",
+      "byte_length": 381
+    },
+    {
+      "file": "profiles/SOURCE_PATH_PROFILE_V1.json",
+      "raw_digest": "4038372ba5b80dbb5e73d6833e8abbba1a1e16c295c7e79a2c840a889ac5b96e",
+      "byte_length": 369
+    }
+  ],
+  "schema_build_digest": "dab5361967c377022ec2d5e3518c7a883901a298d65ed9d8a3e04319fe7e0a69",
+  "source_inputs": {
+    "docs/R5_4_2/autonomous_2026_10_07/tools/source_profile_build_candidate.py": "b15c71a3cc8f02ad30fb9f46f66710e85c7c9064eaf3902492c20bf18fbf5b21",
+    "docs/R5_4_2/autonomous_2026_10_07/design/SOURCE_TRUST_BUILD_PARAMETERS.json": "e3e0f95205f3a9023876a6555d1f1917055d1d436e624ff975969c5b817478c9",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/execution.py": "333402e50b22c4d3cdce19d31f6246bde11bb86c07435ac2d106c38e74738dfe",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/build_time_candidates.py": "89a9f7e0bd1c57486fe498b79bbb7e6f334d6a6fc77dd308344004b8370e3250",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/schema_registry_build_candidate.py": "35746b9cd7b385b559dc60ca8ee6239234a85955b45d12c08bed3c4b244039f0",
+    "docs/R5_4_2/autonomous_2026_10_07/BUILD_TIME_CANDIDATE_READBACK.json": "f4dbdcefa2d869ca47365fa51b3edee852a7fcc2b2dea0eaca39c0626fc5f457",
+    "docs/R5_4_2/autonomous_2026_10_07/SCHEMA_REGISTRY_BUILD_READBACK.json": "6c6c67d48681794dbfb5e2e9befe8b614275c8fe480409e3bd61d9a630c70807",
+    "docs/R5_4_2/autonomous_2026_10_07/design/EXTERNAL_PROFILE_CONTRACTS.json": "b5a0a24f475b00b69b76ff9e9ec271693610039ae521859ec837bf957dd42bbc",
+    "docs/R5_4_2/autonomous_2026_10_07/design/PROFILE_REFERENCE_CONTRACTS.json": "a60bad1cb2b3372db8ba44904795f0ec5b43975ff15f3d87379b83e4bd14d1e1",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/bootstrap_instance_design.py": "dd0751265b8ff100d4b4e752f760f1c2f1d68eba27d7838e346562872955f44a",
+    "docs/R5_4_1/R5_4_1_CANDIDATE_MANIFEST.json": "15415abd7d2601698c6ff664a93077213e81575272a213c4511f6082c9d8fdef",
+    "docs/R5_4_1/candidate/objects/trust_profile__1.json": "bd9da0bc716229092357cad210f1f94aedd3f159928b40b2266f1355f435d37a",
+    "docs/R5_4_1/candidate/schemas/trust_profile__1.schema.json": "23ad1f352b792cecab983e7df2d786c0237aa634f8511eb146ea8870711fefc7",
+    "src/bdb_audit/core/hashing.py": "286dee6109409661624572e4c3e87935d33f22c9a0e3a7bfad8dabbf471248f1",
+    "src/bdb_audit/core/canonical_json.py": "62dfa640d32fdea9025ae167eb1c8a1c7a3bdde6d3b913677aad517ebdea37ac"
+  },
+  "input_drift": [],
+  "qualification": false,
+  "installed": false,
+  "status": "EXACT_SOURCE_TRUST_BUILD_INPUTS_AND_ISOLATED_HISTORY_READ_BACK_NOT_QUALIFIED",
+  "actual_build_dependency_closure": {
+    "nodes": 11,
+    "edges": [
+      [
+        "profiles/BOOTSTRAP_NAMESPACE_V2.json",
+        "profiles/COORDINATOR.json"
+      ],
+      [
+        "profiles/BOOTSTRAP_NAMESPACE_V2.json",
+        "profiles/SOURCE_OWNER.json"
+      ],
+      [
+        "profiles/COORDINATOR.json",
+        "objects/trust_profile__2.json"
+      ],
+      [
+        "profiles/EXACT_DURABLE_RECOVERY_V1.json",
+        "profiles/RECOVERY_REFERENCE_PROFILE_V1.json"
+      ],
+      [
+        "profiles/RECOVERY_REFERENCE_PROFILE_V1.json",
+        "objects/trust_profile__2.json"
+      ],
+      [
+        "profiles/SOURCE_AUTHORITY_V1.json",
+        "profiles/SOURCE_IDENTITY_V3.json"
+      ],
+      [
+        "profiles/SOURCE_AUTHORITY_V1.json",
+        "profiles/SOURCE_IDENTITY_V3.json"
+      ],
+      [
+        "profiles/SOURCE_MANIFEST_ENTRY_PROFILE_V1.json",
+        "profiles/SOURCE_IDENTITY_V3.json"
+      ],
+      [
+        "profiles/SOURCE_OWNER.json",
+        "profiles/SOURCE_AUTHORITY_V1.json"
+      ],
+      [
+        "profiles/SOURCE_PATH_PROFILE_V1.json",
+        "profiles/SOURCE_IDENTITY_V3.json"
+      ]
+    ],
+    "topological_order": [
+      "profiles/BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1.json",
+      "profiles/BOOTSTRAP_NAMESPACE_V2.json",
+      "profiles/EXACT_DURABLE_RECOVERY_V1.json",
+      "profiles/SOURCE_MANIFEST_ENTRY_PROFILE_V1.json",
+      "profiles/SOURCE_PATH_PROFILE_V1.json",
+      "profiles/COORDINATOR.json",
+      "profiles/RECOVERY_REFERENCE_PROFILE_V1.json",
+      "profiles/SOURCE_OWNER.json",
+      "objects/trust_profile__2.json",
+      "profiles/SOURCE_AUTHORITY_V1.json",
+      "profiles/SOURCE_IDENTITY_V3.json"
+    ],
+    "scope": "Actual unqualified source/trust build declarations only; no installed principal or vault guarantee"
+  },
+  "remaining": [
+    "independently authenticated principal and source authority",
+    "independently authorized namespace",
+    "independently authorized successor trust_profile/2 installation; historical /1 is never active",
+    "actual vault/executor isolation enforcement and readback",
+    "surface-key normalizer instances",
+    "complete source identity profile",
+    "complete policy and bootstrap roots",
+    "Q1",
+    "Q2",
+    "N5-N11"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "observed": [
+    {
+      "field": "source_identity_profile_ref",
+      "accepted": true,
+      "commit_seq": 2
+    },
+    {
+      "field": "repository_authority_ref",
+      "accepted": true,
+      "commit_seq": 2
+    }
+  ],
+  "qualification": false,
+  "NF02": "OPEN"
+}

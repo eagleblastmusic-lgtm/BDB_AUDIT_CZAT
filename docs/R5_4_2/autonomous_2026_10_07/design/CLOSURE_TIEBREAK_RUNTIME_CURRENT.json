@@ -1,0 +1,27 @@
+{
+  "status": "TARGETED_RUNTIME_CORRECTION_PASS",
+  "normative_sections": [
+    "2",
+    "15.2"
+  ],
+  "normative_source_raw_digest": "658f8866ca1a1330db9be582b13b47e87381de2208c53ee64ed9e47a8d3e15ee",
+  "implementation_raw_digest": "4c6baa8461380e9d295a603266bfbda8cb3333545e0bd0e87011d34b8e4735ad",
+  "normative_tie_break": [
+    "kind",
+    "logical_id_or_empty",
+    "revision_digest"
+  ],
+  "expected": [
+    "approval",
+    "cmd"
+  ],
+  "observed": [
+    "approval",
+    "cmd"
+  ],
+  "rejected_normative_sequence_code": null,
+  "scope": "Actual canonical_order on two prepared independent nodes; no accepted instance or qualification proof",
+  "required_fix": "Remove command-envelope priority from Kahn ready-node key in successor implementation; preserve typed/order-only edges",
+  "qualification": false,
+  "NF02": "OPEN"
+}

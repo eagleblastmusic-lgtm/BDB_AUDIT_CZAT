@@ -1,0 +1,112 @@
+{
+  "status": "RAW_BACKED_SCHEMA_REGISTRY_BUILD_READ_BACK_NOT_FROZEN_NOT_INSTALLED",
+  "directory": "docs/R5_4_2/autonomous_2026_10_07/schema_registry_build_candidate/a867a8c5c50326bfd7ea63bfee317bb1a74124c8a5d3a2d12bca53e984fe2a09",
+  "build_digest": "a867a8c5c50326bfd7ea63bfee317bb1a74124c8a5d3a2d12bca53e984fe2a09",
+  "entries": [
+    {
+      "file": "objects/artifact_contract_registry__1.json",
+      "raw_digest": "39acff2b8bc449b15e9be91886440c67ccf8a50ced27d343519d67b3c51f8b6a",
+      "byte_length": 561612
+    },
+    {
+      "file": "objects/schema_registry__2.json",
+      "raw_digest": "929a8719f4d8eb1e2a0b46caf768832fa6012b86e5cb68368bc45b8197265ce1",
+      "byte_length": 53528
+    },
+    {
+      "file": "profiles/BDB_CJSON_1.json",
+      "raw_digest": "4850258cdf2644537a32e4c3574a56fc04bd105dc358f2d20bf384e57be29cec",
+      "byte_length": 193
+    },
+    {
+      "file": "profiles/BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1.json",
+      "raw_digest": "8a3d9f48bea7db2faabb75381d75568c80f3853bb82a523d6b208cd958b1a339",
+      "byte_length": 244
+    },
+    {
+      "file": "profiles/EXACT_COMPATIBILITY_V2.json",
+      "raw_digest": "c0902efff9259ba22f40982985e48b0e660cb8c3f57d78e864cb7295e454260e",
+      "byte_length": 219
+    },
+    {
+      "file": "profiles/QUALIFIED_VALIDATOR_V2.json",
+      "raw_digest": "2bc29955bc8a53caad33281a99aac2b866628d0f6842e2ed6a2747f27c679b6c",
+      "byte_length": 501
+    }
+  ],
+  "sources": [
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/BUILD_TIME_CANDIDATE_READBACK.json",
+      "raw_digest": "1aff26d762eb2f963299ce6171a66e984bbeaf7bc04e13b24d49199cec766c62"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/REGISTRY_BUILD_CANDIDATE_READBACK.json",
+      "raw_digest": "da804e35ac5fdc5b3f2698c8005d6f88635a1ddd6b75bf949ec2d41303cde4a0"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/design/EXTERNAL_PROFILE_CONTRACTS.json",
+      "raw_digest": "5369c2ce8acffd4b066d1317546d2ba5bd53401b3a072057d96462799b750043"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/tools/build_time_candidates.py",
+      "raw_digest": "89a9f7e0bd1c57486fe498b79bbb7e6f334d6a6fc77dd308344004b8370e3250"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/tools/execution.py",
+      "raw_digest": "333402e50b22c4d3cdce19d31f6246bde11bb86c07435ac2d106c38e74738dfe"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/tools/schema_registry_build_candidate.py",
+      "raw_digest": "01da36e25b3ab311fa42651583b49c04747ebe798e96cae2ef3eaf02ad70fd1e"
+    },
+    {
+      "file": "src/bdb_audit/core/hashing.py",
+      "raw_digest": "286dee6109409661624572e4c3e87935d33f22c9a0e3a7bfad8dabbf471248f1"
+    },
+    {
+      "file": "src/bdb_audit/core/canonical_json.py",
+      "raw_digest": "62dfa640d32fdea9025ae167eb1c8a1c7a3bdde6d3b913677aad517ebdea37ac"
+    },
+    {
+      "file": "src/bdb_audit/core/errors.py",
+      "raw_digest": "fd22fd0097c928833d63439c665e3dca4a9faa9fad7914ad3354c4715f8d4140"
+    }
+  ],
+  "bound_semantic_keys": 131,
+  "schema_registry_ref": {
+    "kind": "schema_registry",
+    "revision_digest": "4f989f379bae67446babadbc644c9a8501bbfe4455ca518b12f5415bd59aadfd",
+    "schema_revision_ref": {
+      "kind": "schema",
+      "revision_digest": "1fb570f8c9f10b66f5dab4ce504db954bf3fcd9fa31328b38873c3d784e43db8"
+    },
+    "digest_profile": "BDB-OBJECT-DIGEST-1",
+    "logical_id": "schema_registry_00000000-0000-4000-8000-000000000002"
+  },
+  "artifact_contract_registry_ref": {
+    "kind": "artifact_contract_registry",
+    "revision_digest": "6e34642648dc7988261facce34433fa6fbab1c219cfbceb27080db846699922c",
+    "schema_revision_ref": {
+      "kind": "schema",
+      "revision_digest": "bfbf1a30ed8d908285f8e5508b0899be503dd6c3cfce75af8584fe0c60979055"
+    },
+    "digest_profile": "BDB-OBJECT-DIGEST-1"
+  },
+  "external_schema_root": {
+    "file": "schemas/schema_registry__2.schema.json",
+    "raw_digest": "1fb570f8c9f10b66f5dab4ce504db954bf3fcd9fa31328b38873c3d784e43db8",
+    "byte_length": 9159,
+    "media_type": "application/schema+json",
+    "$id": "BDB_SCHEMA_REGISTRY::schema_registry/2",
+    "dialect": "https://json-schema.org/draft/2020-12/schema",
+    "dependency_closure": []
+  },
+  "schema_build_digest": "333b137bd402941e9c6b05dfd105a74e129fff8db7ec7ce4e1d9a3122078490a",
+  "input_drift": [],
+  "qualification": false,
+  "installed": false,
+  "frozen": false,
+  "Q1": "NOT_STARTED",
+  "Q2": "NOT_STARTED",
+  "NF02": "OPEN"
+}

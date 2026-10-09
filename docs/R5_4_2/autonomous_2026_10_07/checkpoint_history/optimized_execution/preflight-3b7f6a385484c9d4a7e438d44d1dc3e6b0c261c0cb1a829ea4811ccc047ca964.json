@@ -1,0 +1,11 @@
+{
+  "actual_instance_DAG": "NOT_PROVEN",
+  "build_digest": "6149465ae7e62b583d30952e2ff34eead1f6c1342c76515321b018c7df628729",
+  "build_readback_raw_digest": "5852a8d5c12061385fec962d7691a925795466830a97b26439c0a0d3d3766789",
+  "copied_directory": "docs/R5_4_2/autonomous_2026_10_07/preflight/68101a77-47c5-4978-9d80-92661c446e14",
+  "fixture_readback_raw_digest": "bf36b0dafd65d381471e4130c63b247df4ce22cd80f15dee2eddfaf8dfc7ddd2",
+  "mismatches": [],
+  "qualification": false,
+  "schema_vectors": 2498,
+  "verified_files": 275
+}

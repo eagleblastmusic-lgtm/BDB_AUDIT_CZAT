@@ -41,6 +41,7 @@ from .inbox import (
 )
 from .packaging import _deterministic_zip, _publish_exact
 from .source_target import ResolvedSource
+from .result_proposal import derive_result_proposal
 
 
 @dataclass(frozen=True)
@@ -249,6 +250,7 @@ class StageBatch:
     frozen_history_cut: dict[str, Any]
     jobs: dict[str, StageLaneJob]
     assignment_accepted_history_cut: dict[str, Any]
+    batch_ticket: str = ""
 
     @property
     def lane_slots(self) -> tuple[str, ...]:
@@ -1574,6 +1576,12 @@ def prepare_stage_phase_batch(
             ),
         )
 
+    batch_ticket = store.issue_batch_ticket(
+        campaign_id=assignments.campaign_id,
+        stage_id=stage_id,
+        cut=frozen_cut,
+    )
+
     return StageBatch(
         campaign_id=assignments.campaign_id,
         stage_id=stage_id,
@@ -1583,6 +1591,7 @@ def prepare_stage_phase_batch(
         assignment_accepted_history_cut=dict(
             assignments.accepted_history_cut
         ),
+        batch_ticket=batch_ticket,
     )
 
 
@@ -1917,6 +1926,24 @@ class StageResultInbox:
                 )
             job = self.batch.get_job(str(slot))
 
+            if not job.package_zip_path.is_file():
+                return self._reject(
+                    path,
+                    str(slot),
+                    "ASSIGNED_PACKAGE_TAMPERED",
+                    f"Assigned package ZIP missing: {job.package_zip_path}",
+                    raw_digest,
+                )
+            actual_pkg_bytes = job.package_zip_path.read_bytes()
+            if hashlib.sha256(actual_pkg_bytes).hexdigest() != job.package_zip_sha256:
+                return self._reject(
+                    path,
+                    str(slot),
+                    "ASSIGNED_PACKAGE_TAMPERED",
+                    "Assigned package bytes tampered on disk",
+                    raw_digest,
+                )
+
             if (
                 manifest.get(
                     "source_commit_sha", ""
@@ -1960,6 +1987,25 @@ class StageResultInbox:
                         ),
                         raw_digest,
                     )
+
+            if not job.package_zip_path.is_file():
+                return self._reject(
+                    path,
+                    str(slot),
+                    "ASSIGNED_PACKAGE_TAMPERED",
+                    f"Assigned package ZIP missing: {job.package_zip_path}",
+                    raw_digest,
+                )
+            actual_pkg_bytes = job.package_zip_path.read_bytes()
+            if hashlib.sha256(actual_pkg_bytes).hexdigest() != job.package_zip_sha256:
+                return self._reject(
+                    path,
+                    str(slot),
+                    "ASSIGNED_PACKAGE_TAMPERED",
+                    "Assigned package bytes tampered on disk",
+                    raw_digest,
+                )
+            self.vault.put_bytes(actual_pkg_bytes, media_type="application/zip")
 
             if (
                 manifest.get("input_package_digest")
@@ -2050,26 +2096,9 @@ class StageResultInbox:
                     raw_digest,
                 )
 
-            proposal_body = dict(manifest)
-            proposal_body["history_cut"] = dict(
-                expected_cut
-            )
-            proposal_body["assignment_ref"] = dict(
-                job.assignment_ref
-            )
-            proposal_body["attempt_ref"] = dict(
-                job.attempt_ref
-            )
-            proposal_body["findings"] = findings
-            proposal_body["outputs"] = outputs
-            proposal_body["raw_result_digest"] = (
-                raw_digest
-            )
-            proposal_body["raw_result_byte_length"] = len(
-                raw
-            )
-            proposal_body["evidence_files"] = (
-                evidence_files
+            proposal_body = derive_result_proposal(
+                raw, members, history_cut=expected_cut,
+                assignment_ref=job.assignment_ref, attempt_ref=job.attempt_ref,
             )
 
             # Construct canonical admission evidence
@@ -2099,6 +2128,7 @@ class StageResultInbox:
                 "source_commit_sha": job.source_commit_sha,
                 "history_cut": dict(expected_cut),
                 "input_package_digest": job.package_digest,
+                "package_zip_sha256": job.package_zip_sha256,
                 "raw_result_digest": raw_digest,
                 "raw_result_byte_length": len(raw),
                 "result_proposal_digest": result_proposal_digest,
@@ -2106,6 +2136,10 @@ class StageResultInbox:
                 "executor_model": job.model,
                 "evidence_files": evidence_files,
             }
+            evidence_body["ingestion_capability"] = self.store.issue_ingestion_capability(
+                evidence_body,
+                batch_ticket=self.batch.batch_ticket,
+            )
             evidence_obj = CanonicalObject("lane_result_admission_evidence", evidence_body)
             proposal_body["admission_evidence_ref"] = evidence_obj.as_ref(ref_class="PRIOR_ACCEPTED_ONLY").as_dict()
 

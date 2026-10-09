@@ -1,0 +1,859 @@
+{
+  "records": [
+    {
+      "file": "OWN_BODY_INVENTORY.json",
+      "raw_digest": "0d07b9c79ade328b85bc43816176c919103af5e180ca04f935ff83d75833c65f",
+      "generator": "semantic_inventory",
+      "matches": true
+    },
+    {
+      "file": "ISSUE_REGISTER.json",
+      "raw_digest": "e521dcf1833988561dee4de8835438c3848185997d04344ecea49047131833c4",
+      "generator": "semantic_inventory",
+      "matches": true
+    },
+    {
+      "file": "REFERENCE_FRONTIER.json",
+      "raw_digest": "bc0065ce3a6f736441b4660b9dc481361fe4506cb841a96f7d410100760ee9e2",
+      "generator": "reference_frontier",
+      "matches": true
+    },
+    {
+      "file": "OWN_REFERENCE_RESOLUTIONS.json",
+      "raw_digest": "6992a12ceeae4c66fdcca6aa6978528e93b5030819f60cf66e8caec10942343d",
+      "generator": "reference_resolution",
+      "matches": true
+    },
+    {
+      "file": "design/VERSION_IMPACT_PLAN.json",
+      "raw_digest": "2687b9377ef6772bec410b15a22239ea24000e72e2b8b3726f80372412e9250d",
+      "generator": "version_impact",
+      "matches": true
+    },
+    {
+      "file": "design/PURPOSE_CONTRACT_GRAMMARS.json",
+      "raw_digest": "0c22f9d37d96126907dee371217f87a0d8cc51bfcd515290f40cb9fbce633ca9",
+      "generator": "purpose_contracts",
+      "matches": true
+    },
+    {
+      "file": "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+      "raw_digest": "8627cc2525a96405ca666ea0b015acc5c944d28ffaacae72b5bec37180502a61",
+      "generator": "purpose_contracts",
+      "matches": true
+    },
+    {
+      "file": "design/EVENT_TARGET_TABLE.json",
+      "raw_digest": "56bdeb70504ed0cda815f46c86a3595846d40b28b2766e09e5860f8dfd76ef96",
+      "generator": "event_grammars",
+      "matches": true
+    },
+    {
+      "file": "design/FULL_PATH_TRANSITION_TABLE.json",
+      "raw_digest": "0a51c32449fa1ddc4c99cb7a8c031c0e28dda1115cc1d97de1cb77a687d68ea2",
+      "generator": "transition_contract",
+      "matches": true
+    },
+    {
+      "file": "design/COMMON_GRAMMARS.json",
+      "raw_digest": "cbddbbb2ac57b05bef1b780b6d2c56ec7e1661238f00eee785c613492a880bfc",
+      "generator": "common_grammars",
+      "matches": true
+    },
+    {
+      "file": "design/COMMON_GRAMMAR_KNOWN_ANSWERS.json",
+      "raw_digest": "dbf15f143168fbefc0a46ba36ea1661ff2c976306f4e2496559a74b2472599e9",
+      "generator": "common_grammars",
+      "matches": true
+    },
+    {
+      "file": "design/OWN_FIELD_DOMAINS.json",
+      "raw_digest": "ad66c4421e32ea818ae7e46ee741b5ee6eb006b467621f40162d12e5d82809c7",
+      "generator": "field_domains",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/approval_decision__2.json",
+      "raw_digest": "25bb38d97518243d0777947fd4638fd82a12d093c8db27d3b5c47c869fa9f9d0",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/artifact_hash_manifest__2.json",
+      "raw_digest": "4ec976a08e36fea1c3fb923c1d504ef2b089edc1a782b817c2e2ed2869801657",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/assignment_manifest__2.json",
+      "raw_digest": "a627d218a21e479f5cf546d205d8ec849aaf8b48088a6f105ce086cd352585f3",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/assignment_package_binding__2.json",
+      "raw_digest": "fddd17fba3d7341010f5d929ed9fae1d7d10ddfc74bd905020484e99e8ac4b6c",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/assurance_claim_set__1.json",
+      "raw_digest": "35f28edcb23ef2cf31a975e5b8c9ae20e08bb240f85c53fe681b4c39aaffb043",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/attempt__2.json",
+      "raw_digest": "9185086c4405a1a5bc5225514efa63364e4e27d18b31efe07795d6682ac88463",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/bdb_audit_lane_result__3.json",
+      "raw_digest": "2e2c110c5d7183676ed5f5f380b7eb73eb6b4781f915ed16a54435f66b3c593c",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/blind_origin_eligibility_assessment__2.json",
+      "raw_digest": "942e922bd7564918b64c26cfa4dc0f2af4431d0227e955226b32feb817a4f2db",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/bootstrap_admission_decision__2.json",
+      "raw_digest": "667ca3c34175b366880d37a9a2989de2f598d75eb91bc976bfaff2b99c0d9a74",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/build_manifest__2.json",
+      "raw_digest": "031c2b88aa1d44442af9b9b1f7164d339c9c9301b99e0f7806c36cc558cfc5b8",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/bundle_manifest__2.json",
+      "raw_digest": "4f82c8421feead198146ffacc09ce23ab9b38b0babf45faf50f4ebb1913ef39f",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/campaign_conclusion__2.json",
+      "raw_digest": "cbe3140f8daa7084ef109929576831f5b1522f0193fbd4cb82445867378e7e7c",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/campaign_genesis__2.json",
+      "raw_digest": "6f7982895ae0057e87343cdabbeb6b89477b4cbb00948be4379d7902506111d4",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/candidate_assurance_case__2.json",
+      "raw_digest": "053b1cbe45ec93fca16b1ae91c1c19df1ba75e950a3750f29187f6d67ff4d807",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/challenger_assignment__2.json",
+      "raw_digest": "3584bde965cd2d4b5cf7e89bfd008edc6a7e969fc90f4ff8acddcc80b626ff78",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/challenger_result__2.json",
+      "raw_digest": "505a64c61a18138815f35f671a00fce9888c89b3c7f92a2518abec870737ea2b",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/checkpoint__2.json",
+      "raw_digest": "5461c401011d4e394f1933d587d11a2fcc290c18fbfa8a6031247c9419ca13c7",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/clean_control_assessment__1.json",
+      "raw_digest": "b4cb5b2f3be6adf7a4caa1a119711d356bcb6ac2bd148fa113c48e4cb1c14c07",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/cleanup_result__2.json",
+      "raw_digest": "0ae0b41a0d68c3554fafa5e15b2d963db6c9d66ba60d9caa8a4c922b2fc7169d",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/command_envelope__2.json",
+      "raw_digest": "e8b50e81406151ea9e9fe545a31f7ab96e8041f8ab8d2cec8c4c2d8c99daf42d",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/command_receipt__2.json",
+      "raw_digest": "c1dd4f5669e2e72d9bc58565b1f3c166289f307f3d95d2198784ae8a98164929",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/commit_body__2.json",
+      "raw_digest": "ca6a6afe7cded0df824f9359976487fe2911afc596b2b6808898dfd1f4e75e68",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/compatibility_fixture_assessment__2.json",
+      "raw_digest": "ae3733cd36197ff6a3f1ddd93fb410705840fb565d8c0f8fc0a308757c627510",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/compatibility_gate_result__2.json",
+      "raw_digest": "60448f96d1ee6d30d84f36ba43b521fa665009bf7932856892ee5e1416ab3583",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/contamination_assessment__2.json",
+      "raw_digest": "d5561b279c297b347b32f601a5d7c426625c1a7888ba6a2fa0338bc3fce6af20",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/contradiction_resolution_decision__2.json",
+      "raw_digest": "ea80d11d99b088bceec3d6c774918731aff923874d2217e5edaf9fb99d5420a5",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/contradiction_revision__2.json",
+      "raw_digest": "d10113a363b8334e015bbc74656fc4e8d46a3ed54d64422784feba4453877fab",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/corpus_manifest__2.json",
+      "raw_digest": "24ee41307f769f20107216bb3e1105689520a11c2fcfb2297c55d7b2ee0196c1",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/corpus_member_admission_assessment__2.json",
+      "raw_digest": "7525097c4998bb7c750eaa42021a51030297d189b03b619875e9d293ae2c008d",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/corpus_member_candidate__1.json",
+      "raw_digest": "1ecf42197dbe6685efb4e2a5d3d1b60c11d34bd559bd04fbd17507ab576b8c59",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/coverage_obligation__2.json",
+      "raw_digest": "e5965cb24d6d027b920430321758f9296c094d6a5be614ad5317a341bdefc647",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/coverage_obligation_key__2.json",
+      "raw_digest": "9c7bbdf7077dfc1ec8d8ef7ede04fa183c2fa83dac0c667de5f993cdc089f110",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/coverage_obligation_qualification__2.json",
+      "raw_digest": "8cfc760bb1b26623135baa9f8b54f5dd450e9e46293098b2b47df5144e1a9e4c",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/defect_unit__1.json",
+      "raw_digest": "4e856b3edaa9a5488653fa1d0147d6bdb105cc6496f187a821db4c639f3745a1",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/delivery_spec__2.json",
+      "raw_digest": "665bf4a1cf3b953b5a9d45b97c35214cffd7ac492f6a11acbe18d2251d33644d",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/dependency_independence_assessment__2.json",
+      "raw_digest": "a4aa1f28d25ee2c1b840f01d3597d0114bd2b8477c752e3c60f71fe16501a941",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/discovery_confirmation_assessment__1.json",
+      "raw_digest": "6645d38e9345de9256e65f8e54ce73452528ecf52c71cb59eae7bde3a3d933e3",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/discovery_corpus_match_assessment__1.json",
+      "raw_digest": "32cf6895efb813c57d03b06565c12b8c40d0aac2a5cb2f32e6946d007e775baf",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/discovery_novelty_assessment__1.json",
+      "raw_digest": "f76db82d9f2fd5c2b06a26931d63e4f81ed08a857db28ba57458a63a220cf665",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/discovery_record__2.json",
+      "raw_digest": "61c1826947cded55ab0d293ce18abbf97f79ea9437ec7bba53e9e22a03821cb6",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/discovery_tool_origin_assessment__1.json",
+      "raw_digest": "2ff3e7c1ad5e430258532ae00720294fc11ea952377bf85a9ccd675ddeaedc8b",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/effort_results__1.json",
+      "raw_digest": "3ebb36f237b4f727804319ac88839eb93fc965b394a7e47faeeb7f4f18df945d",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/environment_record__2.json",
+      "raw_digest": "fdb308d53fb51449e04e76f0dae2a8795350aebe57ce2e6496e59e9f87c60d6c",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/evidence_applicability_assessment__2.json",
+      "raw_digest": "a28e40359a13c8ecf30ea95c4f013ddb6e0dcaa00e6adc5a0ea817c76703d5c4",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/evidence_dependency_graph__1.json",
+      "raw_digest": "018541e2c9cd0853ef50319703f370f88a4bdf71802d9ea3660097a897c110a5",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/evidence_invalidation__2.json",
+      "raw_digest": "bd691d2bf384df4c73322c5baf423e83275f0ac45ba980ea17a792d31bebbcf1",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/evidence_qualification_assessment__2.json",
+      "raw_digest": "a2b641235e80318c48cbd529746a291249714aba7d5d0b6a68d6405447a85351",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/execution_descriptor__2.json",
+      "raw_digest": "cdb79afec9dfb6fe58bf6ec7d7e89eb50261025f99e50d716da7f0889247885b",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/execution_result__2.json",
+      "raw_digest": "535d3cdb349d8c7881eb933c827dcd2d17cc4561f2752deed7d4c2bd5e561e44",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/executor_spec__2.json",
+      "raw_digest": "f27b87634a4e134a6cdad95a757a2831dc962af5f367ee6bd625c490ff036e70",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/experiment_spec__2.json",
+      "raw_digest": "1fc1b734b17ee25bdbcbc784b8ded84eb157fdb15e94bc8940c4538133e7a750",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/false_negative_relationship_assessment__1.json",
+      "raw_digest": "0a898c7420e1b08d7951da0d907b926b0dbef2661924165b830ad099351dac34",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/fault_run_record__2.json",
+      "raw_digest": "88d9ee8f66a113b2f9cda56d14c71c9a7bae47107170fddc422cbc9e8aed4329",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/fault_spec__1.json",
+      "raw_digest": "5105f0ce17de1c5d4a9c667c098ec4c60b3a93dbfd2a5bfa598ddf6d392a45bd",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/final_assurance_case__2.json",
+      "raw_digest": "093366f53d49995c286e4346d44c4e21f8859a9153de02691ffd4a493b399036",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/final_technical_report__2.json",
+      "raw_digest": "492979324f746eda84233393f20cf0ee07b4168d29c516664852149e5a429dbf",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/finding_adjudication_decision__2.json",
+      "raw_digest": "6fe50fc6114ac3c0a53f52cc177bdd1d226723e9025d0540b18393e4638d877b",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/finding_axis_assessment__2.json",
+      "raw_digest": "10136b513b8a3052cd12244148731725a6173fcb5a1f10641bde72a55904dbf5",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/finding_claim_revision__2.json",
+      "raw_digest": "4a9d1be8bc7e80de91cceb4919835a72378e73d74d97ad1a4d726c6955538839",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/finding_defect_match_assessment__1.json",
+      "raw_digest": "473ee76acf5c1ec0836f9929ee1c18ee9b2847849a01150a638e4433dc39e2b0",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/gate_decision__1.json",
+      "raw_digest": "f6af7139a77ebbe86e25075e0596cfc664aa30fd4927b924aef19b2290a903a0",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/grant_body__2.json",
+      "raw_digest": "edcf8b23584493ac1fcbed9a60c1939448896d70de5389cd4178f657c6eaec93",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/handoff_validation_result__1.json",
+      "raw_digest": "6a61c6cba07805f2f29345bc208af8519febe100de2f79742715908ac3897b34",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/history_anchor_receipt__2.json",
+      "raw_digest": "c0672caa72a3eafc9a08b231ed58dfc9e6d69747960a054616300babcdc6a392",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/history_cut__2.json",
+      "raw_digest": "9ac9d44989ca6e59f12372cb991e47039e45b7c794d3990eb11f52e845d81fbc",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/holdout_exposure_assessment__1.json",
+      "raw_digest": "89a936f28814e39e73e318c5c8a072341be92fa7020e0812a2385b3fad14c38e",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/hypothesis_revision__2.json",
+      "raw_digest": "ea2e833c4cb0c2807bf8d9d1cde8e99cc68977b654eb0695a96b97ffe873594d",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/input_disposition_record__2.json",
+      "raw_digest": "635f995ef83cfacbbae7b89ce412c302d2d9f7cc4f9392420acb3c0291c93069",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/invariant_revision__2.json",
+      "raw_digest": "a3e5c01fa13f0e10c810f1e571ffa1fab0c130b5c173e833a341bbb53ef8b1a3",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/inventory_revision__2.json",
+      "raw_digest": "38de7b53e8d904b520bea81a06a17bab64d43a420c5695a8e212f03ac646317f",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/isolation_baseline_profile__2.json",
+      "raw_digest": "1a43726bda8a626b4950830017ba6e4b0148c7805673ccd3b442381d8e0fffa2",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/isolation_qualification__2.json",
+      "raw_digest": "381294dcf9a1790c6d32ccc7d72e0db7e4fc41aa1b68ac6093339342e341a244",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/knowledge_state__2.json",
+      "raw_digest": "fe38355683bc9834af5ec0dd144fa9077f1086f5d6c6adab2f976074aaa7f73a",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/lane_completion__2.json",
+      "raw_digest": "7ebd57ced6b2a8cdab7b8e08276f522dcc5c4fcddb9d0a5f0d2a96b6a4fa8b3d",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/lane_result_admission_evidence__3.json",
+      "raw_digest": "29a60ef988ead7e3d6331fd47c5dc03471c1bfd63688ac7cc894ddf98f40bed2",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/lane_run__2.json",
+      "raw_digest": "d59daed7b0f480c8569bbbd58afdcce04f51092c97c71f08063634efd7782f1a",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/lane_spec__2.json",
+      "raw_digest": "f3bbaa96fa8a5b37e8f3703b0c70e242c159d2e25552b3e0d03d01e7d71aaf03",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/legacy_exposure_reconstruction_assessment__2.json",
+      "raw_digest": "90d3701807784447b75705f67e2110879db70cd18757d64c3d0eac9dc1db34ce",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/legacy_mechanical_validation_assessment__2.json",
+      "raw_digest": "babb1de3d18614e1156be2b26865eb05fba4c9e363e4262f9185ec3f9e84f523",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/legacy_observation_mapping_assessment__2.json",
+      "raw_digest": "8c6c95c7ca22a8b3a0c82fae20f23ff636026c5b622990bf3407913ffde9410c",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/legacy_observation_semantic_equivalence_assessment__2.json",
+      "raw_digest": "3c99c05a501c6368428e6bd76bd1e99fc4e3d912e4278dd453cd9f4741848e08",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/lineage_admission_assessment__2.json",
+      "raw_digest": "5702d54e65005cc85bb2241823a1757c173e12ec758487908abba2fe41a565ed",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/materiality_assessment__2.json",
+      "raw_digest": "d224f97ed81a3f625ecad4b73dbeeba0d99d725db19df78bc147e4ab69d6ed6c",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/model_fidelity_assessment__2.json",
+      "raw_digest": "e05da558f7d510d8952daeb882569735e36f8ddb29d20b9787ac7b59e280b605",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/negative_evidence_record__2.json",
+      "raw_digest": "47ddb0e2b2cd31bff10c1cd222f0bfc7292f1cc0d2549db6200dd93cb94257c5",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/negative_opportunity_unit__1.json",
+      "raw_digest": "83e152426517894cbb1e18ca51bcfae3dc4e004446e5a4426f23d54f35925314",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/obligation_applicability_decision__2.json",
+      "raw_digest": "a7135c7349d88c6dd5183f263e0c62aeb81787d0e70310ea29c94f09a2adb418",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/observation__2.json",
+      "raw_digest": "41579060be221c9eab5e9b0eeb538ce56af029dd093649e23a07a6c841e9c369",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/observation_dependency__1.json",
+      "raw_digest": "ec6f5a0caf7bdb446619ed9bf82056481ed62cea4b049219746b4574fac5985b",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/policy_revision__2.json",
+      "raw_digest": "a29efa886c9c1bb1c3992cc30dd42020224831ca2a856f6fbe8f2051a4b35ce3",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/potential_exposure_record__2.json",
+      "raw_digest": "eb3d2effbe3848acdbf5b1b101f8fdc378869c81180e8bf50d7b29ee1f6ca029",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/public_conclusion_statement__1.json",
+      "raw_digest": "10e8472034c16fb338099fa3b080024631801c1a0054e7478799dd2e2a5ede45",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/release_qualification__2.json",
+      "raw_digest": "cdda107f6f56fde9fefe6ca56eaa239617c52eb7e022856dd0f0cad2cc5a0b3a",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/report_export_receipt__2.json",
+      "raw_digest": "61bd9f3e33deb58d9bb3514e8da1026338617ac9b3758bb3e9c81c48c4e51e80",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/residual_risk__1.json",
+      "raw_digest": "2055c8ddb5efb7417a0a3936e3d8fe8e285eb6b57ab64895a7a7be001c27a25e",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/root_cause_revision__2.json",
+      "raw_digest": "7d7725c204be760450ebec09a88e70aa8cbf650f44312b0f280c176056ff341c",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/run_manifest__2.json",
+      "raw_digest": "79272d7835f1cf9aea8af9c4c60157bbef3f225e71ace68de2dafe2a8ae33927",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/scope_state_record__2.json",
+      "raw_digest": "627e7314f7128e08cc99c22c532a2806839b8793edc957b1c74267674a130c63",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/snapshot__2.json",
+      "raw_digest": "1abae94f791fef344daa00d7888bad9dd2cc51b55016fd34a71c4aabd5f2f204",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/snapshot_export_record__2.json",
+      "raw_digest": "cf80eb1af4974fcf072f0919b62a94f175edefec24e47d1d2004ccc089c5fa31",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/sound_claim__2.json",
+      "raw_digest": "0d95a32ac813c5f75b03b6ea3e053d7f35023f7552a61f6292cf8027c2ce6f02",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/source_drift_impact_assessment__2.json",
+      "raw_digest": "4d6d993e5a6949d6cb32d4bede25d250ebf3f0da3a090cccff378a08a0df15be",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/source_drift_record__2.json",
+      "raw_digest": "88915db3d1c9f13b65bfe81624098c7f8b6d0c803232c8a17c95620e7d9522cd",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/source_generation__2.json",
+      "raw_digest": "3bc71977b68208e5a3aaa5b7827b80783d9a95fdd1207061f26639b236584aa0",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/source_identity__2.json",
+      "raw_digest": "f04de1028f611087bf47d551ee56ec583de620f61b4cfa753e6a1593984073fa",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/source_manifest__2.json",
+      "raw_digest": "fd1c0ab331521b184d009e1c944ebe4dae6c5de2e0e1652add32d860e0b5a415",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/source_reconciliation_assessment__2.json",
+      "raw_digest": "54ba52915622fe20c1a3fcdc5f9f0b10d6dbb8de442f10961fe698661845450e",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/spec_revision__2.json",
+      "raw_digest": "c9abf58d89495d9dca9a9d580cb35004039aebce92b1ed0aaa477e4cc67b81ad",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/stage_completion__2.json",
+      "raw_digest": "7e1e70173b48e756ef9fc03e100f4de5f3a90dbfce89c74f72fb0695e98427a3",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/stage_run__2.json",
+      "raw_digest": "8bb950e57e081371279eec0d6a587db88ee9465a772e3cddbb37727172c42f9e",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/stage_spec__2.json",
+      "raw_digest": "7fcae4409decfdde13dc846fdd7ad6c41858ae4c537feb8b37ae6370fbe02ec9",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/standalone_payload_manifest__2.json",
+      "raw_digest": "5e0cedabdc6be7f5d28cc90fd69f17e20194c51fb2fc5acbc76f8d0a87269763",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/state_model__1.json",
+      "raw_digest": "eed14d2c3e76c9f9f7040469b0a4ab691b8c29f9d7e5075eb268058ce90fe634",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/stop_evaluation__2.json",
+      "raw_digest": "87383738c9448fcd78a0320c778c60765cf9f883d8f6d313364a96c0b9c07d20",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/stop_input__2.json",
+      "raw_digest": "c06aa3829aadec33023bdb0c255b71e45d72d03e8cbf49f7311294c08ddbf92a",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/successor_campaign_genesis__2.json",
+      "raw_digest": "85fa9a368cf35771a719a9ce86a743b72c4edb1909e85b9f760f83647cf16798",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/successor_campaign_selection_decision__2.json",
+      "raw_digest": "fbf2e5a44aaae3514e7ff5b6ecde1b438d6fbd59d57911ddce0baaeba175920c",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/surface_collector_record__2.json",
+      "raw_digest": "be1ceb9d6838813f028d5ae2817eb2815518c0e13241c004cc887b2991a7a5c8",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/surface_key__2.json",
+      "raw_digest": "a952e34b6829939fb40e9c7ef820b6351e2186b4460af72d5e35ae5298ca74e6",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/surface_record__2.json",
+      "raw_digest": "5d8499be63ae3701ff6c0281b3a78b4d99ce941aac3f88c60d12744880c36033",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/tool_execution_record__2.json",
+      "raw_digest": "e58edb216d330afa34fec37eda9b00c0c7c43adeed0d8989b93c85ca82bef4d0",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/transition_authorization_proposal__2.json",
+      "raw_digest": "2297818eb2d9dbe4d0a044295f8b29b57d6a48115b3deb13a12356f6995f2eb3",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/trusted_predecessor_selection_decision__2.json",
+      "raw_digest": "92087ba57d0795f65638429e2fc958f7e7cb856f95f5fb0d4299e85f2daa483b",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/validation_result__2.json",
+      "raw_digest": "aeced2cbe2cf26b1b31507fab214c37260d831a82cbb6e65e1da736723a308c0",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/body_grammars/view_manifest__2.json",
+      "raw_digest": "343d677e13833da33e038aac8922bbf87e6e51873298e6ba98b0151776108c9d",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/BODY_GRAMMAR_FRONTIER.json",
+      "raw_digest": "5c6765cbb1cf74d1103c589dd775d8f488dc549217f645dc668f29b754e3898f",
+      "generator": "body_grammar_frontier",
+      "matches": true
+    },
+    {
+      "file": "design/EXTERNAL_PROFILE_CONTRACTS.json",
+      "raw_digest": "1970001655794ec564aebec738de5e95948c0212a4ed85c4728bc3de3423a6bf",
+      "generator": "profile_contracts",
+      "matches": true
+    },
+    {
+      "file": "design/PROFILE_CLOSURE_FRONTIER.json",
+      "raw_digest": "5c185ce485def21f030bf08955039b90a08b5bf3337e2b5954be71e89ad6e7b4",
+      "generator": "profile_contracts",
+      "matches": true
+    },
+    {
+      "file": "design/PROFILE_REFERENCE_CONTRACTS.json",
+      "raw_digest": "d9fca67735402b00ac3247f1d95eb0a084a3d5eace7573df68ba40e252ccb8f0",
+      "generator": "profile_reference_contracts",
+      "matches": true
+    },
+    {
+      "file": "design/PAYLOAD_REFERENCE_CONTRACTS.json",
+      "raw_digest": "711bd277bd9146b206aa713dd94f85ebd343ab016807ff08286f9e30a5dfef49",
+      "generator": "payload_reference_contracts",
+      "matches": true
+    }
+  ],
+  "drift": [],
+  "qualification": false,
+  "scope": "Exact generator/output parity only, not semantic completeness or authority"
+}

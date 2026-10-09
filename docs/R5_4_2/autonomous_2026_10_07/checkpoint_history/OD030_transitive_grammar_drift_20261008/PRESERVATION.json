@@ -1,0 +1,675 @@
+{
+  "files": [
+    {
+      "file": "design/PURPOSE_CONTRACT_GRAMMARS.json",
+      "raw_digest": "9620a21b1d962a8b70f764fcb2a8d7ea2ab22f6f22fbcedb2acbcd51dee18e6e",
+      "byte_length": 303977
+    },
+    {
+      "file": "design/PURPOSE_GRAMMAR_KNOWN_ANSWERS.json",
+      "raw_digest": "c903c1a63f997d0ceabf25a84612398b1f784464a1ac42eb7cc88be8954a00d8",
+      "byte_length": 18795
+    },
+    {
+      "file": "design/COMMON_GRAMMARS.json",
+      "raw_digest": "0e8262f9ed6269b40d9d8f538b502b4245323b4a03b489cf2be0a580462b7379",
+      "byte_length": 227113
+    },
+    {
+      "file": "design/COMMON_GRAMMAR_KNOWN_ANSWERS.json",
+      "raw_digest": "91d530bf9d0636ce70964d074a41684c9e38ca63211c3862614625391611692e",
+      "byte_length": 4206
+    },
+    {
+      "file": "design/EXTERNAL_PROFILE_CONTRACTS.json",
+      "raw_digest": "0257cb46626ba3e91215e721686ef2c043190ec735859a161910af35b03c590e",
+      "byte_length": 33935182
+    },
+    {
+      "file": "design/PROFILE_REFERENCE_CONTRACTS.json",
+      "raw_digest": "3ef9b35e92715a8c91e7ada01efbb979637331815e6cca041a7c1a8803c530a4",
+      "byte_length": 64145
+    },
+    {
+      "file": "design/PAYLOAD_REFERENCE_CONTRACTS.json",
+      "raw_digest": "46ba475bab9a1362de6cf9ea3498a8a983d34f8e17b8c0e0042e7a17ac0c0776",
+      "byte_length": 43508
+    },
+    {
+      "file": "design/OWN_FIELD_DOMAINS.json",
+      "raw_digest": "ad66c4421e32ea818ae7e46ee741b5ee6eb006b467621f40162d12e5d82809c7",
+      "byte_length": 882468
+    },
+    {
+      "file": "design/GENERATED_DESIGN_PARITY.json",
+      "raw_digest": "83966395043d348311fe63ed641384409d35b066e7e6339c8ec07121bed03ecd",
+      "byte_length": 33585
+    },
+    {
+      "file": "design/body_grammars/approval_decision__2.json",
+      "raw_digest": "8daf7f396b5ac1fb4e49347dedac0de397f3c01bb4f0fca2acd0275a35dd5dbb",
+      "byte_length": 229055
+    },
+    {
+      "file": "design/body_grammars/artifact_hash_manifest__2.json",
+      "raw_digest": "528fc4f76c48a2d5ccde8a3b270df9e114b67deb0319fa26a783b09ddef0aa0c",
+      "byte_length": 227900
+    },
+    {
+      "file": "design/body_grammars/assignment_manifest__2.json",
+      "raw_digest": "46861283b98b2a2fb4a27f11e401cf2bbe4d72563d56366287f06cd485d2b8c8",
+      "byte_length": 230936
+    },
+    {
+      "file": "design/body_grammars/assignment_package_binding__2.json",
+      "raw_digest": "b27efbadceb3ef527d5305b0fee5b4e1d6f988ce53043dcdf9163efdc8ef789e",
+      "byte_length": 227952
+    },
+    {
+      "file": "design/body_grammars/assurance_claim_set__1.json",
+      "raw_digest": "de04a639f62f373548acaa79898583b967db5951a4afc86546fd5ff452a1c0e0",
+      "byte_length": 228360
+    },
+    {
+      "file": "design/body_grammars/attempt__2.json",
+      "raw_digest": "4da4b185f6be44cd3832844422098da2493ffbb3318881794daa095630f8c23a",
+      "byte_length": 229483
+    },
+    {
+      "file": "design/body_grammars/bdb_audit_lane_result__3.json",
+      "raw_digest": "81118cae246adcda8cb7b6622614afb057351625956d2dc424e4b41d6267b3a2",
+      "byte_length": 227980
+    },
+    {
+      "file": "design/body_grammars/blind_origin_eligibility_assessment__2.json",
+      "raw_digest": "c0f1e12cd628ef74a034fe12a1704c55bd838d9f991ac982bb21dc69e9ecb9af",
+      "byte_length": 229487
+    },
+    {
+      "file": "design/body_grammars/bootstrap_admission_decision__2.json",
+      "raw_digest": "d07012c40792380c9372a87ff95183d346945dbfb44065b370d618ea0a3ecfff",
+      "byte_length": 230676
+    },
+    {
+      "file": "design/body_grammars/build_manifest__2.json",
+      "raw_digest": "71832ef250a34f617ba6a157f9616f109ca9125afcafa31e1823fc59dd1b11a7",
+      "byte_length": 229508
+    },
+    {
+      "file": "design/body_grammars/bundle_manifest__2.json",
+      "raw_digest": "ead51e769945dfde44737ac7f328169b65990582035081d20581fd7ec8b5ce31",
+      "byte_length": 230126
+    },
+    {
+      "file": "design/body_grammars/campaign_conclusion__2.json",
+      "raw_digest": "cdcfbf5b6739d9b35d9b8b9303ef70062ee6c6ab45685e55ffd6a83cfb3e6538",
+      "byte_length": 230617
+    },
+    {
+      "file": "design/body_grammars/campaign_genesis__2.json",
+      "raw_digest": "91bc1fb8270f27c63480e53cf5bfce32e1826c9fdb65572e1b3b2271e83c7593",
+      "byte_length": 229858
+    },
+    {
+      "file": "design/body_grammars/candidate_assurance_case__2.json",
+      "raw_digest": "225e711b8e24491164284c3dee552d863f1240b57ffc8756ae1f0baa3b71372b",
+      "byte_length": 232824
+    },
+    {
+      "file": "design/body_grammars/challenger_assignment__2.json",
+      "raw_digest": "9f6553a9d0a812463e04522dc63b6f365e48abe2e22e3be0c28d0c345d128a1f",
+      "byte_length": 229329
+    },
+    {
+      "file": "design/body_grammars/challenger_result__2.json",
+      "raw_digest": "f154bb501f8f33a706f7ea790e2feedb3882873032a8f2712ebfc1ebc1fd38ea",
+      "byte_length": 230368
+    },
+    {
+      "file": "design/body_grammars/checkpoint__2.json",
+      "raw_digest": "14a19f5e28f82933fece3ecb8f1d0ff50fca19623a3ae01506f9fe99fef6c513",
+      "byte_length": 235802
+    },
+    {
+      "file": "design/body_grammars/clean_control_assessment__1.json",
+      "raw_digest": "9daa90129488e82a824f8d76073b18cf2dcec7db07a8263e3f14c9d6a4b4b0a9",
+      "byte_length": 229657
+    },
+    {
+      "file": "design/body_grammars/cleanup_result__2.json",
+      "raw_digest": "cf40546b61c29d9ad6a58842545cc013590be6f9e7e6997d9f8992478cd001e7",
+      "byte_length": 228616
+    },
+    {
+      "file": "design/body_grammars/command_envelope__2.json",
+      "raw_digest": "fc3d637f4023ce1aff40aa5338b96ea884b3cb517ff1f4082e70eb6502570e0f",
+      "byte_length": 230928
+    },
+    {
+      "file": "design/body_grammars/command_receipt__2.json",
+      "raw_digest": "c4779681c7a847489e323b033ca473c1b964f3ec39188f36a6e279e5c1e55e85",
+      "byte_length": 234414
+    },
+    {
+      "file": "design/body_grammars/commit_body__2.json",
+      "raw_digest": "6a7fa2346f6c0a9665b73cb38d8441ea3d80b64c866a8ce8feff8d2c3511ddfc",
+      "byte_length": 235605
+    },
+    {
+      "file": "design/body_grammars/compatibility_fixture_assessment__2.json",
+      "raw_digest": "2158b42cbda1b2d7762652a9a5b5bc44e95b87e372e2d8a70770ef321d572708",
+      "byte_length": 229699
+    },
+    {
+      "file": "design/body_grammars/compatibility_gate_result__2.json",
+      "raw_digest": "b8150065505b2a867cf177880b8ed9974e85858ad722a288fc0bfaf1421c2cf3",
+      "byte_length": 229395
+    },
+    {
+      "file": "design/body_grammars/contamination_assessment__2.json",
+      "raw_digest": "8c29aaaa45b15814bea49226918823305c3ac67b25e78c1c2c8c282394600653",
+      "byte_length": 230576
+    },
+    {
+      "file": "design/body_grammars/contradiction_resolution_decision__2.json",
+      "raw_digest": "9ad9644af215d57d18b58c29c19e2a3bb876225fd5ea381bdea67cb6782e97c8",
+      "byte_length": 229181
+    },
+    {
+      "file": "design/body_grammars/contradiction_revision__2.json",
+      "raw_digest": "01ea3834998514b6eb2c60f8b9078fdad77f4bb58cfcf43df3ca18d0784b24cc",
+      "byte_length": 230869
+    },
+    {
+      "file": "design/body_grammars/corpus_manifest__2.json",
+      "raw_digest": "a414b928f154e054a84793ea0756064101328e9f6b4fba0aa306f2c90e3695fc",
+      "byte_length": 229854
+    },
+    {
+      "file": "design/body_grammars/corpus_member_admission_assessment__2.json",
+      "raw_digest": "0ce1b1f4bb4a032c1651624c416ed1427fb008fa37aaafb444bc91a4430732f3",
+      "byte_length": 230461
+    },
+    {
+      "file": "design/body_grammars/corpus_member_candidate__1.json",
+      "raw_digest": "b001d92b1ada5bc808852584419affe6ffeeceb3c72ce96a010a5cf88346d41e",
+      "byte_length": 229804
+    },
+    {
+      "file": "design/body_grammars/coverage_obligation__2.json",
+      "raw_digest": "75e09e8afe37db0d725628140a4d95f290e418920b84896231f4bfb960e67d46",
+      "byte_length": 231557
+    },
+    {
+      "file": "design/body_grammars/coverage_obligation_key__2.json",
+      "raw_digest": "debe4f10faae842611c5440f7935019d22793197c20377dfc52226407fd98bbb",
+      "byte_length": 228613
+    },
+    {
+      "file": "design/body_grammars/coverage_obligation_qualification__2.json",
+      "raw_digest": "faaffbb9842f289b449d7707260c4ceeeefdbc4aeab6405962bb714a5b0641f0",
+      "byte_length": 230102
+    },
+    {
+      "file": "design/body_grammars/defect_unit__1.json",
+      "raw_digest": "bd9623c971a06c09a6852bab9d6698908b37cac046c2226fc46af9837c298b35",
+      "byte_length": 229401
+    },
+    {
+      "file": "design/body_grammars/delivery_spec__2.json",
+      "raw_digest": "80a86e341220c60981da2144119b122ddc315c885584fbee382e149885a14316",
+      "byte_length": 228585
+    },
+    {
+      "file": "design/body_grammars/dependency_independence_assessment__2.json",
+      "raw_digest": "222340ebd87f21f59083c022eaec58da3e345044dd6923c30bb3d93ed8e3cbd9",
+      "byte_length": 230693
+    },
+    {
+      "file": "design/body_grammars/discovery_confirmation_assessment__1.json",
+      "raw_digest": "611f90134dec1b215d41ea055a27f5706fa5663f7f8adabd727dfb1617d155e1",
+      "byte_length": 229381
+    },
+    {
+      "file": "design/body_grammars/discovery_corpus_match_assessment__1.json",
+      "raw_digest": "4357c0c046a8f015cafbd073cd21886cb6e691bcb97058ac074ee7ce4e476baf",
+      "byte_length": 229522
+    },
+    {
+      "file": "design/body_grammars/discovery_novelty_assessment__1.json",
+      "raw_digest": "8e60b9e0e960b52cf9b0c2b05476fa8e1e7f5380188cfa2cc633a9f72667f8ad",
+      "byte_length": 229045
+    },
+    {
+      "file": "design/body_grammars/discovery_record__2.json",
+      "raw_digest": "51f2fb1e3f89b61059a7c35fd2fad621ace6fff231c9b2a3175e2eeda29d37ff",
+      "byte_length": 230583
+    },
+    {
+      "file": "design/body_grammars/discovery_tool_origin_assessment__1.json",
+      "raw_digest": "54914f7032b1934be265b9bea71985f409939598e52ff8badc0d1c49d4093855",
+      "byte_length": 228820
+    },
+    {
+      "file": "design/body_grammars/effort_results__1.json",
+      "raw_digest": "e85ae8b3221916c562a9bc468b927bcbf0c4255727ac93fec95463a40cecd981",
+      "byte_length": 229273
+    },
+    {
+      "file": "design/body_grammars/environment_record__2.json",
+      "raw_digest": "32369647e985355ad9e8d47ebb66dfb46b75c31204fdaa693aa66283475161b5",
+      "byte_length": 228601
+    },
+    {
+      "file": "design/body_grammars/evidence_applicability_assessment__2.json",
+      "raw_digest": "7d13a31c6dd09ecabc15280eacc1c6b6a9667f43738a827d3b1a85d976683906",
+      "byte_length": 230030
+    },
+    {
+      "file": "design/body_grammars/evidence_dependency_graph__1.json",
+      "raw_digest": "21a97caaf68537a61df6216834d4a4417b10c5ac178e2d2c88e52f19981b835f",
+      "byte_length": 228548
+    },
+    {
+      "file": "design/body_grammars/evidence_invalidation__2.json",
+      "raw_digest": "db2a6f4eedac8fb893c79e50949a282c48057f54d2f91cea38bb2787fe6b764b",
+      "byte_length": 228959
+    },
+    {
+      "file": "design/body_grammars/evidence_qualification_assessment__2.json",
+      "raw_digest": "48b7779ba62279075fc1be18528eb01c809d553d6787106c73e5ad8000187359",
+      "byte_length": 230293
+    },
+    {
+      "file": "design/body_grammars/execution_descriptor__2.json",
+      "raw_digest": "d1dc88e39aea4e6d3552346f3ebec77c9a07499fb410bca28acc7d9416322be0",
+      "byte_length": 229196
+    },
+    {
+      "file": "design/body_grammars/execution_result__2.json",
+      "raw_digest": "c3e08133fe8e5c4e302ac4058ce8fe0d1d205cc5bba319b20f1c30b91cd6e32c",
+      "byte_length": 230752
+    },
+    {
+      "file": "design/body_grammars/executor_spec__2.json",
+      "raw_digest": "707b70cba957c0349cab49ea708b4ae962157ee37ff30474508ce86ac3266804",
+      "byte_length": 229167
+    },
+    {
+      "file": "design/body_grammars/experiment_spec__2.json",
+      "raw_digest": "8c65bc6e26e597d71b8953a8eda93a25eeb9b8cc685c13cf4697a61a992d3ffc",
+      "byte_length": 231966
+    },
+    {
+      "file": "design/body_grammars/false_negative_relationship_assessment__1.json",
+      "raw_digest": "709f424ed7eccf1ef8cd6f2e2aa3d41260cf33472625478dbe22fb42b1b82617",
+      "byte_length": 229304
+    },
+    {
+      "file": "design/body_grammars/fault_run_record__2.json",
+      "raw_digest": "19e785ee19baaa2e55aa0c901e8644b9318827029754e1fc52daa12f7ee3658a",
+      "byte_length": 227631
+    },
+    {
+      "file": "design/body_grammars/fault_spec__1.json",
+      "raw_digest": "816791709bf9391c572a81326efc0e6d7df2a0958a8a2e2f27f749fdde611138",
+      "byte_length": 228598
+    },
+    {
+      "file": "design/body_grammars/final_assurance_case__2.json",
+      "raw_digest": "4946e126656fdab040dd3fa44332bacd9f35a8fa624ced7c85adeb3ade240c3e",
+      "byte_length": 230639
+    },
+    {
+      "file": "design/body_grammars/final_technical_report__2.json",
+      "raw_digest": "bc8cf133875c504384d9e03b7991a46fbbf76ab63d489d126b2dd35afe0afd28",
+      "byte_length": 227634
+    },
+    {
+      "file": "design/body_grammars/finding_adjudication_decision__2.json",
+      "raw_digest": "6b7905b856981e93d6a9559ec1a71be75ec71e86e53ba62c10e1dd58409f78bc",
+      "byte_length": 231817
+    },
+    {
+      "file": "design/body_grammars/finding_axis_assessment__2.json",
+      "raw_digest": "df81af34b6729fe67e202a7453275b07b5ab5a657d9089e75a63e7a1fb26d40f",
+      "byte_length": 230282
+    },
+    {
+      "file": "design/body_grammars/finding_claim_revision__2.json",
+      "raw_digest": "770433cd48c2cfcb9c5f61f0294421ce071f391397cd916b1ed349efeb27ca2a",
+      "byte_length": 230517
+    },
+    {
+      "file": "design/body_grammars/finding_defect_match_assessment__1.json",
+      "raw_digest": "58991cd391eea7031d87b775d08920c04701ca6a664c1588fe48926a680dab17",
+      "byte_length": 229677
+    },
+    {
+      "file": "design/body_grammars/gate_decision__1.json",
+      "raw_digest": "58b21fb5f805f907c7041c7cf29235e7141b3f7f82f81a48ed603df85f5937c9",
+      "byte_length": 229745
+    },
+    {
+      "file": "design/body_grammars/grant_body__2.json",
+      "raw_digest": "78aed5375d4d2c825f4aad1a4ba8c5cc94b1bb3cc5142d083bea2058de8d7386",
+      "byte_length": 229208
+    },
+    {
+      "file": "design/body_grammars/handoff_validation_result__1.json",
+      "raw_digest": "68673fe8be90fe37c4021b64fe737e6ff172932b0b2a732da4c7f26921ebf074",
+      "byte_length": 229054
+    },
+    {
+      "file": "design/body_grammars/history_anchor_receipt__2.json",
+      "raw_digest": "3ac583e4914a7460a9806d5a2c8b221d01353fc6cfaa930b9067928904d90a51",
+      "byte_length": 228758
+    },
+    {
+      "file": "design/body_grammars/history_cut__2.json",
+      "raw_digest": "0f2de2f5abaa8e8707043332a989aa09fd7614e5499dd3b0e79ebcd19b0d97fa",
+      "byte_length": 228542
+    },
+    {
+      "file": "design/body_grammars/holdout_exposure_assessment__1.json",
+      "raw_digest": "146d6bf753858bafe13d5d897e7dd692820944e12d80cccf4d1fa32b77a0bd23",
+      "byte_length": 228727
+    },
+    {
+      "file": "design/body_grammars/hypothesis_revision__2.json",
+      "raw_digest": "783274c44c03e2290ba456d692b7ef1dfe5af8498d33d254518a33019cde74cc",
+      "byte_length": 230340
+    },
+    {
+      "file": "design/body_grammars/input_disposition_record__2.json",
+      "raw_digest": "5d07c882f1a0b5ccfbb91c609e201c9edb96e345c60fb811c0a44fa76cc16450",
+      "byte_length": 228984
+    },
+    {
+      "file": "design/body_grammars/invariant_revision__2.json",
+      "raw_digest": "ea78315137a0e854361214c823fa5c22fefc7194e6a49e07e17cd13aa9a513e7",
+      "byte_length": 229355
+    },
+    {
+      "file": "design/body_grammars/inventory_revision__2.json",
+      "raw_digest": "0a2927172f2168a7d0a7e996cf711294d1f155a57f335a58e296d11868daf19e",
+      "byte_length": 231586
+    },
+    {
+      "file": "design/body_grammars/isolation_baseline_profile__2.json",
+      "raw_digest": "f12074573eab3f00f46213da999b0ac6de8722772775a8d4ed4862cd394bac64",
+      "byte_length": 227763
+    },
+    {
+      "file": "design/body_grammars/isolation_qualification__2.json",
+      "raw_digest": "3f5a859d127b2f948462779d7e3f88e2e53bd467b9fc272d35ea0bc48c1f4497",
+      "byte_length": 232957
+    },
+    {
+      "file": "design/body_grammars/knowledge_state__2.json",
+      "raw_digest": "5b49bd0a52a2bcf2eb21ef89c8dcadddce7e22bf611b5af13e94135c2c119cd7",
+      "byte_length": 230066
+    },
+    {
+      "file": "design/body_grammars/lane_completion__2.json",
+      "raw_digest": "da0e0d5cea77eb2f1068d1aa30d50f019aa48bfb7ef38ccaa8cf0e209641e138",
+      "byte_length": 236110
+    },
+    {
+      "file": "design/body_grammars/lane_result_admission_evidence__3.json",
+      "raw_digest": "a72c6b65672587fbd2e6c21152e89b757f61eb068124e24bddfac0d28eaed0fd",
+      "byte_length": 228449
+    },
+    {
+      "file": "design/body_grammars/lane_run__2.json",
+      "raw_digest": "b56d77fc8ba703c229c136174daf1495d47ece6e4faa2c48ddbf04b031bd5d65",
+      "byte_length": 228940
+    },
+    {
+      "file": "design/body_grammars/lane_spec__2.json",
+      "raw_digest": "f245c15e0749c67e6a882de2e02a465bf11bec624c2ad134bb72fcb5ac02cb87",
+      "byte_length": 229449
+    },
+    {
+      "file": "design/body_grammars/legacy_exposure_reconstruction_assessment__2.json",
+      "raw_digest": "d741ef974f069c6d01f01fa9ad63edfa6a03d2dae28153b6dde0338dae08b449",
+      "byte_length": 230026
+    },
+    {
+      "file": "design/body_grammars/legacy_mechanical_validation_assessment__2.json",
+      "raw_digest": "a6fb8109357c8479f50a0961daa7d5792fa9656803ca4ccdb6cede46389dd910",
+      "byte_length": 228843
+    },
+    {
+      "file": "design/body_grammars/legacy_observation_mapping_assessment__2.json",
+      "raw_digest": "d8442489f7c0664f73b8302677126b50b00bf591b5428d53d4899be6fda24541",
+      "byte_length": 230229
+    },
+    {
+      "file": "design/body_grammars/legacy_observation_semantic_equivalence_assessment__2.json",
+      "raw_digest": "057d41b9a478e2909f836125583a490266ea89c5c18211165a5a9902b028321f",
+      "byte_length": 229751
+    },
+    {
+      "file": "design/body_grammars/lineage_admission_assessment__2.json",
+      "raw_digest": "d0fbb80d259cf9d0c1948e65e24b4e43001d462571d24ad01ff8134b8ad0bdc3",
+      "byte_length": 229907
+    },
+    {
+      "file": "design/body_grammars/materiality_assessment__2.json",
+      "raw_digest": "4ddcb9fdd49e896942a7f30d698b23e8d6f2dda1b61ede12e68ba9a955ec39e5",
+      "byte_length": 229489
+    },
+    {
+      "file": "design/body_grammars/model_fidelity_assessment__2.json",
+      "raw_digest": "a3c8ef2b0de99618877a918bd7f2524d8277fcbda973d3860183f6482c9409dd",
+      "byte_length": 230881
+    },
+    {
+      "file": "design/body_grammars/negative_evidence_record__2.json",
+      "raw_digest": "4faa88742708fefd91ecc0b1476956d8de90a8a76fa0a12d0d9258668c74d786",
+      "byte_length": 230231
+    },
+    {
+      "file": "design/body_grammars/negative_opportunity_unit__1.json",
+      "raw_digest": "2a50fc4c4a78ecc637ac3c6e025ef1b099c5d3cd250c77c6bb08042cf63bc199",
+      "byte_length": 229252
+    },
+    {
+      "file": "design/body_grammars/obligation_applicability_decision__2.json",
+      "raw_digest": "a9edc3799dfe374105cf85b55b32a50d46dd1825e2b30e501034590b6057c44f",
+      "byte_length": 229008
+    },
+    {
+      "file": "design/body_grammars/observation__2.json",
+      "raw_digest": "22a65c1ab2ae404b6a5b94ddd32397d148c3dd5ab678596c6166f219ba06c1b8",
+      "byte_length": 228220
+    },
+    {
+      "file": "design/body_grammars/observation_dependency__1.json",
+      "raw_digest": "8ad087a1ea6addf61475f905608783104a6989d6f3ba171675d68b5b5eb0af74",
+      "byte_length": 229252
+    },
+    {
+      "file": "design/body_grammars/policy_revision__2.json",
+      "raw_digest": "ddfef8086446787612380a111ac9c2ecb658324447cb5bd7b6db7a64b67cd803",
+      "byte_length": 228065
+    },
+    {
+      "file": "design/body_grammars/potential_exposure_record__2.json",
+      "raw_digest": "cdf9af0df44679a9da660fef77e9c26d8223837e820778e358e5cf7efa08afac",
+      "byte_length": 228798
+    },
+    {
+      "file": "design/body_grammars/public_conclusion_statement__1.json",
+      "raw_digest": "1ea160850fbfa1207d2e97960fe608c1912f318b019c9ec8069e9dbc53cf4d77",
+      "byte_length": 228130
+    },
+    {
+      "file": "design/body_grammars/release_qualification__2.json",
+      "raw_digest": "7df96f1a7e43103c884d07a8ecbdb641f52c6a7c392aeafc9166f583d9132c64",
+      "byte_length": 232289
+    },
+    {
+      "file": "design/body_grammars/report_export_receipt__2.json",
+      "raw_digest": "f3413f1971cb8e08d9168c48cc189eac5101392c75d6fcaeaba69ffe6d4a0a4f",
+      "byte_length": 227644
+    },
+    {
+      "file": "design/body_grammars/residual_risk__1.json",
+      "raw_digest": "9bedc4a6e182e6f87a14db192f7c8e2c66a3bddfb83d9c7dfeefad2cf5af9261",
+      "byte_length": 230492
+    },
+    {
+      "file": "design/body_grammars/root_cause_revision__2.json",
+      "raw_digest": "b1dec2209f60a8108f43846bd831d3c1470def1fb62b06e5a0fb65bf8d2bb982",
+      "byte_length": 228924
+    },
+    {
+      "file": "design/body_grammars/run_manifest__2.json",
+      "raw_digest": "0e56bf6a2b629c8da8eb9809d2df5a6a8ed03d021bea595c08cc320dd429d3a7",
+      "byte_length": 231323
+    },
+    {
+      "file": "design/body_grammars/scope_state_record__2.json",
+      "raw_digest": "f12300e4cac54e4028e878197c93536307dd8545edea65c525a8f7729973a663",
+      "byte_length": 230003
+    },
+    {
+      "file": "design/body_grammars/snapshot__2.json",
+      "raw_digest": "7bb8e1d580c31a0d21818800d3055f286d551367a0c45f6a97e9d3275d904fec",
+      "byte_length": 229319
+    },
+    {
+      "file": "design/body_grammars/snapshot_export_record__2.json",
+      "raw_digest": "afaec3bc27f07a8cde12631c3bd5844f80d0f87d5c8eab7c33b955b691d8966d",
+      "byte_length": 228173
+    },
+    {
+      "file": "design/body_grammars/sound_claim__2.json",
+      "raw_digest": "5808a6e5e12790bad2a0645d7f41676a398d3eb72574dcb709a0021c74c5ba65",
+      "byte_length": 230395
+    },
+    {
+      "file": "design/body_grammars/source_drift_impact_assessment__2.json",
+      "raw_digest": "d8eb0c902c58b8de0175f86421f8ac9e4153b167c4fecee18de60bad1a897218",
+      "byte_length": 230528
+    },
+    {
+      "file": "design/body_grammars/source_drift_record__2.json",
+      "raw_digest": "223acb6ec14fa16178de8b575f0b421e16f8517469d29905434e89b6bfb46234",
+      "byte_length": 228942
+    },
+    {
+      "file": "design/body_grammars/source_generation__2.json",
+      "raw_digest": "a59a0aaf7a3119543a0961826a65b31a398b0f2d12227d777b221976606e7fcc",
+      "byte_length": 229246
+    },
+    {
+      "file": "design/body_grammars/source_identity__2.json",
+      "raw_digest": "55d5a47eb099b239085f19b2ecf6d58e08b5d070149ee35b79b2f330a570122c",
+      "byte_length": 228495
+    },
+    {
+      "file": "design/body_grammars/source_manifest__2.json",
+      "raw_digest": "341a12ffe43d27b988b3b5df71cbe6835703fa32c640378786a480154523c9af",
+      "byte_length": 230456
+    },
+    {
+      "file": "design/body_grammars/source_reconciliation_assessment__2.json",
+      "raw_digest": "431574fd7cf1668c69f9de96ebee611794438f215aee7f2632121b478629c30b",
+      "byte_length": 229164
+    },
+    {
+      "file": "design/body_grammars/spec_revision__2.json",
+      "raw_digest": "1a6bbfc7abd7e7917b874e99fbe35b40bb67107c6ae700b92ef227b6cef98d0c",
+      "byte_length": 228770
+    },
+    {
+      "file": "design/body_grammars/stage_completion__2.json",
+      "raw_digest": "6d245c4ff07c251cc1a25611f1f8a39e7e603a136cf33bf8a593ea38e47bdf00",
+      "byte_length": 241060
+    },
+    {
+      "file": "design/body_grammars/stage_run__2.json",
+      "raw_digest": "c1bb50315cc00df184b992cf879d929671518c75bd82a26f6eac0064ec6b2f87",
+      "byte_length": 229643
+    },
+    {
+      "file": "design/body_grammars/stage_spec__2.json",
+      "raw_digest": "6c319c3fbcf05e1a212b6b0455cd8e88254e99a032cadea0a8252fa34ee44dd3",
+      "byte_length": 229617
+    },
+    {
+      "file": "design/body_grammars/standalone_payload_manifest__2.json",
+      "raw_digest": "a83183cf01ccf49e7e28dccf4157e21d705a67ad2233d4f7008c466354b47944",
+      "byte_length": 228129
+    },
+    {
+      "file": "design/body_grammars/state_model__1.json",
+      "raw_digest": "27e54890a13445e2ce4b4fca3b1cc09487fabe06e6aa2bb571fcbf299e6233e4",
+      "byte_length": 229104
+    },
+    {
+      "file": "design/body_grammars/stop_evaluation__2.json",
+      "raw_digest": "b24f486b255ce22d8d2881a46a192921ca27619e13dd3c806b4202458cd12ac3",
+      "byte_length": 229510
+    },
+    {
+      "file": "design/body_grammars/stop_input__2.json",
+      "raw_digest": "d7661471d4a6a74d1d8aea20d35a7b17f6c2247ee8264ebde3b9770a66a1dc3b",
+      "byte_length": 237408
+    },
+    {
+      "file": "design/body_grammars/successor_campaign_genesis__2.json",
+      "raw_digest": "a3646bfb3ea38335ddacf6951df7c7a46c99c99100a8430e838f88e4c7689acc",
+      "byte_length": 231357
+    },
+    {
+      "file": "design/body_grammars/successor_campaign_selection_decision__2.json",
+      "raw_digest": "e53bdf91026a99ed5ff5511f15decb0ff64f8a1a002b236ac7333781f6d85c7c",
+      "byte_length": 229589
+    },
+    {
+      "file": "design/body_grammars/surface_collector_record__2.json",
+      "raw_digest": "7481c829e1121bd839f083dc7a16d8c92ddc8f8156b2983ded6c6f33be50af1f",
+      "byte_length": 228028
+    },
+    {
+      "file": "design/body_grammars/surface_key__2.json",
+      "raw_digest": "3d7ffa3c8efa21d2dd3986dd9ae8b740e12a317342b4099a4b476494ac24f939",
+      "byte_length": 227781
+    },
+    {
+      "file": "design/body_grammars/surface_record__2.json",
+      "raw_digest": "d0e297c08679405de75c5e9c75c2c8eceee54a91d1041c2bf80f7f9ebc982dbf",
+      "byte_length": 228744
+    },
+    {
+      "file": "design/body_grammars/tool_execution_record__2.json",
+      "raw_digest": "eaaf2ba02bc8d98e19f1da320c845af97f63e970e3623d773608d5bf6b3f1c27",
+      "byte_length": 227627
+    },
+    {
+      "file": "design/body_grammars/transition_authorization_proposal__2.json",
+      "raw_digest": "e64669cc0403a08d0c172a011c28dc2808b08cd15a66baa409e6f6d8dcfc63b1",
+      "byte_length": 230133
+    },
+    {
+      "file": "design/body_grammars/trusted_predecessor_selection_decision__2.json",
+      "raw_digest": "85e38a14f69183b666183e544585b256e499aa5db06c3625be07e56ff4e6abdd",
+      "byte_length": 229837
+    },
+    {
+      "file": "design/body_grammars/validation_result__2.json",
+      "raw_digest": "96889255a89b909606e44ef03b5a2446db355d19d6819214572a605e2ad39bc6",
+      "byte_length": 234081
+    },
+    {
+      "file": "design/body_grammars/view_manifest__2.json",
+      "raw_digest": "797c8c8192073b70ba4d6441ba29bf8d1ca43af583607155a485ddcd59cd9d8e",
+      "byte_length": 228025
+    }
+  ],
+  "reason": "Propagate already selected SourceManifest/2 exact finite schema key into stale purpose/common grammar dependencies; original historical schemas unchanged"
+}

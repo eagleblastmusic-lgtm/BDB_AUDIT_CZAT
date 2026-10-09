@@ -1,0 +1,928 @@
+{
+  "vectors": [
+    {
+      "grammar": "path",
+      "input": "src/main.py",
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "path",
+      "input": "../main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "path",
+      "input": "src/../main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "path",
+      "input": "src\\main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "path",
+      "input": "/main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "path",
+      "input": "src//main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_path",
+      "input": ".gitignore",
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_path",
+      "input": ".github/workflows/test.yml",
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_path",
+      "input": "src/żółć.py",
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_path",
+      "input": "../main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_path",
+      "input": "src/./main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_path",
+      "input": "src//main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_path",
+      "input": "src\\main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_path",
+      "input": "src/\u0000main.py",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "path",
+      "input": ".gitignore",
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "safe_integer",
+      "input": true,
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "safe_integer",
+      "input": 9007199254740992,
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "safe_integer",
+      "input": -9007199254740991,
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "int32",
+      "input": 2147483648,
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "accepted_event_ref",
+      "input": {
+        "accepting_commit_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "ordinal": 0
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "accepted_event_ref",
+      "input": {
+        "accepting_commit_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "ordinal": 0,
+        "trusted": true
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "scope_key",
+      "input": {
+        "scope_kind": "PATH",
+        "path": "src/main.py"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "model_state",
+      "input": {
+        "values": [
+          true,
+          true
+        ]
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "observable_selector",
+      "input": {
+        "selector_kind": "JSON_POINTER",
+        "pointer": "/~0/~1"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "observable_selector",
+      "input": {
+        "selector_kind": "JSON_POINTER",
+        "pointer": "/~2"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "observable_selector",
+      "input": {
+        "selector_kind": "EVAL",
+        "expression": "True"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "expected_value",
+      "input": {
+        "value_kind": "BOOLEAN",
+        "value": 1
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "expected_value",
+      "input": {
+        "value_kind": "INTEGER",
+        "value": true
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "changed_manifest_member",
+      "input": {
+        "member_path": ".gitignore",
+        "change": "MODIFIED"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_member",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": ".gitignore"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_anchor",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": ".gitignore",
+        "start_byte": 0,
+        "end_byte": 1
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "STATIC",
+        "member_path": ".gitignore",
+        "byte_offset": 0,
+        "entry_kind": "FUNCTION",
+        "discriminator": "exact"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "RUNTIME",
+        "method": "GET",
+        "route_pattern": "/route",
+        "registration_origin": {
+          "source_manifest_ref": {
+            "kind": "source_manifest",
+            "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          },
+          "member_path": ".gitignore",
+          "start_byte": 0,
+          "end_byte": 1
+        },
+        "namespace": "APP"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "changed_manifest_member",
+      "input": {
+        "member_path": ".github/workflows/test.yml",
+        "change": "MODIFIED"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_member",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": ".github/workflows/test.yml"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_anchor",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": ".github/workflows/test.yml",
+        "start_byte": 0,
+        "end_byte": 1
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "STATIC",
+        "member_path": ".github/workflows/test.yml",
+        "byte_offset": 0,
+        "entry_kind": "FUNCTION",
+        "discriminator": "exact"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "RUNTIME",
+        "method": "GET",
+        "route_pattern": "/route",
+        "registration_origin": {
+          "source_manifest_ref": {
+            "kind": "source_manifest",
+            "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          },
+          "member_path": ".github/workflows/test.yml",
+          "start_byte": 0,
+          "end_byte": 1
+        },
+        "namespace": "APP"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "changed_manifest_member",
+      "input": {
+        "member_path": "src/żółć.py",
+        "change": "MODIFIED"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_member",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": "src/żółć.py"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_anchor",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": "src/żółć.py",
+        "start_byte": 0,
+        "end_byte": 1
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "STATIC",
+        "member_path": "src/żółć.py",
+        "byte_offset": 0,
+        "entry_kind": "FUNCTION",
+        "discriminator": "exact"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "RUNTIME",
+        "method": "GET",
+        "route_pattern": "/route",
+        "registration_origin": {
+          "source_manifest_ref": {
+            "kind": "source_manifest",
+            "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          },
+          "member_path": "src/żółć.py",
+          "start_byte": 0,
+          "end_byte": 1
+        },
+        "namespace": "APP"
+      },
+      "expected": "ACCEPT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "changed_manifest_member",
+      "input": {
+        "member_path": "../main.py",
+        "change": "MODIFIED"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_member",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": "../main.py"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_anchor",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": "../main.py",
+        "start_byte": 0,
+        "end_byte": 1
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "STATIC",
+        "member_path": "../main.py",
+        "byte_offset": 0,
+        "entry_kind": "FUNCTION",
+        "discriminator": "exact"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "RUNTIME",
+        "method": "GET",
+        "route_pattern": "/route",
+        "registration_origin": {
+          "source_manifest_ref": {
+            "kind": "source_manifest",
+            "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          },
+          "member_path": "../main.py",
+          "start_byte": 0,
+          "end_byte": 1
+        },
+        "namespace": "APP"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "changed_manifest_member",
+      "input": {
+        "member_path": "src/./main.py",
+        "change": "MODIFIED"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_member",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": "src/./main.py"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_anchor",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": "src/./main.py",
+        "start_byte": 0,
+        "end_byte": 1
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "STATIC",
+        "member_path": "src/./main.py",
+        "byte_offset": 0,
+        "entry_kind": "FUNCTION",
+        "discriminator": "exact"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "RUNTIME",
+        "method": "GET",
+        "route_pattern": "/route",
+        "registration_origin": {
+          "source_manifest_ref": {
+            "kind": "source_manifest",
+            "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          },
+          "member_path": "src/./main.py",
+          "start_byte": 0,
+          "end_byte": 1
+        },
+        "namespace": "APP"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "changed_manifest_member",
+      "input": {
+        "member_path": "src//main.py",
+        "change": "MODIFIED"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_member",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": "src//main.py"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_anchor",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": "src//main.py",
+        "start_byte": 0,
+        "end_byte": 1
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "STATIC",
+        "member_path": "src//main.py",
+        "byte_offset": 0,
+        "entry_kind": "FUNCTION",
+        "discriminator": "exact"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "RUNTIME",
+        "method": "GET",
+        "route_pattern": "/route",
+        "registration_origin": {
+          "source_manifest_ref": {
+            "kind": "source_manifest",
+            "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          },
+          "member_path": "src//main.py",
+          "start_byte": 0,
+          "end_byte": 1
+        },
+        "namespace": "APP"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "changed_manifest_member",
+      "input": {
+        "member_path": "src\\main.py",
+        "change": "MODIFIED"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_member",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": "src\\main.py"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_anchor",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": "src\\main.py",
+        "start_byte": 0,
+        "end_byte": 1
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "STATIC",
+        "member_path": "src\\main.py",
+        "byte_offset": 0,
+        "entry_kind": "FUNCTION",
+        "discriminator": "exact"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "RUNTIME",
+        "method": "GET",
+        "route_pattern": "/route",
+        "registration_origin": {
+          "source_manifest_ref": {
+            "kind": "source_manifest",
+            "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          },
+          "member_path": "src\\main.py",
+          "start_byte": 0,
+          "end_byte": 1
+        },
+        "namespace": "APP"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "changed_manifest_member",
+      "input": {
+        "member_path": "src/\u0000main.py",
+        "change": "MODIFIED"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_member",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": "src/\u0000main.py"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "source_anchor",
+      "input": {
+        "source_manifest_ref": {
+          "kind": "source_manifest",
+          "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "digest_profile": "BDB-OBJECT-DIGEST-1",
+          "schema_revision_ref": {
+            "kind": "schema",
+            "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "member_path": "src/\u0000main.py",
+        "start_byte": 0,
+        "end_byte": 1
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "STATIC",
+        "member_path": "src/\u0000main.py",
+        "byte_offset": 0,
+        "entry_kind": "FUNCTION",
+        "discriminator": "exact"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    },
+    {
+      "grammar": "surface_anchor",
+      "input": {
+        "anchor_kind": "RUNTIME",
+        "method": "GET",
+        "route_pattern": "/route",
+        "registration_origin": {
+          "source_manifest_ref": {
+            "kind": "source_manifest",
+            "revision_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "digest_profile": "BDB-OBJECT-DIGEST-1",
+            "schema_revision_ref": {
+              "kind": "schema",
+              "revision_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          },
+          "member_path": "src/\u0000main.py",
+          "start_byte": 0,
+          "end_byte": 1
+        },
+        "namespace": "APP"
+      },
+      "expected": "REJECT",
+      "schema_result": "PASS",
+      "canonical_runtime": "NOT_RUN"
+    }
+  ],
+  "status": "PASS",
+  "claim": "Draft syntax only; cross-object predicates and canonical mutation checks NOT_RUN"
+}

@@ -1,0 +1,225 @@
+{
+  "controls": [
+    {
+      "case": "COMPLETE_SOURCE_REPRESENTABLE",
+      "result": "PASS",
+      "eligibility": "NOT_PROVEN"
+    },
+    {
+      "case": "BOUNDED_SOURCE_REPRESENTABLE",
+      "result": "PASS",
+      "eligibility": "NOT_PROVEN"
+    },
+    {
+      "case": "UNKNOWN_OR_WRONG_STATUS_'PASS'",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "UNKNOWN_OR_WRONG_STATUS_'UNKNOWN'",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "UNKNOWN_OR_WRONG_STATUS_''",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "UNKNOWN_OR_WRONG_STATUS_True",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "UNKNOWN_OR_WRONG_STATUS_None",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "UNKNOWN_OR_WRONG_STATUS_'COMPLETE_SOURCE '",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "GIT_IDS_REMAIN_REQUIRED",
+      "result": "PASS"
+    },
+    {
+      "case": "GIT_SHAPE_NO_IDENTITY_PROOF",
+      "result": "PASS",
+      "reconciliation": "NOT_PROVEN"
+    },
+    {
+      "case": "SNAPSHOT_GIT_IDENTITY_git_commit_object_id",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "SNAPSHOT_GIT_IDENTITY_git_tree_object_id",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "SNAPSHOT_GIT_IDENTITY_git_commit_object_id_git_tree_object_id",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "SERIALIZED_TRUST_REJECT",
+      "result": "PASS"
+    },
+    {
+      "case": "REQUIRED_SOURCE_PARAMETER_path_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "case": "REQUIRED_SOURCE_PARAMETER_manifest_entry_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "case": "REQUIRED_SOURCE_PARAMETER_authority_parameters",
+      "result": "PASS"
+    },
+    {
+      "case": "REQUIRED_SOURCE_PARAMETER_submodule_policy",
+      "result": "PASS"
+    },
+    {
+      "case": "REQUIRED_SOURCE_PARAMETER_lfs_policy",
+      "result": "PASS"
+    },
+    {
+      "case": "REQUIRED_SOURCE_PARAMETER_symlink_policy",
+      "result": "PASS"
+    },
+    {
+      "case": "REQUIRED_SOURCE_PARAMETER_mode_policy",
+      "result": "PASS"
+    },
+    {
+      "case": "AUTHORIZED_GIT_SHA1",
+      "result": "PASS",
+      "authority": "NOT_PROVEN"
+    },
+    {
+      "case": "AUTHORIZED_GIT_SHA256",
+      "result": "PASS",
+      "authority": "NOT_PROVEN"
+    },
+    {
+      "case": "AUTHORIZED_GIT_NONE",
+      "result": "PASS",
+      "authority": "NOT_PROVEN"
+    },
+    {
+      "case": "AUTHORIZED_SNAPSHOT_NONE",
+      "result": "PASS",
+      "authority": "NOT_PROVEN"
+    },
+    {
+      "case": "AUTHORIZED_SNAPSHOT_SHA1",
+      "result": "PASS",
+      "authority": "NOT_PROVEN"
+    },
+    {
+      "case": "AUTHORIZED_GIT_MD5",
+      "result": "PASS",
+      "authority": "NOT_PROVEN"
+    },
+    {
+      "case": "PATH_PROFILE_AND_MANIFEST_EXACT_SHAPE",
+      "result": "PASS"
+    },
+    {
+      "case": "CANONICAL_PATH_.gitignore",
+      "result": "PASS"
+    },
+    {
+      "case": "CANONICAL_PATH_.gitattributes",
+      "result": "PASS"
+    },
+    {
+      "case": "CANONICAL_PATH_.github/workflows/test.yml",
+      "result": "PASS"
+    },
+    {
+      "case": "CANONICAL_PATH_src/żółć.py",
+      "result": "PASS"
+    },
+    {
+      "case": "CANONICAL_PATH_a/.hidden",
+      "result": "PASS"
+    },
+    {
+      "case": "INVALID_PATH_'.'",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "INVALID_PATH_'..'",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "INVALID_PATH_'../a'",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "INVALID_PATH_'a/../b'",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "INVALID_PATH_'a/./b'",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "INVALID_PATH_'/a'",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "INVALID_PATH_'a/'",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "INVALID_PATH_'a//b'",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "INVALID_PATH_'a\\\\b'",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "INVALID_PATH_'a\\x00b'",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "INVALID_PATH_'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'",
+      "result": "PASS",
+      "expected": "REJECT"
+    },
+    {
+      "case": "ACTUAL_HEAD_SOURCE_PATHS",
+      "result": "PASS",
+      "path_count": 499,
+      "old_rejected": [
+        ".gitattributes",
+        ".github/workflows/v2-0-3-qualification.yml",
+        ".gitignore"
+      ]
+    }
+  ],
+  "schema_raw_digest": "73f5be784302fa455d14fea34df5a8acbb7ff414dae0075ac99ebfeefe82d730",
+  "source_raw_digest": "7d967707d8f7a0d77ab84484aeb4de0119dab85ed055c31473792c8528919f75",
+  "profile_catalog_raw_digest": "5369c2ce8acffd4b066d1317546d2ba5bd53401b3a072057d96462799b750043",
+  "qualification": false,
+  "actual_source_materialization": "NOT_PROVEN",
+  "NF02": "OPEN"
+}

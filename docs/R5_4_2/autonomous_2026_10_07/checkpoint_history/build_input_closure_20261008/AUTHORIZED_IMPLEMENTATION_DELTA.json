@@ -1,0 +1,49 @@
+{
+  "authorization": "User: wprowadÄ‚â€žĂ„â€¦Ă„Ä…ÄąĹź to i kontynuuj",
+  "files": {
+    "src/bdb_audit/history/closure.py": {
+      "baseline_raw_digest": "744a1a7614d89212e8bf739bcb12388fab9b4adcca558367c852b59643486d61",
+      "current_raw_digest": "4c6baa8461380e9d295a603266bfbda8cb3333545e0bd0e87011d34b8e4735ad",
+      "scope": "Remove hidden command-first ready-node priority; retain all edges and validation"
+    },
+    "src/bdb_audit/history/objects.py": {
+      "baseline_raw_digest": "7da561c99a13fa397bc005b46b60a6b496dd5f35a956b6b1494d3b7a5174ff38",
+      "current_raw_digest": "dbb3eb6e7e5b51ce9b37d03d4392cd119d5d2fa04581834722c65647ff88fe6b",
+      "scope": "Remove global command-first assertion; exact command presence/class/digest and bootstrap scoped precedence preserved"
+    },
+    "src/bdb_audit/source/git_resolver.py": {
+      "baseline_raw_digest": "a0d1af83fd23ae22099e9340d7f835ff217c306da6fb29844eef4a3de0d37e77",
+      "current_raw_digest": "5bca8d24778871d7999e0c0af62918b556422d3bcbe0c157d1a5c8eea2cafd59",
+      "scope": "Exact repository object format determines commit/tree ID validation; only SHA1/SHA256 and exact 40/64 supported, independent pinned authority still pending",
+      "authorization": "User: kontynuuj do koĂ„Ä…Ă˘â‚¬Ĺľca caĂ„Ä…Ă˘â‚¬Ĺˇego planu"
+    },
+    "src/bdb_audit/workflow/source_target.py": {
+      "baseline_raw_digest": "cd6f167a968848bf115439ce3de25656769a4b87ce4c393479f849b7e2d1e6a1",
+      "current_raw_digest": "bee312be9074ac8bab1c26fbee5c03fa2ccf0d1f899b36d18785d77ffc412cff",
+      "scope": "Existing OD033 continuation: workflow descriptor preserves exact SHA1/SHA256 format and lengths; no source authority inferred",
+      "authorization": "Current user: odczytaj aktualny stan i kontynuuj plan; existing source delta reviewed before evidence reconciliation"
+    }
+  },
+  "new_files": {
+    "src/bdb_audit/source/archive.py": {
+      "current_raw_digest": "6765f95ed7a6627867857ac8c8b2b284feda59ea432222a1e825f2cceac16a5c",
+      "authorization": "User whole plan; OD031 source transport and OD032 exact target encoding",
+      "scope": "Pure complete regular/symlink archive reconciliation; no profile activation or canonical authority"
+    },
+    "tests/stage2/test_source_archive_reconciliation.py": {
+      "current_raw_digest": "a622dc088588d0f53c7827390a90e7a451837934cae3c257104092b0bdbf6430",
+      "authorization": "User whole plan; OD031 source transport and OD032 exact target encoding",
+      "scope": "Pure complete regular/symlink archive reconciliation; no profile activation or canonical authority"
+    },
+    "tests/stage2/test_source_object_format_regression.py": {
+      "current_raw_digest": "ff78b7cf6564a399ac152ece5c6675663ddf2481867a98e19116d60ee635b7da",
+      "authorization": "User whole plan; OD031 source transport and OD032 exact target encoding",
+      "scope": "Pure complete regular/symlink archive reconciliation; no profile activation or canonical authority"
+    },
+    "tests/stage2/test_source_archive_real_git.py": {
+      "current_raw_digest": "8f095024603d4b71d95fd246d2d6b74ee9abb21ed299d820731490088e81fc4e",
+      "authorization": "Current user: kontynuuj plan; OD031-033 actual source transport verification",
+      "scope": "Six real Git SHA1/SHA256 regressions; exact hidden/Unicode/executable/symlink transport plus unmaterialized LFS/submodule rejection; no source mocks"
+    }
+  }
+}

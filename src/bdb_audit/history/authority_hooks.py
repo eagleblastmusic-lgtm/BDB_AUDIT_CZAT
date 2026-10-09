@@ -11,7 +11,7 @@ from __future__ import annotations
 from functools import wraps
 import hashlib
 import json
-from typing import Any
+from typing import Any, Iterable, Mapping, cast
 
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
@@ -113,10 +113,76 @@ def _validate_residual_risk_authority(obj, *, con) -> None:
 
 def _digest_set(refs) -> set[str]:
     return {
-        ref.get("revision_digest")
+        ref["revision_digest"]
         for ref in refs
         if isinstance(ref, dict) and isinstance(ref.get("revision_digest"), str)
     }
+
+
+def _check_source_generation_aliases(bodies: Iterable[Mapping[str, Any]]) -> None:
+    """Data 8.3: exact identity and logical alias have a one-to-one mapping.
+
+    The current registered contracts provide no explicit import-alias relation.
+    Archive representations or a parent reference do not create that relation.
+    Reference class metadata does not change the authoritative target identity.
+    """
+    aliases: dict[str, bytes] = {}
+    identities: dict[bytes, str] = {}
+    for body in bodies:
+        alias = body.get("source_generation_id")
+        ref = body.get("source_identity_ref")
+        if type(alias) is not str or not alias or type(ref) is not dict:
+            raise ValidationError("SOURCE_IDENTITY_CONFLICT", "Incomplete source alias binding")
+        identity = canonical_bytes({key: value for key, value in ref.items() if key != "ref_class"})
+        if alias in aliases and aliases[alias] != identity:
+            raise ValidationError("SOURCE_IDENTITY_CONFLICT", "Source alias maps to another exact identity")
+        if identity in identities and identities[identity] != alias:
+            raise ValidationError("SOURCE_IDENTITY_CONFLICT", "Another alias already represents this exact identity")
+        aliases[alias], identities[identity] = identity, alias
+
+
+def _validate_source_generation_context(obj, *, con, content_objects) -> None:
+    """Data 8: a generation cannot contradict its exact SourceIdentity."""
+    ref = obj.body.get("source_identity_ref")
+    if not isinstance(ref, dict) or not isinstance(ref.get("revision_digest"), str):
+        raise ValidationError("SOURCE_IDENTITY_CONFLICT", "Missing exact source identity")
+    target = next((item for item in content_objects if item.digest == ref.get("revision_digest")), None)
+    if target is None:
+        row = _object_record(ref["revision_digest"], con)
+        if row is None:
+            raise ValidationError("SOURCE_IDENTITY_CONFLICT", "Source identity not retained")
+        target = CanonicalObject(row["kind"], row["body"], row["schema_revision_ref"],
+                                 row["logical_id"], row["version"])
+    if target.kind != "source_identity" or _typed_ref_identity(target.as_ref().as_dict()) != _typed_ref_identity(ref):
+        raise ValidationError("SOURCE_IDENTITY_CONFLICT", "Exact source identity mismatch")
+    authority_mode = target.body.get("authority_mode")
+    authority_field = ({"AUTHORIZED_GIT": "repository_authority_ref",
+                        "AUTHORIZED_SNAPSHOT": "snapshot_authority_ref"}.get(authority_mode)
+                       if isinstance(authority_mode, str) else None)
+    if authority_field is None or authority_field not in obj.body:
+        raise ValidationError("SOURCE_IDENTITY_CONFLICT", "Source generation contradicts identity authority mode")
+    authority = obj.body.get("repository_authority_ref", obj.body.get("snapshot_authority_ref"))
+    for name, actual, expected in (
+        ("manifest", obj.body.get("materialized_source_manifest_ref"), target.body.get("materialized_source_manifest_ref")),
+        ("profile", obj.body.get("source_identity_profile_ref"), target.body.get("profile_ref")),
+        ("authority", authority, target.body.get("authorized_repository_or_snapshot_ref")),
+    ):
+        if not isinstance(actual, dict) or not isinstance(expected, dict):
+            raise ValidationError("SOURCE_IDENTITY_CONFLICT", "Incomplete source " + name)
+        actual_key = canonical_bytes({key: value for key, value in actual.items() if key != "ref_class"})
+        expected_key = canonical_bytes({key: value for key, value in expected.items() if key != "ref_class"})
+        if actual_key != expected_key:
+            raise ValidationError("SOURCE_IDENTITY_CONFLICT", "Source generation contradicts identity " + name)
+
+
+def _validate_source_generation_aliases(obj, *, current, con, content_objects) -> None:
+    from ..stop.authority import _accepted_index, _records
+
+    prior = _records("source_generation", _accepted_index(current, con), con) if current is not None else ()
+    bodies = [row["body"] for row in prior]
+    bodies.append(obj.body)
+    bodies.extend(obj.body for obj in content_objects if obj.kind == "source_generation")
+    _check_source_generation_aliases(bodies)
 
 
 def _active_risk_rows(current, con):
@@ -149,7 +215,7 @@ def _accepted_body(kind: str, digest: str | None, index, con) -> dict:
     obj = CanonicalObject(row[0], json.loads(row[4]), row[2], row[3], row[1])
     if obj.digest != digest:
         raise ValidationError("ACCEPTED_HISTORY_INTEGRITY_FAILURE")
-    return obj.body
+    return cast(dict, obj.body)
 
 
 def _object_record(digest: str, con) -> dict | None:
@@ -179,18 +245,7 @@ def _stop_risk_set(stop_eval_ref, index, con) -> set[str]:
 
 
 def _ref_identity(ref):
-    if not isinstance(ref, dict):
-        return None
-    return tuple(
-        ref.get(field)
-        for field in (
-            "kind",
-            "revision_digest",
-            "digest_profile",
-            "schema_revision_ref",
-            "logical_id",
-        )
-    )
+    return _typed_ref_identity(ref)
 
 
 def _require_same_ref(actual, expected, field: str) -> None:
@@ -694,7 +749,7 @@ def _typed_ref_identity(ref):
     if not isinstance(ref, dict):
         return None
     return tuple(
-        ref.get(field)
+        canonical_bytes(ref.get(field)) if field == "schema_revision_ref" else ref.get(field)
         for field in (
             "kind",
             "revision_digest",
@@ -742,6 +797,7 @@ def _resolve_completion_object(ref, *, content_objects, con, context):
         (candidate for candidate in content_objects if candidate.digest == ref.get("revision_digest")),
         None,
     )
+    prior = target is None
     if target is None:
         row = con.execute(
             "SELECT kind,version,schema_ref,logical_id,body FROM immutable_objects WHERE digest=?",
@@ -757,6 +813,9 @@ def _resolve_completion_object(ref, *, content_objects, con, context):
         or target.logical_id != ref.get("logical_id")
     ):
         raise ValidationError("STAGE_COMPLETION_REFERENCE_IDENTITY_MISMATCH", context)
+    if prior:
+        from .raw_artifacts import retained_raw_for_object
+        retained_raw_for_object(con, target)
     return target
 
 
@@ -830,7 +889,7 @@ def _validate_stage_output_obligations(
     con,
 ):
     """Require each named obligation to have its canonical accepted artifact."""
-    outputs_by_kind = {}
+    outputs_by_kind: dict[str, list[CanonicalObject]] = {}
     for target in output_targets:
         outputs_by_kind.setdefault(target.kind, []).append(target)
 
@@ -840,7 +899,7 @@ def _validate_stage_output_obligations(
             raise ValidationError("STAGE_COMPLETION_REQUIRED_OUTPUT_MISSING", name)
         return matches
 
-    expected = {
+    expected: dict[str, dict[str, tuple[str, ...]]] = {
         "E1": {
             "discovery_records": ("discovery_record",),
             "stage_completion_digest": (),
@@ -1026,20 +1085,40 @@ def _accepted_completion_records(kind, *, current, con):
     return _records(kind, _accepted_index(current, con), con)
 
 
-def _validate_lane_result_admission_evidence(obj, *, content_objects, current, con) -> None:
+def _get_vault_from_con(con, raw_digest: str, *, require_retained=False):
+    from .raw_artifacts import AdmissionRawReader
+    return AdmissionRawReader(con, require_retained=require_retained)
+
+
+def compute_ingestion_capability(secret: bytes, body: dict[str, Any]) -> str:
+    import hmac
+    payload = {
+        "campaign_id": body.get("campaign_id"),
+        "stage_id": body.get("stage_id"),
+        "lane_slot": body.get("lane_slot"),
+        "assignment_ref": body.get("assignment_ref"),
+        "attempt_ref": body.get("attempt_ref"),
+        "source_generation_ref": body.get("source_generation_ref"),
+        "source_commit_sha": str(body.get("source_commit_sha", "")).lower(),
+        "input_package_digest": body.get("input_package_digest"),
+        "package_zip_sha256": body.get("package_zip_sha256"),
+        "raw_result_digest": body.get("raw_result_digest"),
+        "raw_result_byte_length": body.get("raw_result_byte_length"),
+        "result_proposal_digest": body.get("result_proposal_digest"),
+        "executor_profile": body.get("executor_profile"),
+        "executor_model": body.get("executor_model"),
+        "history_cut": body.get("history_cut"),
+    }
+    return hmac.new(secret, canonical_bytes(payload), hashlib.sha256).hexdigest()
+
+
+def _validate_lane_result_admission_evidence(obj, *, content_objects, current, con) -> dict[str, bytes]:
     body = obj.body
     raw_digest = body.get("raw_result_digest")
     if not isinstance(raw_digest, str) or len(raw_digest) != 64:
         raise ValidationError("INVALID_RAW_DIGEST")
 
-    from pathlib import Path
-    db_row = con.execute("PRAGMA database_list").fetchone()
-    db_path = db_row[2] if db_row and len(db_row) > 2 else ""
-    if not db_path:
-        raise ValidationError("RAW_ARTIFACT_NOT_FOUND", raw_digest)
-    vault_dir = Path(db_path).resolve().parent / "raw_vault"
-    from ..vault.raw_store import RawArtifactVault
-    vault = RawArtifactVault(vault_dir)
+    vault = _get_vault_from_con(con, raw_digest)
     try:
         raw_bytes = vault.read_bytes(raw_digest)
     except ValidationError:
@@ -1082,6 +1161,9 @@ def _validate_lane_result_admission_evidence(obj, *, content_objects, current, c
     if manifest.get("executor_model") != body.get("executor_model"):
         raise ValidationError("EXECUTOR_MODEL_MISMATCH")
 
+    if current is not None and body.get("campaign_id") != current.campaign_id:
+        raise ValidationError("CAMPAIGN_BINDING_MISMATCH")
+
     assignment = _resolve_completion_object(
         body.get("assignment_ref"),
         content_objects=content_objects,
@@ -1097,8 +1179,74 @@ def _validate_lane_result_admission_evidence(obj, *, content_objects, current, c
     if canonical_bytes(assignment.body.get("assignment_input_history_cut")) != canonical_bytes(body.get("history_cut")):
         raise ValidationError("ASSIGNMENT_CUT_MISMATCH")
 
+    lane_spec = _resolve_completion_object(
+        assignment.body.get("lane_spec_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="lane_spec_ref",
+    )
+    if lane_spec.kind != "lane_spec":
+        raise ValidationError("LANE_SLOT_BINDING_MISMATCH")
 
-def _validate_lane_result(obj, *, content_objects, current, con) -> None:
+    stage_spec = _resolve_completion_object(
+        assignment.body.get("stage_spec_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="stage_spec_ref",
+    )
+    if stage_spec.kind != "stage_spec" or stage_spec.body.get("stage_key") != body.get("stage_id"):
+        raise ValidationError("STAGE_BINDING_MISMATCH")
+
+    stage_key = stage_spec.body.get("stage_key")
+    if _stage_slot_key(stage_key, lane_spec.body.get("lane_key")) != _stage_slot_key(stage_key, body.get("lane_slot")):
+        raise ValidationError("LANE_SLOT_BINDING_MISMATCH")
+
+    attempt = _resolve_completion_object(
+        body.get("attempt_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="attempt_ref",
+    )
+    if attempt.kind != "attempt":
+        raise ValidationError("ASSIGNMENT_ATTEMPT_BINDING_MISMATCH")
+    lane_run = _resolve_completion_object(
+        attempt.body.get("lane_run_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="lane_run_ref",
+    )
+    if lane_run.kind != "lane_run":
+        raise ValidationError("LANE_RUN_REF_INVALID")
+    if _typed_ref_identity(lane_run.body.get("lane_spec_ref")) != _typed_ref_identity(assignment.body.get("lane_spec_ref")):
+        raise ValidationError("LANE_SLOT_BINDING_MISMATCH")
+    if _typed_ref_identity(lane_run.body.get("source_generation_ref")) != _typed_ref_identity(body.get("source_generation_ref")):
+        raise ValidationError("ASSIGNMENT_SOURCE_BINDING_MISMATCH")
+
+    source_gen = _resolve_completion_object(
+        body.get("source_generation_ref"),
+        content_objects=content_objects,
+        con=con,
+        context="source_generation_ref",
+    )
+    if source_gen.kind != "source_generation":
+        raise ValidationError("ASSIGNMENT_SOURCE_BINDING_MISMATCH")
+
+    cap = body.get("ingestion_capability")
+    if not cap or not isinstance(cap, str) or len(cap) != 64:
+        raise ValidationError("UNAUTHORIZED_PRODUCER_AUTHORITY")
+    from .store import _get_or_create_ingestion_authority_key
+    secret = _get_or_create_ingestion_authority_key(con)
+    expected_cap = compute_ingestion_capability(secret, body)
+    import hmac
+    if not hmac.compare_digest(cap, expected_cap):
+        raise ValidationError("UNAUTHORIZED_PRODUCER_AUTHORITY")
+
+    from ..workflow.result_proposal import verify_admission_bytes
+    verify_admission_bytes(body, vault=vault, assignment=assignment.body)
+    return vault.verified
+
+
+def _validate_lane_result(obj, *, content_objects, current, con) -> dict[str, bytes]:
     body = obj.body
     admission_ref = body.get("admission_evidence_ref")
     if not isinstance(admission_ref, dict):
@@ -1143,6 +1291,31 @@ def _validate_lane_result(obj, *, content_objects, current, con) -> None:
     calculated_digest = hashlib.sha256(canonical_bytes(proposal_copy)).hexdigest()
     if calculated_digest != evidence.get("result_proposal_digest"):
         raise ValidationError("RESULT_PROPOSAL_DIGEST_MISMATCH")
+
+    raw_digest = evidence.get("raw_result_digest")
+    if not isinstance(raw_digest, str) or len(raw_digest) != 64:
+        raise ValidationError("INVALID_RAW_DIGEST")
+    vault = _get_vault_from_con(con, raw_digest, require_retained=True)
+    try:
+        raw_bytes = vault.read_bytes(raw_digest)
+    except ValidationError:
+        raise
+    except Exception as exc:
+        raise ValidationError("RAW_ARTIFACT_NOT_FOUND", str(exc)) from exc
+
+    expected_len = evidence.get("raw_result_byte_length")
+    if isinstance(expected_len, int) and len(raw_bytes) != expected_len:
+        raise ValidationError("RAW_RESULT_BYTE_LENGTH_MISMATCH")
+
+    assignment = _resolve_completion_object(
+        evidence.get("assignment_ref"), content_objects=content_objects,
+        con=con, context="assignment_ref",
+    )
+    from ..workflow.result_proposal import verify_admission_bytes
+    derived = verify_admission_bytes(evidence, vault=vault, assignment=assignment.body)
+    if canonical_bytes(proposal_copy) != canonical_bytes(derived):
+        raise ValidationError("RESULT_PROPOSAL_DIGEST_MISMATCH")
+    return vault.verified
 
 
 def _validate_lane_completion(obj, *, content_objects, con, current):
@@ -1399,7 +1572,7 @@ def _validate_lane_completion(obj, *, content_objects, con, current):
 
         for target in output_targets:
             digest = target.digest
-            accepted_match = any(
+            accepted_discovery_match = any(
                 row.get("ref", {}).get("revision_digest") == digest
                 and _typed_ref_identity(row.get("ref"))
                 == _typed_ref_identity(target.ref.as_dict())
@@ -1408,7 +1581,7 @@ def _validate_lane_completion(obj, *, content_objects, con, current):
             in_closure = any(
                 candidate.digest == digest for candidate in content_objects
             )
-            if not accepted_match and not in_closure:
+            if not accepted_discovery_match and not in_closure:
                 raise ValidationError("LANE_COMPLETION_OUTPUT_NOT_ACCEPTED")
 
             discovery = target.body
@@ -1994,7 +2167,7 @@ def _validate_stage_completion(obj, *, content_objects, current, con):
     stage_cut = _cut_seq(body.get("input_history_cut"), context="stage_completion")
 
     observed = set()
-    lane_output_digests = set()
+    lane_output_digests: set[Any] = set()
     for lane_ref in lane_refs:
         lane_completion = _resolve_completion_object(
             lane_ref, content_objects=content_objects, con=con, context="required_lane_slot_results"
@@ -2169,6 +2342,9 @@ def install_domain_authority_hooks(store_cls) -> None:
         )
         if obj.kind == "stage_spec" and obj.body.get("stage_key") in {"E1", "E2", "E3", "E4", "E5"}:
             _validate_native_stage_spec_authority(obj)
+        elif obj.kind == "source_generation":
+            _validate_source_generation_context(obj, con=con, content_objects=content_objects)
+            _validate_source_generation_aliases(obj, current=current, con=con, content_objects=content_objects)
         elif obj.kind == "stage_spec" and obj.body.get("stage_key") == "E6":
             from ..stop.e6 import validate_adaptive_e6_stage_spec_authority
 
@@ -2189,11 +2365,11 @@ def install_domain_authority_hooks(store_cls) -> None:
                 obj, content_objects=content_objects, con=con
             )
         elif obj.kind == "lane_result_admission_evidence":
-            _validate_lane_result_admission_evidence(
+            return _validate_lane_result_admission_evidence(
                 obj, content_objects=content_objects, current=current, con=con
             )
         elif obj.kind == "bdb_audit_lane_result":
-            _validate_lane_result(
+            return _validate_lane_result(
                 obj, content_objects=content_objects, current=current, con=con
             )
         elif obj.kind == "lane_completion":
@@ -2219,10 +2395,10 @@ def install_domain_authority_hooks(store_cls) -> None:
             _validate_finalization_basis(obj, current=current, con=con)
             _validate_finalization_residual_risk_projection(obj, current=current, con=con)
 
-    validate_prior_accepted_membership._bdb_overlay_prior_authority = True
-    validate_material_ref_contracts._bdb_domain_authority_hooks = True
+    setattr(validate_prior_accepted_membership, "_bdb_overlay_prior_authority", True)
+    setattr(validate_material_ref_contracts, "_bdb_domain_authority_hooks", True)
     store_cls._validate_prior_accepted_membership = validate_prior_accepted_membership
     store_cls._validate_material_ref_contracts = validate_material_ref_contracts
 
 
-__all__ = ["install_domain_authority_hooks"]
+__all__ = ["install_domain_authority_hooks", "compute_ingestion_capability"]

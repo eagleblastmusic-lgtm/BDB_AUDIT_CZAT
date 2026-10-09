@@ -1,0 +1,26 @@
+{
+  "file": "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/40079b2c8b334f0b1cb660b2e0dbef4b0fd8906c72aafd5fdb0030a89d92be1f/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+  "raw_digest": "40079b2c8b334f0b1cb660b2e0dbef4b0fd8906c72aafd5fdb0030a89d92be1f",
+  "byte_length": 61055343,
+  "sources": {
+    "docs/R5_4_1/candidate/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4.json": "4cebb462b647c69e6348546180900ac2a3c4806a5bf1716e5269b70ed94edb17",
+    "docs/R5_4_2/autonomous_2026_10_07/BUILD_SCHEMA_FIXTURE_READBACK.json": "e1d079db7be199b441d51133113f3c0dda01c7ff367cf7c77feca9c59c91dc37",
+    "docs/R5_4_2/autonomous_2026_10_07/build_schema_fixtures/9b0fdc3014c0404c143ec130290374200d02830a8894f76234ae0db885bd2b6a/BUILD_SCHEMA_KNOWN_ANSWERS.json": "9b0fdc3014c0404c143ec130290374200d02830a8894f76234ae0db885bd2b6a",
+    "docs/R5_4_2/autonomous_2026_10_07/BUILD_TIME_CANDIDATE_READBACK.json": "0174afc3f38900d36de834d80b613f94201468961ff3f45089ab41fc340c3829",
+    "docs/R5_4_2/autonomous_2026_10_07/design/VERSION_IMPACT_PLAN.json": "2687b9377ef6772bec410b15a22239ea24000e72e2b8b3726f80372412e9250d",
+    "docs/R5_4_2/R5_4_2_SEMANTIC_CLOSURE_GRAPH.json": "57e16f3dc8ffdc448c62cd5ed74663c875517eb6d141f13516358069d15ea75a",
+    "docs/R5_4_2/OWNER_R5_4_2_SEMANTIC_CLOSURE_APPROVAL.json": "78cb86ad8f311e1f4db73d10b6d18e3f9567ac03d8b446a0849a15f047ea9aae",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/build_schema_fixtures.py": "fa05e1913442327d1d7903b0a649d89961333a69758284b2de2d39e02406cf7c",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/execution.py": "333402e50b22c4d3cdce19d31f6246bde11bb86c07435ac2d106c38e74738dfe",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/golden_build_candidate.py": "8c95d4d7a8f396e5fadadf2fdc7266d358c3c3864ae547ffed0f8156aff242fb"
+  },
+  "input_drift": [],
+  "status": "BUILD_TIME_SUCCESSOR_NOT_FROZEN_NOT_QUALIFIED",
+  "inherited_vectors": 167,
+  "exact_schema_vectors": 2528,
+  "unexecuted_canonical_designs": 182,
+  "qualification": false,
+  "frozen": false,
+  "canonical_runtime": "NOT_RUN",
+  "NF02": "OPEN"
+}

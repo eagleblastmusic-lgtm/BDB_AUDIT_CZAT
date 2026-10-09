@@ -1,0 +1,166 @@
+{
+  "purpose": "Preserve exact observed worktree inputs and captured evidence in review Git blobs. Working code, tests, qualification/status payloads and protected tracked attributes were not edited. Existing line-ending-only differences are recorded explicitly; no new gate qualification is asserted.",
+  "exact_byte_attribute_overrides": [
+    "src/bdb_audit/history/authority_hooks.py",
+    "src/bdb_audit/workflow/assurance_projection.py",
+    "docs/**",
+    "F2_QUALIFICATION/CURRENT_IMPLEMENTATION_STATUS.json",
+    "F2_QUALIFICATION/F2_STATUS.json",
+    "build/build_single_file_v2_0_2.py",
+    "build/normalize_runtime_metadata.py",
+    "pyproject.toml",
+    "tests/compatibility/test_legacy_baseline.py",
+    "tests/f4/test_wp06_execution_adapters.py",
+    "tests/f6/test_pr03_property_stateful.py",
+    "tests/f7/test_pr09_challenger_execution.py",
+    "tests/f7/test_pr13_e5_stop_integration_gate.py",
+    "tests/f8/test_m46_standalone_clean_env.py",
+    "tests/f8/test_m49_release_validator.py",
+    "tests/f8/test_ru07_runtime_record_normalization.py",
+    "tests/stage1/test_ru01_residuals.py",
+    "tests/stage1/test_stage1_foundation.py",
+    "tests/stage2/test_ru02_source_identity.py",
+    "tests/stage3/test_ru03_assignment_vault.py",
+    "tests/stage3/test_ru03_import_ui_diagnostics.py",
+    "tests/stage3/test_ru03_package_identity.py",
+    "tests/stage5/test_ru05_truthful_self_test.py"
+  ],
+  "previous_core_whitespace": null,
+  "current_core_whitespace": "blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+  "tracked_gitattributes_modified": false,
+  "reason_for_docs_override": "Captured raw source payload contains its original src/.gitattributes; preserve exact evidence bytes when adding it to the review snapshot",
+  "preserved_additional_preexisting_line_endings": [
+    {
+      "file": "F2_QUALIFICATION/CURRENT_IMPLEMENTATION_STATUS.json",
+      "original_worktree_raw_sha256": "9ed9e704c90394b5c6dcc1075cdbf041424024a1b8a65f378ca8802268001650",
+      "prior_index_raw_sha256": "107f91b010aa84efba0e99a57a702e9374425e68a2848037adb10d5120304fd8",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "F2_QUALIFICATION/F2_STATUS.json",
+      "original_worktree_raw_sha256": "9ed9e704c90394b5c6dcc1075cdbf041424024a1b8a65f378ca8802268001650",
+      "prior_index_raw_sha256": "107f91b010aa84efba0e99a57a702e9374425e68a2848037adb10d5120304fd8",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "build/build_single_file_v2_0_2.py",
+      "original_worktree_raw_sha256": "763f301ed0d6fde20fcf43a81eebc5f32603dc5c33907b0faa78f7b1bfb1f199",
+      "prior_index_raw_sha256": "2417946c822df1a6fbd68b0ef41f3fda6e0efa4b7d16bc811ecacf673ee954bc",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "build/normalize_runtime_metadata.py",
+      "original_worktree_raw_sha256": "1ce0d959b2f4d9736b45514ecb59c98ee2eaf00d0c60aed4b36d6fac0d67ee87",
+      "prior_index_raw_sha256": "a8d66e508519a33610d1fbde849813a241f5818cf5125be1f8f4e6893ac98586",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/design/application_source_snapshots/982eb47a4feaeb3b1e1035fc9c55d1dd8cb2d94b8272430c35a4d5df46e27c94/raw/src/bdb_audit/history/authority_hooks.py",
+      "original_worktree_raw_sha256": "6d95db4a30eeedd43c50cc6e5da15ee35adb206de9b1068b7349b5d2f66a9a98",
+      "prior_index_raw_sha256": "22761f2d1311cf58c527cfaae2888a9a2a815eb24e4126a76b0617380df42c78",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/design/application_source_snapshots/982eb47a4feaeb3b1e1035fc9c55d1dd8cb2d94b8272430c35a4d5df46e27c94/raw/src/bdb_audit/workflow/assurance_projection.py",
+      "original_worktree_raw_sha256": "314d7efadf61cd05e4d15fae01aec5689da1bb72b2df3572d2324c1d4f0189bd",
+      "prior_index_raw_sha256": "cb54ab167c7740a99a5eafc58fc910d3519ce0c5027e422f47fbb2777f9a1ef1",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "pyproject.toml",
+      "original_worktree_raw_sha256": "91f77cd3fe57d119db7390a8ab5a98885bb0e8283ad1fde00e3b51089a890212",
+      "prior_index_raw_sha256": "e434023125f3af61f3cc6c1ce19a4e67eedf3125ce182aca7a039d2c8a6afa75",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/compatibility/test_legacy_baseline.py",
+      "original_worktree_raw_sha256": "b23d98dcceb9556af89d452081a9b7483d1ae9ea6ed619e8f4817f58c5f8a98d",
+      "prior_index_raw_sha256": "1b4175eeeefbccc241a91d8e9faf6febadb4c088035e160726f0899c8a77e201",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/f4/test_wp06_execution_adapters.py",
+      "original_worktree_raw_sha256": "0ed874907377b2b8a1dec8109b87c051aed25ec2535e7831fe60d6f3db5d5363",
+      "prior_index_raw_sha256": "dbb73b14bf590b846a34808a1542fa30dab8e176cc96c39505422eb5b5128896",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/f6/test_pr03_property_stateful.py",
+      "original_worktree_raw_sha256": "1f2e9b616fe0eb40fcc0113f5fd6561505eaee164a10f0411387dedc0d7e6690",
+      "prior_index_raw_sha256": "963ad2cd5df78bc91240ea8481d7c517f91de87b897d9663a4abf9baadfc4392",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/f7/test_pr09_challenger_execution.py",
+      "original_worktree_raw_sha256": "09c5e6a2a932b82829d718950f3087215c0c0d306f419c1fbbee6969467afe99",
+      "prior_index_raw_sha256": "4a6cc61a3962f70429d160b57292e24bd4b2a33af8b263040d36319fb1a00db1",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/f7/test_pr13_e5_stop_integration_gate.py",
+      "original_worktree_raw_sha256": "ca57a93017c2e05456953abb31d0a897f6f234eec90185577a986a9a9acaa8c6",
+      "prior_index_raw_sha256": "6a273dc31e5ec7e8ec78e6ae4dee90401d43567d430a6e765894d6395264a0c5",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/f8/test_m46_standalone_clean_env.py",
+      "original_worktree_raw_sha256": "36b5410a2a29e2f253e77c38ee43a2d677e52565342c6a0507155293b386c827",
+      "prior_index_raw_sha256": "f0e096df8b089798c16a1fcfecce9e91c09293469508a78d3bbffd1151cd8bb9",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/f8/test_m49_release_validator.py",
+      "original_worktree_raw_sha256": "a96277946260a42933f582587c148c19bf5f8a3900d095a8796611d3b03cbbcf",
+      "prior_index_raw_sha256": "88570dbf09e618143bd1e606110275c13cb058d4b93913ec776d4c0c495149c2",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/f8/test_ru07_runtime_record_normalization.py",
+      "original_worktree_raw_sha256": "ca40d47c6130bfed4a00afd5cf23f716333b6cdad7501452b2c4895c7c3dea18",
+      "prior_index_raw_sha256": "9f2bab2d60f97ce4c2e69792e3f325fd970370d69f9f26ec05bba3f1d6e652b6",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/stage1/test_ru01_residuals.py",
+      "original_worktree_raw_sha256": "b7284a4684583b8b72204c806336191121c4e8624ed66398c2461422867d0c3b",
+      "prior_index_raw_sha256": "0e69065c493b5d0ff23c429eee0f40a11976145c9f1ecebe44219f2052a4ec1f",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/stage1/test_stage1_foundation.py",
+      "original_worktree_raw_sha256": "33d00315585b0292aa368379e69f59166cd45afc39191eed182375c2b04248bd",
+      "prior_index_raw_sha256": "e3169366b469f9d40eb7bde742dac3774ff168d7c14179b744a675a0345292c6",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/stage2/test_ru02_source_identity.py",
+      "original_worktree_raw_sha256": "040e6610587a9283c08157a62fddc2cdb0367f9fe20fdd1071509543f22e5dce",
+      "prior_index_raw_sha256": "61063e3116f3aebb20400ad154e888c8b9b7975e6b97ab8b2a029f3c284f1371",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/stage3/test_ru03_assignment_vault.py",
+      "original_worktree_raw_sha256": "4f267bf0345a3783cafcda1430abcf31591f1920278579f4d1260118c62b71d6",
+      "prior_index_raw_sha256": "1217d11988e45325e6a089506d3dac6f971b53256e9797290ca075e702c96468",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/stage3/test_ru03_import_ui_diagnostics.py",
+      "original_worktree_raw_sha256": "9c2ef226fd60b3887e4343373c0c304583e26d8b08152880d28bbc74a18076c1",
+      "prior_index_raw_sha256": "7525cd15e6d6a0ec432feda42f4ac7d89fcec0c16274719a8bf3dd4579817a8d",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/stage3/test_ru03_package_identity.py",
+      "original_worktree_raw_sha256": "dcf3313e6518e10fae19ffa8a621d4ac435ac2894b8c04a833f24510d38ba218",
+      "prior_index_raw_sha256": "d74a56cc52ccc24908cf1ac2fdaa5fc27dc2e4db0d930c3bde6096ecf25bd608",
+      "difference": "CRLF/LF only; working file not modified"
+    },
+    {
+      "file": "tests/stage5/test_ru05_truthful_self_test.py",
+      "original_worktree_raw_sha256": "be1ae12a84be2f2a7c72ff93669960ceda80ba38e1bdba2514d41c8a29964514",
+      "prior_index_raw_sha256": "c2695f9cd018ca1eb7de40b26e5c28f57a590a4888c0419d12ab8db33fa4f199",
+      "difference": "CRLF/LF only; working file not modified"
+    }
+  ]
+}

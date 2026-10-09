@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "-p",
+    "no:cacheprovider",
+    "tests/stage2/test_ru02_source_identity.py",
+    "tests/stage2/test_source_object_format_regression.py",
+    "-q",
+    "--tb=short"
+  ],
+  "exit_code": 0,
+  "duration_seconds": 2.9703503999917302,
+  "source_HEAD": "b7051472909075bb4c83a9a510e298fcca2a6bd5",
+  "repository_HEAD_unchanged": true,
+  "test_inputs": {
+    "tests/stage2/test_ru02_source_identity.py": "040e6610587a9283c08157a62fddc2cdb0367f9fe20fdd1071509543f22e5dce",
+    "tests/stage2/test_source_object_format_regression.py": "2b97937755bb8d666326011fe6dafcff235a8afbfd70b9f0ba74884f22d041f9"
+  },
+  "tool_raw_digest": "df3c038f8e67d4b5182d8ba94c13199bd8fe51cdf360b912be5e4690384b00f3",
+  "implementation_inputs": {
+    "src/bdb_audit/source/git_resolver.py": "5bca8d24778871d7999e0c0af62918b556422d3bcbe0c157d1a5c8eea2cafd59",
+    "src/bdb_audit/source/materializer.py": "635904a91eaaf37456872c13b077d013d221881ec82a0fc0baa8f9a9cd1e29bf",
+    "src/bdb_audit/core/hashing.py": "286dee6109409661624572e4c3e87935d33f22c9a0e3a7bfad8dabbf471248f1",
+    "src/bdb_audit/core/errors.py": "fd22fd0097c928833d63439c665e3dca4a9faa9fad7914ad3354c4715f8d4140"
+  },
+  "environment": "Existing repo-local tmp fixtures; real Git operations in isolated fixture repos",
+  "qualification": false,
+  "trusted_profile_selection": "NOT_PROVEN",
+  "NF02": "OPEN"
+}

@@ -1,0 +1,1245 @@
+{
+  "status": "DESIGN_PROPAGATION_NOT_FROZEN",
+  "mapping": {
+    "approval_decision/1": "approval_decision/2",
+    "artifact_contract_registry/1": "artifact_contract_registry/1",
+    "artifact_hash_manifest/1": "artifact_hash_manifest/2",
+    "assignment_manifest/1": "assignment_manifest/2",
+    "assignment_package_binding/1": "assignment_package_binding/2",
+    "assurance_claim_set/1": "assurance_claim_set/1",
+    "attempt/1": "attempt/2",
+    "bdb_audit_lane_result/2": "bdb_audit_lane_result/3",
+    "blind_origin_eligibility_assessment/1": "blind_origin_eligibility_assessment/2",
+    "bootstrap_admission_decision/1": "bootstrap_admission_decision/2",
+    "build_manifest/1": "build_manifest/2",
+    "bundle_manifest/2": "bundle_manifest/2",
+    "campaign_conclusion/1": "campaign_conclusion/2",
+    "campaign_genesis/1": "campaign_genesis/2",
+    "candidate_assurance_case/1": "candidate_assurance_case/2",
+    "challenger_assignment/1": "challenger_assignment/2",
+    "challenger_result/1": "challenger_result/2",
+    "checkpoint/1": "checkpoint/2",
+    "clean_control_assessment/1": "clean_control_assessment/1",
+    "cleanup_result/2": "cleanup_result/2",
+    "command_envelope/1": "command_envelope/2",
+    "command_receipt/1": "command_receipt/2",
+    "commit_body/1": "commit_body/2",
+    "compatibility_fixture_assessment/1": "compatibility_fixture_assessment/2",
+    "compatibility_gate_result/1": "compatibility_gate_result/2",
+    "contamination_assessment/1": "contamination_assessment/2",
+    "contradiction_resolution_decision/1": "contradiction_resolution_decision/2",
+    "contradiction_revision/1": "contradiction_revision/2",
+    "corpus_manifest/1": "corpus_manifest/2",
+    "corpus_member_admission_assessment/1": "corpus_member_admission_assessment/2",
+    "corpus_member_candidate/1": "corpus_member_candidate/1",
+    "coverage_obligation/1": "coverage_obligation/2",
+    "coverage_obligation_key/1": "coverage_obligation_key/2",
+    "coverage_obligation_qualification/1": "coverage_obligation_qualification/2",
+    "defect_unit/1": "defect_unit/1",
+    "delivery_spec/1": "delivery_spec/2",
+    "dependency_independence_assessment/1": "dependency_independence_assessment/2",
+    "discovery_confirmation_assessment/1": "discovery_confirmation_assessment/1",
+    "discovery_corpus_match_assessment/1": "discovery_corpus_match_assessment/1",
+    "discovery_novelty_assessment/1": "discovery_novelty_assessment/1",
+    "discovery_record/1": "discovery_record/2",
+    "discovery_tool_origin_assessment/1": "discovery_tool_origin_assessment/1",
+    "effort_results/1": "effort_results/1",
+    "environment_record/1": "environment_record/2",
+    "evidence_applicability_assessment/1": "evidence_applicability_assessment/2",
+    "evidence_dependency_graph/1": "evidence_dependency_graph/1",
+    "evidence_invalidation/1": "evidence_invalidation/2",
+    "evidence_qualification_assessment/1": "evidence_qualification_assessment/2",
+    "execution_descriptor/1": "execution_descriptor/2",
+    "execution_result/1": "execution_result/2",
+    "executor_spec/1": "executor_spec/2",
+    "experiment_spec/1": "experiment_spec/2",
+    "false_negative_relationship_assessment/1": "false_negative_relationship_assessment/1",
+    "fault_run_record/2": "fault_run_record/2",
+    "fault_spec/1": "fault_spec/1",
+    "final_assurance_case/1": "final_assurance_case/2",
+    "final_technical_report/2": "final_technical_report/2",
+    "finding_adjudication_decision/1": "finding_adjudication_decision/2",
+    "finding_axis_assessment/1": "finding_axis_assessment/2",
+    "finding_claim_revision/1": "finding_claim_revision/2",
+    "finding_defect_match_assessment/1": "finding_defect_match_assessment/1",
+    "gate_decision/1": "gate_decision/1",
+    "grant_body/1": "grant_body/2",
+    "handoff_validation_result/1": "handoff_validation_result/1",
+    "history_anchor_receipt/1": "history_anchor_receipt/2",
+    "history_cut/1": "history_cut/2",
+    "holdout_exposure_assessment/1": "holdout_exposure_assessment/1",
+    "hypothesis_revision/1": "hypothesis_revision/2",
+    "input_disposition_record/2": "input_disposition_record/2",
+    "installation_bootstrap_profile/1": "installation_bootstrap_profile/1",
+    "invariant_revision/1": "invariant_revision/2",
+    "inventory_revision/2": "inventory_revision/2",
+    "isolation_baseline_profile/1": "isolation_baseline_profile/2",
+    "isolation_qualification/1": "isolation_qualification/2",
+    "knowledge_state/1": "knowledge_state/2",
+    "lane_completion/1": "lane_completion/2",
+    "lane_result_admission_evidence/2": "lane_result_admission_evidence/3",
+    "lane_run/1": "lane_run/2",
+    "lane_spec/1": "lane_spec/2",
+    "legacy_exposure_reconstruction_assessment/1": "legacy_exposure_reconstruction_assessment/2",
+    "legacy_mechanical_validation_assessment/1": "legacy_mechanical_validation_assessment/2",
+    "legacy_observation_mapping_assessment/1": "legacy_observation_mapping_assessment/2",
+    "legacy_observation_semantic_equivalence_assessment/1": "legacy_observation_semantic_equivalence_assessment/2",
+    "legacy_raw_ref/1": "legacy_raw_ref/1",
+    "lineage_admission_assessment/1": "lineage_admission_assessment/2",
+    "materiality_assessment/1": "materiality_assessment/2",
+    "model_fidelity_assessment/1": "model_fidelity_assessment/2",
+    "negative_evidence_record/1": "negative_evidence_record/2",
+    "negative_opportunity_unit/1": "negative_opportunity_unit/1",
+    "obligation_applicability_decision/1": "obligation_applicability_decision/2",
+    "observation/1": "observation/2",
+    "observation_dependency/1": "observation_dependency/1",
+    "policy_revision/1": "policy_revision/2",
+    "potential_exposure_record/1": "potential_exposure_record/2",
+    "projection_policy/1": "projection_policy/1",
+    "public_conclusion_statement/1": "public_conclusion_statement/1",
+    "release_qualification/1": "release_qualification/2",
+    "report_export_receipt/1": "report_export_receipt/2",
+    "residual_risk/1": "residual_risk/1",
+    "root_cause_revision/1": "root_cause_revision/2",
+    "run_manifest/1": "run_manifest/2",
+    "schema_registry/2": "schema_registry/2",
+    "scope_state_record/1": "scope_state_record/2",
+    "snapshot/1": "snapshot/2",
+    "snapshot_export_record/1": "snapshot_export_record/2",
+    "sound_claim/1": "sound_claim/2",
+    "source_drift_impact_assessment/1": "source_drift_impact_assessment/2",
+    "source_drift_record/1": "source_drift_record/2",
+    "source_generation/1": "source_generation/2",
+    "source_identity/1": "source_identity/2",
+    "source_manifest/1": "source_manifest/2",
+    "source_reconciliation_assessment/1": "source_reconciliation_assessment/2",
+    "spec_revision/1": "spec_revision/2",
+    "stage_completion/1": "stage_completion/2",
+    "stage_run/1": "stage_run/2",
+    "stage_spec/1": "stage_spec/2",
+    "standalone_payload_manifest/1": "standalone_payload_manifest/2",
+    "state_model/1": "state_model/1",
+    "stop_evaluation/1": "stop_evaluation/2",
+    "stop_input/1": "stop_input/2",
+    "successor_campaign_genesis/1": "successor_campaign_genesis/2",
+    "successor_campaign_selection_decision/1": "successor_campaign_selection_decision/2",
+    "surface_collector_record/2": "surface_collector_record/2",
+    "surface_key/1": "surface_key/2",
+    "surface_record/1": "surface_record/2",
+    "tool_execution_record/2": "tool_execution_record/2",
+    "transition_authorization_proposal/1": "transition_authorization_proposal/2",
+    "trust_profile/1": "trust_profile/2",
+    "trusted_predecessor_selection_decision/1": "trusted_predecessor_selection_decision/2",
+    "validation_result/1": "validation_result/2",
+    "view_manifest/1": "view_manifest/2"
+  },
+  "decisions": {
+    "approval_decision/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "approval_decision/2"
+    },
+    "artifact_hash_manifest/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "artifact_hash_manifest/2"
+    },
+    "assurance_claim_set/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "assurance_claim_set/1"
+    },
+    "blind_origin_eligibility_assessment/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "blind_origin_eligibility_assessment/2"
+    },
+    "build_manifest/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "build_manifest/2"
+    },
+    "bundle_manifest/2": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "bundle_manifest/2"
+    },
+    "campaign_conclusion/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "campaign_conclusion/2"
+    },
+    "candidate_assurance_case/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "candidate_assurance_case/2"
+    },
+    "challenger_assignment/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "challenger_assignment/2"
+    },
+    "challenger_result/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "challenger_result/2"
+    },
+    "checkpoint/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "checkpoint/2"
+    },
+    "clean_control_assessment/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "clean_control_assessment/1"
+    },
+    "cleanup_result/2": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "cleanup_result/2"
+    },
+    "compatibility_fixture_assessment/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "compatibility_fixture_assessment/2"
+    },
+    "compatibility_gate_result/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "compatibility_gate_result/2"
+    },
+    "contradiction_resolution_decision/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "contradiction_resolution_decision/2"
+    },
+    "contradiction_revision/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "contradiction_revision/2"
+    },
+    "corpus_manifest/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "corpus_manifest/2"
+    },
+    "corpus_member_admission_assessment/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "corpus_member_admission_assessment/2"
+    },
+    "corpus_member_candidate/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "corpus_member_candidate/1"
+    },
+    "coverage_obligation/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "coverage_obligation/2"
+    },
+    "coverage_obligation_key/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "coverage_obligation_key/2"
+    },
+    "coverage_obligation_qualification/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "coverage_obligation_qualification/2"
+    },
+    "defect_unit/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "defect_unit/1"
+    },
+    "delivery_spec/1": {
+      "reason": "Freeze retained-byte retry/idempotency and exact positive-view/redaction profile material references",
+      "successor_key": "delivery_spec/2"
+    },
+    "dependency_independence_assessment/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "dependency_independence_assessment/2"
+    },
+    "discovery_confirmation_assessment/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "discovery_confirmation_assessment/1"
+    },
+    "discovery_corpus_match_assessment/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "discovery_corpus_match_assessment/1"
+    },
+    "discovery_novelty_assessment/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "discovery_novelty_assessment/1"
+    },
+    "discovery_record/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "discovery_record/2"
+    },
+    "discovery_tool_origin_assessment/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "discovery_tool_origin_assessment/1"
+    },
+    "effort_results/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "effort_results/1"
+    },
+    "environment_record/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "environment_record/2"
+    },
+    "evidence_applicability_assessment/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "evidence_applicability_assessment/2"
+    },
+    "evidence_dependency_graph/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "evidence_dependency_graph/1"
+    },
+    "evidence_invalidation/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "evidence_invalidation/2"
+    },
+    "evidence_qualification_assessment/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "evidence_qualification_assessment/2"
+    },
+    "execution_descriptor/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "execution_descriptor/2"
+    },
+    "execution_result/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "execution_result/2"
+    },
+    "executor_spec/1": {
+      "reason": "Freeze exact runtime/tool/environment/isolation profile purposes and material reference obligations",
+      "successor_key": "executor_spec/2"
+    },
+    "experiment_spec/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "experiment_spec/2"
+    },
+    "false_negative_relationship_assessment/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "false_negative_relationship_assessment/1"
+    },
+    "fault_run_record/2": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "fault_run_record/2"
+    },
+    "fault_spec/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "fault_spec/1"
+    },
+    "final_assurance_case/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "final_assurance_case/2"
+    },
+    "final_technical_report/2": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "final_technical_report/2"
+    },
+    "finding_adjudication_decision/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "finding_adjudication_decision/2"
+    },
+    "finding_axis_assessment/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "finding_axis_assessment/2"
+    },
+    "finding_claim_revision/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "finding_claim_revision/2"
+    },
+    "finding_defect_match_assessment/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "finding_defect_match_assessment/1"
+    },
+    "gate_decision/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "gate_decision/1"
+    },
+    "handoff_validation_result/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "handoff_validation_result/1"
+    },
+    "history_anchor_receipt/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "history_anchor_receipt/2"
+    },
+    "holdout_exposure_assessment/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "holdout_exposure_assessment/1"
+    },
+    "hypothesis_revision/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "hypothesis_revision/2"
+    },
+    "input_disposition_record/2": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "input_disposition_record/2"
+    },
+    "invariant_revision/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "invariant_revision/2"
+    },
+    "inventory_revision/2": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "inventory_revision/2"
+    },
+    "isolation_baseline_profile/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "isolation_baseline_profile/2"
+    },
+    "lane_completion/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "lane_completion/2"
+    },
+    "lane_spec/1": {
+      "reason": "Freeze exact completion/effort/exploration profile purposes and propagated result contracts",
+      "successor_key": "lane_spec/2"
+    },
+    "legacy_mechanical_validation_assessment/1": {
+      "reason": "Close parsed legacy facts; raw original remains forensic authority",
+      "successor_key": "legacy_mechanical_validation_assessment/2"
+    },
+    "legacy_observation_mapping_assessment/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "legacy_observation_mapping_assessment/2"
+    },
+    "legacy_observation_semantic_equivalence_assessment/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "legacy_observation_semantic_equivalence_assessment/2"
+    },
+    "materiality_assessment/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "materiality_assessment/2"
+    },
+    "model_fidelity_assessment/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "model_fidelity_assessment/2"
+    },
+    "negative_evidence_record/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "negative_evidence_record/2"
+    },
+    "negative_opportunity_unit/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "negative_opportunity_unit/1"
+    },
+    "obligation_applicability_decision/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "obligation_applicability_decision/2"
+    },
+    "observation/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "observation/2"
+    },
+    "observation_dependency/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "observation_dependency/1"
+    },
+    "policy_revision/1": {
+      "reason": "Old exact const policy is NF02-only; successor explicitly governs complete qualified full-path predicates and profiles",
+      "successor_key": "policy_revision/2"
+    },
+    "public_conclusion_statement/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "public_conclusion_statement/1"
+    },
+    "release_qualification/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "release_qualification/2"
+    },
+    "report_export_receipt/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "report_export_receipt/2"
+    },
+    "residual_risk/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "residual_risk/1"
+    },
+    "root_cause_revision/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "root_cause_revision/2"
+    },
+    "run_manifest/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "run_manifest/2"
+    },
+    "scope_state_record/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "scope_state_record/2"
+    },
+    "snapshot/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "snapshot/2"
+    },
+    "snapshot_export_record/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "snapshot_export_record/2"
+    },
+    "sound_claim/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "sound_claim/2"
+    },
+    "source_drift_impact_assessment/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "source_drift_impact_assessment/2"
+    },
+    "source_drift_record/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "source_drift_record/2"
+    },
+    "source_identity/1": {
+      "reason": "Explicit exact source-bound category/language/runtime surface-normalizer profile context; no silent key reinterpretation",
+      "successor_key": "source_identity/2"
+    },
+    "source_manifest/1": {
+      "reason": "OD-030 canonical source paths admit dot-prefixed names and original Unicode while rejecting dot/traversal/empty components; historical /1 unchanged",
+      "successor_key": "source_manifest/2"
+    },
+    "source_reconciliation_assessment/1": {
+      "reason": "Close incoming identifier assertion representation; none establish source authority",
+      "successor_key": "source_reconciliation_assessment/2"
+    },
+    "spec_revision/1": {
+      "reason": "Version exact transition artifact-kind/version table after target successor propagation",
+      "successor_key": "spec_revision/2"
+    },
+    "stage_completion/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "stage_completion/2"
+    },
+    "stage_spec/1": {
+      "reason": "Freeze explicit purpose-constrained profile/reference contract instead of previously deferred material refs",
+      "successor_key": "stage_spec/2"
+    },
+    "standalone_payload_manifest/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "standalone_payload_manifest/2"
+    },
+    "state_model/1": {
+      "reason": "NEW_CANONICAL_SEMANTIC_KIND",
+      "successor_key": "state_model/1"
+    },
+    "stop_evaluation/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "stop_evaluation/2"
+    },
+    "stop_input/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "stop_input/2"
+    },
+    "successor_campaign_genesis/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "successor_campaign_genesis/2"
+    },
+    "successor_campaign_selection_decision/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "successor_campaign_selection_decision/2"
+    },
+    "surface_collector_record/2": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "surface_collector_record/2"
+    },
+    "surface_key/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "surface_key/2"
+    },
+    "surface_record/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "surface_record/2"
+    },
+    "tool_execution_record/2": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "tool_execution_record/2"
+    },
+    "transition_authorization_proposal/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "transition_authorization_proposal/2"
+    },
+    "trust_profile/1": {
+      "reason": "OD-040 Data 9.1 exact trust/producer/anchor/recovery body replaces declaration-only /1; historical bytes unchanged",
+      "successor_key": "trust_profile/2"
+    },
+    "validation_result/1": {
+      "reason": "CLOSED_BODY_OR_MATERIAL_REFERENCE_CONTRACT_NOT_PREVIOUSLY_EXECUTABLE",
+      "successor_key": "validation_result/2"
+    },
+    "view_manifest/1": {
+      "reason": "Close metadata projection and retain exact RawRef member domain",
+      "successor_key": "view_manifest/2"
+    },
+    "command_envelope/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "approval_decision/1",
+      "field": "command_payload.proposed_object_refs",
+      "successor_key": "command_envelope/2"
+    },
+    "command_receipt/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "approval_decision/1",
+      "field": "result_object_refs",
+      "successor_key": "command_receipt/2"
+    },
+    "commit_body/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "approval_decision/1",
+      "field": "immutable_object_refs",
+      "successor_key": "commit_body/2"
+    },
+    "campaign_genesis/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "build_manifest/1",
+      "field": "application_generation_ref",
+      "successor_key": "campaign_genesis/2"
+    },
+    "attempt/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "checkpoint/1",
+      "field": "retry_reason_ref",
+      "successor_key": "attempt/2"
+    },
+    "contamination_assessment/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "coverage_obligation/1",
+      "field": "scope[]",
+      "successor_key": "contamination_assessment/2"
+    },
+    "isolation_qualification/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "coverage_obligation/1",
+      "field": "scope[]",
+      "successor_key": "isolation_qualification/2"
+    },
+    "assignment_manifest/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "delivery_spec/1",
+      "field": "delivery_profile_ref",
+      "successor_key": "assignment_manifest/2"
+    },
+    "grant_body/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "delivery_spec/1",
+      "field": "delivery_profile_ref",
+      "successor_key": "grant_body/2"
+    },
+    "lineage_admission_assessment/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "history_anchor_receipt/1",
+      "field": "freshness_binding_refs",
+      "successor_key": "lineage_admission_assessment/2"
+    },
+    "lane_run/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "lane_spec/1",
+      "field": "lane_spec_ref",
+      "successor_key": "lane_run/2"
+    },
+    "bootstrap_admission_decision/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "legacy_mechanical_validation_assessment/1",
+      "field": "mechanical_validation_assessment_ref",
+      "successor_key": "bootstrap_admission_decision/2"
+    },
+    "legacy_exposure_reconstruction_assessment/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "observation/1",
+      "field": "controlled_exposure_fact_refs",
+      "successor_key": "legacy_exposure_reconstruction_assessment/2"
+    },
+    "history_cut/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "policy_revision/1",
+      "field": "governing_policy_ref",
+      "successor_key": "history_cut/2"
+    },
+    "source_generation/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "source_identity/1",
+      "field": "source_identity_ref",
+      "successor_key": "source_generation/2"
+    },
+    "trusted_predecessor_selection_decision/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "source_reconciliation_assessment/1",
+      "field": "source_reconciliation_assessment_ref",
+      "successor_key": "trusted_predecessor_selection_decision/2"
+    },
+    "stage_run/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "stage_completion/1",
+      "field": "predecessor_stage_completion_refs",
+      "successor_key": "stage_run/2"
+    },
+    "knowledge_state/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "view_manifest/1",
+      "field": "allowed_view_refs",
+      "successor_key": "knowledge_state/2"
+    },
+    "potential_exposure_record/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "view_manifest/1",
+      "field": "view_manifest_ref",
+      "successor_key": "potential_exposure_record/2"
+    },
+    "assignment_package_binding/1": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "assignment_manifest/1",
+      "field": "assignment_ref",
+      "successor_key": "assignment_package_binding/2"
+    },
+    "lane_result_admission_evidence/2": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "assignment_manifest/1",
+      "field": "assignment_ref",
+      "successor_key": "lane_result_admission_evidence/3"
+    },
+    "bdb_audit_lane_result/2": {
+      "reason": "EXACT_REFERENCE_TARGET_SUCCESSOR",
+      "target": "lane_result_admission_evidence/2",
+      "field": "admission_evidence_ref",
+      "successor_key": "bdb_audit_lane_result/3"
+    }
+  },
+  "traversal": [
+    {
+      "expanded": "approval_decision/1",
+      "new_successors": [
+        "command_envelope/1",
+        "command_receipt/1",
+        "commit_body/1"
+      ]
+    },
+    {
+      "expanded": "artifact_hash_manifest/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "assurance_claim_set/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "blind_origin_eligibility_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "build_manifest/1",
+      "new_successors": [
+        "campaign_genesis/1"
+      ]
+    },
+    {
+      "expanded": "bundle_manifest/2",
+      "new_successors": []
+    },
+    {
+      "expanded": "campaign_conclusion/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "candidate_assurance_case/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "challenger_assignment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "challenger_result/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "checkpoint/1",
+      "new_successors": [
+        "attempt/1"
+      ]
+    },
+    {
+      "expanded": "clean_control_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "cleanup_result/2",
+      "new_successors": []
+    },
+    {
+      "expanded": "compatibility_fixture_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "compatibility_gate_result/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "contradiction_resolution_decision/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "contradiction_revision/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "corpus_manifest/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "corpus_member_admission_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "corpus_member_candidate/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "coverage_obligation/1",
+      "new_successors": [
+        "contamination_assessment/1",
+        "isolation_qualification/1"
+      ]
+    },
+    {
+      "expanded": "coverage_obligation_key/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "coverage_obligation_qualification/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "defect_unit/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "delivery_spec/1",
+      "new_successors": [
+        "assignment_manifest/1",
+        "grant_body/1"
+      ]
+    },
+    {
+      "expanded": "dependency_independence_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "discovery_confirmation_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "discovery_corpus_match_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "discovery_novelty_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "discovery_record/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "discovery_tool_origin_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "effort_results/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "environment_record/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "evidence_applicability_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "evidence_dependency_graph/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "evidence_invalidation/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "evidence_qualification_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "execution_descriptor/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "execution_result/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "executor_spec/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "experiment_spec/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "false_negative_relationship_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "fault_run_record/2",
+      "new_successors": []
+    },
+    {
+      "expanded": "fault_spec/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "final_assurance_case/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "final_technical_report/2",
+      "new_successors": []
+    },
+    {
+      "expanded": "finding_adjudication_decision/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "finding_axis_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "finding_claim_revision/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "finding_defect_match_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "gate_decision/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "handoff_validation_result/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "history_anchor_receipt/1",
+      "new_successors": [
+        "lineage_admission_assessment/1"
+      ]
+    },
+    {
+      "expanded": "holdout_exposure_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "hypothesis_revision/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "input_disposition_record/2",
+      "new_successors": []
+    },
+    {
+      "expanded": "invariant_revision/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "inventory_revision/2",
+      "new_successors": []
+    },
+    {
+      "expanded": "isolation_baseline_profile/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "lane_completion/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "lane_spec/1",
+      "new_successors": [
+        "lane_run/1"
+      ]
+    },
+    {
+      "expanded": "legacy_mechanical_validation_assessment/1",
+      "new_successors": [
+        "bootstrap_admission_decision/1"
+      ]
+    },
+    {
+      "expanded": "legacy_observation_mapping_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "legacy_observation_semantic_equivalence_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "materiality_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "model_fidelity_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "negative_evidence_record/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "negative_opportunity_unit/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "obligation_applicability_decision/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "observation/1",
+      "new_successors": [
+        "legacy_exposure_reconstruction_assessment/1"
+      ]
+    },
+    {
+      "expanded": "observation_dependency/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "policy_revision/1",
+      "new_successors": [
+        "history_cut/1"
+      ]
+    },
+    {
+      "expanded": "public_conclusion_statement/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "release_qualification/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "report_export_receipt/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "residual_risk/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "root_cause_revision/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "run_manifest/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "scope_state_record/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "snapshot/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "snapshot_export_record/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "sound_claim/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "source_drift_impact_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "source_drift_record/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "source_identity/1",
+      "new_successors": [
+        "source_generation/1"
+      ]
+    },
+    {
+      "expanded": "source_manifest/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "source_reconciliation_assessment/1",
+      "new_successors": [
+        "trusted_predecessor_selection_decision/1"
+      ]
+    },
+    {
+      "expanded": "spec_revision/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "stage_completion/1",
+      "new_successors": [
+        "stage_run/1"
+      ]
+    },
+    {
+      "expanded": "stage_spec/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "standalone_payload_manifest/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "state_model/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "stop_evaluation/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "stop_input/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "successor_campaign_genesis/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "successor_campaign_selection_decision/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "surface_collector_record/2",
+      "new_successors": []
+    },
+    {
+      "expanded": "surface_key/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "surface_record/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "tool_execution_record/2",
+      "new_successors": []
+    },
+    {
+      "expanded": "transition_authorization_proposal/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "trust_profile/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "validation_result/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "view_manifest/1",
+      "new_successors": [
+        "knowledge_state/1",
+        "potential_exposure_record/1"
+      ]
+    },
+    {
+      "expanded": "command_envelope/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "command_receipt/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "commit_body/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "campaign_genesis/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "attempt/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "contamination_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "isolation_qualification/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "assignment_manifest/1",
+      "new_successors": [
+        "assignment_package_binding/1",
+        "lane_result_admission_evidence/2"
+      ]
+    },
+    {
+      "expanded": "grant_body/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "lineage_admission_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "lane_run/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "bootstrap_admission_decision/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "legacy_exposure_reconstruction_assessment/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "history_cut/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "source_generation/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "trusted_predecessor_selection_decision/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "stage_run/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "knowledge_state/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "potential_exposure_record/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "assignment_package_binding/1",
+      "new_successors": []
+    },
+    {
+      "expanded": "lane_result_admission_evidence/2",
+      "new_successors": [
+        "bdb_audit_lane_result/2"
+      ]
+    },
+    {
+      "expanded": "bdb_audit_lane_result/2",
+      "new_successors": []
+    }
+  ],
+  "queue": [],
+  "unchanged_contract_keys": [
+    "artifact_contract_registry/1",
+    "installation_bootstrap_profile/1",
+    "legacy_raw_ref/1",
+    "projection_policy/1",
+    "schema_registry/2"
+  ],
+  "historical_reader_rule": "Original exact bytes/schema contexts are retained; no alias or automatic old campaign upgrade",
+  "data_root_rule": "Same contract version only if field semantics/body grammar remain identical; changed literal trust-root data is a new exact immutable revision and never an unqualified campaign write",
+  "mandatory_remaining_audit": [
+    "Compare stable keys own material refs and nested semantic domain to original qualified schema",
+    "Audit generic wrapper embedded object/event target domains; extend successor propagation when their accepted finite wire set changes",
+    "Audit all profile version/identity changes and pinned bootstrap references"
+  ]
+}

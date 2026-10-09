@@ -1,0 +1,5190 @@
+{
+  "results": [
+    {
+      "owner": "approval_decision/1",
+      "design_key": "approval_decision/2",
+      "field": "actor_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "approval_decision/1",
+      "design_key": "approval_decision/2",
+      "field": "actor_authority_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "approval_decision/1",
+      "design_key": "approval_decision/2",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "approval_decision/1",
+      "design_key": "approval_decision/2",
+      "field": "related_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "approval_decision/1",
+      "design_key": "approval_decision/2",
+      "field": "scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "artifact_hash_manifest/1",
+      "design_key": "artifact_hash_manifest/2",
+      "field": "hash_manifest_artifact_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "artifact_hash_manifest/1",
+      "design_key": "artifact_hash_manifest/2",
+      "field": "bundle_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "artifact_hash_manifest/1",
+      "design_key": "artifact_hash_manifest/2",
+      "field": "export_as_of_head",
+      "result": "PASS"
+    },
+    {
+      "owner": "artifact_hash_manifest/1",
+      "design_key": "artifact_hash_manifest/2",
+      "field": "hash_manifest_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_manifest/1",
+      "design_key": "assignment_manifest/2",
+      "field": "assignment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_manifest/1",
+      "design_key": "assignment_manifest/2",
+      "field": "attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_manifest/1",
+      "design_key": "assignment_manifest/2",
+      "field": "delivery_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_manifest/1",
+      "design_key": "assignment_manifest/2",
+      "field": "executor_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_manifest/1",
+      "design_key": "assignment_manifest/2",
+      "field": "grant_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_manifest/1",
+      "design_key": "assignment_manifest/2",
+      "field": "knowledge_state_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_manifest/1",
+      "design_key": "assignment_manifest/2",
+      "field": "lane_spec_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_manifest/1",
+      "design_key": "assignment_manifest/2",
+      "field": "result_slot_contract_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_manifest/1",
+      "design_key": "assignment_manifest/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_manifest/1",
+      "design_key": "assignment_manifest/2",
+      "field": "stage_spec_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_manifest/1",
+      "design_key": "assignment_manifest/2",
+      "field": "view_manifest_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_package_binding/1",
+      "design_key": "assignment_package_binding/2",
+      "field": "assignment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_package_binding/1",
+      "design_key": "assignment_package_binding/2",
+      "field": "binding_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_package_binding/1",
+      "design_key": "assignment_package_binding/2",
+      "field": "package_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "assignment_package_binding/1",
+      "design_key": "assignment_package_binding/2",
+      "field": "package_raw_ref.artifact_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "assurance_claim_set/1",
+      "design_key": "assurance_claim_set/1",
+      "field": "scope_inventory_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "assurance_claim_set/1",
+      "design_key": "assurance_claim_set/1",
+      "field": "claim_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "assurance_claim_set/1",
+      "design_key": "assurance_claim_set/1",
+      "field": "claim_set_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "attempt/1",
+      "design_key": "attempt/2",
+      "field": "lane_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "attempt/1",
+      "design_key": "attempt/2",
+      "field": "executor_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "attempt/1",
+      "design_key": "attempt/2",
+      "field": "delivery_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "attempt/1",
+      "design_key": "attempt/2",
+      "field": "assigned_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "attempt/1",
+      "design_key": "attempt/2",
+      "field": "retry_of_attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "attempt/1",
+      "design_key": "attempt/2",
+      "field": "retry_reason_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "attempt/1",
+      "design_key": "attempt/2",
+      "field": "result_slot_contracts",
+      "result": "PASS"
+    },
+    {
+      "owner": "bdb_audit_lane_result/2",
+      "design_key": "bdb_audit_lane_result/3",
+      "field": "admission_evidence_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bdb_audit_lane_result/2",
+      "design_key": "bdb_audit_lane_result/3",
+      "field": "result_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "blind_origin_eligibility_assessment/1",
+      "design_key": "blind_origin_eligibility_assessment/2",
+      "field": "discovery_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "blind_origin_eligibility_assessment/1",
+      "design_key": "blind_origin_eligibility_assessment/2",
+      "field": "evaluation_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "blind_origin_eligibility_assessment/1",
+      "design_key": "blind_origin_eligibility_assessment/2",
+      "field": "discovery_event_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "blind_origin_eligibility_assessment/1",
+      "design_key": "blind_origin_eligibility_assessment/2",
+      "field": "first_relevant_reveal_event_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "blind_origin_eligibility_assessment/1",
+      "design_key": "blind_origin_eligibility_assessment/2",
+      "field": "isolation_qualification_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "blind_origin_eligibility_assessment/1",
+      "design_key": "blind_origin_eligibility_assessment/2",
+      "field": "contamination_assessment_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "blind_origin_eligibility_assessment/1",
+      "design_key": "blind_origin_eligibility_assessment/2",
+      "field": "forbidden_knowledge_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bootstrap_admission_decision/1",
+      "design_key": "bootstrap_admission_decision/2",
+      "field": "admission_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "bootstrap_admission_decision/1",
+      "design_key": "bootstrap_admission_decision/2",
+      "field": "exposure_reconstruction_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bootstrap_admission_decision/1",
+      "design_key": "bootstrap_admission_decision/2",
+      "field": "legacy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bootstrap_admission_decision/1",
+      "design_key": "bootstrap_admission_decision/2",
+      "field": "lineage_admission_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bootstrap_admission_decision/1",
+      "design_key": "bootstrap_admission_decision/2",
+      "field": "mechanical_validation_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bootstrap_admission_decision/1",
+      "design_key": "bootstrap_admission_decision/2",
+      "field": "source_reconciliation_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bootstrap_admission_decision/1",
+      "design_key": "bootstrap_admission_decision/2",
+      "field": "trusted_predecessor_selection_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bootstrap_admission_decision/1",
+      "design_key": "bootstrap_admission_decision/2",
+      "field": "admission_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "schema_set_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "application_source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "stage_lane_policy_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "builder_recipe_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "ordered_input_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "embedded_resource_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "toolchain_runtime_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "deterministic_settings_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "ordered_input_refs[].object_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "ordered_input_refs[].profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "ordered_input_refs[].raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "embedded_resource_refs[].object_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "embedded_resource_refs[].profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "field": "embedded_resource_refs[].raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bundle_manifest/2",
+      "design_key": "bundle_manifest/2",
+      "field": "bundle_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bundle_manifest/2",
+      "design_key": "bundle_manifest/2",
+      "field": "root_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "bundle_manifest/2",
+      "design_key": "bundle_manifest/2",
+      "field": "members[].raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bundle_manifest/2",
+      "design_key": "bundle_manifest/2",
+      "field": "members[].raw_ref.artifact_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bundle_manifest/2",
+      "design_key": "bundle_manifest/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bundle_manifest/2",
+      "design_key": "bundle_manifest/2",
+      "field": "campaign_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bundle_manifest/2",
+      "design_key": "bundle_manifest/2",
+      "field": "stage_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bundle_manifest/2",
+      "design_key": "bundle_manifest/2",
+      "field": "lane_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "bundle_manifest/2",
+      "design_key": "bundle_manifest/2",
+      "field": "export_as_of_head",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_conclusion/1",
+      "design_key": "campaign_conclusion/2",
+      "field": "campaign_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_conclusion/1",
+      "design_key": "campaign_conclusion/2",
+      "field": "candidate_assurance_case_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_conclusion/1",
+      "design_key": "campaign_conclusion/2",
+      "field": "conclusion_command_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_conclusion/1",
+      "design_key": "campaign_conclusion/2",
+      "field": "limited_conclusion_basis_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_conclusion/1",
+      "design_key": "campaign_conclusion/2",
+      "field": "residual_risk_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_conclusion/1",
+      "design_key": "campaign_conclusion/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_conclusion/1",
+      "design_key": "campaign_conclusion/2",
+      "field": "stop_evaluation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_genesis/1",
+      "design_key": "campaign_genesis/2",
+      "field": "application_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_genesis/1",
+      "design_key": "campaign_genesis/2",
+      "field": "bootstrap_admission_decision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_genesis/1",
+      "design_key": "campaign_genesis/2",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_genesis/1",
+      "design_key": "campaign_genesis/2",
+      "field": "legacy_origin_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_genesis/1",
+      "design_key": "campaign_genesis/2",
+      "field": "owner_operator_authority_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_genesis/1",
+      "design_key": "campaign_genesis/2",
+      "field": "protocol_policy_bundle_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_genesis/1",
+      "design_key": "campaign_genesis/2",
+      "field": "schema_set_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_genesis/1",
+      "design_key": "campaign_genesis/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "campaign_genesis/1",
+      "design_key": "campaign_genesis/2",
+      "field": "trust_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "field": "assurance_claim_set_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "field": "campaign_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "field": "candidate_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "field": "contradiction_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "field": "coverage_obligation_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "field": "coverage_obligation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "field": "coverage_obligation_summary_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "field": "evidence_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "field": "finding_adjudication_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "field": "finding_claim_revision_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "field": "residual_risk_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "field": "scope_inventory_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "challenger_assignment/1",
+      "design_key": "challenger_assignment/2",
+      "field": "assignment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "challenger_assignment/1",
+      "design_key": "challenger_assignment/2",
+      "field": "candidate_assurance_case_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "challenger_assignment/1",
+      "design_key": "challenger_assignment/2",
+      "field": "challenge_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "challenger_assignment/1",
+      "design_key": "challenger_assignment/2",
+      "field": "executor_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "challenger_assignment/1",
+      "design_key": "challenger_assignment/2",
+      "field": "forbidden_prior_result_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "challenger_assignment/1",
+      "design_key": "challenger_assignment/2",
+      "field": "challenge_scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "challenger_result/1",
+      "design_key": "challenger_result/2",
+      "field": "candidate_assurance_case_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "challenger_result/1",
+      "design_key": "challenger_result/2",
+      "field": "challenge_assignment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "challenger_result/1",
+      "design_key": "challenger_result/2",
+      "field": "challenged_claim_or_scope_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "challenger_result/1",
+      "design_key": "challenger_result/2",
+      "field": "counterclaim_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "challenger_result/1",
+      "design_key": "challenger_result/2",
+      "field": "evidence_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "challenger_result/1",
+      "design_key": "challenger_result/2",
+      "field": "result_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "checkpoint/1",
+      "design_key": "checkpoint/2",
+      "field": "stage_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "checkpoint/1",
+      "design_key": "checkpoint/2",
+      "field": "lane_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "checkpoint/1",
+      "design_key": "checkpoint/2",
+      "field": "attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "checkpoint/1",
+      "design_key": "checkpoint/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "checkpoint/1",
+      "design_key": "checkpoint/2",
+      "field": "checkpoint_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "checkpoint/1",
+      "design_key": "checkpoint/2",
+      "field": "knowledge_state_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "checkpoint/1",
+      "design_key": "checkpoint/2",
+      "field": "sealed_output_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "checkpoint/1",
+      "design_key": "checkpoint/2",
+      "field": "governing_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "clean_control_assessment/1",
+      "design_key": "clean_control_assessment/1",
+      "field": "finding_claim_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "clean_control_assessment/1",
+      "design_key": "clean_control_assessment/1",
+      "field": "finding_adjudication_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "clean_control_assessment/1",
+      "design_key": "clean_control_assessment/1",
+      "field": "negative_opportunity_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "clean_control_assessment/1",
+      "design_key": "clean_control_assessment/1",
+      "field": "rationale_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "clean_control_assessment/1",
+      "design_key": "clean_control_assessment/1",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "clean_control_assessment/1",
+      "design_key": "clean_control_assessment/1",
+      "field": "previous_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "clean_control_assessment/1",
+      "design_key": "clean_control_assessment/1",
+      "field": "assessor_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "cleanup_result/2",
+      "design_key": "cleanup_result/2",
+      "field": "execution_descriptor_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "cleanup_result/2",
+      "design_key": "cleanup_result/2",
+      "field": "cleanup_observation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "cleanup_result/2",
+      "design_key": "cleanup_result/2",
+      "field": "cleanup_spec_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "cleanup_result/2",
+      "design_key": "cleanup_result/2",
+      "field": "cleanup_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "actor_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "bootstrap_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "campaign_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "expected_parent_head",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "governing_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "governing_spec_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "history_namespace_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "command_payload.proposed_object_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "command_payload.events[].artifact_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "command_payload.events[].target_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "command_payload.events[].result_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "command_payload.events[].aggregate_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "command_payload.events[].basis_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "command_payload.events[].attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "command_payload.events[].assignment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "field": "command_payload.events[].package_binding_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_receipt/1",
+      "design_key": "command_receipt/2",
+      "field": "accepted_commit_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_receipt/1",
+      "design_key": "command_receipt/2",
+      "field": "accepted_head",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_receipt/1",
+      "design_key": "command_receipt/2",
+      "field": "command_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "command_receipt/1",
+      "design_key": "command_receipt/2",
+      "field": "result_object_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "actor_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "command_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "expected_parent_head",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "governing_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "governing_spec_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "immutable_object_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "prev_history_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "ordered_event_bodies[].artifact_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "ordered_event_bodies[].target_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "ordered_event_bodies[].result_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "ordered_event_bodies[].aggregate_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "ordered_event_bodies[].basis_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "ordered_event_bodies[].attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "ordered_event_bodies[].assignment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "commit_body/1",
+      "design_key": "commit_body/2",
+      "field": "ordered_event_bodies[].package_binding_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "compatibility_fixture_assessment/1",
+      "design_key": "compatibility_fixture_assessment/2",
+      "field": "fixture_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "compatibility_fixture_assessment/1",
+      "design_key": "compatibility_fixture_assessment/2",
+      "field": "expectation_basis_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "compatibility_fixture_assessment/1",
+      "design_key": "compatibility_fixture_assessment/2",
+      "field": "intentional_hardening_exception_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "compatibility_fixture_assessment/1",
+      "design_key": "compatibility_fixture_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "compatibility_fixture_assessment/1",
+      "design_key": "compatibility_fixture_assessment/2",
+      "field": "fixture_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "compatibility_fixture_assessment/1",
+      "design_key": "compatibility_fixture_assessment/2",
+      "field": "independent_safe_expected_result.output_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "compatibility_fixture_assessment/1",
+      "design_key": "compatibility_fixture_assessment/2",
+      "field": "legacy_observed_result.output_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "compatibility_fixture_assessment/1",
+      "design_key": "compatibility_fixture_assessment/2",
+      "field": "v2_observed_result.output_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "compatibility_gate_result/1",
+      "design_key": "compatibility_gate_result/2",
+      "field": "fixture_assessment_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "compatibility_gate_result/1",
+      "design_key": "compatibility_gate_result/2",
+      "field": "compatibility_corpus_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "compatibility_gate_result/1",
+      "design_key": "compatibility_gate_result/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "compatibility_gate_result/1",
+      "design_key": "compatibility_gate_result/2",
+      "field": "governing_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "contamination_assessment/1",
+      "design_key": "contamination_assessment/2",
+      "field": "attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "contamination_assessment/1",
+      "design_key": "contamination_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "contamination_assessment/1",
+      "design_key": "contamination_assessment/2",
+      "field": "forbidden_knowledge_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "contamination_assessment/1",
+      "design_key": "contamination_assessment/2",
+      "field": "channel_inventory_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "contamination_assessment/1",
+      "design_key": "contamination_assessment/2",
+      "field": "potential_exposure_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "contamination_assessment/1",
+      "design_key": "contamination_assessment/2",
+      "field": "forbidden_knowledge_match_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "contamination_assessment/1",
+      "design_key": "contamination_assessment/2",
+      "field": "observation_or_channel_evidence_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "contamination_assessment/1",
+      "design_key": "contamination_assessment/2",
+      "field": "scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "contradiction_resolution_decision/1",
+      "design_key": "contradiction_resolution_decision/2",
+      "field": "basis_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "contradiction_resolution_decision/1",
+      "design_key": "contradiction_resolution_decision/2",
+      "field": "contradiction_prior_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "contradiction_resolution_decision/1",
+      "design_key": "contradiction_resolution_decision/2",
+      "field": "resolution_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "contradiction_resolution_decision/1",
+      "design_key": "contradiction_resolution_decision/2",
+      "field": "resolved_scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "contradiction_revision/1",
+      "design_key": "contradiction_revision/2",
+      "field": "claim_revision_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "contradiction_revision/1",
+      "design_key": "contradiction_revision/2",
+      "field": "opposing_evidence_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "contradiction_revision/1",
+      "design_key": "contradiction_revision/2",
+      "field": "predecessor_contradiction_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "contradiction_revision/1",
+      "design_key": "contradiction_revision/2",
+      "field": "resolution_decision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "contradiction_revision/1",
+      "design_key": "contradiction_revision/2",
+      "field": "supporting_evidence_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "contradiction_revision/1",
+      "design_key": "contradiction_revision/2",
+      "field": "scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "contradiction_revision/1",
+      "design_key": "contradiction_revision/2",
+      "field": "positions[].claim_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "contradiction_revision/1",
+      "design_key": "contradiction_revision/2",
+      "field": "required_falsifier",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_manifest/1",
+      "design_key": "corpus_manifest/2",
+      "field": "consumer_stage_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_manifest/1",
+      "design_key": "corpus_manifest/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_manifest/1",
+      "design_key": "corpus_manifest/2",
+      "field": "member_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_manifest/1",
+      "design_key": "corpus_manifest/2",
+      "field": "member_admission_assessment_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_manifest/1",
+      "design_key": "corpus_manifest/2",
+      "field": "basis_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_member_admission_assessment/1",
+      "design_key": "corpus_member_admission_assessment/2",
+      "field": "member_candidate_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_member_admission_assessment/1",
+      "design_key": "corpus_member_admission_assessment/2",
+      "field": "consumer_stage_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_member_admission_assessment/1",
+      "design_key": "corpus_member_admission_assessment/2",
+      "field": "exposure_or_knowledge_assessment_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_member_admission_assessment/1",
+      "design_key": "corpus_member_admission_assessment/2",
+      "field": "additional_admission_evidence_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_member_admission_assessment/1",
+      "design_key": "corpus_member_admission_assessment/2",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_member_admission_assessment/1",
+      "design_key": "corpus_member_admission_assessment/2",
+      "field": "consumer_knowledge_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_member_candidate/1",
+      "design_key": "corpus_member_candidate/1",
+      "field": "raw_or_object_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_member_candidate/1",
+      "design_key": "corpus_member_candidate/1",
+      "field": "producer_stage_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_member_candidate/1",
+      "design_key": "corpus_member_candidate/1",
+      "field": "producer_lane_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_member_candidate/1",
+      "design_key": "corpus_member_candidate/1",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_member_candidate/1",
+      "design_key": "corpus_member_candidate/1",
+      "field": "mechanical_validation_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "corpus_member_candidate/1",
+      "design_key": "corpus_member_candidate/1",
+      "field": "source_reconciliation_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "field": "obligation_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "field": "target_scope_or_surface_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "field": "invariant_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "field": "materiality_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "field": "environment_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "field": "required_technique_or_capability_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "field": "required_oracle_independence_predicate_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "field": "acceptance_predicate_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "field": "falsifier_or_control_requirements",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "field": "applicability_predicate_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "field": "governing_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "field": "origin_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation_key/1",
+      "design_key": "coverage_obligation_key/2",
+      "field": "environment_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation_key/1",
+      "design_key": "coverage_obligation_key/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation_key/1",
+      "design_key": "coverage_obligation_key/2",
+      "field": "target_scope_or_surface_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation_qualification/1",
+      "design_key": "coverage_obligation_qualification/2",
+      "field": "obligation_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation_qualification/1",
+      "design_key": "coverage_obligation_qualification/2",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation_qualification/1",
+      "design_key": "coverage_obligation_qualification/2",
+      "field": "evidence_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation_qualification/1",
+      "design_key": "coverage_obligation_qualification/2",
+      "field": "applicability_decision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation_qualification/1",
+      "design_key": "coverage_obligation_qualification/2",
+      "field": "waiver_decision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "coverage_obligation_qualification/1",
+      "design_key": "coverage_obligation_qualification/2",
+      "field": "contradiction_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "defect_unit/1",
+      "design_key": "defect_unit/1",
+      "field": "corpus_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "defect_unit/1",
+      "design_key": "defect_unit/1",
+      "field": "affected_scope_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "defect_unit/1",
+      "design_key": "defect_unit/1",
+      "field": "activation_witness_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "defect_unit/1",
+      "design_key": "defect_unit/1",
+      "field": "violated_invariant_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "defect_unit/1",
+      "design_key": "defect_unit/1",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "defect_unit/1",
+      "design_key": "defect_unit/1",
+      "field": "previous_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "defect_unit/1",
+      "design_key": "defect_unit/1",
+      "field": "ground_truth_provenance_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "delivery_spec/1",
+      "design_key": "delivery_spec/2",
+      "field": "idempotency_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "delivery_spec/1",
+      "design_key": "delivery_spec/2",
+      "field": "redaction_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "delivery_spec/1",
+      "design_key": "delivery_spec/2",
+      "field": "retry_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "dependency_independence_assessment/1",
+      "design_key": "dependency_independence_assessment/2",
+      "field": "claim_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "dependency_independence_assessment/1",
+      "design_key": "dependency_independence_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "dependency_independence_assessment/1",
+      "design_key": "dependency_independence_assessment/2",
+      "field": "dependency_graph_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "dependency_independence_assessment/1",
+      "design_key": "dependency_independence_assessment/2",
+      "field": "observer_path_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "dependency_independence_assessment/1",
+      "design_key": "dependency_independence_assessment/2",
+      "field": "shared_dependency_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "dependency_independence_assessment/1",
+      "design_key": "dependency_independence_assessment/2",
+      "field": "independent_dependency_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "dependency_independence_assessment/1",
+      "design_key": "dependency_independence_assessment/2",
+      "field": "independence_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_confirmation_assessment/1",
+      "design_key": "discovery_confirmation_assessment/1",
+      "field": "discovery_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_confirmation_assessment/1",
+      "design_key": "discovery_confirmation_assessment/1",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_confirmation_assessment/1",
+      "design_key": "discovery_confirmation_assessment/1",
+      "field": "previous_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_confirmation_assessment/1",
+      "design_key": "discovery_confirmation_assessment/1",
+      "field": "confirmation_evidence_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_confirmation_assessment/1",
+      "design_key": "discovery_confirmation_assessment/1",
+      "field": "confirmation_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_corpus_match_assessment/1",
+      "design_key": "discovery_corpus_match_assessment/1",
+      "field": "discovery_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_corpus_match_assessment/1",
+      "design_key": "discovery_corpus_match_assessment/1",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_corpus_match_assessment/1",
+      "design_key": "discovery_corpus_match_assessment/1",
+      "field": "previous_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_corpus_match_assessment/1",
+      "design_key": "discovery_corpus_match_assessment/1",
+      "field": "corpus_snapshot_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_corpus_match_assessment/1",
+      "design_key": "discovery_corpus_match_assessment/1",
+      "field": "matched_prior_claim_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_corpus_match_assessment/1",
+      "design_key": "discovery_corpus_match_assessment/1",
+      "field": "match_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_novelty_assessment/1",
+      "design_key": "discovery_novelty_assessment/1",
+      "field": "discovery_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_novelty_assessment/1",
+      "design_key": "discovery_novelty_assessment/1",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_novelty_assessment/1",
+      "design_key": "discovery_novelty_assessment/1",
+      "field": "previous_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_novelty_assessment/1",
+      "design_key": "discovery_novelty_assessment/1",
+      "field": "corpus_match_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_novelty_assessment/1",
+      "design_key": "discovery_novelty_assessment/1",
+      "field": "novelty_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_record/1",
+      "design_key": "discovery_record/2",
+      "field": "lane_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_record/1",
+      "design_key": "discovery_record/2",
+      "field": "attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_record/1",
+      "design_key": "discovery_record/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_record/1",
+      "design_key": "discovery_record/2",
+      "field": "discovery_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_record/1",
+      "design_key": "discovery_record/2",
+      "field": "knowledge_state_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_record/1",
+      "design_key": "discovery_record/2",
+      "field": "method_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_record/1",
+      "design_key": "discovery_record/2",
+      "field": "producer_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_record/1",
+      "design_key": "discovery_record/2",
+      "field": "surface_location_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_record/1",
+      "design_key": "discovery_record/2",
+      "field": "own_observation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_record/1",
+      "design_key": "discovery_record/2",
+      "field": "pre_reveal_checkpoint_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_tool_origin_assessment/1",
+      "design_key": "discovery_tool_origin_assessment/1",
+      "field": "discovery_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_tool_origin_assessment/1",
+      "design_key": "discovery_tool_origin_assessment/1",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_tool_origin_assessment/1",
+      "design_key": "discovery_tool_origin_assessment/1",
+      "field": "previous_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_tool_origin_assessment/1",
+      "design_key": "discovery_tool_origin_assessment/1",
+      "field": "producer_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_tool_origin_assessment/1",
+      "design_key": "discovery_tool_origin_assessment/1",
+      "field": "method_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "discovery_tool_origin_assessment/1",
+      "design_key": "discovery_tool_origin_assessment/1",
+      "field": "tool_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "effort_results/1",
+      "design_key": "effort_results/1",
+      "field": "effort_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "effort_results/1",
+      "design_key": "effort_results/1",
+      "field": "effort_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "effort_results/1",
+      "design_key": "effort_results/1",
+      "field": "stage_completion_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "effort_results/1",
+      "design_key": "effort_results/1",
+      "field": "execution_result_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "effort_results/1",
+      "design_key": "effort_results/1",
+      "field": "metric_basis_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "environment_record/1",
+      "design_key": "environment_record/2",
+      "field": "dependency_set_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "environment_record/1",
+      "design_key": "environment_record/2",
+      "field": "os_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "environment_record/1",
+      "design_key": "environment_record/2",
+      "field": "runtime_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "environment_record/1",
+      "design_key": "environment_record/2",
+      "field": "browser_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "environment_record/1",
+      "design_key": "environment_record/2",
+      "field": "external_service_profile_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "environment_record/1",
+      "design_key": "environment_record/2",
+      "field": "clock_profile",
+      "result": "PASS"
+    },
+    {
+      "owner": "environment_record/1",
+      "design_key": "environment_record/2",
+      "field": "filesystem_profile",
+      "result": "PASS"
+    },
+    {
+      "owner": "environment_record/1",
+      "design_key": "environment_record/2",
+      "field": "network_profile",
+      "result": "PASS"
+    },
+    {
+      "owner": "environment_record/1",
+      "design_key": "environment_record/2",
+      "field": "sandbox_profile",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_applicability_assessment/1",
+      "design_key": "evidence_applicability_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_applicability_assessment/1",
+      "design_key": "evidence_applicability_assessment/2",
+      "field": "claim_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_applicability_assessment/1",
+      "design_key": "evidence_applicability_assessment/2",
+      "field": "dependency_set_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_applicability_assessment/1",
+      "design_key": "evidence_applicability_assessment/2",
+      "field": "environment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_applicability_assessment/1",
+      "design_key": "evidence_applicability_assessment/2",
+      "field": "execution_variant_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_applicability_assessment/1",
+      "design_key": "evidence_applicability_assessment/2",
+      "field": "fixture_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_applicability_assessment/1",
+      "design_key": "evidence_applicability_assessment/2",
+      "field": "harness_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_applicability_assessment/1",
+      "design_key": "evidence_applicability_assessment/2",
+      "field": "previous_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_applicability_assessment/1",
+      "design_key": "evidence_applicability_assessment/2",
+      "field": "subject_baseline_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_applicability_assessment/1",
+      "design_key": "evidence_applicability_assessment/2",
+      "field": "validity_scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_dependency_graph/1",
+      "design_key": "evidence_dependency_graph/1",
+      "field": "root_observation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_dependency_graph/1",
+      "design_key": "evidence_dependency_graph/1",
+      "field": "dependency_fact_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_dependency_graph/1",
+      "design_key": "evidence_dependency_graph/1",
+      "field": "graph_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_invalidation/1",
+      "design_key": "evidence_invalidation/2",
+      "field": "affected_evidence_or_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_invalidation/1",
+      "design_key": "evidence_invalidation/2",
+      "field": "dependency_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_invalidation/1",
+      "design_key": "evidence_invalidation/2",
+      "field": "invalidation_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_invalidation/1",
+      "design_key": "evidence_invalidation/2",
+      "field": "propagation_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_invalidation/1",
+      "design_key": "evidence_invalidation/2",
+      "field": "scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_qualification_assessment/1",
+      "design_key": "evidence_qualification_assessment/2",
+      "field": "applicability_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_qualification_assessment/1",
+      "design_key": "evidence_qualification_assessment/2",
+      "field": "claim_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_qualification_assessment/1",
+      "design_key": "evidence_qualification_assessment/2",
+      "field": "controls_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_qualification_assessment/1",
+      "design_key": "evidence_qualification_assessment/2",
+      "field": "dependency_graph_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_qualification_assessment/1",
+      "design_key": "evidence_qualification_assessment/2",
+      "field": "independence_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_qualification_assessment/1",
+      "design_key": "evidence_qualification_assessment/2",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_qualification_assessment/1",
+      "design_key": "evidence_qualification_assessment/2",
+      "field": "observation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "evidence_qualification_assessment/1",
+      "design_key": "evidence_qualification_assessment/2",
+      "field": "support_scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_descriptor/1",
+      "design_key": "execution_descriptor/2",
+      "field": "experiment_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_descriptor/1",
+      "design_key": "execution_descriptor/2",
+      "field": "subject_baseline_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_descriptor/1",
+      "design_key": "execution_descriptor/2",
+      "field": "environment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_descriptor/1",
+      "design_key": "execution_descriptor/2",
+      "field": "dependency_set_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_descriptor/1",
+      "design_key": "execution_descriptor/2",
+      "field": "execution_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_descriptor/1",
+      "design_key": "execution_descriptor/2",
+      "field": "target_variant_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_descriptor/1",
+      "design_key": "execution_descriptor/2",
+      "field": "harness_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_descriptor/1",
+      "design_key": "execution_descriptor/2",
+      "field": "fixture_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_descriptor/1",
+      "design_key": "execution_descriptor/2",
+      "field": "runner_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_result/1",
+      "design_key": "execution_result/2",
+      "field": "cleanup_result_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_result/1",
+      "design_key": "execution_result/2",
+      "field": "execution_descriptor_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_result/1",
+      "design_key": "execution_result/2",
+      "field": "fault_activation_record_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_result/1",
+      "design_key": "execution_result/2",
+      "field": "started_observation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_result/1",
+      "design_key": "execution_result/2",
+      "field": "finished_observation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_result/1",
+      "design_key": "execution_result/2",
+      "field": "raw_observation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_result/1",
+      "design_key": "execution_result/2",
+      "field": "control_result_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "execution_result/1",
+      "design_key": "execution_result/2",
+      "field": "reset_verification_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "executor_spec/1",
+      "design_key": "executor_spec/2",
+      "field": "executor_tool_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "executor_spec/1",
+      "design_key": "executor_spec/2",
+      "field": "filesystem_boundary_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "executor_spec/1",
+      "design_key": "executor_spec/2",
+      "field": "model_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "executor_spec/1",
+      "design_key": "executor_spec/2",
+      "field": "network_boundary_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "executor_spec/1",
+      "design_key": "executor_spec/2",
+      "field": "runtime_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "executor_spec/1",
+      "design_key": "executor_spec/2",
+      "field": "tool_boundary_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "hypothesis_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "invariant_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "coverage_obligation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "subject_baseline_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "dependency_set_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "fault_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "target_execution_variant_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "environment_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "harness_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "fixture_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "preregistration_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "positive_controls[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "negative_controls[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "cleanup_spec",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "seed_profile",
+      "result": "PASS"
+    },
+    {
+      "owner": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "field": "observation_path_requirements[].capture_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "false_negative_relationship_assessment/1",
+      "design_key": "false_negative_relationship_assessment/1",
+      "field": "discovery_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "false_negative_relationship_assessment/1",
+      "design_key": "false_negative_relationship_assessment/1",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "false_negative_relationship_assessment/1",
+      "design_key": "false_negative_relationship_assessment/1",
+      "field": "previous_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "false_negative_relationship_assessment/1",
+      "design_key": "false_negative_relationship_assessment/1",
+      "field": "predecessor_stage_or_claim_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "false_negative_relationship_assessment/1",
+      "design_key": "false_negative_relationship_assessment/1",
+      "field": "relationship_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "fault_run_record/2",
+      "design_key": "fault_run_record/2",
+      "field": "fault_run_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "fault_run_record/2",
+      "design_key": "fault_run_record/2",
+      "field": "fault_run_raw_ref.artifact_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "fault_run_record/2",
+      "design_key": "fault_run_record/2",
+      "field": "fault_run_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "fault_run_record/2",
+      "design_key": "fault_run_record/2",
+      "field": "fault_run.fault_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "fault_run_record/2",
+      "design_key": "fault_run_record/2",
+      "field": "fault_run.execution_descriptor_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "fault_run_record/2",
+      "design_key": "fault_run_record/2",
+      "field": "fault_run.activation_evidence_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "fault_run_record/2",
+      "design_key": "fault_run_record/2",
+      "field": "fault_run.scope",
+      "result": "PASS"
+    },
+    {
+      "owner": "fault_run_record/2",
+      "design_key": "fault_run_record/2",
+      "field": "fault_run.cleanup_result_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "fault_run_record/2",
+      "design_key": "fault_run_record/2",
+      "field": "fault_run_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "fault_spec/1",
+      "design_key": "fault_spec/1",
+      "field": "previous_fault_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "fault_spec/1",
+      "design_key": "fault_spec/1",
+      "field": "fault_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "fault_spec/1",
+      "design_key": "fault_spec/1",
+      "field": "activation_predicate_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "fault_spec/1",
+      "design_key": "fault_spec/1",
+      "field": "cleanup_spec_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_assurance_case/1",
+      "design_key": "final_assurance_case/2",
+      "field": "campaign_conclusion_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_assurance_case/1",
+      "design_key": "final_assurance_case/2",
+      "field": "candidate_assurance_case_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_assurance_case/1",
+      "design_key": "final_assurance_case/2",
+      "field": "challenger_result_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_assurance_case/1",
+      "design_key": "final_assurance_case/2",
+      "field": "final_case_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_assurance_case/1",
+      "design_key": "final_assurance_case/2",
+      "field": "limited_conclusion_basis_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_assurance_case/1",
+      "design_key": "final_assurance_case/2",
+      "field": "public_conclusion_statement_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_assurance_case/1",
+      "design_key": "final_assurance_case/2",
+      "field": "residual_risk_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_assurance_case/1",
+      "design_key": "final_assurance_case/2",
+      "field": "stop_evaluation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_technical_report/2",
+      "design_key": "final_technical_report/2",
+      "field": "report_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_technical_report/2",
+      "design_key": "final_technical_report/2",
+      "field": "report_raw_ref.artifact_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_technical_report/2",
+      "design_key": "final_technical_report/2",
+      "field": "report_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_technical_report/2",
+      "design_key": "final_technical_report/2",
+      "field": "report_binding.campaign_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_technical_report/2",
+      "design_key": "final_technical_report/2",
+      "field": "report_binding.source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_technical_report/2",
+      "design_key": "final_technical_report/2",
+      "field": "report_binding.final_assurance_case_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_technical_report/2",
+      "design_key": "final_technical_report/2",
+      "field": "report_binding.stop_evaluation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_technical_report/2",
+      "design_key": "final_technical_report/2",
+      "field": "report_binding.campaign_conclusion_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_technical_report/2",
+      "design_key": "final_technical_report/2",
+      "field": "report_binding.release_qualification_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_technical_report/2",
+      "design_key": "final_technical_report/2",
+      "field": "report_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "final_technical_report/2",
+      "design_key": "final_technical_report/2",
+      "field": "report_binding.report_as_of_head",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "field": "adjudicator_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "field": "claim_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "field": "corpus_snapshot_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "field": "evidence_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "field": "impact_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "field": "knowledge_state_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "field": "mechanism_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "field": "previous_adjudication_decision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "field": "reachability_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "field": "severity_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "field": "scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_axis_assessment/1",
+      "design_key": "finding_axis_assessment/2",
+      "field": "claim_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_axis_assessment/1",
+      "design_key": "finding_axis_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_axis_assessment/1",
+      "design_key": "finding_axis_assessment/2",
+      "field": "assessment_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_axis_assessment/1",
+      "design_key": "finding_axis_assessment/2",
+      "field": "evidence_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_axis_assessment/1",
+      "design_key": "finding_axis_assessment/2",
+      "field": "method_or_characterization_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_axis_assessment/1",
+      "design_key": "finding_axis_assessment/2",
+      "field": "scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_claim_revision/1",
+      "design_key": "finding_claim_revision/2",
+      "field": "discovery_relation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_claim_revision/1",
+      "design_key": "finding_claim_revision/2",
+      "field": "previous_finding_claim_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_claim_revision/1",
+      "design_key": "finding_claim_revision/2",
+      "field": "scope_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_claim_revision/1",
+      "design_key": "finding_claim_revision/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_claim_revision/1",
+      "design_key": "finding_claim_revision/2",
+      "field": "violated_invariant_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_defect_match_assessment/1",
+      "design_key": "finding_defect_match_assessment/1",
+      "field": "finding_claim_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_defect_match_assessment/1",
+      "design_key": "finding_defect_match_assessment/1",
+      "field": "finding_adjudication_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_defect_match_assessment/1",
+      "design_key": "finding_defect_match_assessment/1",
+      "field": "defect_unit_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_defect_match_assessment/1",
+      "design_key": "finding_defect_match_assessment/1",
+      "field": "rationale_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_defect_match_assessment/1",
+      "design_key": "finding_defect_match_assessment/1",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_defect_match_assessment/1",
+      "design_key": "finding_defect_match_assessment/1",
+      "field": "previous_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "finding_defect_match_assessment/1",
+      "design_key": "finding_defect_match_assessment/1",
+      "field": "assessor_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "gate_decision/1",
+      "design_key": "gate_decision/1",
+      "field": "stage_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "gate_decision/1",
+      "design_key": "gate_decision/1",
+      "field": "attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "gate_decision/1",
+      "design_key": "gate_decision/1",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "gate_decision/1",
+      "design_key": "gate_decision/1",
+      "field": "checkpoint_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "gate_decision/1",
+      "design_key": "gate_decision/1",
+      "field": "knowledge_state_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "gate_decision/1",
+      "design_key": "gate_decision/1",
+      "field": "requested_view_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "gate_decision/1",
+      "design_key": "gate_decision/1",
+      "field": "gate_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "grant_body/1",
+      "design_key": "grant_body/2",
+      "field": "attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "grant_body/1",
+      "design_key": "grant_body/2",
+      "field": "previous_knowledge_state_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "grant_body/1",
+      "design_key": "grant_body/2",
+      "field": "grant_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "grant_body/1",
+      "design_key": "grant_body/2",
+      "field": "view_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "grant_body/1",
+      "design_key": "grant_body/2",
+      "field": "delivery_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "grant_body/1",
+      "design_key": "grant_body/2",
+      "field": "capability_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "grant_body/1",
+      "design_key": "grant_body/2",
+      "field": "forbidden_knowledge_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "handoff_validation_result/1",
+      "design_key": "handoff_validation_result/1",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "handoff_validation_result/1",
+      "design_key": "handoff_validation_result/1",
+      "field": "handoff_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "handoff_validation_result/1",
+      "design_key": "handoff_validation_result/1",
+      "field": "contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "history_anchor_receipt/1",
+      "design_key": "history_anchor_receipt/2",
+      "field": "campaign_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "history_anchor_receipt/1",
+      "design_key": "history_anchor_receipt/2",
+      "field": "anchor_observation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "history_anchor_receipt/1",
+      "design_key": "history_anchor_receipt/2",
+      "field": "anchor_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "history_anchor_receipt/1",
+      "design_key": "history_anchor_receipt/2",
+      "field": "issuer_or_channel_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "history_anchor_receipt/1",
+      "design_key": "history_anchor_receipt/2",
+      "field": "external_storage_or_witness_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "history_cut/1",
+      "design_key": "history_cut/2",
+      "field": "governing_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "history_cut/1",
+      "design_key": "history_cut/2",
+      "field": "governing_spec_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "history_cut/1",
+      "design_key": "history_cut/2",
+      "field": "history_namespace_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "holdout_exposure_assessment/1",
+      "design_key": "holdout_exposure_assessment/1",
+      "field": "corpus_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "holdout_exposure_assessment/1",
+      "design_key": "holdout_exposure_assessment/1",
+      "field": "evaluator_or_executor_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "holdout_exposure_assessment/1",
+      "design_key": "holdout_exposure_assessment/1",
+      "field": "exposure_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "holdout_exposure_assessment/1",
+      "design_key": "holdout_exposure_assessment/1",
+      "field": "previous_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "hypothesis_revision/1",
+      "design_key": "hypothesis_revision/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "hypothesis_revision/1",
+      "design_key": "hypothesis_revision/2",
+      "field": "scope_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "hypothesis_revision/1",
+      "design_key": "hypothesis_revision/2",
+      "field": "invariant_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "hypothesis_revision/1",
+      "design_key": "hypothesis_revision/2",
+      "field": "obligation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "hypothesis_revision/1",
+      "design_key": "hypothesis_revision/2",
+      "field": "origin_discovery_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "hypothesis_revision/1",
+      "design_key": "hypothesis_revision/2",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "input_disposition_record/2",
+      "design_key": "input_disposition_record/2",
+      "field": "assigned_input_ref.artifact_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "input_disposition_record/2",
+      "design_key": "input_disposition_record/2",
+      "field": "collector_record_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "input_disposition_record/2",
+      "design_key": "input_disposition_record/2",
+      "field": "disposition_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "input_disposition_record/2",
+      "design_key": "input_disposition_record/2",
+      "field": "assigned_input_ref.source_member.source_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "input_disposition_record/2",
+      "design_key": "input_disposition_record/2",
+      "field": "assigned_input_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "installation_bootstrap_profile/1",
+      "design_key": "installation_bootstrap_profile/1",
+      "field": "allowed_history_namespace_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "installation_bootstrap_profile/1",
+      "design_key": "installation_bootstrap_profile/1",
+      "field": "initial_artifact_contract_registry_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "installation_bootstrap_profile/1",
+      "design_key": "installation_bootstrap_profile/1",
+      "field": "initial_governing_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "installation_bootstrap_profile/1",
+      "design_key": "installation_bootstrap_profile/1",
+      "field": "initial_schema_registry_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "installation_bootstrap_profile/1",
+      "design_key": "installation_bootstrap_profile/1",
+      "field": "initial_serialization_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "installation_bootstrap_profile/1",
+      "design_key": "installation_bootstrap_profile/1",
+      "field": "initial_source_identity_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "installation_bootstrap_profile/1",
+      "design_key": "installation_bootstrap_profile/1",
+      "field": "initial_transition_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "installation_bootstrap_profile/1",
+      "design_key": "installation_bootstrap_profile/1",
+      "field": "initial_trust_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "invariant_revision/1",
+      "design_key": "invariant_revision/2",
+      "field": "invariant_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "invariant_revision/1",
+      "design_key": "invariant_revision/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "invariant_revision/1",
+      "design_key": "invariant_revision/2",
+      "field": "target_scope_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "invariant_revision/1",
+      "design_key": "invariant_revision/2",
+      "field": "activation_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "field": "collector_profile_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "field": "input_disposition_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "field": "surface_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "field": "scope_state_record_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "field": "manual_runtime_additions",
+      "result": "PASS"
+    },
+    {
+      "owner": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "field": "unresolved_scope_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "field": "basis_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "field": "assigned_input_refs[].artifact_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "field": "collector_record_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "field": "assigned_input_refs[].source_member.source_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "field": "assigned_input_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "field": "attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "field": "executor_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "field": "delivery_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "field": "channel_inventory_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "field": "enforcement_receipt_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "field": "filesystem_boundary_evidence_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "field": "network_boundary_evidence_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "field": "tool_boundary_evidence_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "field": "session_boundary_evidence_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "field": "contamination_assessment_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "field": "scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "knowledge_state/1",
+      "design_key": "knowledge_state/2",
+      "field": "allowed_view_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "knowledge_state/1",
+      "design_key": "knowledge_state/2",
+      "field": "attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "knowledge_state/1",
+      "design_key": "knowledge_state/2",
+      "field": "basis_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "knowledge_state/1",
+      "design_key": "knowledge_state/2",
+      "field": "contamination_assessment_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "knowledge_state/1",
+      "design_key": "knowledge_state/2",
+      "field": "isolation_qualification_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "knowledge_state/1",
+      "design_key": "knowledge_state/2",
+      "field": "potential_exposure_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "knowledge_state/1",
+      "design_key": "knowledge_state/2",
+      "field": "previous_knowledge_state_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_completion/1",
+      "design_key": "lane_completion/2",
+      "field": "attempt_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_completion/1",
+      "design_key": "lane_completion/2",
+      "field": "contamination_assessment_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_completion/1",
+      "design_key": "lane_completion/2",
+      "field": "final_knowledge_state_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_completion/1",
+      "design_key": "lane_completion/2",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_completion/1",
+      "design_key": "lane_completion/2",
+      "field": "isolation_qualification_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_completion/1",
+      "design_key": "lane_completion/2",
+      "field": "lane_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_completion/1",
+      "design_key": "lane_completion/2",
+      "field": "lane_spec_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_completion/1",
+      "design_key": "lane_completion/2",
+      "field": "required_output_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_result_admission_evidence/2",
+      "design_key": "lane_result_admission_evidence/3",
+      "field": "assignment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_result_admission_evidence/2",
+      "design_key": "lane_result_admission_evidence/3",
+      "field": "package_binding_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_result_admission_evidence/2",
+      "design_key": "lane_result_admission_evidence/3",
+      "field": "result_slot_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_result_admission_evidence/2",
+      "design_key": "lane_result_admission_evidence/3",
+      "field": "admission_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_result_admission_evidence/2",
+      "design_key": "lane_result_admission_evidence/3",
+      "field": "result_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_result_admission_evidence/2",
+      "design_key": "lane_result_admission_evidence/3",
+      "field": "result_raw_ref.artifact_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_run/1",
+      "design_key": "lane_run/2",
+      "field": "stage_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_run/1",
+      "design_key": "lane_run/2",
+      "field": "lane_spec_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_run/1",
+      "design_key": "lane_run/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_run/1",
+      "design_key": "lane_run/2",
+      "field": "creation_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_run/1",
+      "design_key": "lane_run/2",
+      "field": "successor_of_lane_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_run/1",
+      "design_key": "lane_run/2",
+      "field": "required_result_slots",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_spec/1",
+      "design_key": "lane_spec/2",
+      "field": "budget_effort_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_spec/1",
+      "design_key": "lane_spec/2",
+      "field": "completion_predicate_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lane_spec/1",
+      "design_key": "lane_spec/2",
+      "field": "exploration_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_exposure_reconstruction_assessment/1",
+      "design_key": "legacy_exposure_reconstruction_assessment/2",
+      "field": "legacy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_exposure_reconstruction_assessment/1",
+      "design_key": "legacy_exposure_reconstruction_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_exposure_reconstruction_assessment/1",
+      "design_key": "legacy_exposure_reconstruction_assessment/2",
+      "field": "reconstruction_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_exposure_reconstruction_assessment/1",
+      "design_key": "legacy_exposure_reconstruction_assessment/2",
+      "field": "controlled_exposure_fact_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_exposure_reconstruction_assessment/1",
+      "design_key": "legacy_exposure_reconstruction_assessment/2",
+      "field": "supporting_history_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_mechanical_validation_assessment/1",
+      "design_key": "legacy_mechanical_validation_assessment/2",
+      "field": "legacy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_mechanical_validation_assessment/1",
+      "design_key": "legacy_mechanical_validation_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_mechanical_validation_assessment/1",
+      "design_key": "legacy_mechanical_validation_assessment/2",
+      "field": "legacy_schema_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_mechanical_validation_assessment/1",
+      "design_key": "legacy_mechanical_validation_assessment/2",
+      "field": "legacy_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_mechanical_validation_assessment/1",
+      "design_key": "legacy_mechanical_validation_assessment/2",
+      "field": "mechanical_validation_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_observation_mapping_assessment/1",
+      "design_key": "legacy_observation_mapping_assessment/2",
+      "field": "legacy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_observation_mapping_assessment/1",
+      "design_key": "legacy_observation_mapping_assessment/2",
+      "field": "legacy_observation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_observation_mapping_assessment/1",
+      "design_key": "legacy_observation_mapping_assessment/2",
+      "field": "current_obligation_revision_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_observation_mapping_assessment/1",
+      "design_key": "legacy_observation_mapping_assessment/2",
+      "field": "current_claim_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_observation_mapping_assessment/1",
+      "design_key": "legacy_observation_mapping_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_observation_mapping_assessment/1",
+      "design_key": "legacy_observation_mapping_assessment/2",
+      "field": "mapping_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_observation_semantic_equivalence_assessment/1",
+      "design_key": "legacy_observation_semantic_equivalence_assessment/2",
+      "field": "legacy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_observation_semantic_equivalence_assessment/1",
+      "design_key": "legacy_observation_semantic_equivalence_assessment/2",
+      "field": "target_source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_observation_semantic_equivalence_assessment/1",
+      "design_key": "legacy_observation_semantic_equivalence_assessment/2",
+      "field": "candidate_current_claim_or_obligation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_observation_semantic_equivalence_assessment/1",
+      "design_key": "legacy_observation_semantic_equivalence_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_observation_semantic_equivalence_assessment/1",
+      "design_key": "legacy_observation_semantic_equivalence_assessment/2",
+      "field": "legacy_observation_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_observation_semantic_equivalence_assessment/1",
+      "design_key": "legacy_observation_semantic_equivalence_assessment/2",
+      "field": "mapping_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "legacy_raw_ref/1",
+      "design_key": "legacy_raw_ref/1",
+      "field": "import_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "lineage_admission_assessment/1",
+      "design_key": "lineage_admission_assessment/2",
+      "field": "legacy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lineage_admission_assessment/1",
+      "design_key": "lineage_admission_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "lineage_admission_assessment/1",
+      "design_key": "lineage_admission_assessment/2",
+      "field": "admission_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lineage_admission_assessment/1",
+      "design_key": "lineage_admission_assessment/2",
+      "field": "mechanical_validation_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lineage_admission_assessment/1",
+      "design_key": "lineage_admission_assessment/2",
+      "field": "source_reconciliation_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lineage_admission_assessment/1",
+      "design_key": "lineage_admission_assessment/2",
+      "field": "predecessor_pin_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "lineage_admission_assessment/1",
+      "design_key": "lineage_admission_assessment/2",
+      "field": "freshness_binding_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "materiality_assessment/1",
+      "design_key": "materiality_assessment/2",
+      "field": "subject_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "materiality_assessment/1",
+      "design_key": "materiality_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "materiality_assessment/1",
+      "design_key": "materiality_assessment/2",
+      "field": "materiality_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "materiality_assessment/1",
+      "design_key": "materiality_assessment/2",
+      "field": "supporting_fact_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "materiality_assessment/1",
+      "design_key": "materiality_assessment/2",
+      "field": "scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "model_fidelity_assessment/1",
+      "design_key": "model_fidelity_assessment/2",
+      "field": "model_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "model_fidelity_assessment/1",
+      "design_key": "model_fidelity_assessment/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "model_fidelity_assessment/1",
+      "design_key": "model_fidelity_assessment/2",
+      "field": "implementation_anchor_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "model_fidelity_assessment/1",
+      "design_key": "model_fidelity_assessment/2",
+      "field": "execution_conformance_evidence_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "model_fidelity_assessment/1",
+      "design_key": "model_fidelity_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "model_fidelity_assessment/1",
+      "design_key": "model_fidelity_assessment/2",
+      "field": "abstraction_mapping_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "model_fidelity_assessment/1",
+      "design_key": "model_fidelity_assessment/2",
+      "field": "scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_evidence_record/1",
+      "design_key": "negative_evidence_record/2",
+      "field": "coverage_obligation_qualification_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_evidence_record/1",
+      "design_key": "negative_evidence_record/2",
+      "field": "execution_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_evidence_record/1",
+      "design_key": "negative_evidence_record/2",
+      "field": "observation_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_evidence_record/1",
+      "design_key": "negative_evidence_record/2",
+      "field": "as_of_head",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_evidence_record/1",
+      "design_key": "negative_evidence_record/2",
+      "field": "mutation_oracle_challenge_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_evidence_record/1",
+      "design_key": "negative_evidence_record/2",
+      "field": "unresolved_scope_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_evidence_record/1",
+      "design_key": "negative_evidence_record/2",
+      "field": "claim_scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_evidence_record/1",
+      "design_key": "negative_evidence_record/2",
+      "field": "negative_controls[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_opportunity_unit/1",
+      "design_key": "negative_opportunity_unit/1",
+      "field": "corpus_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_opportunity_unit/1",
+      "design_key": "negative_opportunity_unit/1",
+      "field": "benign_scenario_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_opportunity_unit/1",
+      "design_key": "negative_opportunity_unit/1",
+      "field": "prohibited_or_false_claim_scope",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_opportunity_unit/1",
+      "design_key": "negative_opportunity_unit/1",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_opportunity_unit/1",
+      "design_key": "negative_opportunity_unit/1",
+      "field": "previous_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "negative_opportunity_unit/1",
+      "design_key": "negative_opportunity_unit/1",
+      "field": "ground_truth_provenance_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "obligation_applicability_decision/1",
+      "design_key": "obligation_applicability_decision/2",
+      "field": "obligation_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "obligation_applicability_decision/1",
+      "design_key": "obligation_applicability_decision/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "obligation_applicability_decision/1",
+      "design_key": "obligation_applicability_decision/2",
+      "field": "applicability_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "obligation_applicability_decision/1",
+      "design_key": "obligation_applicability_decision/2",
+      "field": "supporting_evidence_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "obligation_applicability_decision/1",
+      "design_key": "obligation_applicability_decision/2",
+      "field": "scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "observation/1",
+      "design_key": "observation/2",
+      "field": "execution_descriptor_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "observation/1",
+      "design_key": "observation/2",
+      "field": "observation_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "observation/1",
+      "design_key": "observation/2",
+      "field": "capture_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "observation_dependency/1",
+      "design_key": "observation_dependency/1",
+      "field": "observation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "observation_dependency/1",
+      "design_key": "observation_dependency/1",
+      "field": "dependency_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "observation_dependency/1",
+      "design_key": "observation_dependency/1",
+      "field": "basis_observation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "observation_dependency/1",
+      "design_key": "observation_dependency/1",
+      "field": "dependency_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "observation_dependency/1",
+      "design_key": "observation_dependency/1",
+      "field": "previous_dependency_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "policy_revision/1",
+      "design_key": "policy_revision/2",
+      "field": "full_path_context_parameters_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "potential_exposure_record/1",
+      "design_key": "potential_exposure_record/2",
+      "field": "attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "potential_exposure_record/1",
+      "design_key": "potential_exposure_record/2",
+      "field": "exposure_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "potential_exposure_record/1",
+      "design_key": "potential_exposure_record/2",
+      "field": "grant_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "potential_exposure_record/1",
+      "design_key": "potential_exposure_record/2",
+      "field": "previous_knowledge_state_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "potential_exposure_record/1",
+      "design_key": "potential_exposure_record/2",
+      "field": "view_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "public_conclusion_statement/1",
+      "design_key": "public_conclusion_statement/1",
+      "field": "campaign_conclusion_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "public_conclusion_statement/1",
+      "design_key": "public_conclusion_statement/1",
+      "field": "statement_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "public_conclusion_statement/1",
+      "design_key": "public_conclusion_statement/1",
+      "field": "render_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "public_conclusion_statement/1",
+      "design_key": "public_conclusion_statement/1",
+      "field": "statement_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "release_qualification/1",
+      "design_key": "release_qualification/2",
+      "field": "accepted_residual_risk_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "release_qualification/1",
+      "design_key": "release_qualification/2",
+      "field": "blocking_finding_or_risk_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "release_qualification/1",
+      "design_key": "release_qualification/2",
+      "field": "campaign_conclusion_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "release_qualification/1",
+      "design_key": "release_qualification/2",
+      "field": "final_assurance_case_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "release_qualification/1",
+      "design_key": "release_qualification/2",
+      "field": "previous_release_qualification_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "release_qualification/1",
+      "design_key": "release_qualification/2",
+      "field": "qualification_command_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "release_qualification/1",
+      "design_key": "release_qualification/2",
+      "field": "release_assessment_basis_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "release_qualification/1",
+      "design_key": "release_qualification/2",
+      "field": "release_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "release_qualification/1",
+      "design_key": "release_qualification/2",
+      "field": "release_reassessment_input_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "release_qualification/1",
+      "design_key": "release_qualification/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "release_qualification/1",
+      "design_key": "release_qualification/2",
+      "field": "stop_evaluation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "report_export_receipt/1",
+      "design_key": "report_export_receipt/2",
+      "field": "report_artifact_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "report_export_receipt/1",
+      "design_key": "report_export_receipt/2",
+      "field": "report_as_of_head",
+      "result": "PASS"
+    },
+    {
+      "owner": "report_export_receipt/1",
+      "design_key": "report_export_receipt/2",
+      "field": "report_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "report_export_receipt/1",
+      "design_key": "report_export_receipt/2",
+      "field": "producer_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "residual_risk/1",
+      "design_key": "residual_risk/1",
+      "field": "subject_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "residual_risk/1",
+      "design_key": "residual_risk/1",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "residual_risk/1",
+      "design_key": "residual_risk/1",
+      "field": "materiality_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "residual_risk/1",
+      "design_key": "residual_risk/1",
+      "field": "basis_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "residual_risk/1",
+      "design_key": "residual_risk/1",
+      "field": "supersedes_risk_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "residual_risk/1",
+      "design_key": "residual_risk/1",
+      "field": "owner_approval_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "root_cause_revision/1",
+      "design_key": "root_cause_revision/2",
+      "field": "membership_edges[].finding_claim_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "root_cause_revision/1",
+      "design_key": "root_cause_revision/2",
+      "field": "predecessor_root_cause_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "root_cause_revision/1",
+      "design_key": "root_cause_revision/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "root_cause_revision/1",
+      "design_key": "root_cause_revision/2",
+      "field": "scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "root_cause_revision/1",
+      "design_key": "root_cause_revision/2",
+      "field": "membership_edges[].scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "assignment_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "stage_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "lane_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "assigned_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "stage_spec_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "lane_spec_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "executor_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "delivery_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "knowledge_state_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "protocol_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "schema_set_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "field": "export_as_of_head",
+      "result": "PASS"
+    },
+    {
+      "owner": "schema_registry/2",
+      "design_key": "schema_registry/2",
+      "field": "artifact_contract_registry_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "schema_registry/2",
+      "design_key": "schema_registry/2",
+      "field": "serialization_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "schema_registry/2",
+      "design_key": "schema_registry/2",
+      "field": "validator_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "schema_registry/2",
+      "design_key": "schema_registry/2",
+      "field": "compatibility_rules_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "schema_registry/2",
+      "design_key": "schema_registry/2",
+      "field": "bindings[].schema_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "schema_registry/2",
+      "design_key": "schema_registry/2",
+      "field": "bindings[].schema_raw_ref.artifact_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "scope_state_record/1",
+      "design_key": "scope_state_record/2",
+      "field": "scope_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "scope_state_record/1",
+      "design_key": "scope_state_record/2",
+      "field": "basis_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "scope_state_record/1",
+      "design_key": "scope_state_record/2",
+      "field": "scope_decision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "scope_state_record/1",
+      "design_key": "scope_state_record/2",
+      "field": "scope_state_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "scope_state_record/1",
+      "design_key": "scope_state_record/2",
+      "field": "scope_key.subject_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "scope_state_record/1",
+      "design_key": "scope_state_record/2",
+      "field": "scope_key.source_member.source_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "snapshot/1",
+      "design_key": "snapshot/2",
+      "field": "as_of_head",
+      "result": "PASS"
+    },
+    {
+      "owner": "snapshot/1",
+      "design_key": "snapshot/2",
+      "field": "projection_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "snapshot/1",
+      "design_key": "snapshot/2",
+      "field": "projection_code_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "snapshot/1",
+      "design_key": "snapshot/2",
+      "field": "projection_input_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "snapshot/1",
+      "design_key": "snapshot/2",
+      "field": "projection_payload.objects[].ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "snapshot/1",
+      "design_key": "snapshot/2",
+      "field": "projection_payload.transition_event_refs[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "snapshot_export_record/1",
+      "design_key": "snapshot_export_record/2",
+      "field": "projection_input_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "snapshot_export_record/1",
+      "design_key": "snapshot_export_record/2",
+      "field": "as_of_head",
+      "result": "PASS"
+    },
+    {
+      "owner": "snapshot_export_record/1",
+      "design_key": "snapshot_export_record/2",
+      "field": "snapshot_artifact_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "snapshot_export_record/1",
+      "design_key": "snapshot_export_record/2",
+      "field": "projection_code_revision",
+      "result": "PASS"
+    },
+    {
+      "owner": "sound_claim/1",
+      "design_key": "sound_claim/2",
+      "field": "claim_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "sound_claim/1",
+      "design_key": "sound_claim/2",
+      "field": "required_obligation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "sound_claim/1",
+      "design_key": "sound_claim/2",
+      "field": "current_qualified_support_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "sound_claim/1",
+      "design_key": "sound_claim/2",
+      "field": "negative_control_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "sound_claim/1",
+      "design_key": "sound_claim/2",
+      "field": "mutation_oracle_challenge_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "sound_claim/1",
+      "design_key": "sound_claim/2",
+      "field": "applicability_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "sound_claim/1",
+      "design_key": "sound_claim/2",
+      "field": "scope[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_drift_impact_assessment/1",
+      "design_key": "source_drift_impact_assessment/2",
+      "field": "source_drift_record_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_drift_impact_assessment/1",
+      "design_key": "source_drift_impact_assessment/2",
+      "field": "affected_stage_lane_attempt_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_drift_impact_assessment/1",
+      "design_key": "source_drift_impact_assessment/2",
+      "field": "affected_evidence_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_drift_impact_assessment/1",
+      "design_key": "source_drift_impact_assessment/2",
+      "field": "affected_obligation_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_drift_impact_assessment/1",
+      "design_key": "source_drift_impact_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_drift_impact_assessment/1",
+      "design_key": "source_drift_impact_assessment/2",
+      "field": "drift_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_drift_record/1",
+      "design_key": "source_drift_record/2",
+      "field": "old_source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_drift_record/1",
+      "design_key": "source_drift_record/2",
+      "field": "new_source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_drift_record/1",
+      "design_key": "source_drift_record/2",
+      "field": "drift_observation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_drift_record/1",
+      "design_key": "source_drift_record/2",
+      "field": "detection_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_drift_record/1",
+      "design_key": "source_drift_record/2",
+      "field": "dependency_profile_change.old_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_drift_record/1",
+      "design_key": "source_drift_record/2",
+      "field": "dependency_profile_change.new_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_generation/1",
+      "design_key": "source_generation/2",
+      "field": "materialized_source_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_generation/1",
+      "design_key": "source_generation/2",
+      "field": "parent_source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_generation/1",
+      "design_key": "source_generation/2",
+      "field": "repository_authority_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_generation/1",
+      "design_key": "source_generation/2",
+      "field": "representation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_generation/1",
+      "design_key": "source_generation/2",
+      "field": "snapshot_authority_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_generation/1",
+      "design_key": "source_generation/2",
+      "field": "source_identity_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_generation/1",
+      "design_key": "source_generation/2",
+      "field": "source_identity_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_identity/1",
+      "design_key": "source_identity/2",
+      "field": "authorized_repository_or_snapshot_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_identity/1",
+      "design_key": "source_identity/2",
+      "field": "materialized_source_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_identity/1",
+      "design_key": "source_identity/2",
+      "field": "profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_reconciliation_assessment/1",
+      "design_key": "source_reconciliation_assessment/2",
+      "field": "legacy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_reconciliation_assessment/1",
+      "design_key": "source_reconciliation_assessment/2",
+      "field": "assessment_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_reconciliation_assessment/1",
+      "design_key": "source_reconciliation_assessment/2",
+      "field": "target_source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_reconciliation_assessment/1",
+      "design_key": "source_reconciliation_assessment/2",
+      "field": "identity_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_reconciliation_assessment/1",
+      "design_key": "source_reconciliation_assessment/2",
+      "field": "reconciliation_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "source_reconciliation_assessment/1",
+      "design_key": "source_reconciliation_assessment/2",
+      "field": "normalized_identity_body_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "spec_revision/1",
+      "design_key": "spec_revision/2",
+      "field": "protocol_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "spec_revision/1",
+      "design_key": "spec_revision/2",
+      "field": "transition_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "required_lane_slot_results",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "required_output_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "stage_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "stage_spec_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "unresolved_material_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "required_lane_slot_results[].lane_completion_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "required_lane_slot_results[].slot_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "mandatory_obligation_summary.applicability_decision_refs[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "mandatory_obligation_summary.obligation_refs[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "mandatory_obligation_summary.qualification_refs[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "mandatory_obligation_summary.waiver_decision_refs[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "unknown_blocked_summary.unknown_refs[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "unknown_blocked_summary.blocked_refs[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "unknown_blocked_summary.invalidated_refs[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "field": "unknown_blocked_summary.unresolved_contradiction_refs[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_run/1",
+      "design_key": "stage_run/2",
+      "field": "campaign_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_run/1",
+      "design_key": "stage_run/2",
+      "field": "stage_spec_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_run/1",
+      "design_key": "stage_run/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_run/1",
+      "design_key": "stage_run/2",
+      "field": "creation_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_run/1",
+      "design_key": "stage_run/2",
+      "field": "assigned_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_run/1",
+      "design_key": "stage_run/2",
+      "field": "predecessor_stage_completion_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_run/1",
+      "design_key": "stage_run/2",
+      "field": "required_lane_slot_contract_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_run/1",
+      "design_key": "stage_run/2",
+      "field": "successor_of_stage_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_spec/1",
+      "design_key": "stage_spec/2",
+      "field": "coverage_obligation_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stage_spec/1",
+      "design_key": "stage_spec/2",
+      "field": "transition_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "standalone_payload_manifest/1",
+      "design_key": "standalone_payload_manifest/2",
+      "field": "build_input_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "standalone_payload_manifest/1",
+      "design_key": "standalone_payload_manifest/2",
+      "field": "runtime_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "standalone_payload_manifest/1",
+      "design_key": "standalone_payload_manifest/2",
+      "field": "embedded_components[].raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "state_model/1",
+      "design_key": "state_model/1",
+      "field": "previous_model_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "state_model/1",
+      "design_key": "state_model/1",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "state_model/1",
+      "design_key": "state_model/1",
+      "field": "scope_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "state_model/1",
+      "design_key": "state_model/1",
+      "field": "model_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "state_model/1",
+      "design_key": "state_model/1",
+      "field": "implementation_mapping_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "state_model/1",
+      "design_key": "state_model/1",
+      "field": "model_artifact_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "state_model/1",
+      "design_key": "state_model/1",
+      "field": "model_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_evaluation/1",
+      "design_key": "stop_evaluation/2",
+      "field": "blocking_obligation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_evaluation/1",
+      "design_key": "stop_evaluation/2",
+      "field": "remaining_obligation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_evaluation/1",
+      "design_key": "stop_evaluation/2",
+      "field": "stop_input_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "candidate_assurance_case_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "challenger_freshness_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "challenger_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "completed_stage_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "continuation_budget_authorization_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "contradiction_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "current_obligation_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "effort_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "effort_results_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "evaluator_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "evidence_invalidation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "governing_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "inventory_revision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "mandatory_obligation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "pending_required_stage_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "policy_spec_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "release_basis_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "release_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "required_stage_set_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "required_stage_spec_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "residual_risk_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "stop_input_snapshot_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "unknown_blocked_summary.unknown_refs[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "unknown_blocked_summary.blocked_refs[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "unknown_blocked_summary.invalidated_refs[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "unknown_blocked_summary.unresolved_contradiction_refs[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "stop_input/1",
+      "design_key": "stop_input/2",
+      "field": "evidence_invalidation_state[]",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_genesis/1",
+      "design_key": "successor_campaign_genesis/2",
+      "field": "carried_forward_qualification_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_genesis/1",
+      "design_key": "successor_campaign_genesis/2",
+      "field": "challenge_freshness_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_genesis/1",
+      "design_key": "successor_campaign_genesis/2",
+      "field": "governing_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_genesis/1",
+      "design_key": "successor_campaign_genesis/2",
+      "field": "governing_spec_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_genesis/1",
+      "design_key": "successor_campaign_genesis/2",
+      "field": "newly_required_obligation_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_genesis/1",
+      "design_key": "successor_campaign_genesis/2",
+      "field": "predecessor_campaign_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_genesis/1",
+      "design_key": "successor_campaign_genesis/2",
+      "field": "predecessor_conclusion_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_genesis/1",
+      "design_key": "successor_campaign_genesis/2",
+      "field": "source_generation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_genesis/1",
+      "design_key": "successor_campaign_genesis/2",
+      "field": "successor_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_genesis/1",
+      "design_key": "successor_campaign_genesis/2",
+      "field": "successor_trigger_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_selection_decision/1",
+      "design_key": "successor_campaign_selection_decision/2",
+      "field": "candidate_successor_campaign_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_selection_decision/1",
+      "design_key": "successor_campaign_selection_decision/2",
+      "field": "governing_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_selection_decision/1",
+      "design_key": "successor_campaign_selection_decision/2",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_selection_decision/1",
+      "design_key": "successor_campaign_selection_decision/2",
+      "field": "predecessor_conclusion_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_selection_decision/1",
+      "design_key": "successor_campaign_selection_decision/2",
+      "field": "resolution_basis_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "successor_campaign_selection_decision/1",
+      "design_key": "successor_campaign_selection_decision/2",
+      "field": "selected_successor_campaign_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collector_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collector_raw_ref.artifact_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collector_record_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collector_execution_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collection_run.collector_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collection_run.assigned_input_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collection_run.assigned_inputs[].source_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collection_run.terminal_input_dispositions[].input_ref.source_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collection_run.terminal_input_dispositions[].exclusion_decision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collection_run.emitted_surface_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collection_run.runtime_manual_additions[].surface_key_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collection_run.runtime_manual_additions[].observation_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collection_run.parse_errors[].input_ref.source_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collection_run.unsupported_capabilities[].input_ref.source_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collection_run.resource_limit_events[].input_ref.source_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "field": "collector_record_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_key/1",
+      "design_key": "surface_key/2",
+      "field": "source_identity_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_key/1",
+      "design_key": "surface_key/2",
+      "field": "normalized_anchor_descriptor.registration_origin.source_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_record/1",
+      "design_key": "surface_record/2",
+      "field": "surface_key",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_record/1",
+      "design_key": "surface_record/2",
+      "field": "source_identity_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_record/1",
+      "design_key": "surface_record/2",
+      "field": "provenance_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "surface_record/1",
+      "design_key": "surface_record/2",
+      "field": "anchor_descriptor.registration_origin.source_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "field": "tool_run_raw_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "field": "tool_run_raw_ref.artifact_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "field": "tool_run_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "field": "tool_run.tool_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "field": "tool_run.execution_descriptor_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "field": "tool_run.command_spec_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "field": "tool_run.command_spec_ref.artifact_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "field": "tool_run.input_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "field": "tool_run.output_raw_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "field": "tool_run.output_raw_refs[].artifact_contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "field": "tool_run.environment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "field": "tool_run_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "field": "tool_run.resource_limit_events[].input_ref.source_manifest_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "transition_authorization_proposal/1",
+      "design_key": "transition_authorization_proposal/2",
+      "field": "stage_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "transition_authorization_proposal/1",
+      "design_key": "transition_authorization_proposal/2",
+      "field": "lane_run_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "transition_authorization_proposal/1",
+      "design_key": "transition_authorization_proposal/2",
+      "field": "attempt_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "transition_authorization_proposal/1",
+      "design_key": "transition_authorization_proposal/2",
+      "field": "prior_checkpoint_or_handoff_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "transition_authorization_proposal/1",
+      "design_key": "transition_authorization_proposal/2",
+      "field": "gate_decision_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "transition_authorization_proposal/1",
+      "design_key": "transition_authorization_proposal/2",
+      "field": "governing_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "transition_authorization_proposal/1",
+      "design_key": "transition_authorization_proposal/2",
+      "field": "authorized_actor_or_capability_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "transition_authorization_proposal/1",
+      "design_key": "transition_authorization_proposal/2",
+      "field": "proposal_parent_head",
+      "result": "PASS"
+    },
+    {
+      "owner": "trust_profile/1",
+      "design_key": "trust_profile/2",
+      "field": "coordinator_authority_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "trust_profile/1",
+      "design_key": "trust_profile/2",
+      "field": "external_anchor_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "trust_profile/1",
+      "design_key": "trust_profile/2",
+      "field": "recovery_pin_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "trusted_predecessor_selection_decision/1",
+      "design_key": "trusted_predecessor_selection_decision/2",
+      "field": "selection_input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "trusted_predecessor_selection_decision/1",
+      "design_key": "trusted_predecessor_selection_decision/2",
+      "field": "candidate_legacy_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "trusted_predecessor_selection_decision/1",
+      "design_key": "trusted_predecessor_selection_decision/2",
+      "field": "selected_legacy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "trusted_predecessor_selection_decision/1",
+      "design_key": "trusted_predecessor_selection_decision/2",
+      "field": "source_reconciliation_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "trusted_predecessor_selection_decision/1",
+      "design_key": "trusted_predecessor_selection_decision/2",
+      "field": "lineage_admission_assessment_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "trusted_predecessor_selection_decision/1",
+      "design_key": "trusted_predecessor_selection_decision/2",
+      "field": "selection_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "trusted_predecessor_selection_decision/1",
+      "design_key": "trusted_predecessor_selection_decision/2",
+      "field": "predecessor_pin_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "validation_result/1",
+      "design_key": "validation_result/2",
+      "field": "target_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "validation_result/1",
+      "design_key": "validation_result/2",
+      "field": "contract_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "validation_result/1",
+      "design_key": "validation_result/2",
+      "field": "validator_profile_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "validation_result/1",
+      "design_key": "validation_result/2",
+      "field": "input_history_cut",
+      "result": "PASS"
+    },
+    {
+      "owner": "view_manifest/1",
+      "design_key": "view_manifest/2",
+      "field": "allowed_member_refs",
+      "result": "PASS"
+    },
+    {
+      "owner": "view_manifest/1",
+      "design_key": "view_manifest/2",
+      "field": "forbidden_knowledge_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "view_manifest/1",
+      "design_key": "view_manifest/2",
+      "field": "projection_policy_ref",
+      "result": "PASS"
+    },
+    {
+      "owner": "view_manifest/1",
+      "design_key": "view_manifest/2",
+      "field": "resolver_capability_profile_ref",
+      "result": "PASS"
+    }
+  ],
+  "issues": [],
+  "claim": "Own-path existence only; target authority/cardinality/temporal predicates remain separately required"
+}

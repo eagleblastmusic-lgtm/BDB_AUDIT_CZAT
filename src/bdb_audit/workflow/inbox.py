@@ -16,7 +16,7 @@ import hashlib
 from pathlib import Path
 from typing import Any, Sequence
 
-from ..assurance.zip_safety import Limits as ZipLimits, read_bytes as read_zip_bytes
+from ..assurance.zip_safety import read_bytes as read_zip_bytes
 from ..coordinator import Coordinator
 from ..core.canonical_json import canonical_bytes, parse
 from ..core.errors import ValidationError
@@ -30,14 +30,9 @@ from ..schemas.identity import LayeredValidator
 from ..stop.models import LaneCompletion, StageCompletion
 from ..vault.raw_store import RawArtifactVault
 from .packaging import E1Batch, E1LaneJob
-
-_RESULT_ZIP_LIMITS = ZipLimits(
-    input_bytes=64 * 1024 * 1024,
-    central_bytes=4 * 1024 * 1024,
-    members=512,
-    member_bytes=32 * 1024 * 1024,
-    expanded_bytes=50 * 1024 * 1024,
-    ratio=500,
+from .result_proposal import (
+    RESULT_ZIP_LIMITS as _RESULT_ZIP_LIMITS,
+    media_type as _media_type, derive_result_proposal,
 )
 
 
@@ -136,17 +131,6 @@ def _current_cut(store: TransactionalHistoryStore) -> tuple[dict[str, Any], dict
         HistoryCut.accepted(head, body["governing_policy_ref"], body["governing_spec_refs"]).as_dict(),
         body,
     )
-
-
-def _media_type(name: str) -> str:
-    lower = name.lower()
-    if lower.endswith(".json"):
-        return "application/json"
-    if lower.endswith((".md", ".txt", ".log")):
-        return "text/plain"
-    if lower.endswith(".xml"):
-        return "application/xml"
-    return "application/octet-stream"
 
 
 def _translate_zip_error(exc: ValidationError) -> ValidationError:
@@ -356,6 +340,13 @@ class E1ResultInbox:
                 return self._reject(path, "UNKNOWN", "UNKNOWN_LANE", f"Invalid lane slot '{slot}'", raw_digest)
             job = self.batch.get_job(slot)
 
+            if not job.package_zip_path.is_file():
+                return self._reject(path, slot, "ASSIGNED_PACKAGE_TAMPERED", f"Assigned package ZIP missing: {job.package_zip_path}", raw_digest)
+            actual_pkg_bytes = job.package_zip_path.read_bytes()
+            if hashlib.sha256(actual_pkg_bytes).hexdigest() != job.package_zip_sha256:
+                return self._reject(path, slot, "ASSIGNED_PACKAGE_TAMPERED", "Assigned package bytes tampered on disk", raw_digest)
+            self.vault.put_bytes(actual_pkg_bytes, media_type="application/zip")
+
             source_sha = manifest.get("source_commit_sha")
             if not source_sha:
                 return self._reject(path, slot, "MISSING_SOURCE_BINDING", "Manifest missing source_commit_sha", raw_digest)
@@ -412,15 +403,10 @@ class E1ResultInbox:
                 if not finding.get("statement") or not (finding.get("finding_id") or finding.get("title")):
                     return self._reject(path, slot, "INVALID_FINDING_STRUCTURE", f"finding {index} lacks statement/id", raw_digest)
 
-            canonical_proposal = dict(manifest)
-            canonical_proposal["history_cut"] = dict(expected_cut)
-            canonical_proposal["findings"] = findings
-            canonical_proposal["findings_count"] = len(findings)
-            canonical_proposal["assignment_ref"] = dict(job.assignment_ref)
-            canonical_proposal["attempt_ref"] = dict(job.attempt_ref)
-            canonical_proposal["raw_result_digest"] = raw_digest
-            canonical_proposal["raw_result_byte_length"] = len(raw)
-            canonical_proposal["evidence_files"] = evidence_files
+            canonical_proposal = derive_result_proposal(
+                raw, members, history_cut=expected_cut,
+                assignment_ref=job.assignment_ref, attempt_ref=job.attempt_ref,
+            )
 
             # Construct canonical admission evidence
             proposal_without_ref = dict(canonical_proposal)
@@ -448,6 +434,7 @@ class E1ResultInbox:
                 "source_commit_sha": job.source_commit_sha,
                 "history_cut": dict(expected_cut),
                 "input_package_digest": job.package_digest,
+                "package_zip_sha256": job.package_zip_sha256,
                 "raw_result_digest": raw_digest,
                 "raw_result_byte_length": len(raw),
                 "result_proposal_digest": result_proposal_digest,
@@ -455,6 +442,10 @@ class E1ResultInbox:
                 "executor_model": job.model,
                 "evidence_files": evidence_files,
             }
+            evidence_body["ingestion_capability"] = self.store.issue_ingestion_capability(
+                evidence_body,
+                batch_ticket=self.batch.batch_ticket,
+            )
             evidence_obj = CanonicalObject("lane_result_admission_evidence", evidence_body)
             canonical_proposal["admission_evidence_ref"] = evidence_obj.as_ref(ref_class="PRIOR_ACCEPTED_ONLY").as_dict()
 

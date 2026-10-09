@@ -1,0 +1,64 @@
+{
+  "file": "registry_build_candidate/ea9cf5733fa60742321f732a12055b16921bdd2da107b7ac13e74eb9ba245b33/BDB_AUDIT_V2_ARTIFACT_CONTRACT_REGISTRY_R5_4_2.json",
+  "raw_digest": "ea9cf5733fa60742321f732a12055b16921bdd2da107b7ac13e74eb9ba245b33",
+  "byte_length": 561260,
+  "parsed_readback": "PASS",
+  "registered_keys": 131,
+  "pending_fields": [],
+  "sources": [
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/OWN_REFERENCE_RESOLUTIONS.json",
+      "raw_digest": "eb0275b80e713d5ad542b77966ade52a8d11dcf443a8bf80a409b4559fef54a1"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/design/VERSION_IMPACT_PLAN.json",
+      "raw_digest": "30580d552a39535c96faf4e41812a24d015943640287a2c6d4679df672fd6ac4"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/design/EXTERNAL_PROFILE_CONTRACTS.json",
+      "raw_digest": "b5a0a24f475b00b69b76ff9e9ec271693610039ae521859ec837bf957dd42bbc"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/design/BOOTSTRAP_PRECEDENCE_SUCCESSOR.json",
+      "raw_digest": "301d6055984712cbc3a8bf2220a8aed9976e57415ca7c6cd63d4c4a92dff0eee"
+    },
+    {
+      "file": "docs/R5_4_1/candidate/BDB_AUDIT_V2_ARTIFACT_CONTRACT_REGISTRY_R5_4.json",
+      "raw_digest": "1b9d17c46843a91053036f0370d4419dac87ce5978df61b0dc922e0e40237e2c"
+    },
+    {
+      "file": "docs/R5_4_2/OWNER_DELEGATED_DECISION_REGISTER.md",
+      "raw_digest": "ac0e2bf40c204eba5b978846a800f6a346303bc84fa77735c9387ea73a821afe"
+    },
+    {
+      "file": "docs/R5_4_2/OWNER_R5_4_2_SEMANTIC_CLOSURE_APPROVAL.json",
+      "raw_digest": "78cb86ad8f311e1f4db73d10b6d18e3f9567ac03d8b446a0849a15f047ea9aae"
+    },
+    {
+      "file": "docs/R5_4_2/R5_4_2_RESIDUAL_RISK_CONTRACT_DECISION_PROPOSAL.md",
+      "raw_digest": "696dfeaf883462aed4c95b81820d95ad87cc7177ed6edf1bb99fd1f30888b66b"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/tools/registry_build_candidate.py",
+      "raw_digest": "3f6139469acd0144cedb2c1fbf0cd3c8e4794b6d9474aa38462907d8363b1a5b"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/tools/semantic_inventory.py",
+      "raw_digest": "9a7990e28a0df5cff52065acdd37c62721e058df7a5b546a48f74f0794db1ed9"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/tools/bootstrap_registry_integration.py",
+      "raw_digest": "1889d838ae575fff641611ef889cdbb0b02837de24eaf1cc9fc7f23a157aa29e"
+    },
+    {
+      "file": "docs/R5_4_2/autonomous_2026_10_07/tools/execution.py",
+      "raw_digest": "333402e50b22c4d3cdce19d31f6246bde11bb86c07435ac2d106c38e74738dfe"
+    }
+  ],
+  "input_drift": [],
+  "frozen": false,
+  "qualification": false,
+  "Q1": "NOT_STARTED",
+  "NF02": "OPEN",
+  "scope": "Complete finite Registry build input; normative parity, mandatory predicates, installed profile pin parity and qualification remain required before freezing."
+}

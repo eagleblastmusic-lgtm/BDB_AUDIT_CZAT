@@ -1,0 +1,19 @@
+{
+  "controls": [
+    {
+      "case": "REPEATED_REAL_CONTROLS_KEEP_PROOF_BYTES_STABLE",
+      "result": "PASS"
+    },
+    {
+      "case": "NEW_DIAGNOSTIC_WORKSPACES_KEEP_REVIEW_INPUTS_STABLE",
+      "result": "PASS"
+    }
+  ],
+  "proof_raw_digests": {
+    "design/SOURCE_ALIAS_PRIOR_DURABILITY_CONTROLS.json": "e4eede01f5228108475919e971838dbc8900155425c39aaf4fbe3e275cbf9d88",
+    "design/RUNTIME_EVIDENCE_DRIFT_CONTROLS.json": "b8b0dd91b496709f4dda54e80c7ab5da69ca124da55840e6b3f76e2348eca71a"
+  },
+  "review_dependency_digest": "faa81ff6131ec39e35dc81107100d0bd898240d432401666453b7dc866763e58",
+  "qualification": false,
+  "semantic_nodes_completed": 0
+}

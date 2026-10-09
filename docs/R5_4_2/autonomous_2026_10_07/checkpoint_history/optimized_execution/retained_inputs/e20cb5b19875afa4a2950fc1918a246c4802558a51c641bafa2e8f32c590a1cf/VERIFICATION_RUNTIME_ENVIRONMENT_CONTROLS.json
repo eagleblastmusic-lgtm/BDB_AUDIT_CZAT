@@ -1,0 +1,54 @@
+{
+  "controls": [
+    {
+      "case": "ASSERTIONS_ENABLED",
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-c",
+        "import execution"
+      ],
+      "exit_code": 0,
+      "expected_accept": true,
+      "result": "PASS"
+    },
+    {
+      "case": "OPTIMIZED_PYTHON",
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-O",
+        "-c",
+        "import execution"
+      ],
+      "exit_code": 1,
+      "expected_accept": false,
+      "result": "PASS"
+    },
+    {
+      "case": "DOUBLE_OPTIMIZED_PYTHON",
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-OO",
+        "-c",
+        "import execution"
+      ],
+      "exit_code": 1,
+      "expected_accept": false,
+      "result": "PASS"
+    },
+    {
+      "case": "ENVIRONMENT_OPTIMIZATION",
+      "argv": [
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-c",
+        "import execution"
+      ],
+      "exit_code": 1,
+      "expected_accept": false,
+      "result": "PASS"
+    }
+  ],
+  "execution_tool_raw_digest": "333402e50b22c4d3cdce19d31f6246bde11bb86c07435ac2d106c38e74738dfe",
+  "repository": "C:\\Projekty\\Audyty\\BDB Audit",
+  "qualification": false,
+  "scope": "Design harness assertion execution only; not runtime authority or qualification"
+}

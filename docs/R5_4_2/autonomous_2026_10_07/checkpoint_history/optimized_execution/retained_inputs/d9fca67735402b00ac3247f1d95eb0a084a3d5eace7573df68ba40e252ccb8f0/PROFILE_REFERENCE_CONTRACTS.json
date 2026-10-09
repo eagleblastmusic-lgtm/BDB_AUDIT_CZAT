@@ -1,0 +1,1740 @@
+{
+  "material_refs": [
+    {
+      "owner": "CLAIM_RELATIVE_ASSESSMENT_V1",
+      "field": "parameters.authorized_principal_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "PRINCIPAL_AUTHORIZATION_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_ACTIVATION_V1",
+      "field": "parameters.activation_check_refs[]",
+      "representation": "RawRef",
+      "targets": [
+        "CLEANUP_EXPECTED_OBSERVABLE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_ACTIVATION_V1",
+      "field": "parameters.required_cleanup_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "CLEANUP_ASSESSMENT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "FINAL_CHAIN_RELEASE_V1",
+      "field": "parameters.permitted_risk_acceptance_authority_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "PRINCIPAL_AUTHORIZATION_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "COLLECTOR_CAPABILITY_V2",
+      "field": "collector_revision_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_PRODUCER_CODE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "COLLECTOR_CAPABILITY_V2",
+      "field": "source_identity_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "SOURCE_IDENTITY_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "TOOL_CAPTURE_V2",
+      "field": "capture_code_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_PRODUCER_CODE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "TOOL_CAPTURE_V2",
+      "field": "output_contract_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1",
+        "OBSERVATION_CAPTURE_V2",
+        "FIXTURE_INPUT_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "CLEANUP_ASSESSMENT_V2",
+      "field": "required_checks[].expected_observable",
+      "representation": "RawRef",
+      "targets": [
+        "CLEANUP_EXPECTED_OBSERVABLE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SURFACE_COLLECTOR_RECORD_JSON_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "TOOL_EXECUTION_RECORD_JSON_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "FAULT_RUN_RECORD_JSON_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "FAULT_RUN_RECORD_JSON_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "CLEANUP_EXPECTED_OBSERVABLE_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "OBSERVATION_CAPTURE_V2",
+      "field": "capture_code_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_PRODUCER_CODE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "EXECUTION_COMMAND_JSON_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "EXECUTION_COMMAND_JSON_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "NETWORK_BOUNDARY_V2",
+      "field": "allowed_endpoint_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXTERNAL_SERVICE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "TOOL_BOUNDARY_V2",
+      "field": "allowed_tool_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXECUTOR_TOOL_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "RUNTIME_ENVIRONMENT_V2",
+      "field": "runtime_code_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "RUNTIME_ENVIRONMENT_V2",
+      "field": "dependency_plan_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXECUTION_DEPENDENCY_PLAN_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "BROWSER_ENVIRONMENT_V2",
+      "field": "browser_code_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "BROWSER_ENVIRONMENT_V2",
+      "field": "network_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "NETWORK_BOUNDARY_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "EXTERNAL_SERVICE_V2",
+      "field": "witness_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "OBSERVATION_CAPTURE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SANDBOX_PROFILE_V1",
+      "field": "filesystem_boundary_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "FILESYSTEM_BOUNDARY_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SANDBOX_PROFILE_V1",
+      "field": "network_boundary_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "NETWORK_BOUNDARY_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SANDBOX_PROFILE_V1",
+      "field": "tool_boundary_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "TOOL_BOUNDARY_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "EXECUTION_DEPENDENCY_PLAN_V1",
+      "field": "dependencies[].raw_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "EXECUTION_DEPENDENCY_PLAN_V1",
+      "field": "command_spec_refs[]",
+      "representation": "RawRef",
+      "targets": [
+        "EXECUTION_COMMAND_JSON_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "ENVIRONMENT_PROFILE_V2",
+      "field": "os_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "OS_ENVIRONMENT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "ENVIRONMENT_PROFILE_V2",
+      "field": "runtime_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "RUNTIME_ENVIRONMENT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "ENVIRONMENT_PROFILE_V2",
+      "field": "filesystem_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "FILESYSTEM_BOUNDARY_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "ENVIRONMENT_PROFILE_V2",
+      "field": "network_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "NETWORK_BOUNDARY_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "ENVIRONMENT_PROFILE_V2",
+      "field": "clock_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "CLOCK_PROFILE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "ENVIRONMENT_PROFILE_V2",
+      "field": "sandbox_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "SANDBOX_PROFILE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "ENVIRONMENT_PROFILE_V2",
+      "field": "external_service_profile_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXTERNAL_SERVICE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "EXECUTION_RUNNER_V2",
+      "field": "runner_code_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_PRODUCER_CODE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "EXECUTION_RUNNER_V2",
+      "field": "dependency_profile_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "ENVIRONMENT_PROFILE_V2",
+        "EXECUTION_DEPENDENCY_PLAN_V1",
+        "TOOL_CAPTURE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "EXECUTION_HARNESS_V2",
+      "field": "harness_code_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_PRODUCER_CODE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "EXECUTION_HARNESS_V2",
+      "field": "dependency_profile_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "ENVIRONMENT_PROFILE_V2",
+        "OBSERVATION_CAPTURE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "EXECUTOR_TOOL_V2",
+      "field": "tool_code_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_PRODUCER_CODE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "EXECUTOR_TOOL_V2",
+      "field": "dependency_profile_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "TOOL_CAPTURE_V2",
+        "EXECUTION_DEPENDENCY_PLAN_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "EXECUTION_VARIANT_V2",
+      "field": "implementation_raw_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "PRINCIPAL_AUTHORIZATION_V1",
+      "field": "namespace_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "BOOTSTRAP_NAMESPACE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_AUTHORITY_V1",
+      "field": "authorizing_principal_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "PRINCIPAL_AUTHORIZATION_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_IDENTITY_V2",
+      "field": "authority_profile_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "SOURCE_AUTHORITY_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_IDENTITY_V2",
+      "field": "surface_key_profile_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "SURFACE_KEY_PROFILE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_IDENTITY_V2",
+      "field": "path_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "SOURCE_PATH_PROFILE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_IDENTITY_V2",
+      "field": "manifest_entry_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "SOURCE_MANIFEST_ENTRY_PROFILE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_IDENTITY_V2",
+      "field": "authority_parameters[].authority_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "SOURCE_AUTHORITY_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "BOOTSTRAP_ADMISSION_V2",
+      "field": "historical_parser_profile_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "LEGACY_SCHEMA_PIN_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "TRUSTED_PREDECESSOR_PIN_V2",
+      "field": "predecessor_raw_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "TRUSTED_PREDECESSOR_PIN_V2",
+      "field": "predecessor_contract_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "LEGACY_SCHEMA_PIN_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "TRUSTED_PREDECESSOR_PIN_V2",
+      "field": "authorization_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "PRINCIPAL_AUTHORIZATION_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "LINEAGE_ADMISSION_V2",
+      "field": "predecessor_pin_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "TRUSTED_PREDECESSOR_PIN_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "MANDATORY_STAGE_SET_V2",
+      "field": "stage_spec_refs[]",
+      "representation": "TypedRef",
+      "targets": [
+        "stage_spec"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "MANDATORY_LANE_SLOT_V1",
+      "field": "result_slot_contract_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "NF02_EXTERNAL_LANE_SLOT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "MANDATORY_LANE_SLOT_V1",
+      "field": "completion_contract_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "LANE_COMPLETION_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "COVERAGE_OBLIGATION_POLICY_V2",
+      "field": "acceptance_contract_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "OBLIGATION_ACCEPTANCE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "COVERAGE_OBLIGATION_POLICY_V2",
+      "field": "applicability_contract_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "OBLIGATION_APPLICABILITY_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_TECHNIQUE_V2",
+      "field": "method_contract_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "METHOD_QUALIFICATION_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_TECHNIQUE_V2",
+      "field": "required_control_experiment_refs[]",
+      "representation": "TypedRef",
+      "targets": [
+        "experiment_spec"
+      ],
+      "ref_class": "PRIOR_ACCEPTED_ONLY",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "EXPLORATION_POLICY_V2",
+      "field": "method_contract_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "METHOD_QUALIFICATION_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_RECONCILIATION_V2",
+      "field": "identity_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "SOURCE_IDENTITY_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_RECONCILIATION_V2",
+      "field": "raw_identifier_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "LEGACY_SCHEMA_PIN_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_MANIFEST_ENTRY_PROFILE_V1",
+      "field": "source_manifest_schema_raw_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SURFACE_KEY_PROFILE_V2",
+      "field": "normalizer_code_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_PRODUCER_CODE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "NF02_EXTERNAL_LANE_SLOT_V2",
+      "field": "normalizer_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "NF02_RESULT_NORMALIZER_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "NF02_EXTERNAL_LANE_SLOT_V2",
+      "field": "transport_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "NF02_RESULT_TRANSPORT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "NF02_PROTOCOL_PROFILE_V2",
+      "field": "input_transport_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "NF02_PACKAGE_TRANSPORT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "NF02_PROTOCOL_PROFILE_V2",
+      "field": "result_transport_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "NF02_RESULT_TRANSPORT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "NF02_PROTOCOL_PROFILE_V2",
+      "field": "normalizer_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "NF02_RESULT_NORMALIZER_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "NF02_PROTOCOL_PROFILE_V2",
+      "field": "result_slot_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "NF02_EXTERNAL_LANE_SLOT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "NF02_PROTOCOL_PROFILE_V2",
+      "field": "package_semantic_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "NF02_PACKAGE_SEMANTIC_PROFILE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "FULL_PATH_CONTEXT_PARAMETERS_V1",
+      "field": "entries[].governing_spec_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "spec_revision"
+      ],
+      "ref_class": "PINNED_INSTALLATION_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "FULL_PATH_CONTEXT_PARAMETERS_V1",
+      "field": "entries[].predicate_contract_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STAGE_COMPLETION_V1",
+        "LANE_COMPLETION_V1",
+        "EXECUTOR_ELIGIBILITY_V1",
+        "NF02_DELIVERY_AUTHORIZATION_V1",
+        "COLLECTOR_ACCOUNTING_V1",
+        "METHOD_QUALIFICATION_V1",
+        "DISCOVERY_CONFIRMATION_V1",
+        "EXACT_SCOPED_MATCH_V1",
+        "CORPUS_RELATIVE_NOVELTY_V1",
+        "PRIOR_FALSE_NEGATIVE_V1",
+        "CLAIM_RELATIVE_ASSESSMENT_V1",
+        "FINITE_MODEL_FIDELITY_V1",
+        "QUALIFIED_ACTIVATION_V1",
+        "FINAL_CHAIN_RELEASE_V1",
+        "OBSERVED_EFFORT_V1",
+        "EXACT_DURABLE_RECOVERY_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "MODEL_ARTIFACT_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "MODEL_ARTIFACT_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "IMPLEMENTATION_MAPPING_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "IMPLEMENTATION_MAPPING_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+      "field": "ground_truth_raw_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+      "field": "authorizing_principal_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "PRINCIPAL_AUTHORIZATION_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "CALIBRATION_GROUND_TRUTH_PROFILE_V1",
+      "field": "independence_contract_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "ORACLE_INDEPENDENCE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "COMPATIBILITY_FIXTURE_V2",
+      "field": "fixture_input_ref",
+      "representation": "RawRef",
+      "targets": [
+        "FIXTURE_INPUT_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "COMPATIBILITY_FIXTURE_V2",
+      "field": "independent_expected_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "COMPATIBILITY_FIXTURE_V2",
+      "field": "ground_truth_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "CALIBRATION_GROUND_TRUTH_PROFILE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "COMPATIBILITY_FIXTURE_V2",
+      "field": "legacy_contract_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "LEGACY_SCHEMA_PIN_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "COMPATIBILITY_FIXTURE_V2",
+      "field": "current_contract_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXACT_COMPATIBILITY_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "COMPATIBILITY_GATE_V2",
+      "field": "required_fixture_contract_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "COMPATIBILITY_FIXTURE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "LEGACY_SCHEMA_PIN_V2",
+      "field": "original_schema_raw_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "LEGACY_SCHEMA_PIN_V2",
+      "field": "original_parser_code_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_PRODUCER_CODE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "LEGACY_MECHANICAL_VALIDATION_V2",
+      "field": "legacy_schema_pin_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "LEGACY_SCHEMA_PIN_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "LEGACY_OBSERVATION_MAPPING_V2",
+      "field": "legacy_schema_pin_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "LEGACY_SCHEMA_PIN_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "LEGACY_OBSERVATION_MAPPING_V2",
+      "field": "current_observation_contract_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "OBSERVATION_CAPTURE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "LEGACY_EXPOSURE_RECONSTRUCTION_V2",
+      "field": "legacy_mapping_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "LEGACY_OBSERVATION_MAPPING_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SNAPSHOT_PROJECTION_V2",
+      "field": "projection_code_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_PRODUCER_CODE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SNAPSHOT_EXPORT_V2",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SNAPSHOT_EXPORT_V2",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "FINAL_TECHNICAL_REPORT_JSON_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "FINAL_TECHNICAL_REPORT_TEXT_V1",
+      "field": "json_report_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "FINAL_TECHNICAL_REPORT_JSON_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "PUBLIC_CONCLUSION_RENDER_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "PUBLIC_CONCLUSION_RENDER_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "BUNDLE_MEMBERSHIP_V2",
+      "field": "member_contract_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "FINAL_TECHNICAL_REPORT_JSON_V1",
+        "EXACT_DURABLE_RECOVERY_V1",
+        "BUILD_RECIPE_V2",
+        "HASH_MANIFEST_V2",
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_ARCHIVE_V2",
+      "field": "transport_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "SOURCE_ZIP_TRANSPORT_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_ZIP_TRANSPORT_V1",
+      "field": "path_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "SOURCE_PATH_PROFILE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_ZIP_TRANSPORT_V1",
+      "field": "manifest_entry_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "SOURCE_MANIFEST_ENTRY_PROFILE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_ZIP_TRANSPORT_V1",
+      "field": "parser_code_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_PRODUCER_CODE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "SOURCE_ZIP_TRANSPORT_V1",
+      "field": "parser_dependency_code_refs[]",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_PRODUCER_CODE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "HANDOFF_TRANSPORT_V2",
+      "field": "required_member_contract_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1",
+        "FIXTURE_INPUT_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "HANDOFF_TRANSPORT_V2",
+      "field": "transport_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "NF02_PACKAGE_TRANSPORT_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "HISTORY_ANCHOR_V2",
+      "field": "witness_authority_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "PRINCIPAL_AUTHORIZATION_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "BUILD_RECIPE_V2",
+      "field": "builder_code_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_PRODUCER_CODE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "BUILD_RECIPE_V2",
+      "field": "command_spec_ref",
+      "representation": "RawRef",
+      "targets": [
+        "EXECUTION_COMMAND_JSON_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "BUILD_RECIPE_V2",
+      "field": "dependency_plan_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXECUTION_DEPENDENCY_PLAN_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "BUILD_RECIPE_V2",
+      "field": "settings_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "DETERMINISTIC_BUILD_SETTINGS_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "field": "artifact_contract_registry_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "artifact_contract_registry"
+      ],
+      "ref_class": "PINNED_INSTALLATION_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "field": "schema_registry_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "schema_registry"
+      ],
+      "ref_class": "PINNED_INSTALLATION_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "field": "governing_policy_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "policy_revision"
+      ],
+      "ref_class": "PINNED_INSTALLATION_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "field": "transition_spec_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "spec_revision"
+      ],
+      "ref_class": "PINNED_INSTALLATION_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "field": "trust_profile_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "trust_profile"
+      ],
+      "ref_class": "PINNED_INSTALLATION_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "field": "protocol_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "NF02_PROTOCOL_PROFILE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "field": "namespace_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "BOOTSTRAP_NAMESPACE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "field": "serialization_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "BDB_CJSON_1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2",
+      "field": "source_identity_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "SOURCE_IDENTITY_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "QUALIFIED_VALIDATOR_V2",
+      "field": "canonical_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "BDB_CJSON_1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "CHANNEL_CAPTURE_PROFILE_V1",
+      "field": "capture_code_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_PRODUCER_CODE_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "REPORT_EXPORT_PROFILE_V1",
+      "field": "json_report_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "FINAL_TECHNICAL_REPORT_JSON_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "REPORT_EXPORT_PROFILE_V1",
+      "field": "text_report_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "FINAL_TECHNICAL_REPORT_TEXT_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "REPORT_EXPORT_PROFILE_V1",
+      "field": "membership_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "BUNDLE_MEMBERSHIP_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "field": "bundle_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "field": "context_parameters_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "FULL_PATH_CONTEXT_PARAMETERS_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "field": "qualification_manifest_raw_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "field": "qualification_record_raw_ref",
+      "representation": "RawRef",
+      "targets": [
+        "RETAINED_OPAQUE_BYTES_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "field": "application_build_manifest_ref",
+      "representation": "TypedRef",
+      "targets": [
+        "build_manifest"
+      ],
+      "ref_class": "PINNED_INSTALLATION_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "INSTALLATION_FULL_PATH_PROFILE_V1",
+      "field": "application_build_provenance_raw_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BUILD_PROVENANCE_RECEIPT_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "RECOVERY_REFERENCE_PROFILE_V1",
+      "field": "recovery_contract_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "EXACT_DURABLE_RECOVERY_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "REPLAY_CAPSULE_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "IMPLEMENTATION_MUTATION_CASE_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "ORACLE_CHALLENGE_CASE_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "ORACLE_CHALLENGE_CASE_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "TEMPORAL_MODEL_CLAIM_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "TEMPORAL_MODEL_CLAIM_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "CAUSAL_CHAIN_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "CAUSAL_CHAIN_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "ENDURANCE_OBSERVATION_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "ENDURANCE_OBSERVATION_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "ENDURANCE_WORKLOAD_V1",
+      "field": "required_capture_profile_refs[]",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "OBSERVATION_CAPTURE_V2"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "BUILD_PROVENANCE_RECEIPT_V1",
+      "field": "parser_profile_ref",
+      "representation": "ExternalProfileRef",
+      "targets": [
+        "STRICT_JSON_CAPTURE_V1"
+      ],
+      "ref_class": "PINNED_PROFILE_REF",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    },
+    {
+      "owner": "BUILD_PROVENANCE_RECEIPT_V1",
+      "field": "payload_schema_ref",
+      "representation": "RawRef",
+      "targets": [
+        "BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1"
+      ],
+      "ref_class": "CONTENT_OBJECT",
+      "same_commit": false,
+      "rule": "Exact full pin/ref and context, independently retained readback; no latest, equivalent bytes or caller trust"
+    }
+  ],
+  "pending": [],
+  "catalog_raw_digest": "1970001655794ec564aebec738de5e95948c0212a4ed85c4728bc3de3423a6bf",
+  "raw_payload_reference_review": "PENDING",
+  "fixed_point_reached": false,
+  "claim": "Explicit installed profile field purposes; does not infer payload or authority completion"
+}

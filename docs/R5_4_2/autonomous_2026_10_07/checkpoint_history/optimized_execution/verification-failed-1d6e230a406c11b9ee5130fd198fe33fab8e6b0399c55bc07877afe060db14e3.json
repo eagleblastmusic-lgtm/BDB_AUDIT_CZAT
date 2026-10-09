@@ -1,0 +1,14 @@
+{
+  "commands": [],
+  "error": "CANDIDATE_DRIFT ['.gitattributes', '.gitignore']",
+  "fresh_commands": 0,
+  "invalid_wrapper_capture": {
+    "file": "invalid-wrapper-diagnostics-abc7422b20ade22b2ae7433a1d8f5b98732c816bdc26b3ef094b1e68e66a4fdd.json",
+    "raw_digest": "abc7422b20ade22b2ae7433a1d8f5b98732c816bdc26b3ef094b1e68e66a4fdd",
+    "status": "INVALID_METADATA; old command list was not executed by this attempt; never reuse as verification evidence"
+  },
+  "qualification": false,
+  "repair": "Only publication-added root metadata modifications restored to exact pre-task HEAD bytes; subsequent preservation check passed",
+  "reused_commands": 0,
+  "stage": "preservation before command execution"
+}

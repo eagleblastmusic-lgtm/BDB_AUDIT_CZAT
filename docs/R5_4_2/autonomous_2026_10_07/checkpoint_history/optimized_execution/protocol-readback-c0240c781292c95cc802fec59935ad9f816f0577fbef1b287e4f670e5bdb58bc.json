@@ -1,0 +1,134 @@
+{
+  "status": "BUILD_INPUTS_READ_BACK_NOT_FROZEN_NOT_INSTALLED_NOT_QUALIFIED",
+  "directory": "docs/R5_4_2/autonomous_2026_10_07/initial_protocol_build_candidate/29833211a61ccc1c8a95abcdb95006fb8f2caa8d82947c8892d1c5e9be5107ef",
+  "build_digest": "29833211a61ccc1c8a95abcdb95006fb8f2caa8d82947c8892d1c5e9be5107ef",
+  "entries": [
+    {
+      "file": "objects/spec_revision__2.json",
+      "raw_digest": "fd6e3a049282d64a56fbf433854671630a4ef52efe1a0bfd2468424f7e60fa35",
+      "byte_length": 1594
+    },
+    {
+      "file": "profiles/FULL_PATH_TRANSITION_TABLE_V2.json",
+      "raw_digest": "fcf798e09e52249a4ceba5c9a4ad48e397b1832b490613f4055a2334e5fae536",
+      "byte_length": 12592
+    },
+    {
+      "file": "profiles/NF02_EXTERNAL_LANE_SLOT_V3.json",
+      "raw_digest": "f5037a3e2a09f9e58f7015b3d6ca99023e5873a11ee13a6536aefc4e41587377",
+      "byte_length": 491
+    },
+    {
+      "file": "profiles/NF02_INPUT_PACKAGE_TRANSPORT_V2.json",
+      "raw_digest": "4bd9bc0a7032333ef5626d2b11a170b3f07e69a27535de8a61bb2db92ecfdb28",
+      "byte_length": 999
+    },
+    {
+      "file": "profiles/NF02_PACKAGE_SEMANTIC_PROFILE_V1.json",
+      "raw_digest": "1d40249ec16b1de00f9a18e5e8195d261cf52a9b1704411b495f580258117df9",
+      "byte_length": 469
+    },
+    {
+      "file": "profiles/NF02_PROTOCOL_PROFILE_V3.json",
+      "raw_digest": "914e41ffeb22c668c6fcf0e381e19f5fa2270548c13a8819ecddacd66bef6cb5",
+      "byte_length": 930
+    },
+    {
+      "file": "profiles/NF02_RESULT_NORMALIZER_V2.json",
+      "raw_digest": "ca2ab3c1a338536f9d25858f521366d0ae02f833383435dc948b986bcf057de9",
+      "byte_length": 684
+    },
+    {
+      "file": "profiles/NF02_RESULT_TRANSPORT_V2.json",
+      "raw_digest": "bfd2f9715a7227927b4c87e7daeda518fd8e0d8c2e8f9c547c2cdbdf17da46ce",
+      "byte_length": 986
+    }
+  ],
+  "spec_revision_ref": {
+    "kind": "spec_revision",
+    "revision_digest": "22fff083929940ef4e16a176e06f46694b8424d1ba1e37f540b454120f55c745",
+    "schema_revision_ref": {
+      "kind": "schema",
+      "revision_digest": "40ed373674dd91323e214fd09cbcf1c3748f324a211ce00dac7a70ca3c933e02"
+    },
+    "digest_profile": "BDB-OBJECT-DIGEST-1",
+    "logical_id": "spec_revision_00000000-0000-4000-8000-000000000001"
+  },
+  "schema_build_digest": "dab5361967c377022ec2d5e3518c7a883901a298d65ed9d8a3e04319fe7e0a69",
+  "source_inputs": {
+    "docs/R5_4_2/autonomous_2026_10_07/tools/initial_protocol_build_candidate.py": "da221f1cf9eccb66d9f04814ea6085c105230b602b907f21d5d4003312893cfa",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/execution.py": "333402e50b22c4d3cdce19d31f6246bde11bb86c07435ac2d106c38e74738dfe",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/schema_registry_build_candidate.py": "35746b9cd7b385b559dc60ca8ee6239234a85955b45d12c08bed3c4b244039f0",
+    "docs/R5_4_2/autonomous_2026_10_07/tools/build_time_candidates.py": "89a9f7e0bd1c57486fe498b79bbb7e6f334d6a6fc77dd308344004b8370e3250",
+    "docs/R5_4_2/autonomous_2026_10_07/BUILD_TIME_CANDIDATE_READBACK.json": "5943342a724a20bbc1d23ad1a30189ada57b9f62a836b575cb8509899cd9ca19",
+    "docs/R5_4_2/autonomous_2026_10_07/design/EXTERNAL_PROFILE_CONTRACTS.json": "a639e3af385cfe17c853a79933f1e684f9054b8cf5215e965418f92523e026f7",
+    "docs/R5_4_2/autonomous_2026_10_07/design/PROFILE_REFERENCE_CONTRACTS.json": "8220fd7fb9ceb5f3d311f2314b243a8ce4edb8295ffda296eddc63f6ebc9a9d9",
+    "src/bdb_audit/core/hashing.py": "286dee6109409661624572e4c3e87935d33f22c9a0e3a7bfad8dabbf471248f1",
+    "src/bdb_audit/core/canonical_json.py": "62dfa640d32fdea9025ae167eb1c8a1c7a3bdde6d3b913677aad517ebdea37ac",
+    "docs/R5_4_2/OWNER_DELEGATED_DECISION_REGISTER.md": "34f4f1ea0af429c29d3d08075d14f42e0d739d2ec38afd17881b6502e6c2587f"
+  },
+  "input_drift": [],
+  "qualification": false,
+  "installed": false,
+  "actual_build_dependency_closure": {
+    "nodes": 8,
+    "edges": [
+      [
+        "NF02_RESULT_NORMALIZER_V2",
+        "NF02_EXTERNAL_LANE_SLOT_V2"
+      ],
+      [
+        "NF02_RESULT_TRANSPORT_V2",
+        "NF02_EXTERNAL_LANE_SLOT_V2"
+      ],
+      [
+        "NF02_PACKAGE_TRANSPORT_V2",
+        "NF02_PROTOCOL_PROFILE_V2"
+      ],
+      [
+        "NF02_RESULT_TRANSPORT_V2",
+        "NF02_PROTOCOL_PROFILE_V2"
+      ],
+      [
+        "NF02_RESULT_NORMALIZER_V2",
+        "NF02_PROTOCOL_PROFILE_V2"
+      ],
+      [
+        "NF02_EXTERNAL_LANE_SLOT_V2",
+        "NF02_PROTOCOL_PROFILE_V2"
+      ],
+      [
+        "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+        "NF02_PROTOCOL_PROFILE_V2"
+      ],
+      [
+        "NF02_PROTOCOL_PROFILE_V2",
+        "spec_revision/2"
+      ],
+      [
+        "FULL_PATH_TRANSITION_TABLE_V2",
+        "spec_revision/2"
+      ]
+    ],
+    "topological_order": [
+      "FULL_PATH_TRANSITION_TABLE_V2",
+      "NF02_PACKAGE_SEMANTIC_PROFILE_V1",
+      "NF02_PACKAGE_TRANSPORT_V2",
+      "NF02_RESULT_NORMALIZER_V2",
+      "NF02_RESULT_TRANSPORT_V2",
+      "NF02_EXTERNAL_LANE_SLOT_V2",
+      "NF02_PROTOCOL_PROFILE_V2",
+      "spec_revision/2"
+    ],
+    "scope": "Actual protocol/Spec build inputs only; no installed trust or campaign facts"
+  },
+  "remaining": [
+    "independent trusted installation qualification",
+    "exact policy purpose parameters",
+    "complete bootstrap roots and namespace",
+    "legal durable genesis",
+    "Q1",
+    "Q2",
+    "N5-N11"
+  ]
+}

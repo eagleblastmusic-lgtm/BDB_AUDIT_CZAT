@@ -1,0 +1,1673 @@
+{
+  "build_digest": "333b137bd402941e9c6b05dfd105a74e129fff8db7ec7ce4e1d9a3122078490a",
+  "checks": [
+    {
+      "byte_length": 99939,
+      "file": "payload_schemas/BUILD_PROVENANCE_RECEIPT_V2.schema.json",
+      "raw_digest": "a6a7e0013c66600b14a9a142b5e97726049b4e54693eb61d6f27cd0032d36125",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100177,
+      "file": "payload_schemas/CAUSAL_CHAIN_V1.schema.json",
+      "raw_digest": "8132efd1d044e1d4f03acc6f6be6eea250ee8878e0ede9393f6404cea221ed45",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99580,
+      "file": "payload_schemas/CLEANUP_EXPECTED_OBSERVABLE_V1.schema.json",
+      "raw_digest": "d559d97caf0f20298d19a4454e5bcdc13dad0e2ff505d84660451ab381ade374",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100394,
+      "file": "payload_schemas/ENDURANCE_OBSERVATION_V1.schema.json",
+      "raw_digest": "7d7d1c30df62323b36a413ae1f64eeffced1e8c7e129896227283d6322eb0e81",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100123,
+      "file": "payload_schemas/EXECUTION_COMMAND_JSON_V1.schema.json",
+      "raw_digest": "9700e106a5da6a837b8b4a7368cd38cd2228199fb5ce6941e72d8300fd09c8ea",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100168,
+      "file": "payload_schemas/FAULT_RUN_RECORD_JSON_V1.schema.json",
+      "raw_digest": "85d7df66abcb3e3fa1bb79bf8be94dbdf11cd50497ece12b551678ca1676302e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99564,
+      "file": "payload_schemas/FINAL_TECHNICAL_REPORT_JSON_V1.schema.json",
+      "raw_digest": "f02fc841b6d411dd835decd17453fc5b4193f3712e053cfef0a7997fd9d6683f",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100264,
+      "file": "payload_schemas/IMPLEMENTATION_MAPPING_V1.schema.json",
+      "raw_digest": "aec1c1dcb50ea6a2f22a8b142db58ebf61c2743f696eff33b888f120b7b5d734",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100476,
+      "file": "payload_schemas/IMPLEMENTATION_MUTATION_CASE_V1.schema.json",
+      "raw_digest": "99b1e493bf9c2863f87ddf6e3a95413885cca1fcd33f858f898eca853b3bb3e3",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101296,
+      "file": "payload_schemas/MODEL_ARTIFACT_V1.schema.json",
+      "raw_digest": "2e224e0cb6c2ae96c70e7f81a84c0439fbd113c12fb6ac51f82b1740a0c14750",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 9276,
+      "file": "payload_schemas/NF02_INPUT_PACKAGE_TRANSPORT_V2.schema.json",
+      "raw_digest": "c2e4d44a17849fbfa9fe194a42ba748bf5a3228d2af7393c710859f7083934d9",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 9409,
+      "file": "payload_schemas/NF02_RESULT_TRANSPORT_V2.schema.json",
+      "raw_digest": "5b892d3a69c922b525549dc6a97fe83e59a9fcd960181da35f369fe3e621b0eb",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100626,
+      "file": "payload_schemas/ORACLE_CHALLENGE_CASE_V1.schema.json",
+      "raw_digest": "f2c396bca281c0f3c521684eb45a81339b81202d778c7c4db081d441af173981",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101337,
+      "file": "payload_schemas/PUBLIC_CONCLUSION_RENDER_V1.schema.json",
+      "raw_digest": "513950910465c8d65d64571b7ec6f9a8efde1923b0c87b8efdfa5005b11b6393",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100931,
+      "file": "payload_schemas/REPLAY_CAPSULE_V1.schema.json",
+      "raw_digest": "fa44a5b8643d9aef900d88d6a5b9f37303a19292ffbdcb87a84d9c497fd36080",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99534,
+      "file": "payload_schemas/SNAPSHOT_EXPORT_V2.schema.json",
+      "raw_digest": "126ea260effb94b4c69e251068a164007a6937e3b0a028fdb695706d78d5ac30",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100937,
+      "file": "payload_schemas/SURFACE_COLLECTOR_RECORD_JSON_V1.schema.json",
+      "raw_digest": "0b236738c1c38d144de2378329a50aee144c0bcd6fa554373343cb928b27f90d",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100047,
+      "file": "payload_schemas/TEMPORAL_MODEL_CLAIM_V1.schema.json",
+      "raw_digest": "1cfd38ddc1c4b03309288e09b32b804ca266cf6dbbab0957d943759f58eeb30c",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100874,
+      "file": "payload_schemas/TOOL_EXECUTION_RECORD_JSON_V1.schema.json",
+      "raw_digest": "8315e7541c366dcc683ba778131b08130f2c38f32611801753556b04cce69255",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99658,
+      "file": "profile_schemas/BDB_CJSON_1.schema.json",
+      "raw_digest": "c644782595d9c7b15aaeaaa689e20ff2e614d8bd773e2d1f22d797bb59b99d7d",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99761,
+      "file": "profile_schemas/BDB_EXECUTABLE_JSON_SCHEMA_RAW_V1.schema.json",
+      "raw_digest": "452f20f214a277a7250018a1c6a9c3a11d4861a4b4daff3b4c0ebe195e24de81",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99729,
+      "file": "profile_schemas/BOOTSTRAP_ADMISSION_V2.schema.json",
+      "raw_digest": "892308762af6dcdf4b761ee6110611672abddbb288f53732102179ac33bfbe3e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99638,
+      "file": "profile_schemas/BOOTSTRAP_NAMESPACE_V2.schema.json",
+      "raw_digest": "a90dc77f20e8ae14680b8150548f6df1bc3adff60ebd6dbec04bad92aa57044a",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99618,
+      "file": "profile_schemas/BROWSER_ENVIRONMENT_V2.schema.json",
+      "raw_digest": "1d972b78c0a89f0de79d00e714987a81e7bdc93abb00c3469d56add8bea94f11",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99660,
+      "file": "profile_schemas/BUILD_PROVENANCE_RECEIPT_V2.schema.json",
+      "raw_digest": "f25d580a6d0ab02515bcabceb874b05c59557fa3f4c1384383413b66b09f91b0",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99695,
+      "file": "profile_schemas/BUILD_RECIPE_V2.schema.json",
+      "raw_digest": "0b6938c4ee66656bfc267de4ee619959cb790126cc122296a500933bdf728bd9",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99850,
+      "file": "profile_schemas/BUNDLE_MEMBERSHIP_V2.schema.json",
+      "raw_digest": "d55a92f5d2f36ae55df297f04a0d05637610d42b2c0293e5af60887a9f880182",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99806,
+      "file": "profile_schemas/CALIBRATION_GROUND_TRUTH_PROFILE_V1.schema.json",
+      "raw_digest": "63e92766053b399a7004ab58173845de8dc1376a891aaef1981cc7a3a508e31d",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99733,
+      "file": "profile_schemas/CAPABILITY_BOUNDARY_V2.schema.json",
+      "raw_digest": "38203ceab3e44de01b61e61427bacc718cf9b1aebe1f875670c8b287b1cb00da",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99636,
+      "file": "profile_schemas/CAUSAL_CHAIN_V1.schema.json",
+      "raw_digest": "5d3d525743c156bc96f64516882b619da3790d022b34b9887808e868e1a0b3b9",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99656,
+      "file": "profile_schemas/CHALLENGER_FRESHNESS_V2.schema.json",
+      "raw_digest": "20cae23c59438511e22fd5aea3e4be8f17e56673e48836801cb6f33bed7aa56b",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99831,
+      "file": "profile_schemas/CHANNEL_CAPTURE_PROFILE_V1.schema.json",
+      "raw_digest": "ff0815336c0cd7052cdb575aafe76059afa769e488656412e32be10b42514388",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 11845,
+      "file": "profile_schemas/CLAIM_RELATIVE_ASSESSMENT_V1.schema.json",
+      "raw_digest": "026bf2b1f6c17ca9bc0a0f9b0eea2dcbdf1b7de51c5169100d8aa0e74c1a4c9e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99649,
+      "file": "profile_schemas/CLAIM_SET_CLOSURE_V1.schema.json",
+      "raw_digest": "7127790f3d2b0eaa2465cdd7e3692f664a4c08d97e2e603eeb611b4c56e4784e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99657,
+      "file": "profile_schemas/CLEANUP_ASSESSMENT_V2.schema.json",
+      "raw_digest": "54d6f10b1c68def4226438ae7f5b109f31a8b4b11c25298d0f8f6486913b9270",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99666,
+      "file": "profile_schemas/CLEANUP_EXPECTED_OBSERVABLE_V1.schema.json",
+      "raw_digest": "7e411a5373e5545a101dd7c7b1f29cdd875093bd9d6a7f932ed7313f678c1d14",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99588,
+      "file": "profile_schemas/CLOCK_PROFILE_V1.schema.json",
+      "raw_digest": "ad3d5a3cb76f50ffa7b6cb58385d34f7831a8c3830f2b6a8c6b38fe94f5272e9",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 11583,
+      "file": "profile_schemas/COLLECTOR_ACCOUNTING_V1.schema.json",
+      "raw_digest": "a21f74bda87ac37c376d8a208d75005d78b6b2005dbbfacc55b9cab07b807d86",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100164,
+      "file": "profile_schemas/COLLECTOR_CAPABILITY_V2.schema.json",
+      "raw_digest": "22f5f12eeae42827c0615ba7f3d259f64fe4992ffe717f165e45c7fdc0698157",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99841,
+      "file": "profile_schemas/COMPATIBILITY_FIXTURE_V2.schema.json",
+      "raw_digest": "c8857d771d4ddc21f6c3b0c56731c58f247c2f9a227367b356d4ff089f420502",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99833,
+      "file": "profile_schemas/COMPATIBILITY_GATE_V2.schema.json",
+      "raw_digest": "1ba535e75acaef42195830cd7e9463146b3b62b8bd0124aff046979d83955420",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 11335,
+      "file": "profile_schemas/CORPUS_RELATIVE_NOVELTY_V1.schema.json",
+      "raw_digest": "5a4c1fa497c37d663e050b85557d7a9ad465d59de26fae5ce0f9704bce584037",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99787,
+      "file": "profile_schemas/COVERAGE_OBLIGATION_POLICY_V2.schema.json",
+      "raw_digest": "fabba497960da1953d521be8384edb51db550196864ee58fb4e72f22b528a6f6",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99614,
+      "file": "profile_schemas/DELIVERY_IDEMPOTENCY_V2.schema.json",
+      "raw_digest": "494bbf223ea5d648fe6df3515cba23136cd58ab80e5791932204cc8ac8713df4",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99550,
+      "file": "profile_schemas/DELIVERY_RETRY_V2.schema.json",
+      "raw_digest": "cb2270f8ddc08b6931c1b95323b5850222955f7e1a181119151b8bac986d7b8b",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99583,
+      "file": "profile_schemas/DEPENDENCY_CLOSURE_V1.schema.json",
+      "raw_digest": "e772317ed283241d24dcbc18e39442ddbc2d042d220117911211fc420ab23742",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99752,
+      "file": "profile_schemas/DETERMINISTIC_BUILD_SETTINGS_V2.schema.json",
+      "raw_digest": "6b6dc12b1fa7eedccf09dfa940f5bacdbcc6b1b50eddbdec1200ca60689736ba",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 11554,
+      "file": "profile_schemas/DISCOVERY_CONFIRMATION_V1.schema.json",
+      "raw_digest": "93a50a17493ac6846450835029eb075c0a0e8e8abf1c3da09701ca0067541a98",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99654,
+      "file": "profile_schemas/ENDURANCE_OBSERVATION_V1.schema.json",
+      "raw_digest": "450f1cc69d07dff122bc1a13590f7f2f8b8ee44599a47895d94fd7c32a4cffa5",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99912,
+      "file": "profile_schemas/ENDURANCE_WORKLOAD_V1.schema.json",
+      "raw_digest": "d2181ec75d69f7887e05cc90b1ce46c6cd4f13acd79e5f2e4c032b8f22e663d5",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100099,
+      "file": "profile_schemas/ENVIRONMENT_PROFILE_V2.schema.json",
+      "raw_digest": "cdce931c114e1c3f7f47c14e3af46f96b7b7310987d2c223fc2ac091a3434afe",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99733,
+      "file": "profile_schemas/EXACT_COMPATIBILITY_V2.schema.json",
+      "raw_digest": "49798c23a08e76161fa873e1edfd1ade9e64c419381866d31d9caee94b51bf5e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 11494,
+      "file": "profile_schemas/EXACT_DURABLE_RECOVERY_V1.schema.json",
+      "raw_digest": "0f1ee2942acdd7ee0560214d930955dee039d27c7de6f980d12116a4436adbff",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 11508,
+      "file": "profile_schemas/EXACT_SCOPED_MATCH_V1.schema.json",
+      "raw_digest": "7bffe4b558ffaf59b016b90fb4461af83c1e784d84f080bd3b747c61e30fe4b6",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99656,
+      "file": "profile_schemas/EXECUTION_COMMAND_JSON_V1.schema.json",
+      "raw_digest": "a861677bf6b2f615e1deed40247181d82770464dd06cdf35459c4aa0807c5849",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99923,
+      "file": "profile_schemas/EXECUTION_DEPENDENCY_PLAN_V1.schema.json",
+      "raw_digest": "dd7ca31221683174a1e96f1134fd6d33cf1adb5a0b91c85774df4ee753ff0673",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99738,
+      "file": "profile_schemas/EXECUTION_HARNESS_V2.schema.json",
+      "raw_digest": "a19f776b0058a87046f59cefbd96a16f70ca93e164e0bed54b205ff7d951cb88",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99734,
+      "file": "profile_schemas/EXECUTION_RUNNER_V2.schema.json",
+      "raw_digest": "70ae6e7416d9975bb49da0594cd976d094a73ab64cd00598ebe1c067e495d044",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99628,
+      "file": "profile_schemas/EXECUTION_VARIANT_V2.schema.json",
+      "raw_digest": "d23df4e42a9bee5a072156d08f2f7606f579491a3bd517c9f83291e5d5b7e3f5",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 11869,
+      "file": "profile_schemas/EXECUTOR_ELIGIBILITY_V1.schema.json",
+      "raw_digest": "5d73639c95a1abb14f3893f12af81e96e9a28d916a9808f5e804d13ce7ea3191",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99724,
+      "file": "profile_schemas/EXECUTOR_TOOL_V2.schema.json",
+      "raw_digest": "7995d84258f347ec4c7a6d3976c906c275057f797a32480f09a22380bffc0988",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99828,
+      "file": "profile_schemas/EXPLORATION_POLICY_V2.schema.json",
+      "raw_digest": "fc816bc2081010ed52f6da892e27e88bc13abb6de841ef60ea7dde4ebde95488",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99655,
+      "file": "profile_schemas/EXTERNAL_SERVICE_V2.schema.json",
+      "raw_digest": "644efe51fd0aefd1a844ae1404d3ce6118ca54697d550deca00d01a7f2828762",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99654,
+      "file": "profile_schemas/FAULT_RUN_RECORD_JSON_V1.schema.json",
+      "raw_digest": "9f2a79bff68437101d1625dfc8c582a732c4388d3cbf5a23cff0cec37d2eb6b6",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99676,
+      "file": "profile_schemas/FILESYSTEM_BOUNDARY_V2.schema.json",
+      "raw_digest": "423caf89a9acc17363d21e441ee2decd9b50628698a297ddd6295abf10bf354b",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 11745,
+      "file": "profile_schemas/FINAL_CHAIN_RELEASE_V1.schema.json",
+      "raw_digest": "1e85f1b5f9d4b3eb2ce64c1d9068e206f76898a9225bc37f8df3bd094078a396",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99666,
+      "file": "profile_schemas/FINAL_TECHNICAL_REPORT_JSON_V1.schema.json",
+      "raw_digest": "77281764c21621f5c98f2ea40cb7b4118dfc74a4586f2682bf343b19f2d6123b",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99669,
+      "file": "profile_schemas/FINAL_TECHNICAL_REPORT_TEXT_V1.schema.json",
+      "raw_digest": "57d4dfe4bf6a664ec8c718ba1502deb46b47aa500e6a0bc74fbab359c7f377b8",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 11623,
+      "file": "profile_schemas/FINITE_MODEL_FIDELITY_V1.schema.json",
+      "raw_digest": "cb045dde40c105e687a1462cc2f18a52ea0c22773820d492f9d1a5f4ac34a48a",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99566,
+      "file": "profile_schemas/FIXTURE_INPUT_V1.schema.json",
+      "raw_digest": "5d491708e53d7c9401fa0291178b83fa91a0d764d50794584701806e7fa5a7a7",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99685,
+      "file": "profile_schemas/FULL_FINALIZATION_PROFILE_V1.schema.json",
+      "raw_digest": "8449a66cd53cfb8b61343d7b83f4b82f41729b853fcc5520072407b3f63bc463",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 201687,
+      "file": "profile_schemas/FULL_PATH_CONTEXT_PARAMETERS_V2.schema.json",
+      "raw_digest": "120aa0948c35292d6adf7113a746146ac94a31697e4d3443d16c0d165484e594",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99561,
+      "file": "profile_schemas/FULL_PATH_SEMANTIC_V1.schema.json",
+      "raw_digest": "9e79d4007fabb5ebc684c4e8de1fbc6f6293158582b720af77af6672dbfcd459",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 112102,
+      "file": "profile_schemas/FULL_PATH_TRANSITION_TABLE_V2.schema.json",
+      "raw_digest": "4a78f80ef0959726d96ca8fa500de0631e31f45534e6f1d6fe307209970cd769",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 105885,
+      "file": "profile_schemas/GATE_ELIGIBILITY_PROFILE_V1.schema.json",
+      "raw_digest": "3d0e0adfee1bf79f1ad76055f1ceb62cdd5bf1e6c6205ad51914368ca6c3021c",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99734,
+      "file": "profile_schemas/HANDOFF_TRANSPORT_V2.schema.json",
+      "raw_digest": "32c00542772bbd506d1715b716830faf5efde26785986da44b53cc48606313ba",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99639,
+      "file": "profile_schemas/HASH_MANIFEST_V2.schema.json",
+      "raw_digest": "c707ff83c8f3f2def526c07cc0cb1db5e413cebe8abbc7adbb5e39fdc4c9fa36",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99648,
+      "file": "profile_schemas/HISTORY_ANCHOR_V2.schema.json",
+      "raw_digest": "54d98397cfebf538c9993ee8471459c14f7577acb3e61bef67a46f1415dd3ef7",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99656,
+      "file": "profile_schemas/IMPLEMENTATION_MAPPING_V1.schema.json",
+      "raw_digest": "35e4b713f4071805c12a34291d2493013bda8f41d471e444a6165f2ecc1ea104",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99668,
+      "file": "profile_schemas/IMPLEMENTATION_MUTATION_CASE_V1.schema.json",
+      "raw_digest": "8b0fdbcb89f49d396c32d2932307ca1019e0d1142637bd8814d69aac18bba65b",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100146,
+      "file": "profile_schemas/INSTALLATION_FULL_PATH_PROFILE_V2.schema.json",
+      "raw_digest": "6f9e6f07e89173c84ace37c9ea596d13134e7c43b07c66bffb0e48e4ec9e60d6",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100144,
+      "file": "profile_schemas/KNOWLEDGE_POLICY_V2.schema.json",
+      "raw_digest": "f81f5153b2b27bb63a041c009759da8abfcd10e4ab8017eb6a71726ac0856d6e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 18837,
+      "file": "profile_schemas/LANE_COMPLETION_V2.schema.json",
+      "raw_digest": "9eceee144ed469a4a2c3a80a6314cf9a289c3bd688331970afe3c68d1628705f",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99706,
+      "file": "profile_schemas/LEGACY_EXPOSURE_RECONSTRUCTION_V2.schema.json",
+      "raw_digest": "fd1f37e785f02ab8dd759b85042c18c3c4187a06821f0e2590f0d1d77abfe209",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99692,
+      "file": "profile_schemas/LEGACY_MECHANICAL_VALIDATION_V2.schema.json",
+      "raw_digest": "9b0b21e2ce585e668e53c3028d82415d938ac492514442fb82081e12f9260f09",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99722,
+      "file": "profile_schemas/LEGACY_OBSERVATION_MAPPING_V2.schema.json",
+      "raw_digest": "d9864f2949c82ba9820cc83b1bd95dbba36e4ca025031752f9a66ce4651a45e7",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99584,
+      "file": "profile_schemas/LEGACY_OBSERVATION_RAW_V1.schema.json",
+      "raw_digest": "c12af9fd46e84e966c38ab5e363897d69068e829c29dd0802b063177a8cb64b9",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100275,
+      "file": "profile_schemas/LEGACY_SCHEMA_PIN_V2.schema.json",
+      "raw_digest": "2ba2a9e23677d362a069e8cd4770aa4a1eeef7972a1dc1c58948198a88e99795",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99670,
+      "file": "profile_schemas/LINEAGE_ADMISSION_V2.schema.json",
+      "raw_digest": "81ea2bc1bdd2f962f8a530ebc87d40fc230c0b008a6950c9af57fd964021ae27",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99779,
+      "file": "profile_schemas/MANDATORY_LANE_SLOT_V1.schema.json",
+      "raw_digest": "0c12fb3138d89faf43a1c000a994b3f63407a9346cc6444ea46dd64f0f9986fa",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99687,
+      "file": "profile_schemas/MANDATORY_STAGE_SET_V2.schema.json",
+      "raw_digest": "c9e686dd44411e4a1906fe5acb699a09645632bcad0e13d8508595a610a9df9a",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 12168,
+      "file": "profile_schemas/METHOD_QUALIFICATION_V2.schema.json",
+      "raw_digest": "d60052ac7d1d5e422c2e01a8c0de00d294115f22f0f7fdf81ee3071405521c7d",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99630,
+      "file": "profile_schemas/MODEL_AGENT_BOUNDARY_V2.schema.json",
+      "raw_digest": "1dbbcc34dca1d29d0c4e497406220962b8c586f7e82ba520be4e087db7f4e717",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99640,
+      "file": "profile_schemas/MODEL_ARTIFACT_V1.schema.json",
+      "raw_digest": "261e9fc07a05dc40979df323f05238c268fe49c4e5a077d90dd405a54c31a456",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99632,
+      "file": "profile_schemas/NETWORK_BOUNDARY_V2.schema.json",
+      "raw_digest": "5f5c2747332346d4c7432c4da9e60c15e474a82bbc4bdfceccc789cc3537dd6e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 11540,
+      "file": "profile_schemas/NF02_DELIVERY_AUTHORIZATION_V1.schema.json",
+      "raw_digest": "289a2ca9915ff0d6c9aab7ad8690683fff2ab04c458df7589a389b68a0d060e5",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99818,
+      "file": "profile_schemas/NF02_EXTERNAL_LANE_SLOT_V3.schema.json",
+      "raw_digest": "bac02ac5eed798ed1c2cdcdee8e16bbd53e9d878352a9046735540f8ce942e16",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100670,
+      "file": "profile_schemas/NF02_INPUT_PACKAGE_TRANSPORT_V2.schema.json",
+      "raw_digest": "fc9f951e33a9d6e208fe16876ce565f74bff11ed3b62260d68be82647f25484d",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100127,
+      "file": "profile_schemas/NF02_PACKAGE_SEMANTIC_PROFILE_V1.schema.json",
+      "raw_digest": "be8266cbe582baac368434d651854a087ebcdcb23e3b1e799306e3dfcd37078e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100076,
+      "file": "profile_schemas/NF02_PROTOCOL_PROFILE_V3.schema.json",
+      "raw_digest": "0bb0dbce24aa0028f5195993a225c15711d8f6122f8aa9d3b4ba118820d2bd51",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100352,
+      "file": "profile_schemas/NF02_RESULT_NORMALIZER_V2.schema.json",
+      "raw_digest": "ebaa9e0ba35b08489f4ef9d8e1b9321cab5c5e002964f288bc1c6f0ceecb0881",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100650,
+      "file": "profile_schemas/NF02_RESULT_TRANSPORT_V2.schema.json",
+      "raw_digest": "4ef6a0711a3ad7e8f9192aa9cb4973906d8abccc7761adf59631e285417ad372",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99716,
+      "file": "profile_schemas/OBLIGATION_ACCEPTANCE_V2.schema.json",
+      "raw_digest": "7a3d8baf08759b9d9b70f394e26f82f988287a1e7f8a84e59048f8956142c6ed",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99678,
+      "file": "profile_schemas/OBLIGATION_APPLICABILITY_V2.schema.json",
+      "raw_digest": "94621fc5808b5523bef75478733fc80e0b0ec21ba20a1c263100b4d7af541752",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99838,
+      "file": "profile_schemas/OBSERVATION_CAPTURE_V2.schema.json",
+      "raw_digest": "01b2df0fd1f319ee1d11605140ac2fd4f870207063779a618226fc589f656767",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 12200,
+      "file": "profile_schemas/OBSERVED_EFFORT_V2.schema.json",
+      "raw_digest": "db08cffb5a35b08539e57605a4c39ede8cd97e66331e6e0cd7117346dab42e82",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99654,
+      "file": "profile_schemas/ORACLE_CHALLENGE_CASE_V1.schema.json",
+      "raw_digest": "9354f9848359e8351935a8b691be5a30c65ae8b0a2c9cc4a3194aff9b8f9a189",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99843,
+      "file": "profile_schemas/ORACLE_INDEPENDENCE_V2.schema.json",
+      "raw_digest": "1b7bbae18618ba1b8976b3518f30a810d5ac7d2fbd7d4ae520f2ca8a41cebf02",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99579,
+      "file": "profile_schemas/OS_ENVIRONMENT_V2.schema.json",
+      "raw_digest": "f2a02589812666e1c9fce7f0ad3cc7e79f67178a1f237de4853d32e4556afc8d",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99629,
+      "file": "profile_schemas/POSITIVE_VIEW_PROJECTION_V2.schema.json",
+      "raw_digest": "cbde478c6382d90c0c3438db7147aad9db446f8a4c4373d9c51cdba718f959e6",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100315,
+      "file": "profile_schemas/PRINCIPAL_AUTHORIZATION_V2.schema.json",
+      "raw_digest": "048771ad0edd7607c2887c7616b9916bc8723ef75bebb1d98be5433faba63318",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 11450,
+      "file": "profile_schemas/PRIOR_FALSE_NEGATIVE_V1.schema.json",
+      "raw_digest": "bc24622c1df61811fce4757bcce7f1fc9b446e7e3e8547ea501149f60a6b39ab",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99660,
+      "file": "profile_schemas/PUBLIC_CONCLUSION_RENDER_V1.schema.json",
+      "raw_digest": "8752a009e73c217328ca51b850564a940276834dd608c048e5c94a3c6282e7f4",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99597,
+      "file": "profile_schemas/PUBLIC_REDACTION_V2.schema.json",
+      "raw_digest": "3a3ccaa830533b2f2ee4b6bbd4cd6dc9f8ef69c2e854a59e41868cbb2c26c06f",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 11531,
+      "file": "profile_schemas/QUALIFIED_ACTIVATION_V1.schema.json",
+      "raw_digest": "ebf236a2bba7262f9fe679ca5b39255bb98d03021236594141d7bf151a47ad90",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100673,
+      "file": "profile_schemas/QUALIFIED_PROTOCOL_POLICY_BUNDLE_V2.schema.json",
+      "raw_digest": "79d8a082ff1742e1a8e972e30adaf250c04c1c89c0294ea3c405b28d53b8b6f8",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99824,
+      "file": "profile_schemas/QUALIFIED_TECHNIQUE_V2.schema.json",
+      "raw_digest": "6bc94b5ce2f869e8dc5b05770651b3a1556c3601258e4bebadd46151559c7a6e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99948,
+      "file": "profile_schemas/QUALIFIED_VALIDATOR_V2.schema.json",
+      "raw_digest": "095eabbd2a598b7b25b654be0c1d999c8b3ce82cbc78538ba6896d429cf16e94",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99585,
+      "file": "profile_schemas/RECOVERY_REFERENCE_PROFILE_V1.schema.json",
+      "raw_digest": "2a37972d8d133412bb2d6383a5435eaab59b6f6e991af4c3407d4a1ba61d1812",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99640,
+      "file": "profile_schemas/REPLAY_CAPSULE_V1.schema.json",
+      "raw_digest": "5d353f0a03ecd601618df27fb8ff1f497b798cd07359c3ff0cea3156b969db05",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99703,
+      "file": "profile_schemas/REPORT_EXPORT_PROFILE_V1.schema.json",
+      "raw_digest": "585a8c0c600535f78a9f573d8d78b40d2508343b3a612c3ef78bfc33b4bc791b",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99582,
+      "file": "profile_schemas/RETAINED_OPAQUE_BYTES_V1.schema.json",
+      "raw_digest": "7d10e06ebee446ed3d8f6f845f48cf9ff30ee72536e4433c32817d657c382db8",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99584,
+      "file": "profile_schemas/RETAINED_PRODUCER_CODE_V1.schema.json",
+      "raw_digest": "adf5b8bb75427d6cae0904ba2fcd72d309b1983f06f2a4bafd05bf250363cfd7",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99618,
+      "file": "profile_schemas/RUNTIME_ENVIRONMENT_V2.schema.json",
+      "raw_digest": "5a152d6917a88eb9be2fb55ffb3226a2a890d80d76870150d891f164fd412343",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99726,
+      "file": "profile_schemas/SANDBOX_PROFILE_V1.schema.json",
+      "raw_digest": "7aac066a3ca5a5d7d02912f8a2a55f8754a876a6e1619fd8f19df0c14d1e60a9",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99611,
+      "file": "profile_schemas/SEED_PROFILE_V1.schema.json",
+      "raw_digest": "88ae35f4048a03f21a1233e952dd0d0ca36d8edc5821c38771b32df51cd1ec3d",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99642,
+      "file": "profile_schemas/SNAPSHOT_EXPORT_V2.schema.json",
+      "raw_digest": "456cca7d1420010acd5c5fb1887949b0e2bb0b85c76d8556a605504103363abd",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99680,
+      "file": "profile_schemas/SNAPSHOT_PROJECTION_V2.schema.json",
+      "raw_digest": "0d346aaf346f892e3d98d18429dda407d4e23ccc8c1d1c67f6c86ff2c5c6a644",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99650,
+      "file": "profile_schemas/SOURCE_ARCHIVE_V2.schema.json",
+      "raw_digest": "d550ed02839d1225a22107b231ff62a1e94ae107a7f03cf377e458b4d7495dfe",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99745,
+      "file": "profile_schemas/SOURCE_AUTHORITY_V1.schema.json",
+      "raw_digest": "02c18172b2eb2ff7142b77000bdbee2c2c1b163a160baabcde4e1823c53c9536",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99663,
+      "file": "profile_schemas/SOURCE_DRIFT_POLICY_V2.schema.json",
+      "raw_digest": "bcdc6573ff580d32eeb6bb245cb83d4bc670455ee19715a92d84a1513cc78b90",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101087,
+      "file": "profile_schemas/SOURCE_IDENTITY_V3.schema.json",
+      "raw_digest": "774619d6ef9825695154276196fc089fb1962204fd64d045c89a4c4478eddcec",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99777,
+      "file": "profile_schemas/SOURCE_MANIFEST_ENTRY_PROFILE_V1.schema.json",
+      "raw_digest": "b11c81f22cc84f91ef65346a0b5adbc9199b3da20c5a0ee4d49537bddac3b8d1",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99894,
+      "file": "profile_schemas/SOURCE_PATH_PROFILE_V1.schema.json",
+      "raw_digest": "6762ab9ac71f2cf08ed3dcb43510204acd0b4f49de18339a1429af405e1396a2",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99679,
+      "file": "profile_schemas/SOURCE_RECONCILIATION_V2.schema.json",
+      "raw_digest": "0f06ccacd373697365a0579cd04905d0dbef463e4204a6924c572a203d5d2e57",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101090,
+      "file": "profile_schemas/SOURCE_ZIP_TRANSPORT_V1.schema.json",
+      "raw_digest": "bcd95b97f2a78c4aca9efa6060e17f88b6914b6a9aea5ce4953c1396d74a7d3b",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 17702,
+      "file": "profile_schemas/STAGE_COMPLETION_V1.schema.json",
+      "raw_digest": "5a9b8e127fe2986bef8f29aaa59c67bb585f9674d95ec852f9890a48f12d8e83",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99759,
+      "file": "profile_schemas/STRICT_JSON_CAPTURE_V1.schema.json",
+      "raw_digest": "d91dd07948b8f19ef2b9a8100726202989aab8eb1dcf85a39810141569c70eb0",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99670,
+      "file": "profile_schemas/SURFACE_COLLECTOR_RECORD_JSON_V1.schema.json",
+      "raw_digest": "2f606d23bdfd3e3ed8e9bf8001c21a9d2eb0a24350d5387b1649a2f8fa17bcb7",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99954,
+      "file": "profile_schemas/SURFACE_KEY_PROFILE_V2.schema.json",
+      "raw_digest": "765dbc85d55a25c12f3d6a3ca145b8b81c21cfdbfa5d8b91aa45bea8a1cccc7c",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99652,
+      "file": "profile_schemas/TEMPORAL_MODEL_CLAIM_V1.schema.json",
+      "raw_digest": "707ee7f6eea27c28835988f58679c57471c8eb2d02b9133140f12a36d7c472a0",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99618,
+      "file": "profile_schemas/TOOL_BOUNDARY_V2.schema.json",
+      "raw_digest": "d771f8a885f757479c67a1fabe62b59089c2f7d35dda2d6c2883a89030c7e4d7",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99817,
+      "file": "profile_schemas/TOOL_CAPTURE_V3.schema.json",
+      "raw_digest": "7c3eced3d0f514f2a64f23398f2fa6d5051803bd3a7e41fd53cd6cc654bf2aa2",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99664,
+      "file": "profile_schemas/TOOL_EXECUTION_RECORD_JSON_V1.schema.json",
+      "raw_digest": "51ca419b567e57eacd513f69b609d8ee1746085865e62ed04e96ee027b1a2bf2",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99649,
+      "file": "profile_schemas/TRANSITION_POLICY_V2.schema.json",
+      "raw_digest": "a84ea8deee5dcd0eecd70fbcd1bbbf11a8fb17e8ce1d40fd18e63c2c3d2055f3",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99694,
+      "file": "profile_schemas/TRUSTED_PREDECESSOR_PIN_V2.schema.json",
+      "raw_digest": "35d943684364b7a6577155c046cdacb26ecb4a2b175b153b11e758b1a8fdc111",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100425,
+      "file": "schemas/approval_decision__2.schema.json",
+      "raw_digest": "7656bccd08f42b70bd99751b60c409d451a582798f88f204ef639506632010b5",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 568684,
+      "file": "schemas/artifact_contract_registry__1.schema.json",
+      "raw_digest": "bfbf1a30ed8d908285f8e5508b0899be503dd6c3cfce75af8584fe0c60979055",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99754,
+      "file": "schemas/artifact_hash_manifest__2.schema.json",
+      "raw_digest": "82e75b27dd333a2c5799da71f9aff8a1eac68dc3922fce3372c35db8917c7646",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101012,
+      "file": "schemas/assignment_manifest__2.schema.json",
+      "raw_digest": "3b4ad1ecd48c381eb97e2ad49ae06dd5ea6d4ceb05d7e650698e961799eab9f6",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100339,
+      "file": "schemas/assignment_package_binding__2.schema.json",
+      "raw_digest": "424d839728e9a5514c1568f31f1484db024a8a80cba94e7a12e40f89e3a44aae",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99958,
+      "file": "schemas/assurance_claim_set__1.schema.json",
+      "raw_digest": "0e9086395ea45c0030c524ca7a6b00f86493cc5857e3a74f1e8d9baf368a391e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100400,
+      "file": "schemas/attempt__2.schema.json",
+      "raw_digest": "b572bf11b2155dc0e5e8cf492842027ea1146f784c2bd0c1166d71f947a2101e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99834,
+      "file": "schemas/bdb_audit_lane_result__3.schema.json",
+      "raw_digest": "74077bdf89e50e4416c7a649aaf0885702845fa6e290d5dc46cd2a1fbe548654",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100654,
+      "file": "schemas/blind_origin_eligibility_assessment__2.schema.json",
+      "raw_digest": "c5c6e81a714ed976022c8321e310c124395e90a45160f65813b68fa0d524d6f7",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101210,
+      "file": "schemas/bootstrap_admission_decision__2.schema.json",
+      "raw_digest": "6cc499ee48802151beb0ea335509a0e09ad12dd9c5f47e2e65ccc4328229baca",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100631,
+      "file": "schemas/build_manifest__2.schema.json",
+      "raw_digest": "8c59605168c338dc48c25b1d98685cef7bf002560e1901a904bc2a20b550c621",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100698,
+      "file": "schemas/bundle_manifest__2.schema.json",
+      "raw_digest": "4939ffc47383d1cdb106acefab5b3c761eae165c2d302fec804ea8e9546f54d3",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101052,
+      "file": "schemas/campaign_conclusion__2.schema.json",
+      "raw_digest": "9fa274d4bf722f176a4173247f84ebd12cd7dd8d048c0416e85bd282ea852c23",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100630,
+      "file": "schemas/campaign_genesis__2.schema.json",
+      "raw_digest": "09066fbecb4d84d2e3f3cc977f3124eac8e33d50973521957a631cdcce3e8b19",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101984,
+      "file": "schemas/candidate_assurance_case__2.schema.json",
+      "raw_digest": "b732249c743f95e966fc258560145bedb54c8ab96fd32142dd726da773bf012f",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100451,
+      "file": "schemas/challenger_assignment__2.schema.json",
+      "raw_digest": "2580f6f84a16ce597664a93b9b6905815b6773326cb2c1cc3ee7125e098c65b5",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100963,
+      "file": "schemas/challenger_result__2.schema.json",
+      "raw_digest": "8756f8450610d087640a4fac6f4e969b1a203417d6180bd340c0883f990274b2",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 103851,
+      "file": "schemas/checkpoint__2.schema.json",
+      "raw_digest": "79b38d22124e58196d89bc3e20cd514477ebf23b97cb91e04007a2c429b38dad",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100567,
+      "file": "schemas/clean_control_assessment__1.schema.json",
+      "raw_digest": "dfe28471f01033396a0f721445fdfbb2c85dfecfdf21fe5a6843c369afcae806",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100110,
+      "file": "schemas/cleanup_result__2.schema.json",
+      "raw_digest": "de6ccf4f446092f38e2bf85d76c9f20031ab199ab3b17f470857e24b9f7e9f84",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101148,
+      "file": "schemas/command_envelope__2.schema.json",
+      "raw_digest": "59e3ad654ec987e93bd9cb54e42a317ffe546a8bdc4e31cc7db801e135638233",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 103181,
+      "file": "schemas/command_receipt__2.schema.json",
+      "raw_digest": "a906e7f934bdc07a960f1df87f2b9ea9be3e21b72f3f19e2ecd54f32735fb04b",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 103813,
+      "file": "schemas/commit_body__2.schema.json",
+      "raw_digest": "eee0e13ca3f495b8ba1f70a5248d938cf38433d7d615fe883d4704ec0c17e49a",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100921,
+      "file": "schemas/compatibility_fixture_assessment__2.schema.json",
+      "raw_digest": "12d4f7a3224c0ea74c531227fca0b6bb8ff0051f14720d35519111481506e8dc",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100648,
+      "file": "schemas/compatibility_gate_result__2.schema.json",
+      "raw_digest": "8dd7b1afac24be64c861a0869091dfd4e79174880867950a4d2bcfe27e914294",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101048,
+      "file": "schemas/contamination_assessment__2.schema.json",
+      "raw_digest": "d9899111671cffdaaccb575cdc9d9dfcd0e7e340b63bf6aeea3f5def49e7676d",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100459,
+      "file": "schemas/contradiction_resolution_decision__2.schema.json",
+      "raw_digest": "354e591fd3904c9f4807b745f114db92927d24631f943a209d095171a57e6ea0",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101509,
+      "file": "schemas/contradiction_revision__2.schema.json",
+      "raw_digest": "93d040506dfbe2962f2890df08d4193502dea56bfab3898549c6e81ef9cc710c",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100727,
+      "file": "schemas/corpus_manifest__2.schema.json",
+      "raw_digest": "8b2d8d817f0a97d81d628dd0b114f1cfff61dc2e8d6252d36ba6c637d1447d2b",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101154,
+      "file": "schemas/corpus_member_admission_assessment__2.schema.json",
+      "raw_digest": "b18a307ce16118f3859d969432dfd07ca6fd2c8941d9211496ed87774b463729",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100599,
+      "file": "schemas/corpus_member_candidate__1.schema.json",
+      "raw_digest": "8ab930e64d3093762a093f67b0c5f86029f84ae387e44e33c05a772a28be2aed",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101726,
+      "file": "schemas/coverage_obligation__2.schema.json",
+      "raw_digest": "5a66a3f8554ba8ee9e7f5c677770158fa7019e140ae796e6ec26779a54e14536",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100146,
+      "file": "schemas/coverage_obligation_key__2.schema.json",
+      "raw_digest": "77b0c26ffb80133e46ab14c9425efbe7ecfff37232c634656a415b5d1f9fcf29",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100820,
+      "file": "schemas/coverage_obligation_qualification__2.schema.json",
+      "raw_digest": "64672d734247068d2f21bf6f23f8be6a65712a2b4156e85377d0c9db6d61a843",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100418,
+      "file": "schemas/defect_unit__1.schema.json",
+      "raw_digest": "7d2fc6a36f4a319dcbde7f8a0d062bab1fd2e37b6b7d2c2a7cd963e4a3edbf73",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100298,
+      "file": "schemas/delivery_spec__2.schema.json",
+      "raw_digest": "73804d7a7a9499402cbda1ffa88979a1255aab4ec02985305310a1ffa4ae84ac",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101199,
+      "file": "schemas/dependency_independence_assessment__2.schema.json",
+      "raw_digest": "a9af7932e1812b9084bd9dabbed8088d9f1325ac69451909475eb6e67fcf45d5",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100538,
+      "file": "schemas/discovery_confirmation_assessment__1.schema.json",
+      "raw_digest": "c1178bb8296595b640d9bd2a7d9fa574927542dce6b7cae681146d8b95315ee4",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100551,
+      "file": "schemas/discovery_corpus_match_assessment__1.schema.json",
+      "raw_digest": "fd59eca2c04b76e290adab0646bb7432e6d091545bec9299e41f20b736efd2a5",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100349,
+      "file": "schemas/discovery_novelty_assessment__1.schema.json",
+      "raw_digest": "899db960033fd7b275bb0b665d2f62cf8d2fb284a48b555375999959c6b5cdb3",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100952,
+      "file": "schemas/discovery_record__2.schema.json",
+      "raw_digest": "cb7629936aa3364149768def6bcfa8c014acddc6e8d8d1c9dde9f47adbb501de",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100278,
+      "file": "schemas/discovery_tool_origin_assessment__1.schema.json",
+      "raw_digest": "58a79bb142371e0490e3c69ae9ce5d912e5aa72b52bf83c987b362c411ac0d56",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100407,
+      "file": "schemas/effort_results__1.schema.json",
+      "raw_digest": "0ea2092799acee146323b8cb0800813bbca6b64a5df93f8c2b80001c1adbc1e5",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100367,
+      "file": "schemas/environment_record__2.schema.json",
+      "raw_digest": "7c6510dcdfe40e319d9106c9fd627f0e3d65cf8a64305c1a02576fc732262542",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100842,
+      "file": "schemas/evidence_applicability_assessment__2.schema.json",
+      "raw_digest": "e9ea6597940aea6079d108c7fd3f525cdf86fb4619c7b94852930b353e0dccb3",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100065,
+      "file": "schemas/evidence_dependency_graph__1.schema.json",
+      "raw_digest": "17b615b97586ae8bd88455893226df3dcbf2e5d6cb21b92b55494a9824245048",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100287,
+      "file": "schemas/evidence_invalidation__2.schema.json",
+      "raw_digest": "dd4e114f96ca54f8719f60176a2fd7d985154de3267acfaf936302ece600ef5f",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100902,
+      "file": "schemas/evidence_qualification_assessment__2.schema.json",
+      "raw_digest": "f12989fde10590ed33b9e87db3c98be24334fa23a90cbbb3531c0995aaaeb6fd",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100486,
+      "file": "schemas/execution_descriptor__2.schema.json",
+      "raw_digest": "2ce9a347da462f84ac1f148df73398fa8bfd0eee650e55bff479c2c26af31264",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100957,
+      "file": "schemas/execution_result__2.schema.json",
+      "raw_digest": "de09d140490132561ef7bd2d6544145b1e7ecbfbe86d5158e925ae7d93b02fae",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100677,
+      "file": "schemas/executor_spec__2.schema.json",
+      "raw_digest": "222d652b086457407630ed152afb468216a682030a53ca6e2c4990ae233110a0",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101980,
+      "file": "schemas/experiment_spec__2.schema.json",
+      "raw_digest": "7a92b0a341794cf63a792e34710355e9ceccdff062ffd237d8cb8af03de40b42",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100507,
+      "file": "schemas/false_negative_relationship_assessment__1.schema.json",
+      "raw_digest": "b7d9c959c1bea3723d38476f27bf32740ddff6b34d5d0cbdf970f0305a2c1929",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99651,
+      "file": "schemas/fault_run_record__2.schema.json",
+      "raw_digest": "5b2bac87a226c61392e287e9d6d02c4f042aee14e76fc8f3321393356600b4ff",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100226,
+      "file": "schemas/fault_spec__1.schema.json",
+      "raw_digest": "114889793ba626e6570838c118c2d8dda6f4a5fc33a3c9a2c9a1adc7f6dc0443",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100983,
+      "file": "schemas/final_assurance_case__2.schema.json",
+      "raw_digest": "5e77bc52b57659a250e8e502ad0bcdb53ee1846f08a10d404bd48b3d47b0c0a9",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99654,
+      "file": "schemas/final_technical_report__2.schema.json",
+      "raw_digest": "f40c7af94d4e46ef40a57d5357eee5d9409b0c591bd973c9188b6f5e20b9c39e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101636,
+      "file": "schemas/finding_adjudication_decision__2.schema.json",
+      "raw_digest": "37b83232ab03662bb92c5ecf9902f0de2132d1a9b0389792b42d84d406257edc",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101011,
+      "file": "schemas/finding_axis_assessment__2.schema.json",
+      "raw_digest": "57399283940ce27b490648d2a2f7287b73b61c1268685bf366b9a7c7e0611f6c",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101038,
+      "file": "schemas/finding_claim_revision__2.schema.json",
+      "raw_digest": "df8959aa95f628cfd0da3eb8167ce5e5ffff5c571bde01fbbbb8feeaa3f1a728",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100581,
+      "file": "schemas/finding_defect_match_assessment__1.schema.json",
+      "raw_digest": "104ad233ae0422e6530bca263fa4a1da387e69c9b8423e2dd4a3e64ca543dec7",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100628,
+      "file": "schemas/gate_decision__1.schema.json",
+      "raw_digest": "6f603d85ac500014fd8fbf166ab7ace8b1049070ecb328f4bc53462152a33776",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100286,
+      "file": "schemas/grant_body__2.schema.json",
+      "raw_digest": "8c8ee30b546b9d35fe1763157cb9598ab5866358fc14cd6196ccbf066fd409db",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100503,
+      "file": "schemas/handoff_validation_result__1.schema.json",
+      "raw_digest": "9d30d08a48511b528494d0269e4dbf780b6a4b393a24b5f194121830202e3dd2",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100279,
+      "file": "schemas/history_anchor_receipt__2.schema.json",
+      "raw_digest": "078563f6e3ae87552e05cc6200785c312d96de7c62dbd03c4daceae7409ca4d4",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100029,
+      "file": "schemas/history_cut__2.schema.json",
+      "raw_digest": "6592da361e5e73607ab4b566f9e16a6c956cc7af746223f32f245d5296212aa0",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100142,
+      "file": "schemas/holdout_exposure_assessment__1.schema.json",
+      "raw_digest": "915e11e49ed2f4c4a4361ce6ad680c0665e3020258da75b63f43d2edefcddfb7",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100872,
+      "file": "schemas/hypothesis_revision__2.schema.json",
+      "raw_digest": "d070e9c3be56bc92321d827fc6bb0fad99b07408e4705d560a6c70d36b4e12bf",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100325,
+      "file": "schemas/input_disposition_record__2.schema.json",
+      "raw_digest": "59cac4f9ceae74e511c57164f37c8f7bb4c8865cb511119540c227ace7a3102f",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 9768,
+      "file": "schemas/installation_bootstrap_profile__1.schema.json",
+      "raw_digest": "9c6dd9fcd6dbc02cdc2bc2bd588379b264137c3cd43d18de537019fffb9c1750",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100471,
+      "file": "schemas/invariant_revision__2.schema.json",
+      "raw_digest": "62b41a8b397a58341e917da3e7f83c2f729ec0e3ecc0c82e5a0a076af6451b46",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101515,
+      "file": "schemas/inventory_revision__2.schema.json",
+      "raw_digest": "7ca09258f1d8e5ea0ef51ddebd9c758ed9b4b36fe037bc9ea309278d03995dfb",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99747,
+      "file": "schemas/isolation_baseline_profile__2.schema.json",
+      "raw_digest": "c0e8a74ebf0b7b1d96a686c3929534ea0f815fa10f8bcda4ff86dbba2f7c4588",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 102097,
+      "file": "schemas/isolation_qualification__2.schema.json",
+      "raw_digest": "bce6f94577a4c96b4f64b6e6c8b8a8e1e31f468b1b5cdcbbd43d291895ca340f",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100686,
+      "file": "schemas/knowledge_state__2.schema.json",
+      "raw_digest": "d89535c4f9ebf9edeacb80d4c833e018cfdcb91321a540cfc614247add5750ba",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 103980,
+      "file": "schemas/lane_completion__2.schema.json",
+      "raw_digest": "8a4cef14edb980bcff3ae7fb2e3388e0d25a8c9dd3d1370b1777670f51df453a",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100081,
+      "file": "schemas/lane_result_admission_evidence__3.schema.json",
+      "raw_digest": "708bb78debe9b52f74de9821ceee2d47ecc3f17221c7863ea402138cdb5b731e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100154,
+      "file": "schemas/lane_run__2.schema.json",
+      "raw_digest": "90a05171784dc9dbd37142559da8aba7935c8018e4cd40c9a235be1fb965f6c1",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100803,
+      "file": "schemas/lane_spec__2.schema.json",
+      "raw_digest": "9ceb8f23279e7f48379a6adb893c44a400ca3cf4fcc05b8cb559d464f8b35c23",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100841,
+      "file": "schemas/legacy_exposure_reconstruction_assessment__2.schema.json",
+      "raw_digest": "cc0a275a4b0cb2aefc62e6550b0bdc2177ec9cb37df29e5f2afa476db2724abc",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100368,
+      "file": "schemas/legacy_mechanical_validation_assessment__2.schema.json",
+      "raw_digest": "db8be0e8592cad958606bbd65d8a6fc6033c3f839c3c4d3af7348a43836b37c2",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100985,
+      "file": "schemas/legacy_observation_mapping_assessment__2.schema.json",
+      "raw_digest": "c6480e7b204a9763add3e1a6a35677aa7522bee0b731ecf1e7b318a9c2d9670d",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100815,
+      "file": "schemas/legacy_observation_semantic_equivalence_assessment__2.schema.json",
+      "raw_digest": "36a3719f140f525b896cbdb4bb9ccfa1caf474a8dfddc27db9948c461105ed8a",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 7867,
+      "file": "schemas/legacy_raw_ref__1.schema.json",
+      "raw_digest": "8db9698ac6fd6415d1f05c620625682981453b7610e299391c6c7ae4bd111d98",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100802,
+      "file": "schemas/lineage_admission_assessment__2.schema.json",
+      "raw_digest": "377fdd7e159f641a584c103bbceab0a9e2e099f1394024807523f14d8741e4ae",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100544,
+      "file": "schemas/materiality_assessment__2.schema.json",
+      "raw_digest": "8510cf8a70680c95fc04059ce8ef0f4009a108c08d2b9dd0b9bf1083ebb5f0fc",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101388,
+      "file": "schemas/model_fidelity_assessment__2.schema.json",
+      "raw_digest": "b164b88601e83519bf4441cd0cba2d473b971068f4290c5365ed0aae3d3c0709",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100865,
+      "file": "schemas/negative_evidence_record__2.schema.json",
+      "raw_digest": "cbacb438b9c8b666326a3fd52a3dff118ce76341be2e34422e6e218f019155fd",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100400,
+      "file": "schemas/negative_opportunity_unit__1.schema.json",
+      "raw_digest": "99d176d83194b7a562f7ea5ceb1c24ac21470f48f5cc4decb15818ce2dc362b1",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100391,
+      "file": "schemas/obligation_applicability_decision__2.schema.json",
+      "raw_digest": "7683af977daee3bc7e2c7e876f1abb71696804e8764a231f2753c634bf60b9dd",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99949,
+      "file": "schemas/observation__2.schema.json",
+      "raw_digest": "92b2b98e8265b10e357a3cdbc1df0a919f7f3853e159cfe375ac8b5c599a1645",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100347,
+      "file": "schemas/observation_dependency__1.schema.json",
+      "raw_digest": "b1679b362394a5a328ab4a9718078bd681572aeb3259a64151ca68c7977cc5d7",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99973,
+      "file": "schemas/policy_revision__2.schema.json",
+      "raw_digest": "a0bb7336d7fc449e2c3717b4ccce6d4365688755532bbb0c3a805cf0f36ce174",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100058,
+      "file": "schemas/potential_exposure_record__2.schema.json",
+      "raw_digest": "495d3febfea82891e1010595641a81a01da191c933e1f8dd0b639018865fde58",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 7874,
+      "file": "schemas/projection_policy__1.schema.json",
+      "raw_digest": "c640df3b4b2aeddfa6020afd3658a246fa891307d31ebb33985697b0caa9af35",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99947,
+      "file": "schemas/public_conclusion_statement__1.schema.json",
+      "raw_digest": "a2f9e034cafcc42fcae9d7a2dabb7d8898bd9849708179c84d602f55e93ee1d6",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101906,
+      "file": "schemas/release_qualification__2.schema.json",
+      "raw_digest": "3557e232043caaa11d7a5accb1cac0e51c133e11224700b4e1e493e0a1e688bc",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99664,
+      "file": "schemas/report_export_receipt__2.schema.json",
+      "raw_digest": "da20df5d626d4eebdc1eb441070ac4d8c78e6038449304691fe6c15565c2d09e",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101012,
+      "file": "schemas/residual_risk__1.schema.json",
+      "raw_digest": "135f0bebbd4068830a29768f49201b3da764168b1ab296d6ef42c4ecea0a437a",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100301,
+      "file": "schemas/root_cause_revision__2.schema.json",
+      "raw_digest": "6b4f22c4b0ed687bcdc1a67dd47d7c49cc31545020a231588bd6c5ed99693bf6",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101076,
+      "file": "schemas/run_manifest__2.schema.json",
+      "raw_digest": "a01ddc63620e92857067123cf9df7f9bc90d8db7fd9df380990b072ea2bfba8b",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 9159,
+      "file": "schemas/schema_registry__2.schema.json",
+      "raw_digest": "1fb570f8c9f10b66f5dab4ce504db954bf3fcd9fa31328b38873c3d784e43db8",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100763,
+      "file": "schemas/scope_state_record__2.schema.json",
+      "raw_digest": "69aa6419e865b529ecf1747fbd0ce891bc6c72026797eeb5e490fa71cbb814df",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100547,
+      "file": "schemas/snapshot__2.schema.json",
+      "raw_digest": "6fed20794c8ea91bde24c520458e481576b248b1d51f3d60bf7bd4fb6b66ee45",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99909,
+      "file": "schemas/snapshot_export_record__2.schema.json",
+      "raw_digest": "e5b424b1267d70b113a358d204824d0d215bf9b47c8dfb3575644157955b9a4b",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100931,
+      "file": "schemas/sound_claim__2.schema.json",
+      "raw_digest": "30b0b2a344ff53b54a2ceabb51bf3caa47aa2579f14612bab4e3db98924e011f",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101190,
+      "file": "schemas/source_drift_impact_assessment__2.schema.json",
+      "raw_digest": "bb957c2e6362162425df639d3db6135448a4549175f9a0342be8b7fd06c9b340",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100250,
+      "file": "schemas/source_drift_record__2.schema.json",
+      "raw_digest": "7462416941a6f658c956d60a0b08466977e061df1e6386e20b37b5f0cbda0bfd",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100423,
+      "file": "schemas/source_generation__2.schema.json",
+      "raw_digest": "38486f4c098548b96ee2eee13f5dda3cc4a3abef8f6d5c0048d83759a5b132ab",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100216,
+      "file": "schemas/source_identity__2.schema.json",
+      "raw_digest": "609b644ac6cef1dd7397be90115e4132dda10c856c24324dd42ca603d0fe0614",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100705,
+      "file": "schemas/source_manifest__2.schema.json",
+      "raw_digest": "e59241038736b24348443df8db7652f2d18eef4274c54ba8a171c1308324ecf3",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100414,
+      "file": "schemas/source_reconciliation_assessment__2.schema.json",
+      "raw_digest": "6ebbbf803e8c757fa10add628c25368ec11c86e28b2d67af79de1586e6e97695",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100609,
+      "file": "schemas/spec_revision__2.schema.json",
+      "raw_digest": "40ed373674dd91323e214fd09cbcf1c3748f324a211ce00dac7a70ca3c933e02",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 106934,
+      "file": "schemas/stage_completion__2.schema.json",
+      "raw_digest": "8d76cf09a713b20a075755f56a494dddc07c4b159116f2f664e8eda133d7bb19",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100536,
+      "file": "schemas/stage_run__2.schema.json",
+      "raw_digest": "42d8b3946f5abdb90870478bb06e554f271d918c1592768ca24e5df595a3f1e2",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100906,
+      "file": "schemas/stage_spec__2.schema.json",
+      "raw_digest": "ea963d91198a0b7655772c262f9532617632e411653b3008b14e554d9744962b",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 103454,
+      "file": "schemas/standalone_payload_manifest__2.schema.json",
+      "raw_digest": "e7f3618da27ad2e8dd7babab295f8870b1d053b789db0555bb0279efde86e724",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100362,
+      "file": "schemas/state_model__1.schema.json",
+      "raw_digest": "477861676957f84a5a55841922a358fd9948ded8ae286e81177089779e14c2b0",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100560,
+      "file": "schemas/stop_evaluation__2.schema.json",
+      "raw_digest": "8e546ec9ade3475648beb111f2740f7dac85296469e9d4db1539de9057fa5eb1",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 104133,
+      "file": "schemas/stop_input__2.schema.json",
+      "raw_digest": "b185e5ac2eef9f77385c1d29ea541aeb431e39082797c60c2bafd6369a10a44f",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 101343,
+      "file": "schemas/successor_campaign_genesis__2.schema.json",
+      "raw_digest": "df683b7a564fff9cf591d2196ff2479810331360a7cf90ee576fbe725fa57afb",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100481,
+      "file": "schemas/successor_campaign_selection_decision__2.schema.json",
+      "raw_digest": "0d9dd4f0ca85c35b054a88e1f673202a7b07e9a6065535bfbe29d49355c0cc16",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99854,
+      "file": "schemas/surface_collector_record__2.schema.json",
+      "raw_digest": "14e0986f91735cc886de12c5d8d453b3aff352e8bff86e639c200d05f5035c59",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99663,
+      "file": "schemas/surface_key__2.schema.json",
+      "raw_digest": "255853b0f618e410bb2ec6fac35cd8df6b0cb119113589145447d04d7de19c44",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100061,
+      "file": "schemas/surface_record__2.schema.json",
+      "raw_digest": "f9b818b6040d82155b68f1946d56183104c385ae21dab01d25962bfaaca3cd62",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99647,
+      "file": "schemas/tool_execution_record__2.schema.json",
+      "raw_digest": "33329bb4f55554bd8f2ae3b9b844ea449b907ceb7f82b9c58b8189bb865c70d4",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100885,
+      "file": "schemas/transition_authorization_proposal__2.schema.json",
+      "raw_digest": "dfe12c91ce5dc09423b627c09fc6a3a98978f379fa1008b630ed8f7ba97c90e8",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100649,
+      "file": "schemas/trust_profile__2.schema.json",
+      "raw_digest": "a944785af9ebb03c2e1f41a3323060e0e6fd29a3af91dd6e3f5a9cc49aacabfb",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 100756,
+      "file": "schemas/trusted_predecessor_selection_decision__2.schema.json",
+      "raw_digest": "3363da525d4d4bfe585d31df29b15548c5119133fdc4182c7307b65127bebc97",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 103332,
+      "file": "schemas/validation_result__2.schema.json",
+      "raw_digest": "d635bb775da857827ae7580c14ec2795bd45f2768fab7d4b057bc77c9a63a1e4",
+      "result": "PASS"
+    },
+    {
+      "byte_length": 99925,
+      "file": "schemas/view_manifest__2.schema.json",
+      "raw_digest": "4f5f80dd730fbd7edb472e0eb1cec3a1f79e487f4adf5734a4d02a5a65fc6a47",
+      "result": "PASS"
+    }
+  ],
+  "disposable_directory": "._nf02_current_audit/review-schema-readback-7be484cac3a4489f9fe4bf26f45c97bc",
+  "qualification": false,
+  "readback_file": "docs/R5_4_2/autonomous_2026_10_07/BUILD_TIME_CANDIDATE_READBACK.json",
+  "readback_raw_digest": "1aff26d762eb2f963299ce6171a66e984bbeaf7bc04e13b24d49199cec766c62",
+  "schema_count": 277,
+  "scope": "DISPOSABLE_EXACT_SCHEMA_BYTE_COPY_AND_INDEPENDENT_REHASH; not Q1 qualification or full semantic parity"
+}

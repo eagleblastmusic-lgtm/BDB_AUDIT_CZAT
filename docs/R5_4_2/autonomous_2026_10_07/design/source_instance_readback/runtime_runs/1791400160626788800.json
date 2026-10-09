@@ -1,0 +1,42 @@
+{
+  "argv": [
+    "-p",
+    "no:cacheprovider",
+    "tests/stage1",
+    "tests/stage2",
+    "tests/stage3",
+    "tests/workflow/test_scope_baseline.py",
+    "-q",
+    "--tb=short"
+  ],
+  "exit_code": 0,
+  "duration_seconds": 99.07001180000952,
+  "source_HEAD": "b7051472909075bb4c83a9a510e298fcca2a6bd5",
+  "repository_HEAD_unchanged": true,
+  "test_inputs": {
+    "tests/stage1/test_ru01_residuals.py": "b7284a4684583b8b72204c806336191121c4e8624ed66398c2461422867d0c3b",
+    "tests/stage1/test_stage1_foundation.py": "33d00315585b0292aa368379e69f59166cd45afc39191eed182375c2b04248bd",
+    "tests/stage2/test_ru02_source_identity.py": "040e6610587a9283c08157a62fddc2cdb0367f9fe20fdd1071509543f22e5dce",
+    "tests/stage2/test_source_archive_reconciliation.py": "38c224867f35d34de8393127b3fdb6cd95a9ef00d65167b3222c21a4c9657ae1",
+    "tests/stage2/test_source_object_format_regression.py": "2b97937755bb8d666326011fe6dafcff235a8afbfd70b9f0ba74884f22d041f9",
+    "tests/stage3/test_ru03_assignment_vault.py": "4f267bf0345a3783cafcda1430abcf31591f1920278579f4d1260118c62b71d6",
+    "tests/stage3/test_ru03_authority_bindings.py": "18ef9c90354ec40bfc24d87ddd91ad2a47f51487b29d8f82b2445779bc7375c6",
+    "tests/stage3/test_ru03_e3_completion_identity.py": "d603030961dc02a8f0ed229d1d0abc968a656cdfb59c5431b997202ac16fe79b",
+    "tests/stage3/test_ru03_import_ui_diagnostics.py": "9c2ef226fd60b3887e4343373c0c304583e26d8b08152880d28bbc74a18076c1",
+    "tests/stage3/test_ru03_package_identity.py": "dcf3313e6518e10fae19ffa8a621d4ac435ac2894b8c04a833f24510d38ba218",
+    "tests/stage3/test_ru03_result_roundtrip.py": "821f960de84ea9f8a261c10912f9f7e889bf91a1e2d137c71b3ef3ef4916d630",
+    "tests/workflow/test_scope_baseline.py": "f3dff4806ba60a77c9b5a5c3809255a472cff470589f60bbe58d6255bf0cd78a"
+  },
+  "tool_raw_digest": "bcfb00a91c1e3c163b98e13f238747997e74ed91af6fca0faa8afbba063d5889",
+  "implementation_inputs": {
+    "src/bdb_audit/source/git_resolver.py": "5bca8d24778871d7999e0c0af62918b556422d3bcbe0c157d1a5c8eea2cafd59",
+    "src/bdb_audit/source/materializer.py": "635904a91eaaf37456872c13b077d013d221881ec82a0fc0baa8f9a9cd1e29bf",
+    "src/bdb_audit/core/hashing.py": "286dee6109409661624572e4c3e87935d33f22c9a0e3a7bfad8dabbf471248f1",
+    "src/bdb_audit/core/errors.py": "fd22fd0097c928833d63439c665e3dca4a9faa9fad7914ad3354c4715f8d4140",
+    "src/bdb_audit/source/archive.py": "14b640cb93a474ebe846f28a42f9f1ec6738e12f394d664462bcbe593fb76324"
+  },
+  "environment": "Existing repo-local tmp fixtures; real Git operations in isolated fixture repos",
+  "qualification": false,
+  "trusted_profile_selection": "NOT_PROVEN",
+  "NF02": "OPEN"
+}

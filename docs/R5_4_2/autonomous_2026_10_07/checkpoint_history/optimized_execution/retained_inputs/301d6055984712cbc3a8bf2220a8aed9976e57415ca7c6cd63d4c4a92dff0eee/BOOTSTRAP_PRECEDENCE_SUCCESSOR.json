@@ -1,0 +1,249 @@
+{
+  "profile_id": "BDB_BOOTSTRAP_PRECEDENCE_V2",
+  "predecessor_profile_id": "BDB_BOOTSTRAP_PRECEDENCE_V1",
+  "source_registry_raw_digest": "1b9d17c46843a91053036f0370d4419dac87ce5978df61b0dc922e0e40237e2c",
+  "profile": {
+    "activation_semantics": "Exact scope match and exact pinned profile identity are required. No prose-derived, latest, wildcard, fallback, or non-initialization activation is allowed.",
+    "edge_semantics": "ORDER_ONLY: participates in canonical closure ordering and union-graph cycle detection only; does not create a typed/content/history ref, reachability, authority, provenance, schema satisfaction, or required material-ref/cardinality satisfaction; cannot be persisted as an inferred object-body field.",
+    "group_precedence_semantics": "For every two present groups i<j, every same-commit node whose exact kind is in group i has an order-only edge to every same-commit node whose exact kind is in group j. Missing optional groups create no nodes/edges. Within one group and for nodes not ordered by this profile, normal Kahn zero-indegree typed tie-break applies.",
+    "legacy_raw_ref_semantics": "legacy_raw_ref remains EXPLICIT_COMPLETE without source_generation_ref; source_generation-before-legacy_raw_ref is an order-only bootstrap constraint, not a content reference.",
+    "ordered_kind_groups": [
+      [
+        "source_generation"
+      ],
+      [
+        "legacy_raw_ref"
+      ],
+      [
+        "legacy_mechanical_validation_assessment"
+      ],
+      [
+        "source_reconciliation_assessment"
+      ],
+      [
+        "lineage_admission_assessment"
+      ],
+      [
+        "legacy_exposure_reconstruction_assessment"
+      ],
+      [
+        "trusted_predecessor_selection_decision"
+      ],
+      [
+        "bootstrap_admission_decision"
+      ],
+      [
+        "campaign_genesis"
+      ]
+    ],
+    "scope": {
+      "command_kind": "INITIALIZE_CAMPAIGN_FROM_LEGACY",
+      "commit_seq": 1,
+      "expected_parent": "EMPTY_HISTORY"
+    },
+    "union_graph_semantics": "canonical closure graph edges = typed same-commit content-reference dependency edges UNION active order-only precedence edges; cycle in union graph rejects; exactly one Kahn sort is run over the union."
+  },
+  "controls": {
+    "inherited_union_cycle_reproduced": true,
+    "successor_contract_order": [
+      "source_generation",
+      "legacy_raw_ref",
+      "legacy_mechanical_validation_assessment",
+      "source_reconciliation_assessment",
+      "lineage_admission_assessment",
+      "legacy_exposure_reconstruction_assessment",
+      "trusted_predecessor_selection_decision",
+      "bootstrap_admission_decision",
+      "campaign_genesis",
+      "command_envelope"
+    ],
+    "restored_command_first_cycle_rejected": true
+  },
+  "witness_content_edges": [
+    [
+      "bootstrap_admission_decision",
+      "command_envelope"
+    ],
+    [
+      "campaign_genesis",
+      "command_envelope"
+    ],
+    [
+      "legacy_exposure_reconstruction_assessment",
+      "command_envelope"
+    ],
+    [
+      "legacy_mechanical_validation_assessment",
+      "command_envelope"
+    ],
+    [
+      "legacy_raw_ref",
+      "command_envelope"
+    ],
+    [
+      "lineage_admission_assessment",
+      "command_envelope"
+    ],
+    [
+      "source_generation",
+      "command_envelope"
+    ],
+    [
+      "source_reconciliation_assessment",
+      "command_envelope"
+    ],
+    [
+      "trusted_predecessor_selection_decision",
+      "command_envelope"
+    ]
+  ],
+  "witness_order_only_edges": [
+    [
+      "bootstrap_admission_decision",
+      "campaign_genesis"
+    ],
+    [
+      "legacy_exposure_reconstruction_assessment",
+      "bootstrap_admission_decision"
+    ],
+    [
+      "legacy_exposure_reconstruction_assessment",
+      "campaign_genesis"
+    ],
+    [
+      "legacy_exposure_reconstruction_assessment",
+      "trusted_predecessor_selection_decision"
+    ],
+    [
+      "legacy_mechanical_validation_assessment",
+      "bootstrap_admission_decision"
+    ],
+    [
+      "legacy_mechanical_validation_assessment",
+      "campaign_genesis"
+    ],
+    [
+      "legacy_mechanical_validation_assessment",
+      "legacy_exposure_reconstruction_assessment"
+    ],
+    [
+      "legacy_mechanical_validation_assessment",
+      "lineage_admission_assessment"
+    ],
+    [
+      "legacy_mechanical_validation_assessment",
+      "source_reconciliation_assessment"
+    ],
+    [
+      "legacy_mechanical_validation_assessment",
+      "trusted_predecessor_selection_decision"
+    ],
+    [
+      "legacy_raw_ref",
+      "bootstrap_admission_decision"
+    ],
+    [
+      "legacy_raw_ref",
+      "campaign_genesis"
+    ],
+    [
+      "legacy_raw_ref",
+      "legacy_exposure_reconstruction_assessment"
+    ],
+    [
+      "legacy_raw_ref",
+      "legacy_mechanical_validation_assessment"
+    ],
+    [
+      "legacy_raw_ref",
+      "lineage_admission_assessment"
+    ],
+    [
+      "legacy_raw_ref",
+      "source_reconciliation_assessment"
+    ],
+    [
+      "legacy_raw_ref",
+      "trusted_predecessor_selection_decision"
+    ],
+    [
+      "lineage_admission_assessment",
+      "bootstrap_admission_decision"
+    ],
+    [
+      "lineage_admission_assessment",
+      "campaign_genesis"
+    ],
+    [
+      "lineage_admission_assessment",
+      "legacy_exposure_reconstruction_assessment"
+    ],
+    [
+      "lineage_admission_assessment",
+      "trusted_predecessor_selection_decision"
+    ],
+    [
+      "source_generation",
+      "bootstrap_admission_decision"
+    ],
+    [
+      "source_generation",
+      "campaign_genesis"
+    ],
+    [
+      "source_generation",
+      "legacy_exposure_reconstruction_assessment"
+    ],
+    [
+      "source_generation",
+      "legacy_mechanical_validation_assessment"
+    ],
+    [
+      "source_generation",
+      "legacy_raw_ref"
+    ],
+    [
+      "source_generation",
+      "lineage_admission_assessment"
+    ],
+    [
+      "source_generation",
+      "source_reconciliation_assessment"
+    ],
+    [
+      "source_generation",
+      "trusted_predecessor_selection_decision"
+    ],
+    [
+      "source_reconciliation_assessment",
+      "bootstrap_admission_decision"
+    ],
+    [
+      "source_reconciliation_assessment",
+      "campaign_genesis"
+    ],
+    [
+      "source_reconciliation_assessment",
+      "legacy_exposure_reconstruction_assessment"
+    ],
+    [
+      "source_reconciliation_assessment",
+      "lineage_admission_assessment"
+    ],
+    [
+      "source_reconciliation_assessment",
+      "trusted_predecessor_selection_decision"
+    ],
+    [
+      "trusted_predecessor_selection_decision",
+      "bootstrap_admission_decision"
+    ],
+    [
+      "trusted_predecessor_selection_decision",
+      "campaign_genesis"
+    ]
+  ],
+  "qualification": false,
+  "accepted_instance_DAG": "NOT_PROVEN",
+  "remaining": "Materialize exact Registry/installation pin and normative successor; prove all actual instance bodies, pins, union edges and guards. This witness does not prove full bootstrap feasibility."
+}

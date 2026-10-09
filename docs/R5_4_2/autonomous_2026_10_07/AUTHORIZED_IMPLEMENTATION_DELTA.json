@@ -1,0 +1,90 @@
+{
+  "authorization": "User: wprowadÄ‚â€žĂ„â€¦Ă„Ä…ÄąĹź to i kontynuuj",
+  "files": {
+    "src/bdb_audit/history/closure.py": {
+      "baseline_raw_digest": "744a1a7614d89212e8bf739bcb12388fab9b4adcca558367c852b59643486d61",
+      "current_raw_digest": "4c6baa8461380e9d295a603266bfbda8cb3333545e0bd0e87011d34b8e4735ad",
+      "scope": "Remove hidden command-first ready-node priority; retain all edges and validation"
+    },
+    "src/bdb_audit/history/objects.py": {
+      "baseline_raw_digest": "7da561c99a13fa397bc005b46b60a6b496dd5f35a956b6b1494d3b7a5174ff38",
+      "current_raw_digest": "dbb3eb6e7e5b51ce9b37d03d4392cd119d5d2fa04581834722c65647ff88fe6b",
+      "scope": "Remove global command-first assertion; exact command presence/class/digest and bootstrap scoped precedence preserved"
+    },
+    "src/bdb_audit/source/git_resolver.py": {
+      "baseline_raw_digest": "a0d1af83fd23ae22099e9340d7f835ff217c306da6fb29844eef4a3de0d37e77",
+      "current_raw_digest": "5bca8d24778871d7999e0c0af62918b556422d3bcbe0c157d1a5c8eea2cafd59",
+      "scope": "Exact repository object format determines commit/tree ID validation; only SHA1/SHA256 and exact 40/64 supported, independent pinned authority still pending",
+      "authorization": "User: kontynuuj do koĂ„Ä…Ă˘â‚¬Ĺľca caĂ„Ä…Ă˘â‚¬Ĺˇego planu"
+    },
+    "src/bdb_audit/workflow/source_target.py": {
+      "baseline_raw_digest": "cd6f167a968848bf115439ce3de25656769a4b87ce4c393479f849b7e2d1e6a1",
+      "current_raw_digest": "bee312be9074ac8bab1c26fbee5c03fa2ccf0d1f899b36d18785d77ffc412cff",
+      "scope": "Existing OD033 continuation: workflow descriptor preserves exact SHA1/SHA256 format and lengths; no source authority inferred",
+      "authorization": "Current user: odczytaj aktualny stan i kontynuuj plan; existing source delta reviewed before evidence reconciliation"
+    },
+    "build/build_single_file.py": {
+      "baseline_raw_digest": "7c6a8592bf52603898812f3f928b2ba0b0a8a512a0ed04e0d300b30cf6231dc4",
+      "current_raw_digest": "9669cd90a6c7589958dce860a04874feb780d4db965d231f65bc203defc82827",
+      "scope": "Reject missing or non-file declared runtime distribution inputs instead of silently omitting them; preserve explicit transport/cache exclusions",
+      "authorization": "User: kontynuuj do końca całego planu; Data 123 exact declared build closure"
+    },
+    "src/bdb_audit/history/authority_hooks.py": {
+      "baseline_raw_digest": "82d82474df2e3e457274319eeaab6a66cac71b1039ba51ee8e2421b090043730",
+      "current_raw_digest": "6d95db4a30eeedd43c50cc6e5da15ee35adb206de9b1068b7349b5d2f66a9a98",
+      "scope": "Data 8 exact SourceGeneration manifest/profile/authority agreement and one-to-one alias mapping before durability; canonical structured schema identity; semantic-neutral mypy repairs; require matching Git/snapshot authority branch",
+      "authorization": "User whole plan; full normative Data8.3, no new alias-relation authority"
+    },
+    "src/bdb_audit/workflow/assurance_projection.py": {
+      "baseline_raw_digest": "d3008deaec41298802f6319300de59006ac29ab1c8ee175c1ec307fc919663c4",
+      "current_raw_digest": "314d7efadf61cd05e4d15fae01aec5689da1bb72b2df3572d2324c1d4f0189bd",
+      "scope": "Compare entire structured schema identity canonically and retain digest_profile in assurance reference deduplication; preserve rebuildable read-model authority boundary",
+      "authorization": "User: kontynuuj do końca całego planu; Data 192.1 complete TypedRef identity"
+    },
+    "tests/f2/helpers.py": {
+      "baseline_raw_digest": "d494b3c1394c4aff459e1561b7d72e8ea8c1936502495df0140929e4de791ff1",
+      "current_raw_digest": "6208d96d28d3e3f9250022ca30c15e7b7b77ac12ad018522790b0e0ed1ac6c6e",
+      "scope": "Correct shared snapshot bootstrap fixture to use snapshot_authority_ref consistently with its exact SourceIdentity mode",
+      "authorization": "User whole plan; Data 8.1 Git/snapshot authority distinction"
+    },
+    "src/bdb_audit/coordinator/operations.py": {
+      "baseline_raw_digest": "8dbc7df0fbba90c066cf751e65d7348ce6198b4a8908eefc5594b3b3f667504a",
+      "current_raw_digest": "2e5f57669bf143a7b5248ec81486fad73534485efece9c31aa544df4164c271b",
+      "scope": "Choose repository_authority_ref for Git and snapshot_authority_ref for snapshot generation, consistently with the exact identity mode",
+      "authorization": "User whole-plan continuation; Data 8.1"
+    }
+  },
+  "new_files": {
+    "src/bdb_audit/source/archive.py": {
+      "current_raw_digest": "6765f95ed7a6627867857ac8c8b2b284feda59ea432222a1e825f2cceac16a5c",
+      "authorization": "User whole plan; OD031 source transport and OD032 exact target encoding",
+      "scope": "Pure complete regular/symlink archive reconciliation; no profile activation or canonical authority"
+    },
+    "tests/stage2/test_source_archive_reconciliation.py": {
+      "current_raw_digest": "a622dc088588d0f53c7827390a90e7a451837934cae3c257104092b0bdbf6430",
+      "authorization": "User whole plan; OD031 source transport and OD032 exact target encoding",
+      "scope": "Pure complete regular/symlink archive reconciliation; no profile activation or canonical authority"
+    },
+    "tests/stage2/test_source_object_format_regression.py": {
+      "current_raw_digest": "ff78b7cf6564a399ac152ece5c6675663ddf2481867a98e19116d60ee635b7da",
+      "authorization": "User whole plan; OD031 source transport and OD032 exact target encoding",
+      "scope": "Pure complete regular/symlink archive reconciliation; no profile activation or canonical authority"
+    },
+    "tests/stage2/test_source_archive_real_git.py": {
+      "current_raw_digest": "26bceaf9bd77caa57793c2636f56deff944b9425ffd03f4aaa7b8ca85a0ce31f",
+      "authorization": "Current user: kontynuuj plan; OD031-033 actual source transport verification",
+      "scope": "Six real Git SHA1/SHA256 regressions; exact hidden/Unicode/executable/symlink transport plus unmaterialized LFS/submodule rejection; no source mocks",
+      "CI_fixture_followup": "Pin local core.autocrlf=false/core.eol=lf so exact blob archive fixture is independent of runner global Windows conversion defaults; exact byte assertions retained."
+    },
+    "tests/f8/test_runtime_build_input_closure.py": {
+      "current_raw_digest": "6588184b7e697fd85e6a01b030542236d103e35e4c9b5eb8640d6ee8420260b3",
+      "scope": "Missing input, directory substitution and exact-byte retention regressions",
+      "authorization": "User whole plan; build-input closure verification"
+    },
+    "tests/stage2/test_source_generation_alias_guard.py": {
+      "current_raw_digest": "ededa03927d95ee2a3c9a8ccd86761ce0d5d20e0cc3cb2786c615b18d58b6fe2",
+      "scope": "Data 8 exact SourceGeneration manifest/profile/authority agreement and one-to-one alias mapping before durability; canonical structured schema identity; semantic-neutral mypy repairs",
+      "authorization": "User whole plan; targeted semantic source regressions"
+    }
+  }
+}

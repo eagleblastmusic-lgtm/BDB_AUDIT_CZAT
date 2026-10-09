@@ -17,7 +17,7 @@ from ..source.git_resolver import (
     validate_repository_location,
 )
 
-GIT_OBJECT_HEX_PATTERN = re.compile(r"^[0-9a-fA-F]{40,64}$")
+GIT_OBJECT_HEX_PATTERN = re.compile(r"^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$")
 # Backward-compatible exported name; SHA-1 repositories remain the baseline.
 SHA1_HEX_PATTERN = re.compile(r"^[0-9a-fA-F]{40}$")
 
@@ -35,9 +35,14 @@ class ResolvedSource:
     object_format: str = "sha1"
 
     def __post_init__(self):
-        if not GIT_OBJECT_HEX_PATTERN.fullmatch(self.exact_commit_sha):
+        lengths = {"sha1": 40, "sha256": 64}
+        if self.object_format not in lengths:
+            raise ValueError(f"Unsupported Git object format: {self.object_format}")
+        if (not GIT_OBJECT_HEX_PATTERN.fullmatch(self.exact_commit_sha)
+                or len(self.exact_commit_sha) != lengths[self.object_format]):
             raise ValueError(f"Invalid Git commit object ID: {self.exact_commit_sha}")
-        if self.exact_tree_sha is not None and not GIT_OBJECT_HEX_PATTERN.fullmatch(self.exact_tree_sha):
+        if self.exact_tree_sha is not None and (not GIT_OBJECT_HEX_PATTERN.fullmatch(self.exact_tree_sha)
+                                              or len(self.exact_tree_sha) != lengths[self.object_format]):
             raise ValueError(f"Invalid Git tree object ID: {self.exact_tree_sha}")
 
     def as_dict(self) -> dict[str, Any]:

@@ -1,0 +1,10 @@
+{
+  "changed_raw_byte_offset": 24706139,
+  "exact_restored_raw_digest": "684eaa000d4a7c6fb322823e4962a47c498aa20ad4e76ec75de63846f28aeed4",
+  "file": "design/SEMANTIC_OBLIGATION_QUEUE.json",
+  "observed_raw_digest": "bb0c8502b355ed4a58ac07b62802276589403e17c56ebea7dcc9cea502aae167",
+  "original_verification_raw_digest": "2cb341234283e9b946926273acef5952c11ab64fd512de0d0b915ccf2b3f6216",
+  "qualification": false,
+  "repair": "One whitespace byte changed from 0x20 to 0x24 after verification. Original observed bytes preserved; exact inverse restored the entire SHA-256 bound by completed draft verification. No running Python writer found. Cause of the intervening byte change is not established.",
+  "stage": "Post-verification derived-output integrity check, before snapshot staging"
+}

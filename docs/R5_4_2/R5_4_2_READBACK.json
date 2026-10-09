@@ -1,0 +1,55 @@
+{
+  "schema": "BDB_R5_4_2_STOPPED_READBACK/1",
+  "candidate_readback_status": "NOT_RUN_NO_CANDIDATE",
+  "successor_candidate_manifest_type": "BDB_CANDIDATE_NOT_MATERIALIZED_NOTICE/1",
+  "successor_candidate_count": 0,
+  "successor_candidate_mismatch_count": null,
+  "count_source": "Empty candidate_files of not-materialized notice; 0 is not a successful readback or Q1 prerequisite PASS.",
+  "predecessor_readback": {
+    "count": 120,
+    "mismatches": 0
+  },
+  "approved_input_artifacts": [
+    {
+      "file": "docs/R5_4_2/R5_4_2_OWNER_DECISION_PACKAGE.md",
+      "bytes": 85031,
+      "raw_digest": "018d577290b09f1ad9a009edffe31d4f23af87ff9381d597a2a0060919aa8119"
+    },
+    {
+      "file": "docs/R5_4_2/R5_4_2_RESIDUAL_RISK_CONTRACT_DECISION_PROPOSAL.md",
+      "bytes": 35108,
+      "raw_digest": "696dfeaf883462aed4c95b81820d95ad87cc7177ed6edf1bb99fd1f30888b66b"
+    },
+    {
+      "file": "docs/R5_4_2/R5_4_2_ASSURANCE_CLAIM_SET_CONTRACT_PROPOSAL.md",
+      "bytes": 9403,
+      "raw_digest": "6ee0e4237ed0d0fe2a6515c397e09430fa7c2b0e8c58a834814db3f32e497c56"
+    },
+    {
+      "file": "docs/R5_4_2/R5_4_2_PUBLIC_CONCLUSION_CONTRACT_PROPOSAL.md",
+      "bytes": 10523,
+      "raw_digest": "77665fee86e10cc59c2543b6d18d4677090b8cb118be8b215dc6bc40f4890db7"
+    },
+    {
+      "file": "docs/R5_4_2/R5_4_2_SEMANTIC_CLOSURE_GRAPH.json",
+      "bytes": 4372832,
+      "raw_digest": "57e16f3dc8ffdc448c62cd5ed74663c875517eb6d141f13516358069d15ea75a"
+    },
+    {
+      "file": "docs/R5_4_2/R5_4_2_FULL_SEMANTIC_CLOSURE_REPORT.md",
+      "bytes": 17091,
+      "raw_digest": "2abd0f09aad0d97e843649bc1ecc6e5378fd67aca83fc9037739dbfeb4e70ea3"
+    },
+    {
+      "file": "docs/R5_4_2/R5_4_2_RUNTIME_SCHEMA_REACHABILITY.json",
+      "bytes": 1161613,
+      "raw_digest": "d1dfaf07a6f77d8e75ef449d5568d3a2c4814b0691e5630c25e7c47c978139de"
+    },
+    {
+      "file": "docs/R5_4_2/RESIDUAL_RISK_NORMATIVE_USAGE_INVENTORY.json",
+      "bytes": 543498,
+      "raw_digest": "685c5ffd1ba4f02ed7b1bc25e6e5e9501fb06d6629b55c977c0896b8f5462a55"
+    }
+  ],
+  "final_gate": "SPEC_CONFLICT"
+}

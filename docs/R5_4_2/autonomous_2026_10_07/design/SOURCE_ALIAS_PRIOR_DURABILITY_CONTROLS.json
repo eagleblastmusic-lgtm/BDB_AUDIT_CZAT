@@ -1,0 +1,23 @@
+{
+  "controls": [
+    {
+      "case": "PRIOR_ACCEPTED_EXACT_IDENTITY_SECOND_ALIAS_REJECTED",
+      "result": "PASS"
+    },
+    {
+      "case": "REJECTION_PRESERVES_HEAD_COMMITS_AND_RECEIPT",
+      "result": "PASS"
+    },
+    {
+      "case": "REOPEN_RETAINS_ORIGINAL_HISTORY",
+      "result": "PASS"
+    },
+    {
+      "case": "EXACT_BOOTSTRAP_RETRY_REUSES_ORIGINAL_RECEIPT",
+      "result": "PASS"
+    }
+  ],
+  "qualification": false,
+  "successor_schema_binding": "NOT_PROVEN",
+  "NF02": "OPEN"
+}

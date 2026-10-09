@@ -1,0 +1,16 @@
+{
+  "scope": "UNQUALIFIED_CANDIDATE_INPUTS; no authentication, installation or campaign creation",
+  "namespace_id": "history_namespace_ec0b6d74-0b2c-42b1-8aa0-037224b31fa7",
+  "trust_profile_id": "trust_profile_e00ab466-ca4f-4383-939d-5069e9b49ea4",
+  "coordinator_principal_id": "BDB_QUALIFICATION_COORDINATOR",
+  "source_authorizer_principal_id": "BDB_SOURCE_OWNER",
+  "repository_identity": "https://github.com/eagleblastmusic-lgtm/bdb-audit",
+  "history_anchor_mode": "LOCAL_PINNED",
+  "vault_protection_class": "Dedicated canonical vault outside executor writable namespaces; enforcement required before installation.",
+  "executor_write_boundary": "Executors may write only assigned delivery/result directories; no canonical vault or local-pin write access.",
+  "guarantees": [],
+  "explicit_non_guarantees": [
+    "FULL_HOST_ROLLBACK_UNDETECTABLE_WITHOUT_INDEPENDENT_ANCHOR",
+    "Candidate declarations do not establish authenticated principal, filesystem isolation or installed authority."
+  ]
+}

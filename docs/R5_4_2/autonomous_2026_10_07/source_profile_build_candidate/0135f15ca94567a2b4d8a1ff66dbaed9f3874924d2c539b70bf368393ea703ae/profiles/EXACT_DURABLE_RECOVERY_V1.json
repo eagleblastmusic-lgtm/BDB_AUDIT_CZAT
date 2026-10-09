@@ -1,0 +1,1 @@
+{"algorithm_id":"EXACT_DURABLE_RECOVERY_V1","parameters":{"anchor_policy":"LOCAL","head_policy":"EXACT_CHAIN","raw_policy":"READBACK_ALL_ACCEPTED_REFS","receipt_policy":"RECONSTRUCT_FROM_ACCEPTED_COMMIT"},"profile_id":"EXACT_DURABLE_RECOVERY_V1"}

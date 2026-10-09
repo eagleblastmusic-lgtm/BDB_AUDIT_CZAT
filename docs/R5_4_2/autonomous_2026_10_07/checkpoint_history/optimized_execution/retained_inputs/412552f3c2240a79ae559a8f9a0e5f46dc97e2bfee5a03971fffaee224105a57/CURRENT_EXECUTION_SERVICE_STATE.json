@@ -1,0 +1,28 @@
+{
+  "goal_service": {
+    "goal": {
+      "threadId": "01a1173a-4cf2-7fe1-ad93-38bcab26217f",
+      "objective": "Autonomicznie zamknąć NF02 od docs/R5_4_2/autonomous_2026_10_07/CONTINUATION_REPORT.md i RESUMED_WORK_CHECKPOINT.json, zachowując delegację właściciela, OD-001–OD-025 i historyczne bytes; kontynuować niezakończone semantic parity, materializację i wymagane Q1/Q2/N5–N11, bez commitu i push.",
+      "status": "active",
+      "tokensUsed": 180844,
+      "timeUsedSeconds": 1386,
+      "createdAt": 1791391251,
+      "updatedAt": 1791392638
+    },
+    "remainingTokens": null,
+    "completionBudgetReport": null
+  },
+  "ordinaryUsageAllowed": true,
+  "primary": {
+    "usedPercent": 69,
+    "windowDurationMins": 300,
+    "resetsAt": 1791408735
+  },
+  "secondary": {
+    "usedPercent": 27,
+    "windowDurationMins": 10080,
+    "resetsAt": 1791971488
+  },
+  "history_note": "Historical usageLimited records describe prior executions and are preserved. This snapshot reports active; no new execution resource blocker is asserted.",
+  "qualification": false
+}

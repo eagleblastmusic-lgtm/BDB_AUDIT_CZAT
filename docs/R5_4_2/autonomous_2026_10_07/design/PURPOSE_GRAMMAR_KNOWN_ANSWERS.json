@@ -1,0 +1,685 @@
+{
+  "design_text_raw_digest": "b780af750090143788e20fa0a441ef0124c073770cd7f0af84b8789f2fd97f13",
+  "contracts": 16,
+  "vectors": [
+    {
+      "purpose": "STAGE",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "STAGE",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "STAGE",
+      "vector": "MISSING_PARAMETER_completion_output_kind_versions",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "STAGE",
+      "vector": "MISSING_PARAMETER_required_qualification_status",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "STAGE",
+      "vector": "MISSING_PARAMETER_spec_selection",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "STAGE",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "LANE",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "LANE",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "LANE",
+      "vector": "MISSING_PARAMETER_allowed_result_kind_versions",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "LANE",
+      "vector": "MISSING_PARAMETER_output_bindings",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "LANE",
+      "vector": "MISSING_PARAMETER_required_isolation_results",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "LANE",
+      "vector": "MISSING_PARAMETER_spec_selection",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "LANE",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "EXECUTOR",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "EXECUTOR",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "EXECUTOR",
+      "vector": "MISSING_PARAMETER_executor_selection",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "EXECUTOR",
+      "vector": "MISSING_PARAMETER_require_fresh_session",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "EXECUTOR",
+      "vector": "MISSING_PARAMETER_required_capabilities",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "EXECUTOR",
+      "vector": "MISSING_PARAMETER_required_channel_classes",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "EXECUTOR",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "DELIVERY",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "DELIVERY",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "DELIVERY",
+      "vector": "MISSING_PARAMETER_delivery_selection",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "DELIVERY",
+      "vector": "MISSING_PARAMETER_raw_source",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "DELIVERY",
+      "vector": "MISSING_PARAMETER_require_binding",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "DELIVERY",
+      "vector": "MISSING_PARAMETER_require_started",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "DELIVERY",
+      "vector": "MISSING_PARAMETER_retry_mode",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "DELIVERY",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "COLLECTOR",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "COLLECTOR",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "COLLECTOR",
+      "vector": "MISSING_PARAMETER_assigned_input_policy",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "COLLECTOR",
+      "vector": "MISSING_PARAMETER_exclusion_decision_type",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "COLLECTOR",
+      "vector": "MISSING_PARAMETER_output_identity",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "COLLECTOR",
+      "vector": "MISSING_PARAMETER_terminal_dispositions",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "COLLECTOR",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "METHOD",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "METHOD",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "METHOD",
+      "vector": "MISSING_PARAMETER_control_selection",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "METHOD",
+      "vector": "MISSING_PARAMETER_method_type",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "METHOD",
+      "vector": "MISSING_PARAMETER_required_independence_dimensions",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "METHOD",
+      "vector": "MISSING_PARAMETER_required_observation_kinds",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "METHOD",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "CONFIRMATION",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "CONFIRMATION",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "CONFIRMATION",
+      "vector": "MISSING_PARAMETER_permitted_modes",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "CONFIRMATION",
+      "vector": "MISSING_PARAMETER_require_current_applicability",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "CONFIRMATION",
+      "vector": "MISSING_PARAMETER_require_exact_discovery_scope",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "CONFIRMATION",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MATCHING",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MATCHING",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MATCHING",
+      "vector": "MISSING_PARAMETER_candidate_policy",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MATCHING",
+      "vector": "MISSING_PARAMETER_exact_match_rule",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MATCHING",
+      "vector": "MISSING_PARAMETER_require_complete_corpus",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MATCHING",
+      "vector": "MISSING_PARAMETER_unknown_overlap",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MATCHING",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "NOVELTY",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "NOVELTY",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "NOVELTY",
+      "vector": "MISSING_PARAMETER_basis",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "NOVELTY",
+      "vector": "MISSING_PARAMETER_missing_basis",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "NOVELTY",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RELATIONSHIP",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RELATIONSHIP",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RELATIONSHIP",
+      "vector": "MISSING_PARAMETER_minimum_prior_stages",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RELATIONSHIP",
+      "vector": "MISSING_PARAMETER_scope_rule",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RELATIONSHIP",
+      "vector": "MISSING_PARAMETER_unknown_rule",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RELATIONSHIP",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "ASSESSOR",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "ASSESSOR",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "ASSESSOR",
+      "vector": "MISSING_PARAMETER_assessment_kind_version",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "ASSESSOR",
+      "vector": "MISSING_PARAMETER_authorized_principal_refs",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "ASSESSOR",
+      "vector": "MISSING_PARAMETER_require_current_applicability",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "ASSESSOR",
+      "vector": "MISSING_PARAMETER_require_opposing_evidence_accounting",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "ASSESSOR",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "ASSESSOR",
+      "vector": "EXACT_MATERIALITY_KIND_AND_OUTPUT_DOMAIN",
+      "input": {
+        "algorithm_id": "CLAIM_RELATIVE_ASSESSMENT_V1",
+        "parameters": {
+          "assessment_kind_version": "BDB_SCHEMA_REGISTRY::materiality_assessment/2",
+          "authorized_principal_refs": [
+            {
+              "profile_id": "TEST",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ],
+          "require_current_applicability": true,
+          "require_opposing_evidence_accounting": true
+        },
+        "profile_id": "CLAIM_RELATIVE_ASSESSMENT_V1"
+      },
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "ASSESSOR",
+      "vector": "SOURCE_FACT_IS_NOT_ASSESSOR_TARGET",
+      "input": {
+        "algorithm_id": "CLAIM_RELATIVE_ASSESSMENT_V1",
+        "parameters": {
+          "assessment_kind_version": "BDB_SCHEMA_REGISTRY::source_manifest/2",
+          "authorized_principal_refs": [
+            {
+              "profile_id": "TEST",
+              "revision_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ],
+          "require_current_applicability": true,
+          "require_opposing_evidence_accounting": true
+        },
+        "profile_id": "CLAIM_RELATIVE_ASSESSMENT_V1"
+      },
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MODEL",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MODEL",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MODEL",
+      "vector": "MISSING_PARAMETER_max_path_steps",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MODEL",
+      "vector": "MISSING_PARAMETER_max_states",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MODEL",
+      "vector": "MISSING_PARAMETER_max_transitions",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MODEL",
+      "vector": "MISSING_PARAMETER_require_complete_mapping",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MODEL",
+      "vector": "MISSING_PARAMETER_require_implementation_conformance",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "MODEL",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "FAULT",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "FAULT",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "FAULT",
+      "vector": "MISSING_PARAMETER_activation_check_refs",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "FAULT",
+      "vector": "MISSING_PARAMETER_require_all_targets",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "FAULT",
+      "vector": "MISSING_PARAMETER_required_cleanup_profile_ref",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "FAULT",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RELEASE",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RELEASE",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RELEASE",
+      "vector": "MISSING_PARAMETER_blocking_severity_values",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RELEASE",
+      "vector": "MISSING_PARAMETER_permitted_risk_acceptance_authority_refs",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RELEASE",
+      "vector": "MISSING_PARAMETER_require_adequate_declared_scope",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RELEASE",
+      "vector": "MISSING_PARAMETER_require_completed_pass",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RELEASE",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "EFFORT",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "EFFORT",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "EFFORT",
+      "vector": "MISSING_PARAMETER_stage_requirements",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "EFFORT",
+      "vector": "MISSING_PARAMETER_stage_selection",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "EFFORT",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RECOVERY",
+      "vector": "CALLER_TRUST_EXTRA_FIELD",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RECOVERY",
+      "vector": "UNKNOWN_ALGORITHM",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RECOVERY",
+      "vector": "MISSING_PARAMETER_anchor_policy",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RECOVERY",
+      "vector": "MISSING_PARAMETER_head_policy",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RECOVERY",
+      "vector": "MISSING_PARAMETER_raw_policy",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RECOVERY",
+      "vector": "MISSING_PARAMETER_receipt_policy",
+      "schema_outcome": "REJECT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    },
+    {
+      "purpose": "RECOVERY",
+      "vector": "EXACT_PROFILE_GRAMMAR",
+      "schema_outcome": "ACCEPT",
+      "canonical_runtime_outcome": "NOT_RUN"
+    }
+  ],
+  "claim": "Pure draft grammar known-answer checks only; no canonical state, runtime qualification or candidate authority"
+}

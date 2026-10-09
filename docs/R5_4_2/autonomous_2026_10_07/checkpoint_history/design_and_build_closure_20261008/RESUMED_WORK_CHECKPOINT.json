@@ -1,0 +1,72 @@
+{
+  "decision_register_through": "OD-033",
+  "active_design_keys": 131,
+  "profiles": 127,
+  "profile_grammar_vectors": 988,
+  "declared_profile_cycles": 0,
+  "draft_fixture_pending": 0,
+  "actual_body_reference_paths": 846,
+  "missing_reference_declarations": 0,
+  "cardinality": {
+    "paths": 861,
+    "local_issues": 0,
+    "conditional_obligations": 69
+  },
+  "fixed_point_reached": false,
+  "qualified_fixture_execution": "NOT_RUN",
+  "candidate_materialized": false,
+  "conditional_grammar_controls": 41,
+  "scope_exclusion_design_controls": 40,
+  "bootstrap_integration_design_controls": 14,
+  "profile_wire_identity_controls": 4,
+  "explicit_profile_wire_mappings": 10,
+  "build_installation_context_controls": 24,
+  "source_identity_design_controls": 42,
+  "actual_source_manifest_entries": 499,
+  "actual_source_manifest_schema_errors": 0,
+  "retained_actual_source_archive_members": 499,
+  "source_entry_parity_controls": 21,
+  "actual_source_parser_members": 499,
+  "installed_profile_material_paths": 152,
+  "raw_payload_material_paths": 98,
+  "Q1": "NOT_STARTED",
+  "Q2": "NOT_STARTED",
+  "N5_N11": "NOT_STARTED",
+  "NF02": "OPEN",
+  "next_required_work": [
+    "OD-024 bootstrap precedence V2 integration and actual-instance proof",
+    "per-kind source/body/profile/predicate parity",
+    "accepted-instance chronology/DAG",
+    "all conditional reference predicates",
+    "finite classification/policy context parity",
+    "full candidate materialization and fresh Q1",
+    "Q2 and N5-N11"
+  ],
+  "execution_status": "LOCAL_CONTINUATION_ACTIVE",
+  "full_lifecycle": "NOT_QUALIFIED",
+  "fresh_final_full_verification": "DRAFT_ONLY_PASS_17_COMMANDS",
+  "pending_semantic_nodes": 131,
+  "real_git_source_transport_regressions": 6,
+  "affected_source_consumer_regressions": 112,
+  "running_sessions": {},
+  "current_implementation_delta": "AUTHORIZED_IMPLEMENTATION_DELTA.json",
+  "next_exact_operation": "OD024/027 full actual bootstrap body/ref/pin union DAG; independently qualified source/profile/installation selection and durable guards; per-kind semantic parity before candidate and Q1.",
+  "previous_checkpoint": {
+    "file": "checkpoint_history/OD033_before_resume_20261008_RESUMED_WORK_CHECKPOINT.json",
+    "raw_digest": "dd0b7fc877b5aab80089555bc7dc539830e3d103601cf7793b8da6a870ac5cce"
+  },
+  "verification": {
+    "file": "RESUME_VERIFICATION_20261008.json",
+    "raw_digest": "69bd829a87dbdc00e8a80ab772022ff8ed1eaca6856c64b84fa842d92e126bca"
+  },
+  "commit": "NOT_CREATED",
+  "push": "NOT_PERFORMED",
+  "files": {
+    "CONTINUATION_REPORT.md": "d741a3d81578568845636eaa3a9145df9e5391144f8bed906fb4bab155dfcfe6",
+    "DRAFT_VERIFICATION.json": "92e9e70953b8683f6166c769c7e60bb7ba80cb1169a0738248357b64ab40e270",
+    "AUTHORIZED_IMPLEMENTATION_DELTA.json": "5bdeda9fb89da14f21496620b3d37d335312f2b87334941db4a72976df0c52d6",
+    "CONTINUATION_PROGRESS.json": "36ce01167a7b4ccbeb64dc5b89f40f2d40a851e28702917ae6aafa38af00df80",
+    "ISSUE_REGISTER.json": "6e89e75825ebf4dfbaa3170245df7cdecc5f51b3d3135fa8057e2735a82e2272",
+    "design/source_instance_readback/runtime_runs/1791456792026577200.json": "edbe815467fc3287361b406286cbed8918d8f3338a2762c2cf89db9037fa5d09"
+  }
+}

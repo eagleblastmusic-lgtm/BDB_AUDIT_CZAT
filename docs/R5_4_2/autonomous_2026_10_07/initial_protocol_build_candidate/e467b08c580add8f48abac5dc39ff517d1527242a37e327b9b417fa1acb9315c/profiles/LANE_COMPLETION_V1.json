@@ -1,0 +1,1 @@
+{"algorithm_id":"LANE_COMPLETION_V1","parameters":{"allowed_result_kind_versions":["BDB_SCHEMA_REGISTRY::bdb_audit_lane_result/3"],"required_isolation_results":["ENFORCED"],"spec_selection":"EXACT_LANE_RUN_REF"},"profile_id":"LANE_COMPLETION_V1"}

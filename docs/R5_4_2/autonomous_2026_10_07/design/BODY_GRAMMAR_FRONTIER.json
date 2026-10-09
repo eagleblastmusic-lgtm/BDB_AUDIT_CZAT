@@ -1,0 +1,663 @@
+{
+  "compiled": [
+    {
+      "source_key": "approval_decision/1",
+      "design_key": "approval_decision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "artifact_contract_registry/1",
+      "design_key": "artifact_contract_registry/1",
+      "mode": "EXACT_INHERITED_BYTES_PENDING_PARITY"
+    },
+    {
+      "source_key": "artifact_hash_manifest/1",
+      "design_key": "artifact_hash_manifest/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "assignment_manifest/1",
+      "design_key": "assignment_manifest/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "assignment_package_binding/1",
+      "design_key": "assignment_package_binding/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "assurance_claim_set/1",
+      "design_key": "assurance_claim_set/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "attempt/1",
+      "design_key": "attempt/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "bdb_audit_lane_result/2",
+      "design_key": "bdb_audit_lane_result/3",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "blind_origin_eligibility_assessment/1",
+      "design_key": "blind_origin_eligibility_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "bootstrap_admission_decision/1",
+      "design_key": "bootstrap_admission_decision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "build_manifest/1",
+      "design_key": "build_manifest/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "bundle_manifest/2",
+      "design_key": "bundle_manifest/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "campaign_conclusion/1",
+      "design_key": "campaign_conclusion/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "campaign_genesis/1",
+      "design_key": "campaign_genesis/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "candidate_assurance_case/1",
+      "design_key": "candidate_assurance_case/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "challenger_assignment/1",
+      "design_key": "challenger_assignment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "challenger_result/1",
+      "design_key": "challenger_result/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "checkpoint/1",
+      "design_key": "checkpoint/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "clean_control_assessment/1",
+      "design_key": "clean_control_assessment/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "cleanup_result/2",
+      "design_key": "cleanup_result/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "command_envelope/1",
+      "design_key": "command_envelope/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "command_receipt/1",
+      "design_key": "command_receipt/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "commit_body/1",
+      "design_key": "commit_body/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "compatibility_fixture_assessment/1",
+      "design_key": "compatibility_fixture_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "compatibility_gate_result/1",
+      "design_key": "compatibility_gate_result/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "contamination_assessment/1",
+      "design_key": "contamination_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "contradiction_resolution_decision/1",
+      "design_key": "contradiction_resolution_decision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "contradiction_revision/1",
+      "design_key": "contradiction_revision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "corpus_manifest/1",
+      "design_key": "corpus_manifest/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "corpus_member_admission_assessment/1",
+      "design_key": "corpus_member_admission_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "corpus_member_candidate/1",
+      "design_key": "corpus_member_candidate/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "coverage_obligation/1",
+      "design_key": "coverage_obligation/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "coverage_obligation_key/1",
+      "design_key": "coverage_obligation_key/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "coverage_obligation_qualification/1",
+      "design_key": "coverage_obligation_qualification/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "defect_unit/1",
+      "design_key": "defect_unit/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "delivery_spec/1",
+      "design_key": "delivery_spec/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "dependency_independence_assessment/1",
+      "design_key": "dependency_independence_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "discovery_confirmation_assessment/1",
+      "design_key": "discovery_confirmation_assessment/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "discovery_corpus_match_assessment/1",
+      "design_key": "discovery_corpus_match_assessment/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "discovery_novelty_assessment/1",
+      "design_key": "discovery_novelty_assessment/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "discovery_record/1",
+      "design_key": "discovery_record/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "discovery_tool_origin_assessment/1",
+      "design_key": "discovery_tool_origin_assessment/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "effort_results/1",
+      "design_key": "effort_results/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "environment_record/1",
+      "design_key": "environment_record/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "evidence_applicability_assessment/1",
+      "design_key": "evidence_applicability_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "evidence_dependency_graph/1",
+      "design_key": "evidence_dependency_graph/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "evidence_invalidation/1",
+      "design_key": "evidence_invalidation/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "evidence_qualification_assessment/1",
+      "design_key": "evidence_qualification_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "execution_descriptor/1",
+      "design_key": "execution_descriptor/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "execution_result/1",
+      "design_key": "execution_result/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "executor_spec/1",
+      "design_key": "executor_spec/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "experiment_spec/1",
+      "design_key": "experiment_spec/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "false_negative_relationship_assessment/1",
+      "design_key": "false_negative_relationship_assessment/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "fault_run_record/2",
+      "design_key": "fault_run_record/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "fault_spec/1",
+      "design_key": "fault_spec/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "final_assurance_case/1",
+      "design_key": "final_assurance_case/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "final_technical_report/2",
+      "design_key": "final_technical_report/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "finding_adjudication_decision/1",
+      "design_key": "finding_adjudication_decision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "finding_axis_assessment/1",
+      "design_key": "finding_axis_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "finding_claim_revision/1",
+      "design_key": "finding_claim_revision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "finding_defect_match_assessment/1",
+      "design_key": "finding_defect_match_assessment/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "gate_decision/1",
+      "design_key": "gate_decision/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "grant_body/1",
+      "design_key": "grant_body/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "handoff_validation_result/1",
+      "design_key": "handoff_validation_result/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "history_anchor_receipt/1",
+      "design_key": "history_anchor_receipt/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "history_cut/1",
+      "design_key": "history_cut/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "holdout_exposure_assessment/1",
+      "design_key": "holdout_exposure_assessment/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "hypothesis_revision/1",
+      "design_key": "hypothesis_revision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "input_disposition_record/2",
+      "design_key": "input_disposition_record/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "installation_bootstrap_profile/1",
+      "design_key": "installation_bootstrap_profile/1",
+      "mode": "EXACT_INHERITED_BYTES_PENDING_PARITY"
+    },
+    {
+      "source_key": "invariant_revision/1",
+      "design_key": "invariant_revision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "inventory_revision/2",
+      "design_key": "inventory_revision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "isolation_baseline_profile/1",
+      "design_key": "isolation_baseline_profile/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "isolation_qualification/1",
+      "design_key": "isolation_qualification/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "knowledge_state/1",
+      "design_key": "knowledge_state/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "lane_completion/1",
+      "design_key": "lane_completion/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "lane_result_admission_evidence/2",
+      "design_key": "lane_result_admission_evidence/3",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "lane_run/1",
+      "design_key": "lane_run/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "lane_spec/1",
+      "design_key": "lane_spec/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "legacy_exposure_reconstruction_assessment/1",
+      "design_key": "legacy_exposure_reconstruction_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "legacy_mechanical_validation_assessment/1",
+      "design_key": "legacy_mechanical_validation_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "legacy_observation_mapping_assessment/1",
+      "design_key": "legacy_observation_mapping_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "legacy_observation_semantic_equivalence_assessment/1",
+      "design_key": "legacy_observation_semantic_equivalence_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "legacy_raw_ref/1",
+      "design_key": "legacy_raw_ref/1",
+      "mode": "EXACT_INHERITED_BYTES_PENDING_PARITY"
+    },
+    {
+      "source_key": "lineage_admission_assessment/1",
+      "design_key": "lineage_admission_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "materiality_assessment/1",
+      "design_key": "materiality_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "model_fidelity_assessment/1",
+      "design_key": "model_fidelity_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "negative_evidence_record/1",
+      "design_key": "negative_evidence_record/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "negative_opportunity_unit/1",
+      "design_key": "negative_opportunity_unit/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "obligation_applicability_decision/1",
+      "design_key": "obligation_applicability_decision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "observation/1",
+      "design_key": "observation/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "observation_dependency/1",
+      "design_key": "observation_dependency/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "policy_revision/1",
+      "design_key": "policy_revision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "potential_exposure_record/1",
+      "design_key": "potential_exposure_record/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "projection_policy/1",
+      "design_key": "projection_policy/1",
+      "mode": "EXACT_INHERITED_BYTES_PENDING_PARITY"
+    },
+    {
+      "source_key": "public_conclusion_statement/1",
+      "design_key": "public_conclusion_statement/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "release_qualification/1",
+      "design_key": "release_qualification/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "report_export_receipt/1",
+      "design_key": "report_export_receipt/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "residual_risk/1",
+      "design_key": "residual_risk/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "root_cause_revision/1",
+      "design_key": "root_cause_revision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "run_manifest/1",
+      "design_key": "run_manifest/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "schema_registry/2",
+      "design_key": "schema_registry/2",
+      "mode": "EXACT_INHERITED_BYTES_PENDING_PARITY"
+    },
+    {
+      "source_key": "scope_state_record/1",
+      "design_key": "scope_state_record/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "snapshot/1",
+      "design_key": "snapshot/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "snapshot_export_record/1",
+      "design_key": "snapshot_export_record/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "sound_claim/1",
+      "design_key": "sound_claim/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "source_drift_impact_assessment/1",
+      "design_key": "source_drift_impact_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "source_drift_record/1",
+      "design_key": "source_drift_record/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "source_generation/1",
+      "design_key": "source_generation/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "source_identity/1",
+      "design_key": "source_identity/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "source_manifest/1",
+      "design_key": "source_manifest/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "source_reconciliation_assessment/1",
+      "design_key": "source_reconciliation_assessment/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "spec_revision/1",
+      "design_key": "spec_revision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "stage_completion/1",
+      "design_key": "stage_completion/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "stage_run/1",
+      "design_key": "stage_run/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "stage_spec/1",
+      "design_key": "stage_spec/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "standalone_payload_manifest/1",
+      "design_key": "standalone_payload_manifest/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "state_model/1",
+      "design_key": "state_model/1",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "stop_evaluation/1",
+      "design_key": "stop_evaluation/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "stop_input/1",
+      "design_key": "stop_input/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "successor_campaign_genesis/1",
+      "design_key": "successor_campaign_genesis/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "successor_campaign_selection_decision/1",
+      "design_key": "successor_campaign_selection_decision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "surface_collector_record/2",
+      "design_key": "surface_collector_record/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "surface_key/1",
+      "design_key": "surface_key/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "surface_record/1",
+      "design_key": "surface_record/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "tool_execution_record/2",
+      "design_key": "tool_execution_record/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "transition_authorization_proposal/1",
+      "design_key": "transition_authorization_proposal/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "trust_profile/1",
+      "design_key": "trust_profile/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "trusted_predecessor_selection_decision/1",
+      "design_key": "trusted_predecessor_selection_decision/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "validation_result/1",
+      "design_key": "validation_result/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    },
+    {
+      "source_key": "view_manifest/1",
+      "design_key": "view_manifest/2",
+      "mode": "CLOSED_DRAFT_META_VALID; SEMANTIC_PREDICATES_PENDING"
+    }
+  ],
+  "pending": [],
+  "semantic_fixed_point_reached": false,
+  "candidate_materialized": false,
+  "remaining": "Nested domains, conditional/cardinality/ordering/material-ref obligations and profile closure are not inferred from draft schema meta-validity"
+}
