@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "implementation_commit": "c7797f751dfd1d621895caef2b6a7d2a0d55eda6",
+  "source_bindings_verified": 437,
+  "exact_artifact_sha256": "094065a8fc59efe7d1bba48343f842f480f8422fd21ee29c2117b15975a80ce5",
+  "removed_paths_exactly_equal_manifest": true,
+  "frozen_legacy_qualifications_normative_sources_unchanged": true,
+  "source_sha256_unchanged_after_test_and_commit": true,
+  "unique_verified_cases": 421,
+  "product_gate": "LIMITED_PROFILE_ONLY",
+  "formal_Q1_Q2": "NO_NEW_PASS_CLAIM"
+}
