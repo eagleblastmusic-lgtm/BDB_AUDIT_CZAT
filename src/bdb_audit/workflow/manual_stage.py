@@ -11,6 +11,8 @@ LaneCompletion. No package, cache, or UI state becomes campaign authority.
 """
 from __future__ import annotations
 
+from ..product_safety import NF02_BLOCK_CODE, NF02_BLOCK_DETAIL
+
 from dataclasses import dataclass, field
 import hashlib
 from pathlib import Path
@@ -1791,6 +1793,10 @@ class StageResultInbox:
     def ingest_zip(
         self, zip_path: Path | str
     ) -> tuple[str, str, str | None]:
+        return self._reject(
+            Path(zip_path).resolve(), "UNKNOWN", NF02_BLOCK_CODE,
+            NF02_BLOCK_DETAIL, None, "QUALIFIED_ACTIVATION_REQUIRED",
+        )
         path = Path(zip_path).resolve()
         self._last_file_result = None
         if not path.is_file():

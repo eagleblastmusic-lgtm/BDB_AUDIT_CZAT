@@ -11,6 +11,8 @@ separate enforcement profile provides receipts.
 """
 from __future__ import annotations
 
+from ..product_safety import NF02_BLOCK_CODE, NF02_BLOCK_DETAIL
+
 from dataclasses import dataclass, field
 import hashlib
 from pathlib import Path
@@ -296,6 +298,10 @@ class E1ResultInbox:
 
     def ingest_zip(self, zip_path: Path | str) -> tuple[str, str, str | None]:
         """Stage raw bytes, validate proposal, and accept one result idempotently."""
+        return self._reject(
+            Path(zip_path).resolve(), "UNKNOWN", NF02_BLOCK_CODE,
+            NF02_BLOCK_DETAIL, None, "QUALIFIED_ACTIVATION_REQUIRED",
+        )
         path = Path(zip_path).resolve()
         self._last_file_result = None
         if not path.is_file():

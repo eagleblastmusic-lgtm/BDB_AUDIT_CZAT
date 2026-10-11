@@ -1,0 +1,117 @@
+{
+  "groups": {
+    "2f251b82a63e026a8c49a1caacde36aa9bbfcc00fb4341469f1e0d57032e1e72": {
+      "files": 277,
+      "bytes": 26327477,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json",
+        "docs/R5_4_2/autonomous_2026_10_07/NF02_Q1_IMPACT_MATRIX.json",
+        "docs/R5_4_2/autonomous_2026_10_07/OPT4_CURRENT_WITNESS_BINDINGS.json"
+      ]
+    },
+    "333b137bd402941e9c6b05dfd105a74e129fff8db7ec7ce4e1d9a3122078490a": {
+      "files": 277,
+      "bytes": 26428340,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json",
+        "docs/R5_4_2/autonomous_2026_10_07/ACTIVE_EXECUTION_STATE.md",
+        "docs/R5_4_2/autonomous_2026_10_07/BUILD_SCHEMA_FIXTURE_READBACK.json",
+        "docs/R5_4_2/autonomous_2026_10_07/BUILD_TIME_CANDIDATE_READBACK.json",
+        "docs/R5_4_2/autonomous_2026_10_07/DRAFT_VERIFICATION.json",
+        "docs/R5_4_2/autonomous_2026_10_07/INITIAL_PROTOCOL_BUILD_READBACK.json",
+        "docs/R5_4_2/autonomous_2026_10_07/NF02_Q1_IMPACT_MATRIX.json",
+        "docs/R5_4_2/autonomous_2026_10_07/SCHEMA_REGISTRY_BUILD_READBACK.json",
+        "docs/R5_4_2/autonomous_2026_10_07/SOURCE_PROFILE_BUILD_READBACK.json"
+      ]
+    },
+    "3ae872fbca66d04a4b21fe878c4c1f3c4c5b7c5e1fc5279e241ecb187ebae9e4": {
+      "files": 277,
+      "bytes": 26327477,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json"
+      ]
+    },
+    "6149465ae7e62b583d30952e2ff34eead1f6c1342c76515321b018c7df628729": {
+      "files": 275,
+      "bytes": 26308792,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json"
+      ]
+    },
+    "75aced7227c08da5a8907609b40921b60c5d456b14d01e14d03a7d5bcb2ac6bc": {
+      "files": 275,
+      "bytes": 25811428,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json"
+      ]
+    },
+    "7a8aaee05b40160ba0fa906783596098558d53e01813daa0d791d845d09053c1": {
+      "files": 275,
+      "bytes": 26243806,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json",
+        "docs/R5_4_2/autonomous_2026_10_07/OD037_AFFECTED_BUILD_VERIFICATION.json"
+      ]
+    },
+    "9d79b934735cba132d1c3f3964263111416d60e5a2d4513471dce5b66589793e": {
+      "files": 275,
+      "bytes": 26308226,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json"
+      ]
+    },
+    "a0be05d997537b8b0830a01fa7a967b2e8ed769ebf57d690d8b31716c8bae419": {
+      "files": 275,
+      "bytes": 26216105,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json"
+      ]
+    },
+    "b0e0970f98f3601a0f5ee50e5187927ebe9fceca38efd8657e58907d03cfefb7": {
+      "files": 275,
+      "bytes": 26215569,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json"
+      ]
+    },
+    "bdc75e33a27e9f117a83d872a1d86cb5aaf901d4bf299ecb5e3c638eef914b8f": {
+      "files": 275,
+      "bytes": 26216105,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json"
+      ]
+    },
+    "d48910ba617e5e44620a760f72f829e38d628b8552d76d19c0177e45db834715": {
+      "files": 275,
+      "bytes": 26304691,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json"
+      ]
+    },
+    "dab5361967c377022ec2d5e3518c7a883901a298d65ed9d8a3e04319fe7e0a69": {
+      "files": 277,
+      "bytes": 26421133,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json",
+        "docs/R5_4_2/autonomous_2026_10_07/ACTIVE_EXECUTION_STATE.md",
+        "docs/R5_4_2/autonomous_2026_10_07/NF02_Q1_IMPACT_MATRIX.json",
+        "docs/R5_4_2/autonomous_2026_10_07/PRE_FREEZE_CANDIDATE_PREFLIGHT.md"
+      ]
+    },
+    "e30489d2429c0fe0904a759f7a78d75172a74f7b2cd2b93a4430b6a9cd4c86f6": {
+      "files": 275,
+      "bytes": 26216105,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json"
+      ]
+    },
+    "ffe285b90a95b315d30dd765143d6582b05f64b5acee32803c9c5a24444a8d3a": {
+      "files": 275,
+      "bytes": 26308606,
+      "refs": [
+        "docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json"
+      ]
+    }
+  },
+  "scan": "ALL tracked text/json/python/config, streaming without size limit, excluding only generated candidate/checkpoint copies; active code/build/test included."
+}

@@ -9,6 +9,7 @@ import signal
 import subprocess
 import tempfile
 import time
+import uuid
 
 from ..core.canonical_json import canonical_bytes
 from ..core.errors import ValidationError
@@ -49,7 +50,10 @@ def _terminate_tree(process: subprocess.Popen[bytes]) -> None:
 
 
 def _safe_copy(source: Path, worker: Path) -> None:
-    shutil.copytree(source, worker, symlinks=False)
+    # Match source_manifest's excluded metadata; Git's read-only objects also
+    # prevent ordinary Windows cleanup of a copied .git directory.
+    shutil.copytree(source, worker, symlinks=False,
+                    ignore=shutil.ignore_patterns(".git", ".pytest_cache", "__pycache__"))
 
 
 def _persist(path: Path, data: bytes) -> None:
@@ -87,7 +91,12 @@ class ToolSupervisor:
             )
 
         evidence.mkdir(parents=True, exist_ok=True)
-        temp_root = Path(tempfile.mkdtemp(prefix="bdb-tool-run-"))
+        # Windows Python 3.13+ applies a special ACL to mkdir(mode=0o700),
+        # also used by mkdtemp. Restricted desktop tokens cannot read that ACL.
+        # Inherit the user's temp-directory ACL; this runner already advertises
+        # HOST_FILESYSTEM_ISOLATION_NOT_ENFORCED, never a security boundary.
+        temp_root = Path(tempfile.gettempdir()) / ("bdb-tool-run-" + uuid.uuid4().hex)
+        temp_root.mkdir()
         worker = temp_root / "workspace"
         stdout_temp = temp_root / "stdout.bin"
         stderr_temp = temp_root / "stderr.bin"

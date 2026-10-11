@@ -1,0 +1,8 @@
+{
+  "path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-test-tmp",
+  "files": 3039,
+  "bytes": 20984512,
+  "classification": "SAFE_TO_REMOVE_OWN_REGENERABLE_TEST_RUNTIME",
+  "reason": "created exclusively by tools/product_test_tmp.py for these runs; logs/XML and real product smoke/campaign/raw receipts retained",
+  "restore": "rerun recorded pytest commands against product implementation commit; no original snapshot or user WIP involved"
+}

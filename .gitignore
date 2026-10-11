@@ -4,3 +4,7 @@ __pycache__/
 *.sqlite
 tmp*/
 /dist/BDB_AUDIT_ASSISTANT_v*.py
+/.product-test-tmp/
+/.product-smoke/
+/docs/PRODUCT_V1/test-scratch/
+/docs/PRODUCT_V1/cleanup-paths.nul

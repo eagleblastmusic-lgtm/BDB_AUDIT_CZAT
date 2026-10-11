@@ -1,0 +1,59 @@
+{
+  "files": [
+    {
+      "path": "docs/R5_4_2/autonomous_2026_10_07/checkpoint_history/optimized_execution/nf02-context-178b8ebc65ad181af4513a6bc530f095114426b9e3898fa65b3310c06adbce86.json",
+      "bytes": 14319345,
+      "sha256": "178b8ebc65ad181af4513a6bc530f095114426b9e3898fa65b3310c06adbce86"
+    },
+    {
+      "path": "docs/R5_4_2/autonomous_2026_10_07/checkpoint_history/optimized_execution/nf02-context-6756afd0f4d25fbfafe217090b0c607eb1de0c861ced993ce5972c7f134b5cd7.json",
+      "bytes": 648361725,
+      "sha256": "6756afd0f4d25fbfafe217090b0c607eb1de0c861ced993ce5972c7f134b5cd7"
+    },
+    {
+      "path": "docs/R5_4_2/autonomous_2026_10_07/checkpoint_history/optimized_execution/nf02-context-7d1b3ea0fe52cfcea18a1f83fa6a35c804d4bad34b7dfd1434d2d28d5bfd8f2d.json",
+      "bytes": 14540918,
+      "sha256": "7d1b3ea0fe52cfcea18a1f83fa6a35c804d4bad34b7dfd1434d2d28d5bfd8f2d"
+    },
+    {
+      "path": "docs/R5_4_2/autonomous_2026_10_07/checkpoint_history/optimized_execution/nf02-context-dag-b05b91375ff554216091a230bf023a83ef4961864940c0a534d3350585b8bc5a.json",
+      "bytes": 265943658,
+      "sha256": "b05b91375ff554216091a230bf023a83ef4961864940c0a534d3350585b8bc5a"
+    },
+    {
+      "path": "docs/R5_4_2/autonomous_2026_10_07/checkpoint_history/optimized_execution/nf02-context-state-493661d2d20a6cbd8959220dc3096e18f6894b6d1332323cdff0bbd414513477.json",
+      "bytes": 205837075,
+      "sha256": "493661d2d20a6cbd8959220dc3096e18f6894b6d1332323cdff0bbd414513477"
+    },
+    {
+      "path": "docs/R5_4_2/autonomous_2026_10_07/checkpoint_history/semantic_reviews/0c85cfbd784aff35247191d1f185e015c69b4a68b41e874609aa1976cd19826a.json",
+      "bytes": 136154542,
+      "sha256": "0c85cfbd784aff35247191d1f185e015c69b4a68b41e874609aa1976cd19826a"
+    },
+    {
+      "path": "docs/R5_4_2/autonomous_2026_10_07/checkpoint_history/semantic_reviews/1cbc0a91ff5797a84bf99fa36c19a4c38b5deb1cd89daf4aa45184837db8571e.json",
+      "bytes": 135884942,
+      "sha256": "1cbc0a91ff5797a84bf99fa36c19a4c38b5deb1cd89daf4aa45184837db8571e"
+    },
+    {
+      "path": "docs/R5_4_2.zip",
+      "bytes": 12979925,
+      "sha256": "33e14987d33ddfe087f7c95d8d392ac84d635c657fbde346cca39df1f4a65ed1"
+    }
+  ],
+  "directories": [
+    {
+      "path": "._nf02_current_audit",
+      "exists": true,
+      "mtime_ns": 1791587574493315600,
+      "verification": "untouched namespace; full recursive hashing intentionally not repeated"
+    },
+    {
+      "path": "._nf02_raw_durability_20261002",
+      "exists": true,
+      "mtime_ns": 1790984128335340500,
+      "verification": "untouched namespace; full recursive hashing intentionally not repeated"
+    }
+  ],
+  "reason": "initial user untracked state; never staged or deleted"
+}

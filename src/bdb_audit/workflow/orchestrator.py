@@ -247,7 +247,11 @@ class FullAuditOrchestrator:
         # This removes mutable output_work_dir from resume authority.
         return self.active_store_path.parent / "artifacts"
 
-    def run_preflight(self, explicit_target_sha: str | None = None) -> PreflightReport:
+    def run_preflight(
+        self, explicit_target_sha: str | None = None, *,
+        target_type: str | None = None, target_location: str | None = None,
+        target_ref: str | None = None,
+    ) -> PreflightReport:
         """Run all preflight checks before creating new lane assignments."""
         checks: list[PreflightCheckResult] = []
 
@@ -256,22 +260,24 @@ class FullAuditOrchestrator:
             if self.settings.execution_mode == "ChatGPT / GitHub"
             else self.settings.local_repo_path
         )
+        if target_location is not None:
+            target_loc = target_location
         if not target_loc:
             checks.append(PreflightCheckResult("Source / target", "NEEDS_INPUT", "No target repository configured"))
         else:
             checks.append(PreflightCheckResult("Source / target", "PASS", f"Configured: {target_loc}"))
 
-        target_ref = (
+        selected_ref = target_ref or (
             self.settings.github_default_ref
             if self.settings.execution_mode == "ChatGPT / GitHub"
             else self.settings.local_default_ref
         )
         try:
-            target_type = "github" if self.settings.execution_mode == "ChatGPT / GitHub" else "local"
+            selected_type = target_type or ("github" if self.settings.execution_mode == "ChatGPT / GitHub" else "local")
             resolved_src = resolve_source_identity(
-                target_type=target_type,
+                target_type=selected_type,
                 location=target_loc,
-                ref=target_ref,
+                ref=selected_ref,
                 explicit_sha=explicit_target_sha,
             )
             self.resolved_source = resolved_src

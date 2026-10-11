@@ -18,6 +18,7 @@ from .workflow.executors import EXECUTION_MODES, get_executor_profile
 from .workflow.history_projection import CampaignHistoryService
 from .workflow.orchestrator import FullAuditOrchestrator
 from .orchestration.native_ensemble import E1_LANE_SLOTS
+from .product_safety import NF02_BLOCK_DETAIL
 
 
 class InteractiveAuditUI:
@@ -55,6 +56,8 @@ class InteractiveAuditUI:
         settings = self.settings_mgr.settings
         output_func("\n--------------------------------------------------")
         output_func("RUN FULL AUDIT — TARGET CONFIRMATION")
+        output_func("PRODUCT-V1: przygotowanie audytu; przyjęcie zewnętrznych wyników zablokowane.")
+        output_func(NF02_BLOCK_DETAIL)
         output_func("--------------------------------------------------")
         mode = settings.execution_mode
         if mode == "ChatGPT / GitHub":

@@ -36,6 +36,8 @@ files = [
     "src/bdb_audit/self_audit.py",
     "src/bdb_audit/coordinator/operations.py",
     "src/bdb_audit/cli.py",
+    "src/bdb_audit/product_cli.py",
+    "src/bdb_audit/product_safety.py",
     "src/bdb_audit/ui.py",
     "src/bdb_audit/orchestration/templates.py",
     "src/bdb_audit/orchestration/compiler.py",

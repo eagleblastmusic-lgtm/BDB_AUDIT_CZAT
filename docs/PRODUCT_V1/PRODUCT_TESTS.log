@@ -1,0 +1,1029 @@
+.........F.........F.................................................... [ 17%]
+........................................................................ [ 34%]
+......................EEEEEEEEEEEEEEEEEEEEEEEEE......................... [ 51%]
+........................................................................ [ 68%]
+........................................................................ [ 85%]
+.................................F.FF.F......................            [100%]
+=================================== ERRORS ====================================
+______________ ERROR at setup of test_dual_corpus[VALID_BASE_F1] ______________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+____________ ERROR at setup of test_dual_corpus[VALID_BASE_FINAL] _____________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+_______________ ERROR at setup of test_dual_corpus[VALID_E2_F1] _______________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+_______________ ERROR at setup of test_dual_corpus[VALID_E2_F2] _______________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+_____________ ERROR at setup of test_dual_corpus[VALID_E2_FINAL] ______________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+____________ ERROR at setup of test_dual_corpus[VALID_ATTESTATION] ____________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+________ ERROR at setup of test_dual_corpus[VALID_CONTINUATION_TICKET] ________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+______ ERROR at setup of test_dual_corpus[VALID_PREVIOUS_PROMPT_BUNDLE] _______
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+______________ ERROR at setup of test_dual_corpus[WRONG_VARIANT] ______________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+______________ ERROR at setup of test_dual_corpus[WRONG_RUN_ID] _______________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+_____________ ERROR at setup of test_dual_corpus[WRONG_AUDIT_ID] ______________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+____________ ERROR at setup of test_dual_corpus[WRONG_SOURCE_SHA] _____________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+____________ ERROR at setup of test_dual_corpus[WRONG_SOURCE_TREE] ____________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+__________ ERROR at setup of test_dual_corpus[CONFLICTING_DUPLICATE] __________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+__________ ERROR at setup of test_dual_corpus[INVALID_HASH_MANIFEST] __________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+____________ ERROR at setup of test_dual_corpus[MISSING_SNAPSHOT] _____________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+__________ ERROR at setup of test_dual_corpus[BROKEN_LEDGER_PREFIX] ___________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+____________ ERROR at setup of test_dual_corpus[BAD_F1_CHECKPOINT] ____________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+____________ ERROR at setup of test_dual_corpus[BAD_F2_CHECKPOINT] ____________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+______________ ERROR at setup of test_dual_corpus[EARLY_REVEAL] _______________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+__________ ERROR at setup of test_dual_corpus[SOURCE_GENERATION_MIX] __________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+______________ ERROR at setup of test_dual_corpus[SUBSTITUTE_F2] ______________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+_____________ ERROR at setup of test_dual_corpus[UNSAFE_ZIP_PATH] _____________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+____________ ERROR at setup of test_dual_corpus[DUPLICATE_MEMBER] _____________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+__________ ERROR at setup of test_dual_corpus[WRONG_ARTIFACT_FAMILY] __________
+
+    @pytest.fixture(scope="module")
+    def dual():
+>       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+>           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError
+================================== FAILURES ===================================
+____________________ test_resume_rejects_tampered_package _____________________
+
+campaign = (WindowsPath('C:/Projekty/Audyty/BDB Audit/.product-test-tmp/da294f9d00a54911920566f9282fe423/test_resume_rejects_tamp...ial_governing_policy_ref', ...}, 'audit_completion': 'NOT_COMPLETED', 'campaign_id': 'campaign_300473efe55500ee', ...})
+capsys = <_pytest.capture.CaptureFixture object at 0x000001D6E31B7E50>
+
+    def test_resume_rejects_tampered_package(campaign, capsys):
+        store, _, data = campaign
+        package = Path(data["packages"][0]["package_zip_path"])
+        package.write_bytes(b"substituted raw ZIP")
+        before = _bytes(store.parent)
+        assert run_cli(["product", "resume", "--store", str(store), "--json"]) == 2
+        assert json.loads(capsys.readouterr().err)["status"] == "BLOCKED"
+        assert _bytes(store.parent) == before
+        # Exercise the actual E1 inbox, bypassing the product CLI.
+        workflow = FullAuditOrchestrator(settings_mgr=SettingsManager(store.parent / "product-settings.json"))
+        workflow.resume_campaign(store)
+        before = _bytes(store.parent)
+>       imported = workflow.e1_inbox.ingest_zip(result)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'ingest_zip'
+
+tests\product\test_product_v1.py:107: AttributeError
+___________ test_ru10_timeout_terminates_spawned_child_process_tree ___________
+
+tmp_path = WindowsPath('C:/Projekty/Audyty/BDB Audit/.product-test-tmp/da294f9d00a54911920566f9282fe423/test_ru10_timeout_terminates_spawned_child_process_tree-005dc21ce5e04801834ad2fd3ea68b94')
+
+    def test_ru10_timeout_terminates_spawned_child_process_tree(tmp_path: Path) -> None:
+        source = _source(tmp_path)
+        marker = tmp_path / "child-survived.txt"
+        child = f"import time; from pathlib import Path; time.sleep(3); Path({str(marker)!r}).write_text('survived')"
+        parent = (
+            "import subprocess,sys,time; "
+            f"subprocess.Popen([sys.executable, '-c', {child!r}]); "
+            "time.sleep(30)"
+        )
+        result = ToolSupervisor().run(
+            ToolRunSpec(
+                run_id="child-tree-timeout",
+                source_root=str(source),
+                evidence_dir=str(tmp_path / "evidence"),
+                argv=(sys.executable, "-c", parent),
+                timeout_seconds=1,
+            )
+        )
+        assert result.supervisor_status == "TIMEOUT"
+        time.sleep(4)
+>       assert not marker.exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Projekty/Audyty/BDB Audit/.product-test-tmp/da294f9d00a54911920566f9282fe423/test_ru10_timeout_terminates_spawned_child_process_tree-005dc21ce5e04801834ad2fd3ea68b94/child-survived.txt').exists
+
+tests\runner\test_ru10_cli_and_process_tree.py:101: AssertionError
+_______________________ test_m46_build_reproducibility ________________________
+
+    def test_m46_build_reproducibility():
+        """Hard requirement: same input -> exact same bytes and SHA256."""
+        with tempfile.TemporaryDirectory() as td:
+            p1 = Path(td) / "build1.py"
+            p2 = Path(td) / "build2.py"
+>           _, sha1, sz1 = build_standalone(p1)
+                           ^^^^^^^^^^^^^^^^^^^^
+
+tests\f8\test_m46_build.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+build\build_single_file.py:552: in build_standalone
+    output_path.write_bytes(script_bytes)
+C:\Python314\Lib\pathlib\__init__.py:796: in write_bytes
+    with self.open(mode='wb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/Skarabeusz/AppData/Local/Temp/tmprfizxo_u/build1.py')
+mode = 'wb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       PermissionError: [Errno 13] Permission denied: 'C:\\Users\\Skarabeusz\\AppData\\Local\\Temp\\tmprfizxo_u\\build1.py'
+
+C:\Python314\Lib\pathlib\__init__.py:771: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+top = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmprfizxo_u', topdown = False
+onerror = <function _rmtree_unsafe.<locals>.onerror at 0x000001D6E5909380>
+followlinks = <object object at 0x000001D6DF7D0210>
+
+>   ???
+E   PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmprfizxo_u'
+
+<frozen os>:377: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+    def test_m46_build_reproducibility():
+        """Hard requirement: same input -> exact same bytes and SHA256."""
+>       with tempfile.TemporaryDirectory() as td:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\f8\test_m46_build.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\tempfile.py:971: in __exit__
+    self.cleanup()
+C:\Python314\Lib\tempfile.py:975: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+C:\Python314\Lib\tempfile.py:955: in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+C:\Python314\Lib\shutil.py:852: in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+C:\Python314\Lib\shutil.py:689: in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+<frozen os>:413: in walk
+    ???
+C:\Python314\Lib\shutil.py:687: in onerror
+    onexc(os.scandir, err.filename, err)
+C:\Python314\Lib\tempfile.py:927: in onexc
+    _resetperms(path)
+C:\Python314\Lib\tempfile.py:283: in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+func = <built-in function chmod>
+path = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmprfizxo_u', args = (448,)
+
+    def _dont_follow_symlinks(func, path, *args):
+        # Pass follow_symlinks=False, unless not supported on this platform.
+        if func in _os.supports_follow_symlinks:
+>           func(path, *args, follow_symlinks=False)
+E           PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmprfizxo_u'
+
+C:\Python314\Lib\tempfile.py:272: PermissionError
+_____________________ test_m46_no_absolute_machine_paths ______________________
+
+    def test_m46_no_absolute_machine_paths():
+        """Standalone script must contain no machine-specific absolute paths."""
+        with tempfile.TemporaryDirectory() as td:
+            out_file = Path(td) / "test_standalone.py"
+>           build_standalone(out_file)
+
+tests\f8\test_m46_build.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+build\build_single_file.py:552: in build_standalone
+    output_path.write_bytes(script_bytes)
+C:\Python314\Lib\pathlib\__init__.py:796: in write_bytes
+    with self.open(mode='wb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/Skarabeusz/AppData/Local/Temp/tmpf_wcpmk5/test_standalone.py')
+mode = 'wb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       PermissionError: [Errno 13] Permission denied: 'C:\\Users\\Skarabeusz\\AppData\\Local\\Temp\\tmpf_wcpmk5\\test_standalone.py'
+
+C:\Python314\Lib\pathlib\__init__.py:771: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+top = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpf_wcpmk5', topdown = False
+onerror = <function _rmtree_unsafe.<locals>.onerror at 0x000001D6E5909590>
+followlinks = <object object at 0x000001D6DF7D0210>
+
+>   ???
+E   PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpf_wcpmk5'
+
+<frozen os>:377: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+    def test_m46_no_absolute_machine_paths():
+        """Standalone script must contain no machine-specific absolute paths."""
+>       with tempfile.TemporaryDirectory() as td:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\f8\test_m46_build.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\tempfile.py:971: in __exit__
+    self.cleanup()
+C:\Python314\Lib\tempfile.py:975: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+C:\Python314\Lib\tempfile.py:955: in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+C:\Python314\Lib\shutil.py:852: in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+C:\Python314\Lib\shutil.py:689: in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+<frozen os>:413: in walk
+    ???
+C:\Python314\Lib\shutil.py:687: in onerror
+    onexc(os.scandir, err.filename, err)
+C:\Python314\Lib\tempfile.py:927: in onexc
+    _resetperms(path)
+C:\Python314\Lib\tempfile.py:283: in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+func = <built-in function chmod>
+path = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpf_wcpmk5', args = (448,)
+
+    def _dont_follow_symlinks(func, path, *args):
+        # Pass follow_symlinks=False, unless not supported on this platform.
+        if func in _os.supports_follow_symlinks:
+>           func(path, *args, follow_symlinks=False)
+E           PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpf_wcpmk5'
+
+C:\Python314\Lib\tempfile.py:272: PermissionError
+____________ test_m46_standalone_verification_and_tamper_detection ____________
+
+    def test_m46_standalone_verification_and_tamper_detection():
+        """Standalone script verifies payload and fails closed on tampering."""
+        import subprocess
+        import sys
+    
+        with tempfile.TemporaryDirectory() as td:
+            out_file = Path(td) / "test_standalone.py"
+>           build_standalone(out_file)
+
+tests\f8\test_m46_build.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+build\build_single_file.py:552: in build_standalone
+    output_path.write_bytes(script_bytes)
+C:\Python314\Lib\pathlib\__init__.py:796: in write_bytes
+    with self.open(mode='wb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/Skarabeusz/AppData/Local/Temp/tmp7y9ndk9p/test_standalone.py')
+mode = 'wb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       PermissionError: [Errno 13] Permission denied: 'C:\\Users\\Skarabeusz\\AppData\\Local\\Temp\\tmp7y9ndk9p\\test_standalone.py'
+
+C:\Python314\Lib\pathlib\__init__.py:771: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+top = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmp7y9ndk9p', topdown = False
+onerror = <function _rmtree_unsafe.<locals>.onerror at 0x000001D6E5909F30>
+followlinks = <object object at 0x000001D6DF7D0210>
+
+>   ???
+E   PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmp7y9ndk9p'
+
+<frozen os>:377: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+    def test_m46_standalone_verification_and_tamper_detection():
+        """Standalone script verifies payload and fails closed on tampering."""
+        import subprocess
+        import sys
+    
+>       with tempfile.TemporaryDirectory() as td:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\f8\test_m46_build.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\tempfile.py:971: in __exit__
+    self.cleanup()
+C:\Python314\Lib\tempfile.py:975: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+C:\Python314\Lib\tempfile.py:955: in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+C:\Python314\Lib\shutil.py:852: in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+C:\Python314\Lib\shutil.py:689: in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+<frozen os>:413: in walk
+    ???
+C:\Python314\Lib\shutil.py:687: in onerror
+    onexc(os.scandir, err.filename, err)
+C:\Python314\Lib\tempfile.py:927: in onexc
+    _resetperms(path)
+C:\Python314\Lib\tempfile.py:283: in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+func = <built-in function chmod>
+path = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmp7y9ndk9p', args = (448,)
+
+    def _dont_follow_symlinks(func, path, *args):
+        # Pass follow_symlinks=False, unless not supported on this platform.
+        if func in _os.supports_follow_symlinks:
+>           func(path, *args, follow_symlinks=False)
+E           PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmp7y9ndk9p'
+
+C:\Python314\Lib\tempfile.py:272: PermissionError
+_ test_standalone_runs_in_clean_isolated_python_without_jsonschema_installed __
+
+    def test_standalone_runs_in_clean_isolated_python_without_jsonschema_installed():
+        """The exact release defect: clean host import fails, embedded runtime succeeds."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            artifact = root / "BDB_AUDIT_ASSISTANT_v2.0.3.py"
+            venv_dir = root / "clean_venv"
+>           build_standalone(artifact)
+
+tests\f8\test_m46_standalone_clean_env.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+build\build_single_file.py:552: in build_standalone
+    output_path.write_bytes(script_bytes)
+C:\Python314\Lib\pathlib\__init__.py:796: in write_bytes
+    with self.open(mode='wb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/Skarabeusz/AppData/Local/Temp/tmpz3ldxj2c/BDB_AUDIT_ASSISTANT_v2.0.3.py')
+mode = 'wb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       PermissionError: [Errno 13] Permission denied: 'C:\\Users\\Skarabeusz\\AppData\\Local\\Temp\\tmpz3ldxj2c\\BDB_AUDIT_ASSISTANT_v2.0.3.py'
+
+C:\Python314\Lib\pathlib\__init__.py:771: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+top = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpz3ldxj2c', topdown = False
+onerror = <function _rmtree_unsafe.<locals>.onerror at 0x000001D6E586FCC0>
+followlinks = <object object at 0x000001D6DF7D0210>
+
+>   ???
+E   PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpz3ldxj2c'
+
+<frozen os>:377: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+    def test_standalone_runs_in_clean_isolated_python_without_jsonschema_installed():
+        """The exact release defect: clean host import fails, embedded runtime succeeds."""
+>       with tempfile.TemporaryDirectory() as td:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\f8\test_m46_standalone_clean_env.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\tempfile.py:971: in __exit__
+    self.cleanup()
+C:\Python314\Lib\tempfile.py:975: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+C:\Python314\Lib\tempfile.py:955: in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+C:\Python314\Lib\shutil.py:852: in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+C:\Python314\Lib\shutil.py:689: in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+<frozen os>:413: in walk
+    ???
+C:\Python314\Lib\shutil.py:687: in onerror
+    onexc(os.scandir, err.filename, err)
+C:\Python314\Lib\tempfile.py:927: in onexc
+    _resetperms(path)
+C:\Python314\Lib\tempfile.py:283: in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+func = <built-in function chmod>
+path = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpz3ldxj2c', args = (448,)
+
+    def _dont_follow_symlinks(func, path, *args):
+        # Pass follow_symlinks=False, unless not supported on this platform.
+        if func in _os.supports_follow_symlinks:
+>           func(path, *args, follow_symlinks=False)
+E           PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpz3ldxj2c'
+
+C:\Python314\Lib\tempfile.py:272: PermissionError
+============================== warnings summary ===============================
+tests/stage2/test_source_archive_reconciliation.py::test_member_reconciliation_rejects[rows6-SOURCE_ARCHIVE_DUPLICATE_OR_UNSUPPORTED_PATH]
+  C:\Python314\Lib\zipfile\__init__.py:1721: UserWarning: Duplicate name: 'a/.hidden'
+    return self._open_to_write(zinfo, force_zip64=force_zip64)
+
+tests/f1/test_zip.py::test_duplicates_and_special
+  C:\Python314\Lib\zipfile\__init__.py:1721: UserWarning: Duplicate name: 'a'
+    return self._open_to_write(zinfo, force_zip64=force_zip64)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Projekty\Audyty\BDB Audit\docs\PRODUCT_V1\PRODUCT_TEST_RESULTS.xml -
+=========================== short test summary info ===========================
+FAILED tests/product/test_product_v1.py::test_resume_rejects_tampered_package
+FAILED tests/runner/test_ru10_cli_and_process_tree.py::test_ru10_timeout_terminates_spawned_child_process_tree
+FAILED tests/f8/test_m46_build.py::test_m46_build_reproducibility - Permissio...
+FAILED tests/f8/test_m46_build.py::test_m46_no_absolute_machine_paths - Permi...
+FAILED tests/f8/test_m46_build.py::test_m46_standalone_verification_and_tamper_detection
+FAILED tests/f8/test_m46_standalone_clean_env.py::test_standalone_runs_in_clean_isolated_python_without_jsonschema_installed
+ERROR tests/f1/test_legacy.py::test_dual_corpus[VALID_BASE_F1] - AssertionError
+ERROR tests/f1/test_legacy.py::test_dual_corpus[VALID_BASE_FINAL] - Assertion...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[VALID_E2_F1] - AssertionError
+ERROR tests/f1/test_legacy.py::test_dual_corpus[VALID_E2_F2] - AssertionError
+ERROR tests/f1/test_legacy.py::test_dual_corpus[VALID_E2_FINAL] - AssertionError
+ERROR tests/f1/test_legacy.py::test_dual_corpus[VALID_ATTESTATION] - Assertio...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[VALID_CONTINUATION_TICKET] - ...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[VALID_PREVIOUS_PROMPT_BUNDLE]
+ERROR tests/f1/test_legacy.py::test_dual_corpus[WRONG_VARIANT] - AssertionError
+ERROR tests/f1/test_legacy.py::test_dual_corpus[WRONG_RUN_ID] - AssertionError
+ERROR tests/f1/test_legacy.py::test_dual_corpus[WRONG_AUDIT_ID] - AssertionError
+ERROR tests/f1/test_legacy.py::test_dual_corpus[WRONG_SOURCE_SHA] - Assertion...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[WRONG_SOURCE_TREE] - Assertio...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[CONFLICTING_DUPLICATE] - Asse...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[INVALID_HASH_MANIFEST] - Asse...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[MISSING_SNAPSHOT] - Assertion...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[BROKEN_LEDGER_PREFIX] - Asser...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[BAD_F1_CHECKPOINT] - Assertio...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[BAD_F2_CHECKPOINT] - Assertio...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[EARLY_REVEAL] - AssertionError
+ERROR tests/f1/test_legacy.py::test_dual_corpus[SOURCE_GENERATION_MIX] - Asse...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[SUBSTITUTE_F2] - AssertionError
+ERROR tests/f1/test_legacy.py::test_dual_corpus[UNSAFE_ZIP_PATH] - AssertionE...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[DUPLICATE_MEMBER] - Assertion...
+ERROR tests/f1/test_legacy.py::test_dual_corpus[WRONG_ARTIFACT_FAMILY] - Asse...
+6 failed, 390 passed, 2 warnings, 25 errors in 354.15s (0:05:54)

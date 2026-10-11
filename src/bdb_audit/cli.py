@@ -225,7 +225,13 @@ def _run_environment(argv: Sequence[str]) -> int:
 
 
 def run_cli(argv: Sequence[str] | None = None) -> int:
+    # New routes share the existing UTF-8 console policy, including python -I
+    # where PYTHONUTF8 is deliberately ignored.
+    _legacy._ensure_utf8_stdio()
     values = list(sys.argv[1:] if argv is None else argv)
+    if values and values[0] == "product":
+        from .product_cli import run_product
+        return run_product(values[1:])
     if values and values[0] == "tools":
         return _run_tools(values[1:])
     if values and values[0] == "environment":

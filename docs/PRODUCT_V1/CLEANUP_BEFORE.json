@@ -1,0 +1,6 @@
+{
+  "before_tree_logical_bytes": 7083918754,
+  "removed_worktree_file_bytes_expected": 262233104,
+  "git_count_objects": "count: 0\nsize: 0\nin-pack: 8756\npacks: 4\nsize-pack: 247579\nprune-packable: 0\ngarbage: 8\nsize-garbage: 277\n",
+  "git_measurement": "count-objects: object store KiB, not complete .git directory"
+}

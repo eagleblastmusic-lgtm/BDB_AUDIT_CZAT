@@ -1,0 +1,700 @@
+{
+  "kind": "REAL_LOCAL_SUBPROCESS_SMOKE",
+  "synthetic_external_results": false,
+  "distribution": "standalone -I",
+  "target_type": "created non-sensitive Git repository with explicit known defect",
+  "target_commit": "e6b1154bc1707c4230eca481c4904ded9c08130a",
+  "campaign_id": "campaign_4e0926d847dc7a55",
+  "store": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\campaign.sqlite",
+  "rejection_and_restart_no_mutation": true,
+  "external_audit": "BLOCKED_NF02_OPEN",
+  "local_checks": "one actual passing control and one actual detected clamp defect",
+  "records": [
+    {
+      "argv": [
+        "product",
+        "start",
+        "--repo",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\target",
+        "--ref",
+        "e6b1154bc1707c4230eca481c4904ded9c08130a",
+        "--store",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\campaign.sqlite",
+        "--json"
+      ],
+      "exit_code": 0,
+      "result": {
+        "action": "product.start",
+        "assignment_input_history_cut": {
+          "accepted_head_hash": "86fce091173b8f09e5ed1d71bc8adaa57bd20b46b3a76cc2ea81fdcec650085c",
+          "accepted_head_seq": 7,
+          "campaign_id": "campaign_4e0926d847dc7a55",
+          "governing_policy_ref": "pin:initial_governing_policy_ref",
+          "governing_spec_refs": [
+            "pin:initial_transition_profile_ref"
+          ],
+          "variant": "ACCEPTED_HISTORY_CUT"
+        },
+        "audit_completion": "NOT_COMPLETED",
+        "campaign_id": "campaign_4e0926d847dc7a55",
+        "external_ingestion": "BLOCKED",
+        "isolation": "DECLARED; host/network runner NOT_ENFORCED",
+        "next_action": "NF02 OPEN: brak niezależnie autoryzowanego producenta i kwalifikowanej aktywacji. Zachowaj ZIP poza historią. Przygotowanie paczek, lokalne kontrole i raport częściowy są dostępne; E1-E6 nie jest ukończone.",
+        "nf02": "OPEN",
+        "packages": [
+          {
+            "assignment_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "assignment_manifest",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "4b18c1b7d850492ae628ead0c5fe963d94ea237f0ae2a13ac379968d98010787",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::assignment_manifest/1"
+            },
+            "attempt_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "attempt",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "0549f4b4e9510bf65528de5bb2c39c1a1a541b21352af4ccadb588ed4e77840a",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::attempt/1"
+            },
+            "campaign_id": "campaign_4e0926d847dc7a55",
+            "input_history_cut": {
+              "accepted_head_hash": "86fce091173b8f09e5ed1d71bc8adaa57bd20b46b3a76cc2ea81fdcec650085c",
+              "accepted_head_seq": 7,
+              "campaign_id": "campaign_4e0926d847dc7a55",
+              "governing_policy_ref": "pin:initial_governing_policy_ref",
+              "governing_spec_refs": [
+                "pin:initial_transition_profile_ref"
+              ],
+              "variant": "ACCEPTED_HISTORY_CUT"
+            },
+            "lane_slot": "E1-A",
+            "lane_title": "General Systems & Architecture",
+            "package_digest": "5db6e6064b2b4d32f3ea4bf553dbdfdeb3d2087befe56717c48ac9825f087147",
+            "package_zip_path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\artifacts\\campaign_4e0926d847dc7a55\\E1\\E1-A_General_Systems_AND_Architecture_5db6e6064b2b_PACKAGE.zip",
+            "package_zip_sha256": "b32498f4c4561d7e0d48032c8d877e0d23b78ac0f5f45e4268c0b46d4925ab68",
+            "prompt_sha256": "33c2d41f6fb6e447a9304b4d4cab121ce76839487b5c080f349df0d6d67fd76d",
+            "stage_id": "E1",
+            "strategy": "STRUCTURAL_ENUMERATION"
+          },
+          {
+            "assignment_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "assignment_manifest",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "74df5d0efffbba794caefd8d9c12e7ff1ea26a0c1ccd5af2cf203c2bdc503ca9",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::assignment_manifest/1"
+            },
+            "attempt_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "attempt",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "a225e00807be4e1965d44f184339f85d4133ee101eb30adbfa60d095e2314ffb",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::attempt/1"
+            },
+            "campaign_id": "campaign_4e0926d847dc7a55",
+            "input_history_cut": {
+              "accepted_head_hash": "86fce091173b8f09e5ed1d71bc8adaa57bd20b46b3a76cc2ea81fdcec650085c",
+              "accepted_head_seq": 7,
+              "campaign_id": "campaign_4e0926d847dc7a55",
+              "governing_policy_ref": "pin:initial_governing_policy_ref",
+              "governing_spec_refs": [
+                "pin:initial_transition_profile_ref"
+              ],
+              "variant": "ACCEPTED_HISTORY_CUT"
+            },
+            "lane_slot": "E1-B",
+            "lane_title": "Security, Trust & Authority",
+            "package_digest": "fd904c3a08883005a92f2a890e5c7171c03f3f7c83ac89e2dbfcb74997f4bc2b",
+            "package_zip_path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\artifacts\\campaign_4e0926d847dc7a55\\E1\\E1-B_Security_Trust_AND_Authority_fd904c3a0888_PACKAGE.zip",
+            "package_zip_sha256": "c8aefe9ec2126ac28bb74ee19f2550240102622b0b0ba51a1ba1d525ef2b98da",
+            "prompt_sha256": "f763baa51f751bd1d26fd4751777b79abf3090e5384198faaca6cb71b4ec17f2",
+            "stage_id": "E1",
+            "strategy": "AUTHORITY_BOUNDARY_ANALYSIS"
+          },
+          {
+            "assignment_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "assignment_manifest",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "96962b490322fb4f8a9fd43dd7ac3e4a4af58b4b0e9684774357b4e513715da9",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::assignment_manifest/1"
+            },
+            "attempt_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "attempt",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "86111d1e787738ba03e08d96865687336d01ced72d5fd870ced6ed9db5ba7d8c",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::attempt/1"
+            },
+            "campaign_id": "campaign_4e0926d847dc7a55",
+            "input_history_cut": {
+              "accepted_head_hash": "86fce091173b8f09e5ed1d71bc8adaa57bd20b46b3a76cc2ea81fdcec650085c",
+              "accepted_head_seq": 7,
+              "campaign_id": "campaign_4e0926d847dc7a55",
+              "governing_policy_ref": "pin:initial_governing_policy_ref",
+              "governing_spec_refs": [
+                "pin:initial_transition_profile_ref"
+              ],
+              "variant": "ACCEPTED_HISTORY_CUT"
+            },
+            "lane_slot": "E1-C",
+            "lane_title": "State, Persistence & Recovery",
+            "package_digest": "4fabdd0bc7dc17cfe1e7fe7ab77ff699c6806d77217dda1eaf382f31585c289b",
+            "package_zip_path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\artifacts\\campaign_4e0926d847dc7a55\\E1\\E1-C_State_Persistence_AND_Recovery_4fabdd0bc7dc_PACKAGE.zip",
+            "package_zip_sha256": "1159e1253dcde3fa3ba36543b82ee26ad346795ff3be37b13c7550eef3970a88",
+            "prompt_sha256": "8e3de3bed4e35db1ba094ac90fb855161375b32096d0d3eb14b16a634f9b8713",
+            "stage_id": "E1",
+            "strategy": "STATE_MUTATION_TRACE"
+          },
+          {
+            "assignment_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "assignment_manifest",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "7d0aa61c5866be21e1caec9b54f5b4f50662128edd58cde6400e540f718466b9",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::assignment_manifest/1"
+            },
+            "attempt_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "attempt",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "e18d65a603f9019680a8757ddba75ca0f544cfa9b163693dc97a30ba0efdd5d0",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::attempt/1"
+            },
+            "campaign_id": "campaign_4e0926d847dc7a55",
+            "input_history_cut": {
+              "accepted_head_hash": "86fce091173b8f09e5ed1d71bc8adaa57bd20b46b3a76cc2ea81fdcec650085c",
+              "accepted_head_seq": 7,
+              "campaign_id": "campaign_4e0926d847dc7a55",
+              "governing_policy_ref": "pin:initial_governing_policy_ref",
+              "governing_spec_refs": [
+                "pin:initial_transition_profile_ref"
+              ],
+              "variant": "ACCEPTED_HISTORY_CUT"
+            },
+            "lane_slot": "E1-D",
+            "lane_title": "Data, Catalog & Parsing",
+            "package_digest": "39be882c0790145d34980f9a593e91ebbcb178bf5f75d138a89bbc43fcaa5a36",
+            "package_zip_path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\artifacts\\campaign_4e0926d847dc7a55\\E1\\E1-D_Data_Catalog_AND_Parsing_39be882c0790_PACKAGE.zip",
+            "package_zip_sha256": "8eea9f8fddffa95b189c917d00b602e6c4b003c284409bddcf7a5e765c03777e",
+            "prompt_sha256": "28b390ffedd204b499d98acdffd4d4dc3ed0646b15d870d5dc154c0542088a75",
+            "stage_id": "E1",
+            "strategy": "INPUT_PARSER_DIFFERENTIAL"
+          },
+          {
+            "assignment_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "assignment_manifest",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "6cdd558b3a355451d073f06db42892cd961282a3fc000dfca93358dc88752e1c",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::assignment_manifest/1"
+            },
+            "attempt_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "attempt",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "a8abad317747c3c049926d6c0cfc72441613252415f2f0581d7dae4a47f36ad0",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::attempt/1"
+            },
+            "campaign_id": "campaign_4e0926d847dc7a55",
+            "input_history_cut": {
+              "accepted_head_hash": "86fce091173b8f09e5ed1d71bc8adaa57bd20b46b3a76cc2ea81fdcec650085c",
+              "accepted_head_seq": 7,
+              "campaign_id": "campaign_4e0926d847dc7a55",
+              "governing_policy_ref": "pin:initial_governing_policy_ref",
+              "governing_spec_refs": [
+                "pin:initial_transition_profile_ref"
+              ],
+              "variant": "ACCEPTED_HISTORY_CUT"
+            },
+            "lane_slot": "E1-E",
+            "lane_title": "Concurrency, Resources & Oracles",
+            "package_digest": "09c7cecaeeed19f03d44e1510343586db0df9908e1f8b0803fd5fce0aae735a6",
+            "package_zip_path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\artifacts\\campaign_4e0926d847dc7a55\\E1\\E1-E_Concurrency_Resources_AND_Oracles_09c7cecaeeed_PACKAGE.zip",
+            "package_zip_sha256": "a38597af7d1a18d9f0e706fc1672507da8d421f4475992468557893b481a7ffc",
+            "prompt_sha256": "f2c064933e988761945ba4f36c7c91d441ff3c4b01c0d040b0955b358ef50cf5",
+            "stage_id": "E1",
+            "strategy": "INTERACTION_CONCURRENCY_ANALYSIS"
+          }
+        ],
+        "preflight": [
+          {
+            "check_name": "Source / target",
+            "details": "Configured: C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\target",
+            "status": "PASS"
+          },
+          {
+            "check_name": "Exact source identity",
+            "details": "e6b1154bc1707c4230eca481c4904ded9c08130a @ e6b1154bc170 tree 80ea5443b921",
+            "status": "PASS"
+          },
+          {
+            "check_name": "Executor profile",
+            "details": "ChatGPT / GitHub (Sol 5.6)",
+            "status": "PASS"
+          },
+          {
+            "check_name": "Delivery profile",
+            "details": "ZIP_PROMPT_CLIPBOARD",
+            "status": "PASS"
+          },
+          {
+            "check_name": "Output directory",
+            "details": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work",
+            "status": "PASS"
+          },
+          {
+            "check_name": "Campaign store",
+            "details": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\campaign.sqlite",
+            "status": "PASS"
+          },
+          {
+            "check_name": "Required templates",
+            "details": "Verified template e1_ensemble",
+            "status": "PASS"
+          },
+          {
+            "check_name": "Required contracts",
+            "details": "Verified canonical schemas",
+            "status": "PASS"
+          }
+        ],
+        "profile": "PRODUCT-V1_PREPARATION_AND_LOCAL_CHECKS",
+        "qualification": "NO_NEW_Q1_Q2_CLAIM",
+        "source": {
+          "display_name": "target",
+          "exact_commit_sha": "e6b1154bc1707c4230eca481c4904ded9c08130a",
+          "exact_tree_sha": "80ea5443b921f9471962a4a002ca3d9dd0b73346",
+          "location": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\target",
+          "object_format": "sha1",
+          "ref": "e6b1154bc1707c4230eca481c4904ded9c08130a",
+          "resolved": true,
+          "target_type": "local"
+        },
+        "status": "READY_FOR_REVIEW",
+        "store_path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\campaign.sqlite"
+      }
+    },
+    {
+      "argv": [
+        "tools",
+        "run",
+        "--source",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\target",
+        "--evidence",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\checks-pass",
+        "--run-id",
+        "sum-control",
+        "--json",
+        "--",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "unittest",
+        "test_calculator.CalculatorTest.test_sum"
+      ],
+      "exit_code": 0,
+      "result": {
+        "action": "tools.run",
+        "capability_profile_digest": "0feff10f2c86ffef892eae49a7290ff43396ad803cc85e12d2d646e9cbee33e5",
+        "cleanup_status": "CLEAN",
+        "detail": null,
+        "evidence_files": [
+          "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\checks-pass\\RUN_MANIFEST.json",
+          "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\checks-pass\\stdout.bin",
+          "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\checks-pass\\stderr.bin"
+        ],
+        "limitations": [
+          "HOST_FILESYSTEM_ISOLATION_NOT_ENFORCED",
+          "NETWORK_EGRESS_NOT_ENFORCED"
+        ],
+        "output_limit_exceeded": false,
+        "receipt_digest": "13dccebf8988724350c8680ebe144ed427352877eda2d6490bec2a01a09b776c",
+        "run_id": "sum-control",
+        "spec_digest": "681ecd31f41b41d5eda89da685e5398cdc95033b1cd9aa57739d25ca164b605f",
+        "stderr_bytes": 103,
+        "stderr_sha256": "1a52ff93b2b7c8bc576900f70c9062f5baedb573cf55507ec33070c999cd9b12",
+        "stdout_bytes": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "supervisor_status": "SUCCESS",
+        "target_exit_code": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "argv": [
+        "tools",
+        "results",
+        "--evidence",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\checks-pass",
+        "--json"
+      ],
+      "exit_code": 0,
+      "result": {
+        "action": "tools.results",
+        "cleanup_status": "CLEAN",
+        "receipt_digest": "13dccebf8988724350c8680ebe144ed427352877eda2d6490bec2a01a09b776c",
+        "run_id": "sum-control",
+        "spec_digest": "681ecd31f41b41d5eda89da685e5398cdc95033b1cd9aa57739d25ca164b605f",
+        "status": "PASS",
+        "stderr_sha256": "1a52ff93b2b7c8bc576900f70c9062f5baedb573cf55507ec33070c999cd9b12",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "supervisor_status": "SUCCESS"
+      }
+    },
+    {
+      "argv": [
+        "tools",
+        "run",
+        "--source",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\target",
+        "--evidence",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\checks-detected-defect",
+        "--run-id",
+        "clamp-defect",
+        "--json",
+        "--",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.venv-f2\\Scripts\\python.exe",
+        "-m",
+        "unittest",
+        "test_calculator.CalculatorTest.test_clamp_midpoint"
+      ],
+      "exit_code": 0,
+      "result": {
+        "action": "tools.run",
+        "capability_profile_digest": "0feff10f2c86ffef892eae49a7290ff43396ad803cc85e12d2d646e9cbee33e5",
+        "cleanup_status": "CLEAN",
+        "detail": null,
+        "evidence_files": [
+          "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\checks-detected-defect\\RUN_MANIFEST.json",
+          "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\checks-detected-defect\\stdout.bin",
+          "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\checks-detected-defect\\stderr.bin"
+        ],
+        "limitations": [
+          "HOST_FILESYSTEM_ISOLATION_NOT_ENFORCED",
+          "NETWORK_EGRESS_NOT_ENFORCED"
+        ],
+        "output_limit_exceeded": false,
+        "receipt_digest": "f6af8e58f545b2a57dd91db178dfa239b281a477b3ce3fc7ca16c7e0ca1f8b36",
+        "run_id": "clamp-defect",
+        "spec_digest": "c861ef122732be024c9dceb57d490448a01122e72467893adc09f966e7fb2767",
+        "stderr_bytes": 646,
+        "stderr_sha256": "86dbd554b22ab8a700e65b9b6d41e51f8dfead986002afd1898d41ee4a96f99e",
+        "stdout_bytes": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "supervisor_status": "TARGET_NONZERO",
+        "target_exit_code": 1,
+        "timed_out": false
+      }
+    },
+    {
+      "argv": [
+        "tools",
+        "results",
+        "--evidence",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\checks-detected-defect",
+        "--json"
+      ],
+      "exit_code": 0,
+      "result": {
+        "action": "tools.results",
+        "cleanup_status": "CLEAN",
+        "receipt_digest": "f6af8e58f545b2a57dd91db178dfa239b281a477b3ce3fc7ca16c7e0ca1f8b36",
+        "run_id": "clamp-defect",
+        "spec_digest": "c861ef122732be024c9dceb57d490448a01122e72467893adc09f966e7fb2767",
+        "status": "PASS",
+        "stderr_sha256": "86dbd554b22ab8a700e65b9b6d41e51f8dfead986002afd1898d41ee4a96f99e",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "supervisor_status": "TARGET_NONZERO"
+      }
+    },
+    {
+      "argv": [
+        "product",
+        "import",
+        "--store",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\campaign.sqlite",
+        "--zip",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\unauthorized.zip",
+        "--json"
+      ],
+      "exit_code": 2,
+      "result": {
+        "audit_completion": "NOT_COMPLETED",
+        "detail": "PRODUCT_V1_EXTERNAL_INGESTION_BLOCKED: NF02 OPEN: brak niezależnie autoryzowanego producenta i kwalifikowanej aktywacji. Zachowaj ZIP poza historią. Przygotowanie paczek, lokalne kontrole i raport częściowy są dostępne; E1-E6 nie jest ukończone.",
+        "error": "PRODUCT_V1_EXTERNAL_INGESTION_BLOCKED",
+        "external_ingestion": "BLOCKED",
+        "isolation": "DECLARED; host/network runner NOT_ENFORCED",
+        "next_action": "NF02 OPEN: brak niezależnie autoryzowanego producenta i kwalifikowanej aktywacji. Zachowaj ZIP poza historią. Przygotowanie paczek, lokalne kontrole i raport częściowy są dostępne; E1-E6 nie jest ukończone.",
+        "nf02": "OPEN",
+        "profile": "PRODUCT-V1_PREPARATION_AND_LOCAL_CHECKS",
+        "qualification": "NO_NEW_Q1_Q2_CLAIM",
+        "status": "BLOCKED"
+      }
+    },
+    {
+      "argv": [
+        "product",
+        "resume",
+        "--store",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\campaign.sqlite",
+        "--json"
+      ],
+      "exit_code": 0,
+      "result": {
+        "accepted_history_cut": {
+          "accepted_head_hash": "d1d9a29945193f4340fb25fdab8966c8b5afe2509aee294b7d8ced452c6012b5",
+          "accepted_head_seq": 8,
+          "campaign_id": "campaign_4e0926d847dc7a55",
+          "governing_policy_ref": "pin:initial_governing_policy_ref",
+          "governing_spec_refs": [
+            "pin:initial_transition_profile_ref"
+          ],
+          "variant": "ACCEPTED_HISTORY_CUT"
+        },
+        "action": "product.resume",
+        "audit_completion": "NOT_COMPLETED",
+        "campaign_id": "campaign_4e0926d847dc7a55",
+        "external_ingestion": "BLOCKED",
+        "isolation": "DECLARED; host/network runner NOT_ENFORCED",
+        "next_action": "NF02 OPEN: brak niezależnie autoryzowanego producenta i kwalifikowanej aktywacji. Zachowaj ZIP poza historią. Przygotowanie paczek, lokalne kontrole i raport częściowy są dostępne; E1-E6 nie jest ukończone.",
+        "nf02": "OPEN",
+        "packages": [
+          {
+            "assignment_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "assignment_manifest",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "4b18c1b7d850492ae628ead0c5fe963d94ea237f0ae2a13ac379968d98010787",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::assignment_manifest/1"
+            },
+            "attempt_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "attempt",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "0549f4b4e9510bf65528de5bb2c39c1a1a541b21352af4ccadb588ed4e77840a",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::attempt/1"
+            },
+            "campaign_id": "campaign_4e0926d847dc7a55",
+            "input_history_cut": {
+              "accepted_head_hash": "86fce091173b8f09e5ed1d71bc8adaa57bd20b46b3a76cc2ea81fdcec650085c",
+              "accepted_head_seq": 7,
+              "campaign_id": "campaign_4e0926d847dc7a55",
+              "governing_policy_ref": "pin:initial_governing_policy_ref",
+              "governing_spec_refs": [
+                "pin:initial_transition_profile_ref"
+              ],
+              "variant": "ACCEPTED_HISTORY_CUT"
+            },
+            "lane_slot": "E1-A",
+            "lane_title": "General Systems & Architecture",
+            "package_digest": "5db6e6064b2b4d32f3ea4bf553dbdfdeb3d2087befe56717c48ac9825f087147",
+            "package_zip_path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\artifacts\\campaign_4e0926d847dc7a55\\E1\\E1-A_General_Systems_AND_Architecture_5db6e6064b2b_PACKAGE.zip",
+            "package_zip_sha256": "b32498f4c4561d7e0d48032c8d877e0d23b78ac0f5f45e4268c0b46d4925ab68",
+            "prompt_sha256": "33c2d41f6fb6e447a9304b4d4cab121ce76839487b5c080f349df0d6d67fd76d",
+            "stage_id": "E1",
+            "strategy": "STRUCTURAL_ENUMERATION"
+          },
+          {
+            "assignment_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "assignment_manifest",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "74df5d0efffbba794caefd8d9c12e7ff1ea26a0c1ccd5af2cf203c2bdc503ca9",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::assignment_manifest/1"
+            },
+            "attempt_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "attempt",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "a225e00807be4e1965d44f184339f85d4133ee101eb30adbfa60d095e2314ffb",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::attempt/1"
+            },
+            "campaign_id": "campaign_4e0926d847dc7a55",
+            "input_history_cut": {
+              "accepted_head_hash": "86fce091173b8f09e5ed1d71bc8adaa57bd20b46b3a76cc2ea81fdcec650085c",
+              "accepted_head_seq": 7,
+              "campaign_id": "campaign_4e0926d847dc7a55",
+              "governing_policy_ref": "pin:initial_governing_policy_ref",
+              "governing_spec_refs": [
+                "pin:initial_transition_profile_ref"
+              ],
+              "variant": "ACCEPTED_HISTORY_CUT"
+            },
+            "lane_slot": "E1-B",
+            "lane_title": "Security, Trust & Authority",
+            "package_digest": "fd904c3a08883005a92f2a890e5c7171c03f3f7c83ac89e2dbfcb74997f4bc2b",
+            "package_zip_path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\artifacts\\campaign_4e0926d847dc7a55\\E1\\E1-B_Security_Trust_AND_Authority_fd904c3a0888_PACKAGE.zip",
+            "package_zip_sha256": "c8aefe9ec2126ac28bb74ee19f2550240102622b0b0ba51a1ba1d525ef2b98da",
+            "prompt_sha256": "f763baa51f751bd1d26fd4751777b79abf3090e5384198faaca6cb71b4ec17f2",
+            "stage_id": "E1",
+            "strategy": "AUTHORITY_BOUNDARY_ANALYSIS"
+          },
+          {
+            "assignment_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "assignment_manifest",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "96962b490322fb4f8a9fd43dd7ac3e4a4af58b4b0e9684774357b4e513715da9",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::assignment_manifest/1"
+            },
+            "attempt_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "attempt",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "86111d1e787738ba03e08d96865687336d01ced72d5fd870ced6ed9db5ba7d8c",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::attempt/1"
+            },
+            "campaign_id": "campaign_4e0926d847dc7a55",
+            "input_history_cut": {
+              "accepted_head_hash": "86fce091173b8f09e5ed1d71bc8adaa57bd20b46b3a76cc2ea81fdcec650085c",
+              "accepted_head_seq": 7,
+              "campaign_id": "campaign_4e0926d847dc7a55",
+              "governing_policy_ref": "pin:initial_governing_policy_ref",
+              "governing_spec_refs": [
+                "pin:initial_transition_profile_ref"
+              ],
+              "variant": "ACCEPTED_HISTORY_CUT"
+            },
+            "lane_slot": "E1-C",
+            "lane_title": "State, Persistence & Recovery",
+            "package_digest": "4fabdd0bc7dc17cfe1e7fe7ab77ff699c6806d77217dda1eaf382f31585c289b",
+            "package_zip_path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\artifacts\\campaign_4e0926d847dc7a55\\E1\\E1-C_State_Persistence_AND_Recovery_4fabdd0bc7dc_PACKAGE.zip",
+            "package_zip_sha256": "1159e1253dcde3fa3ba36543b82ee26ad346795ff3be37b13c7550eef3970a88",
+            "prompt_sha256": "8e3de3bed4e35db1ba094ac90fb855161375b32096d0d3eb14b16a634f9b8713",
+            "stage_id": "E1",
+            "strategy": "STATE_MUTATION_TRACE"
+          },
+          {
+            "assignment_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "assignment_manifest",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "7d0aa61c5866be21e1caec9b54f5b4f50662128edd58cde6400e540f718466b9",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::assignment_manifest/1"
+            },
+            "attempt_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "attempt",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "e18d65a603f9019680a8757ddba75ca0f544cfa9b163693dc97a30ba0efdd5d0",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::attempt/1"
+            },
+            "campaign_id": "campaign_4e0926d847dc7a55",
+            "input_history_cut": {
+              "accepted_head_hash": "86fce091173b8f09e5ed1d71bc8adaa57bd20b46b3a76cc2ea81fdcec650085c",
+              "accepted_head_seq": 7,
+              "campaign_id": "campaign_4e0926d847dc7a55",
+              "governing_policy_ref": "pin:initial_governing_policy_ref",
+              "governing_spec_refs": [
+                "pin:initial_transition_profile_ref"
+              ],
+              "variant": "ACCEPTED_HISTORY_CUT"
+            },
+            "lane_slot": "E1-D",
+            "lane_title": "Data, Catalog & Parsing",
+            "package_digest": "39be882c0790145d34980f9a593e91ebbcb178bf5f75d138a89bbc43fcaa5a36",
+            "package_zip_path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\artifacts\\campaign_4e0926d847dc7a55\\E1\\E1-D_Data_Catalog_AND_Parsing_39be882c0790_PACKAGE.zip",
+            "package_zip_sha256": "8eea9f8fddffa95b189c917d00b602e6c4b003c284409bddcf7a5e765c03777e",
+            "prompt_sha256": "28b390ffedd204b499d98acdffd4d4dc3ed0646b15d870d5dc154c0542088a75",
+            "stage_id": "E1",
+            "strategy": "INPUT_PARSER_DIFFERENTIAL"
+          },
+          {
+            "assignment_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "assignment_manifest",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "6cdd558b3a355451d073f06db42892cd961282a3fc000dfca93358dc88752e1c",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::assignment_manifest/1"
+            },
+            "attempt_ref": {
+              "digest_profile": "BDB-OBJECT-DIGEST-1",
+              "kind": "attempt",
+              "ref_class": "PRIOR_ACCEPTED_ONLY",
+              "revision_digest": "a8abad317747c3c049926d6c0cfc72441613252415f2f0581d7dae4a47f36ad0",
+              "schema_revision_ref": "BDB_SCHEMA_REGISTRY::attempt/1"
+            },
+            "campaign_id": "campaign_4e0926d847dc7a55",
+            "input_history_cut": {
+              "accepted_head_hash": "86fce091173b8f09e5ed1d71bc8adaa57bd20b46b3a76cc2ea81fdcec650085c",
+              "accepted_head_seq": 7,
+              "campaign_id": "campaign_4e0926d847dc7a55",
+              "governing_policy_ref": "pin:initial_governing_policy_ref",
+              "governing_spec_refs": [
+                "pin:initial_transition_profile_ref"
+              ],
+              "variant": "ACCEPTED_HISTORY_CUT"
+            },
+            "lane_slot": "E1-E",
+            "lane_title": "Concurrency, Resources & Oracles",
+            "package_digest": "09c7cecaeeed19f03d44e1510343586db0df9908e1f8b0803fd5fce0aae735a6",
+            "package_zip_path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\artifacts\\campaign_4e0926d847dc7a55\\E1\\E1-E_Concurrency_Resources_AND_Oracles_09c7cecaeeed_PACKAGE.zip",
+            "package_zip_sha256": "a38597af7d1a18d9f0e706fc1672507da8d421f4475992468557893b481a7ffc",
+            "prompt_sha256": "f2c064933e988761945ba4f36c7c91d441ff3c4b01c0d040b0955b358ef50cf5",
+            "stage_id": "E1",
+            "strategy": "INTERACTION_CONCURRENCY_ANALYSIS"
+          }
+        ],
+        "profile": "PRODUCT-V1_PREPARATION_AND_LOCAL_CHECKS",
+        "qualification": "NO_NEW_Q1_Q2_CLAIM",
+        "status": "READY_FOR_REVIEW",
+        "store_path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\campaign.sqlite",
+        "workflow": {
+          "accepted_lanes_count": 0,
+          "active_inbox": "E1",
+          "campaign_id": "campaign_4e0926d847dc7a55",
+          "current_phase": null,
+          "current_stage": "E1",
+          "executor_model": "Sol 5.6",
+          "executor_profile": "ChatGPT / GitHub",
+          "missing_lanes": [
+            "E1-A",
+            "E1-B",
+            "E1-C",
+            "E1-D",
+            "E1-E"
+          ],
+          "phase_complete": false,
+          "source_commit_sha": "e6b1154bc1707c4230eca481c4904ded9c08130a",
+          "source_tree_sha": "80ea5443b921f9471962a4a002ca3d9dd0b73346",
+          "stage_complete": false,
+          "status": "SUCCESS",
+          "store_path": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\campaign.sqlite",
+          "total_required_lanes": 5
+        }
+      }
+    },
+    {
+      "argv": [
+        "product",
+        "report",
+        "--store",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\work\\campaign.sqlite",
+        "--output",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\AUDIT_REPORT.md",
+        "--run-evidence",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\checks-pass",
+        "--run-evidence",
+        "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\checks-detected-defect",
+        "--json"
+      ],
+      "exit_code": 0,
+      "result": {
+        "action": "product.report",
+        "audit_completion": "NOT_COMPLETED",
+        "campaign_id": "campaign_4e0926d847dc7a55",
+        "external_ingestion": "BLOCKED",
+        "isolation": "DECLARED; host/network runner NOT_ENFORCED",
+        "local_run_count": 2,
+        "next_action": "NF02 OPEN: brak niezależnie autoryzowanego producenta i kwalifikowanej aktywacji. Zachowaj ZIP poza historią. Przygotowanie paczek, lokalne kontrole i raport częściowy są dostępne; E1-E6 nie jest ukończone.",
+        "nf02": "OPEN",
+        "output": "C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\9f371932992d4a369260043f7e93bb3b\\AUDIT_REPORT.md",
+        "profile": "PRODUCT-V1_PREPARATION_AND_LOCAL_CHECKS",
+        "qualification": "NO_NEW_Q1_Q2_CLAIM",
+        "report_sha256": "f96755a3d90d13d5b53cb786c81e84b1696c72eecb7f0dfda43856b7247efde8",
+        "status": "EXPORTED_PARTIAL"
+      }
+    }
+  ]
+}

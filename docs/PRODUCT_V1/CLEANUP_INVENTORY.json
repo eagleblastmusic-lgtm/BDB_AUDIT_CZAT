@@ -1,0 +1,235 @@
+{
+  "candidate_paths_are_not_approved_for_deletion": true,
+  "categories": {
+    "PROTECT_src": {
+      "files": 254,
+      "logical_bytes": 3112411
+    },
+    "PROTECT_tests": {
+      "files": 169,
+      "logical_bytes": 1424119
+    },
+    "build_schema_fixtures": {
+      "files": 25,
+      "logical_bytes": 1602544764
+    },
+    "build_time_candidate": {
+      "files": 3858,
+      "logical_bytes": 367653860
+    },
+    "checkpoint_history": {
+      "files": 1090,
+      "logical_bytes": 1829151584
+    },
+    "golden_build_candidate": {
+      "files": 20,
+      "logical_bytes": 1210014738
+    },
+    "normative_build_candidate": {
+      "files": 210,
+      "logical_bytes": 1720170651
+    },
+    "other_docs_REVIEW": {
+      "files": 356,
+      "logical_bytes": 126298420
+    },
+    "other_r5_4_2_autonomous": {
+      "files": 1564,
+      "logical_bytes": 220508889
+    },
+    "other_root_REVIEW": {
+      "files": 88,
+      "logical_bytes": 3039318
+    }
+  },
+  "distinct_blob_ids": 2473,
+  "duplicate_groups": 1407,
+  "kind": "READ_ONLY_GIT_TREE_INVENTORY",
+  "largest_duplicate_groups": [
+    {
+      "blob_sha": "7d6de1fd4554936b30dcf531cdf4453fd989c029",
+      "count": 3,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/ff9d1559f46db4616f40c622a35c8213b067f9dec7348c0b0b4ccc861b635251/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/03da495dc1d814401ad9b5c32a3a3592ae77b848e3e645e2c4ef13603f6e988d/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/23f4f297d7cfc67479152a5fbca8dca3ddee6364e23e72dab41ce9284aeaf8c3/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 119705562
+    },
+    {
+      "blob_sha": "33c87bcb7ba7e987d98d817a51e72b51934a71d1",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/50139cd874ff2d4140fe311e83bebc0c8c0c6722a7da681949a004d22aa02643/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/805041d5bea03d3061d33b196cb8ff224104ab4e5954013e712fde61e81d4870/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 61334522
+    },
+    {
+      "blob_sha": "395980599d97926a963b4b6c12e5242452fe6982",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/8ad292e61fece632d824e3871c13bcfd5d2f1f0748799d79886e1b5a6f0d1392/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/eed601e470cafe97ad15160ca96602c68393542589d843e2d2bee180dfe61a29/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 61334522
+    },
+    {
+      "blob_sha": "6a9735acf544502c7a4c0787a7efdfda69c25fd8",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/64673b1ac7fa9c0833ce7573532beee522aa1d332b23243069b1326669b34c53/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/464e3900c3dba84fa9a3146d97d1205c85079f12d70f394bcc2e9c2e5258e292/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 61334522
+    },
+    {
+      "blob_sha": "f33ea2e311006e763b39f7c39da617809d93483c",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/f5115c4718d5e7a3c61a61f530d5a294ebb5f985b1040e807023e3d6572794e4/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/8fb23b02a406ab59b6a13ed54e628c7684f3f1201ab503a21f278c0e91437616/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 61334522
+    },
+    {
+      "blob_sha": "f9d367a9ae4532c3140678b65ce10a47633310ee",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/13ce930d9ed07e4079dec3b42f8b729fea4d420e07a558af7963d7f885fd6be0/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/a7380a66d4dc0522b6514346620583204ff8d25b8b5edb16de6db262e11d1f21/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 61334522
+    },
+    {
+      "blob_sha": "577162a9a352b640ceea16645d8070ea6f7559df",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/40079b2c8b334f0b1cb660b2e0dbef4b0fd8906c72aafd5fdb0030a89d92be1f/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/7f0a0f80b2185076e179a1609b9ab97bd0551876f79cb16fd75cd75bcc85dfc0/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 61055343
+    },
+    {
+      "blob_sha": "6d88e659731d1914344768a76bf796ef63192901",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/71b539c547098858cb01e9ce729fe48e4d48843bb8e1e9eb486eae3e555650e4/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/bafae0f688af3fc838d98c3d998d514ed7ed035031d36feed8faa3aaaf2850ff/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 61055343
+    },
+    {
+      "blob_sha": "b29106e12294a7698bdea185759fd9998e9b5393",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/bdeeb2c5ec96fd34455fd4cede0a959b5ae38e2bede6722ac6212631b400d28e/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/3322d87a4081faa9e8407a8e12d8e90d889d60994545cabd988705d9478463f2/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 61055343
+    },
+    {
+      "blob_sha": "209412ad73fbc064d149f06aa1a3382838b499ac",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/97554e872cb88f1501076950162d4574e65e66ec89b731f718d2885878e1a57b/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/426f2ee3efe5ec3eb7a1b98182802c74a29666e1be31be947d8cbe66b9d2ca37/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 61002949
+    },
+    {
+      "blob_sha": "931b32047a63cb040d5c7f31243eec1a2a6bb0ae",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/5a879f7f87a676d2dd79c5a74813cb19edf68b45fb181daff50ec0920931d732/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/c7088c1802c9c3fbc4befb9eb99a16fd6a8bd707618eef22b68526a5a9c08776/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 60645340
+    },
+    {
+      "blob_sha": "169f02e060f33d071dc7ed92581785b9a922e299",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/20b50135935620ea776a74deec0bef69463d9090a3e17ff5dcfd02165ef29087/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/426046e2add161f5325cdfeebec5538f94edb019301b583cec04e3a256ee40af/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 59852781
+    },
+    {
+      "blob_sha": "1c28e163085d58f95cbd24b15d541d98785ae82d",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/b7285281dcb90735ad52e424f2ff6ed45b888acd18053be868ec1405b23b568d/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/cf7a9990ddd212adc615940c78d4a805c44b545ddddf6033dfb363c6051efb2b/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 59852781
+    },
+    {
+      "blob_sha": "1e5c5e18bcc5ea6361abdae44ceab6c259d3d828",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/6d64695af1da309de7fb14506eb432fab34a65442a361f13167e604837160c79/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/7b0766988188cb131b7984caf94a85f10ab7d41bdf6b32e8bf590fb0281a60d6/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 59852781
+    },
+    {
+      "blob_sha": "73b2317340a05e0ef70051204ed96b96f619bee1",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/63133c02487a39f36c45a171d0b13690675ab6a0918057484b62ad76213ac5fc/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/066012a6b0829a409661efefc3b1611c5d7ab7267eebb76d0a60ffa6d029efe4/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 59852781
+    },
+    {
+      "blob_sha": "7539a9eee98b787cd80aca01500cdb5762b96f49",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/d4507a5ab2280c6a163581712337e72e98ee481bf17842e7f8ec5328a43fd363/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/90375ebe6ca88008f02eb1a1ebce61cee03ff073e4863aa0b629248b10192a48/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 59852781
+    },
+    {
+      "blob_sha": "8a35580cf5be3ea0b6ca2897c38e9fcf9a55e72d",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/e0a3425ff5ea7328341ae698556f0c906ff8eecad34453630f822bc691e528e3/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/1cb23070e019c48b5ce0a6060c06f947b5800a26c3179155a94ebc2c4041ebe1/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 59852781
+    },
+    {
+      "blob_sha": "9e687b58f4ed2b977c09644f8ca4d44a5f76e2eb",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/3c16898854c2e242e9084a5d1df94ac5d391454a28ac66674c90cd3ff54bb11d/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/e3fbbcd37a4baaf8f13badd1046b6489c091bcd8d812acbee0d57a0ddbaf1d28/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 59852781
+    },
+    {
+      "blob_sha": "d0040e4ee9254a210c929c782d958d2dadec7e33",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/3bb87799c34685e325f027594a1e34ddcdb299664f0ca079a71ee40e0ff63ee2/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/b8d8ef790a563cee1c4bed6f52d0cb2628a66823ea78857aaef4b695883792e0/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 59852781
+    },
+    {
+      "blob_sha": "daf776163bf78aaf503f8d5420c9a4055084fda8",
+      "count": 2,
+      "examples": [
+        "docs/R5_4_2/autonomous_2026_10_07/golden_build_candidate/3bcce26580375f2b642149f7bb547e45ad7a6dc42399ddae54acc198dc487558/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json",
+        "docs/R5_4_2/autonomous_2026_10_07/normative_build_candidate/18feaf49b26bb1e4c5cc372883f92609af837cb6e74099ed26e671066f5d8c17/BDB_AUDIT_V2_FOUNDATION_GOLDEN_VECTORS_R5_4_2.json"
+      ],
+      "logical_repeat_bytes": 59852781
+    }
+  ],
+  "ref": "f23dbedccb6dca9d23f41830e282e814e550bca1",
+  "repeated_identical_blob_logical_bytes": 2058243813,
+  "total_logical_bytes": 7083918754,
+  "warning": "Deleting paths does not remove committed blobs from Git history."
+}

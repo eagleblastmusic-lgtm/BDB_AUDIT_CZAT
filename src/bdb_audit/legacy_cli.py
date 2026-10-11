@@ -38,6 +38,8 @@ EXIT_CAMPAIGN_NOT_FOUND = 3
 EXIT_CONFLICT_ERROR = 4
 
 SOURCE_CAPABILITIES = {
+    "product_v1": "PREPARATION_LOCAL_CHECKS_PARTIAL_REPORT",
+    "external_result_acceptance": "DISABLED_NF02_OPEN",
     "build": "SUPPORTED",
     "self_test": "SUPPORTED",
     "audit_cli": "SUPPORTED",
@@ -83,6 +85,7 @@ def create_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--version", action="version", version=f"BDB Audit v{APP_VERSION} ({BUILD_ID})")
     subparsers = parser.add_subparsers(dest="command", help="Operational commands")
+    subparsers.add_parser("product", help="PRODUCT-V1: prepare, resume, partial report; NF02 OPEN")
 
     audit_p = subparsers.add_parser("audit", help="Audit user workflow")
     audit_subs = audit_p.add_subparsers(dest="subcommand", help="Audit operations")

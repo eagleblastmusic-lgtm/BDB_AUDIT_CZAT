@@ -1,0 +1,4754 @@
+{
+  "status": "PASS_WITHIN_DECLARED_PRODUCT_SCOPE",
+  "unique_verified_cases": 421,
+  "runs": [
+    {
+      "file": "PRODUCT_TEST_RESULTS.xml",
+      "cases": 421,
+      "not_pass": 31
+    },
+    {
+      "file": "ENVIRONMENT_RETRY_TEST_RESULTS.xml",
+      "cases": 38,
+      "not_pass": 0
+    },
+    {
+      "file": "PRODUCT_POST_CLEANUP_TEST_RESULTS.xml",
+      "cases": 15,
+      "not_pass": 0
+    },
+    {
+      "file": "FINAL_CLI_TEST_RESULTS.xml",
+      "cases": 21,
+      "not_pass": 0
+    }
+  ],
+  "case_results": [
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_cross_process",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_decimal_rational",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_decimal_rejections[+1]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_decimal_rejections[-01]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_decimal_rejections[-0]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_decimal_rejections[.5]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_decimal_rejections[0.00]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_decimal_rejections[00]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_decimal_rejections[1.0]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_decimal_rejections[1.]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_decimal_rejections[1e2]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_domain_and_ids",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_golden",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[\"\\ud800\"]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[\"\\udfff\"]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[+1]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[-0]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[-9007199254740992]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[1.0]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[1e0]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[9007199254740992]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[Infinity]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[NaN]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[\\xef\\xbb\\xbf{}]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[\\xff]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[{\"\\u00e9\":1}]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[{\"a\":1,\"\\u0061\":2}]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_parse_rejections[{\"a\":1,\"a\":2}]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_pinned_golden_identity_vectors",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_reference_boundaries",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_reference_properties",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_resource_bounds_and_alias_bypass",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_roundtrip[-9007199254740991]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_roundtrip[0]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_roundtrip[9007199254740991]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_roundtrip[False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_roundtrip[None]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_roundtrip[True]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_roundtrip[\\U0001f600]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_roundtrip[\\xe9]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_roundtrip[e\\u0301]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_roundtrip[value9]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_stream_ownership_and_bounds",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_core",
+      "name": "test_unicode_and_order",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[BAD_F1_CHECKPOINT]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[BAD_F2_CHECKPOINT]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[BROKEN_LEDGER_PREFIX]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[CONFLICTING_DUPLICATE]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[DUPLICATE_MEMBER]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[EARLY_REVEAL]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[INVALID_HASH_MANIFEST]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[MISSING_SNAPSHOT]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[SOURCE_GENERATION_MIX]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[SUBSTITUTE_F2]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[UNSAFE_ZIP_PATH]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[VALID_ATTESTATION]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[VALID_BASE_F1]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[VALID_BASE_FINAL]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[VALID_CONTINUATION_TICKET]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[VALID_E2_F1]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[VALID_E2_F2]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[VALID_E2_FINAL]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[VALID_PREVIOUS_PROMPT_BUNDLE]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[WRONG_ARTIFACT_FAMILY]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[WRONG_AUDIT_ID]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[WRONG_RUN_ID]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[WRONG_SOURCE_SHA]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[WRONG_SOURCE_TREE]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_dual_corpus[WRONG_VARIANT]",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_exact_payload_metadata_and_duplicate_basename",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_missing_and_malformed_archive",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_prefix_sequence_boundaries",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_previous_prompt_failure_paths",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_snapshot_raw_binding",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_legacy",
+      "name": "test_two_oracles",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_actual_decompression_not_header[0]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_actual_decompression_not_header[12]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_actual_decompression_not_header[14]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_actual_decompression_not_header[8]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_actual_decompression_not_header[93]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_crc_and_nested",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_duplicates_and_special",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_empty_and_zip64_metadata",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_manifest_cases",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_owned_handle_cleanup",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_paths[../a]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_paths[//host/a]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_paths[/a]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_paths[C:/a]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_paths[a/../../b]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_paths[a\\\\b]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_quotas",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f1.test_zip",
+      "name": "test_representation_identity",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_authority_repairs",
+      "name": "test_accepted_resolver_requires_exact_cut_and_membership",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_authority_repairs",
+      "name": "test_command_required_fields_and_initialization_shape",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_authority_repairs",
+      "name": "test_delivery_uses_accepted_grant_and_rebuilds_without_grant_cache",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_authority_repairs",
+      "name": "test_finding_claim_successor_identity_and_revision_are_store_enforced",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_authority_repairs",
+      "name": "test_forged_blindness_annotations_cannot_supply_missing_fact[DECLARED-False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_authority_repairs",
+      "name": "test_forged_blindness_annotations_cannot_supply_missing_fact[DECLARED-True]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_authority_repairs",
+      "name": "test_forged_blindness_annotations_cannot_supply_missing_fact[ENFORCED-False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_authority_repairs",
+      "name": "test_forged_blindness_annotations_cannot_supply_missing_fact[ENFORCED-True]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_authority_repairs",
+      "name": "test_forged_blindness_annotations_cannot_supply_missing_fact[UNKNOWN-False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_authority_repairs",
+      "name": "test_forged_blindness_annotations_cannot_supply_missing_fact[UNKNOWN-True]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_authority_repairs",
+      "name": "test_forged_local_grant_does_not_authorize_delivery",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_authority_repairs",
+      "name": "test_runtime_acceptance_enforces_fsm_before_persistence",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_bootstrap_order_diagnostic",
+      "name": "test_diagnostic_command_is_not_reported_as_gate_pass",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_bootstrap_order_diagnostic",
+      "name": "test_order_conflict_reproduces_from_exact_sources",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_cli",
+      "name": "test_help_has_no_domain_side_effect",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_closure_tiebreak_regression",
+      "name": "test_independent_command_uses_normative_kind_order[False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_closure_tiebreak_regression",
+      "name": "test_independent_command_uses_normative_kind_order[True]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_closure_tiebreak_regression",
+      "name": "test_typed_dependency_still_precedes_kind_order",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_golden_vectors_complete",
+      "name": "test_bootstrap_precedence_r5n80_and_fr03_vectors",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_golden_vectors_complete",
+      "name": "test_canonical_identity_vectors",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_golden_vectors_complete",
+      "name": "test_commit_closure_and_dag_vectors",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_golden_vectors_complete",
+      "name": "test_fsm_vectors",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_golden_vectors_complete",
+      "name": "test_golden_set_identity_and_completeness",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_golden_vectors_complete",
+      "name": "test_governance_and_schema_boundary_vectors",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_history_process_faults",
+      "name": "test_process_death_is_old_or_new_complete[after_commit_before_receipt]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_history_process_faults",
+      "name": "test_process_death_is_old_or_new_complete[after_commit_durability_before_ack]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_history_process_faults",
+      "name": "test_process_death_is_old_or_new_complete[after_head_durability]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_history_process_faults",
+      "name": "test_process_death_is_old_or_new_complete[after_object_durability]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_history_process_faults",
+      "name": "test_process_death_is_old_or_new_complete[after_receipt_before_head]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_history_process_faults",
+      "name": "test_process_death_is_old_or_new_complete[before_commit_durability]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_history_process_faults",
+      "name": "test_process_death_is_old_or_new_complete[before_object_durability]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_history_process_faults",
+      "name": "test_real_concurrent_expected_head_conflict",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m10_schema_identity",
+      "name": "test_all_f2_schema_keys_are_bound_with_backend_identity",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m10_schema_identity",
+      "name": "test_layered_validator_fail_closed_before_unbound_runtime_acceptance",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m11_corpus",
+      "name": "test_corpus_rejects_multiple_direct_and_cross_source_members",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m11_corpus",
+      "name": "test_direct_predecessor_single_auxiliary_multi_and_legacy_raw_preserved",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m12_knowledge_discovery",
+      "name": "test_knowledge_state_is_attempt_bound_and_blind_origin_needs_earlier_cut",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m12_knowledge_discovery",
+      "name": "test_provenance_classes_and_no_false_blind_claim",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m13_quarantine",
+      "name": "test_nested_allowed_refs_are_projected_to_safe_bytes_deterministically",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m13_quarantine",
+      "name": "test_nested_forbidden_refs_are_checked_recursively[dict-in-dict]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m13_quarantine",
+      "name": "test_nested_forbidden_refs_are_checked_recursively[dict-in-list]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m13_quarantine",
+      "name": "test_nested_forbidden_refs_are_checked_recursively[list-in-dict]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m13_quarantine",
+      "name": "test_nested_forbidden_refs_are_checked_recursively[list-in-list]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m13_quarantine",
+      "name": "test_quarantine_positive_bytes_and_opaque_namespace",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m13_quarantine",
+      "name": "test_transitive_forbidden_ref_fails_closed",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m5_fsm",
+      "name": "test_e0_and_lane_completion_gates",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m5_fsm",
+      "name": "test_terminal_state_and_retry_are_immutable",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m5_objects",
+      "name": "test_bootstrap_accepts_one_head_and_retry",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m5_objects",
+      "name": "test_empty_history_after_seq1_and_blocked_admission_rejected",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m5_objects",
+      "name": "test_r5n80_union_precedence_vectors",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m5_transaction",
+      "name": "test_each_persistence_boundary_recovers_old_or_new[after_commit_before_receipt]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m5_transaction",
+      "name": "test_each_persistence_boundary_recovers_old_or_new[after_commit_durability_before_ack]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m5_transaction",
+      "name": "test_each_persistence_boundary_recovers_old_or_new[after_head_durability]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m5_transaction",
+      "name": "test_each_persistence_boundary_recovers_old_or_new[after_object_durability]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m5_transaction",
+      "name": "test_each_persistence_boundary_recovers_old_or_new[after_receipt_before_head]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m5_transaction",
+      "name": "test_each_persistence_boundary_recovers_old_or_new[before_commit_durability]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m5_transaction",
+      "name": "test_each_persistence_boundary_recovers_old_or_new[before_object_durability]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m5_transaction",
+      "name": "test_expected_head_compare_and_id_reuse_conflict",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m6_stages",
+      "name": "test_initial_stage_registry_recognizes_e1_to_e5_and_exact_ref",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m6_stages",
+      "name": "test_stage_plan_rejects_duplicate_ordinal_cycle_missing_predecessor_and_reveal",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m7_isolation",
+      "name": "test_grant_exposure_is_monotonic_and_discovery_provenance",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m7_isolation",
+      "name": "test_isolation_classes_do_not_fallback_to_enforced",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m7_isolation",
+      "name": "test_isolation_requires_material_channel_basis_before_enforced",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m7_isolation",
+      "name": "test_lane_spec_keeps_isolation_and_knowledge_requirements_explicit",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m7_isolation",
+      "name": "test_store_does_not_accept_unresolved_enforced_isolation[False-ISOLATION_REQUIRED_ASSURANCE_MISMATCH]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m7_isolation",
+      "name": "test_store_does_not_accept_unresolved_enforced_isolation[True-ISOLATION_REQUIRED_ASSURANCE_MISMATCH]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m8_capability",
+      "name": "test_grant_is_accepted_before_delivery",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m8_capability",
+      "name": "test_positive_view_excludes_hidden_and_transitive_forbidden_bytes",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m8_capability",
+      "name": "test_recursive_positive_view_rejects_nested_cycles_and_unknown_refs[cycle-VIEW_REFERENCE_CYCLE]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m8_capability",
+      "name": "test_recursive_positive_view_rejects_nested_cycles_and_unknown_refs[unknown-VIEW_TRANSITIVE_LEAK]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_m9_compiler",
+      "name": "test_compiler_is_byte_deterministic_and_has_no_authority_writer",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_backend_identity_and_format_behavior",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_bound_exact_bytes_no_rebinding_and_reference_parity",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_contract_mutations[canonical_role-OTHER-UNKNOWN_CANONICAL_ROLE]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_contract_mutations[material_refs-value2-EXPLICIT_COMPLETE]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_contract_mutations[ordering_rules-value0-ORDERING_RULE_DEFECT]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_contract_mutations[reference_contract_mode-SCHEMA_BOUND_BEFORE_FIRST_ACCEPTANCE-EXPLICIT_COMPLETE]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_duplicates_rejected_before_unbound_schema",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_exact_loader_and_unknown_kind_version",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_local_resolution_and_missing_target_fail_closed",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_offline_pinned_behavior[patch0-DIALECT]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_offline_pinned_behavior[patch1-EXTERNAL_RESOLUTION]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_offline_pinned_behavior[patch2-EXTERNAL_RESOLUTION]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_offline_pinned_behavior[patch3-FORMAT_NOT_PINNED]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_offline_pinned_behavior[patch4-DYNAMIC_RESOLUTION]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_r5n06_exact_missing_binding",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_r5n77_implementation_exists_without_acceptance",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_ref_classes_and_top_level_semantics_cannot_be_overridden",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_registry_concrete_golden[R5N01_CRITICAL_REGISTRY_REF_COMPLETENESS]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_registry_concrete_golden[R5N02_CANONICAL_ROLE_DOMAIN_REJECT]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_registry_concrete_golden[R5N04_DANGLING_REF_TARGET_REJECT]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_registry_concrete_golden[R5N25_EXPLICIT_COMPLETE_BODY_REGISTRY_PARITY]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_registry_concrete_golden[R5N42_REFERENCE_ARRAY_DEFAULT_ORDERING]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_registry_concrete_golden[R5N70_INVENTORY_INVARIANT_MATERIALITY_EXPLICIT]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_structural_failures_match_reference[body0]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_structural_failures_match_reference[body1]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_structural_failures_match_reference[body2]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_structural_failures_match_reference[body3]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f2.test_registry_schema",
+      "name": "test_typed_reference_set_identity_includes_schema",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m14_inventory",
+      "name": "test_input_disposition_record_and_enum_separation",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m14_inventory",
+      "name": "test_inventory_revision_and_domain_separation",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m14_inventory",
+      "name": "test_m14_gate_full_evaluation",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m14_inventory",
+      "name": "test_m14_golden_vectors",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m14_inventory",
+      "name": "test_m14_schemas_with_layered_validator",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m14_inventory",
+      "name": "test_scope_state_record_and_enum_separation",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m14_inventory",
+      "name": "test_surface_key_and_record",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m14_inventory",
+      "name": "test_terminal_accounting_validation",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m15_m16_coverage",
+      "name": "test_adversarial_coverage_engine",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m15_m16_coverage",
+      "name": "test_coverage_golden_vectors",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m15_m16_coverage",
+      "name": "test_coverage_obligation_and_input_history_requirement",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m15_m16_coverage",
+      "name": "test_coverage_obligation_qualification_and_single_waiver_authority",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m15_m16_coverage",
+      "name": "test_coverage_schemas_with_layered_validator",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m15_m16_coverage",
+      "name": "test_invariant_and_no_backlink_cycle",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m15_m16_coverage",
+      "name": "test_materiality_assessment",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m17_m18_hypothesis",
+      "name": "test_adversarial_hypothesis_rules",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m17_m18_hypothesis",
+      "name": "test_discovery_opportunity_map",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m17_m18_hypothesis",
+      "name": "test_hypothesis_confirmation_flow",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m17_m18_hypothesis",
+      "name": "test_hypothesis_lifecycle_and_rejection_retention",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m17_m18_hypothesis",
+      "name": "test_hypothesis_schema_with_layered_validator",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m19_experiment_execution",
+      "name": "test_experiment_spec_and_execution_binding",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m19_experiment_execution",
+      "name": "test_fr04_golden_vectors",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m19_experiment_execution",
+      "name": "test_m19_schemas_with_layered_validator",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m20_evidence_qualification",
+      "name": "test_evidence_qualification_and_applicability",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m20_evidence_qualification",
+      "name": "test_invalidation_propagation",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m20_evidence_qualification",
+      "name": "test_m20_schemas_with_layered_validator",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m20_evidence_qualification",
+      "name": "test_observation_creation",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m20_evidence_qualification",
+      "name": "test_shared_oracle_independence_rejection",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m21_m22_adjudication",
+      "name": "test_contradiction_and_majority_vote_forbidden",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m21_m22_adjudication",
+      "name": "test_finding_adjudication_flow",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m21_m22_adjudication",
+      "name": "test_finding_claim_successor_keeps_logical_identity_and_changes_revision_digest",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m21_m22_adjudication",
+      "name": "test_m21_golden_vectors",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m21_m22_adjudication",
+      "name": "test_m21_schemas_with_layered_validator",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m23_projection",
+      "name": "test_m23_derived_contribution_unique_support_leave_one_out",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m23_projection",
+      "name": "test_m23_projection_rebuild_determinism_and_no_canonical_mutation",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m23_projection",
+      "name": "test_m23_reject_contribution_as_canonical_authority",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m24_stage_completion_stop",
+      "name": "test_m24_intermediate_stop_forbids_pass_and_release_readiness",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m24_stage_completion_stop",
+      "name": "test_m24_intermediate_stop_happy_path_ends_continue_required",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m24_stage_completion_stop",
+      "name": "test_m24_schemas_validity",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m24_stage_completion_stop",
+      "name": "test_m24_stage_completion_happy_and_blocked",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m25_reference_slice",
+      "name": "test_foundation_reference_slice_determinism",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m25_reference_slice",
+      "name": "test_foundation_reference_slice_end_to_end",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m25_reference_slice",
+      "name": "test_store_rejects_completed_stage_without_required_results[None-output_refs1-STAGE_COMPLETION_EXECUTION_EVIDENCE_REQUIRED]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m25_reference_slice",
+      "name": "test_store_rejects_completed_stage_without_required_results[lane_refs0-None-REFERENCE_CARDINALITY_MISMATCH]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m26_adversarial_failures",
+      "name": "test_f1_contaminated_lane_rejects_blind_slot",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m26_adversarial_failures",
+      "name": "test_f2_missing_unknown_material_surface_blocks_stage_completion",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m26_adversarial_failures",
+      "name": "test_f3_shared_broken_oracle_rejects_independence",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m26_adversarial_failures",
+      "name": "test_f4_crash_and_idempotent_retry_exactly_one_accepted_effect",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m26_adversarial_failures",
+      "name": "test_f5_stale_predecessor_blocked_canonical_admission",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m26_adversarial_failures",
+      "name": "test_f6_invalidated_evidence_blocks_completion_until_replacement",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m26_adversarial_failures",
+      "name": "test_f7_insufficient_data_intermediate_stop_both_reasons",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_m26_adversarial_failures",
+      "name": "test_steady_state_stale_parent_head_fails_closed",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_pr028_regressions",
+      "name": "test_continuation_budget_authorization_dangling_rejected",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_pr028_regressions",
+      "name": "test_continuation_budget_authorization_none_legal_and_omitted",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_pr028_regressions",
+      "name": "test_continuation_budget_authorization_real_accepted_legal",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_pr028_regressions",
+      "name": "test_continuation_budget_authorization_wrong_kind_rejected",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_pr028_regressions",
+      "name": "test_schema_binding_snapshot_and_budget_optionality",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_pr028_regressions",
+      "name": "test_stop_input_snapshot_dangling_rejected",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_pr028_regressions",
+      "name": "test_stop_input_snapshot_extra_projection_input_conflict",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_pr028_regressions",
+      "name": "test_stop_input_snapshot_missing_projection_input_conflict",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_pr028_regressions",
+      "name": "test_stop_input_snapshot_stale_head_conflict",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_pr028_regressions",
+      "name": "test_stop_input_snapshot_valid_same_commit_pass",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_pr028_regressions",
+      "name": "test_stop_input_snapshot_wrong_kind_rejected",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_r5n15_prior_accepted_boundary",
+      "name": "test_content_or_prior_same_commit_remains_content_dag_legal",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_r5n15_prior_accepted_boundary",
+      "name": "test_fabricated_canonical_prior_ref_is_rejected",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_r5n15_prior_accepted_boundary",
+      "name": "test_generic_prior_accepted_same_commit_uses_r5n15_error",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_r5n15_prior_accepted_boundary",
+      "name": "test_orphan_object_row_is_not_prior_acceptance_evidence",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f3.test_r5n15_prior_accepted_boundary",
+      "name": "test_reference_slice_accepts_knowledge_before_discovery",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_distribution_provenance",
+      "name": "test_dist_readme_declares_release_authority_boundary",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_distribution_provenance",
+      "name": "test_generated_versioned_standalones_are_ignored",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_distribution_provenance",
+      "name": "test_generated_versioned_standalones_are_not_tracked",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_m46_build",
+      "name": "test_m46_build_reproducibility",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_m46_build",
+      "name": "test_m46_manifest_and_payload_contents",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_m46_build",
+      "name": "test_m46_no_absolute_machine_paths",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_m46_build",
+      "name": "test_m46_standalone_verification_and_tamper_detection",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_m46_standalone_clean_env",
+      "name": "test_standalone_payload_contains_pinned_runtime_closure",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_m46_standalone_clean_env",
+      "name": "test_standalone_runs_in_clean_isolated_python_without_jsonschema_installed",
+      "status": "PASS",
+      "evidence": "ENVIRONMENT_RETRY_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_cli",
+      "name": "test_full_assurance_cli_refuses_incomplete_campaign",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_cli",
+      "name": "test_remediation_cli_exports_only_proposed_plan_and_validates_it",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_cli",
+      "name": "test_report_bundle_cli_export_and_verify",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_cli",
+      "name": "test_single_report_formats_are_available",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_remediation_bundle",
+      "name": "test_bundle_is_deterministic_and_detects_tamper",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_remediation_bundle",
+      "name": "test_full_assurance_export_is_blocked_on_incomplete_campaign",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_remediation_bundle",
+      "name": "test_markdown_and_html_escape_untrusted_payload",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_remediation_bundle",
+      "name": "test_q09_requires_repair_unit_for_explicit_p0_p1",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_remediation_bundle",
+      "name": "test_remediation_cycle_is_rejected",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_remediation_bundle",
+      "name": "test_root_cause_planner_keeps_all_symptoms_and_stays_proposed",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_report_builder",
+      "name": "test_report_cannot_claim_full_assurance_by_default",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_report_builder",
+      "name": "test_report_is_deterministic_and_bound_to_exact_current_cut",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_report_builder",
+      "name": "test_report_reference_validation_fails_closed_on_dangling_ref",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_report_builder",
+      "name": "test_report_tracks_new_accepted_history_without_rewriting_prior_projection",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_report_builder",
+      "name": "test_report_validation_rejects_duplicate_accepted_fact",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_ru09_report_builder",
+      "name": "test_unknown_extraction_is_explicit_and_deterministic",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_runtime_build_input_closure",
+      "name": "test_declared_runtime_files_retained_and_transport_exclusions_preserved",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_runtime_build_input_closure",
+      "name": "test_declared_runtime_input_cannot_disappear[absent]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.f8.test_runtime_build_input_closure",
+      "name": "test_declared_runtime_input_cannot_disappear[directory]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_disabled_import_does_not_create_missing_store",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_manual_stage_import_blocked_without_mutation",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_public_import_is_disabled_without_any_mutation[declared_not_enforced]",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_public_import_is_disabled_without_any_mutation[missing_output]",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_public_import_is_disabled_without_any_mutation[second_slot]",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_public_import_is_disabled_without_any_mutation[self_grant]",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_public_import_is_disabled_without_any_mutation[stale_cut]",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_public_import_is_disabled_without_any_mutation[terminal_attempt]",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_public_import_is_disabled_without_any_mutation[unauthorized]",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_public_import_is_disabled_without_any_mutation[wrong_raw]",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_resume_rejects_tampered_package",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_start_refuses_overwriting_campaign",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_start_resume_and_report_bind_real_commit",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_product_v1",
+      "name": "test_store_cannot_self_authorize_or_accept_external_result",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.product.test_runner_real_git",
+      "name": "test_real_git_metadata_not_copied_and_cleanup_succeeds",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_cli_and_process_tree",
+      "name": "test_ru10_environment_verify_exposes_real_limitations",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_cli_and_process_tree",
+      "name": "test_ru10_required_host_filesystem_isolation_fails_closed",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_cli_and_process_tree",
+      "name": "test_ru10_timeout_terminates_spawned_child_process_tree",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_cli_and_process_tree",
+      "name": "test_ru10_tools_plan_and_run_and_results_cli",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_cli_and_process_tree",
+      "name": "test_ru10_vnext_cli_preserves_legacy_command_surface",
+      "status": "PASS",
+      "evidence": "FINAL_CLI_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_controlled_runner",
+      "name": "test_ru10_evidence_cannot_be_written_inside_target",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_controlled_runner",
+      "name": "test_ru10_executes_exact_argv_only_in_disposable_copy",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_controlled_runner",
+      "name": "test_ru10_network_isolation_requirement_fails_closed_when_unavailable",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_controlled_runner",
+      "name": "test_ru10_output_limit_is_not_success",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_controlled_runner",
+      "name": "test_ru10_sensitive_environment_is_rejected",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_controlled_runner",
+      "name": "test_ru10_shell_tokens_are_plain_arguments_not_shell_programs",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_controlled_runner",
+      "name": "test_ru10_timeout_is_not_success",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_environment_and_verification",
+      "name": "test_ru10_environment_manifest_binds_source_and_capability",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_environment_and_verification",
+      "name": "test_ru10_evidence_verifier_detects_raw_output_tamper",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_environment_and_verification",
+      "name": "test_ru10_evidence_verifier_detects_receipt_tamper",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_environment_and_verification",
+      "name": "test_ru10_source_manifest_is_content_bound_and_ignores_vcs_metadata",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_execution_bridge",
+      "name": "test_ru10_bridge_does_not_invent_observation_from_zero_exit",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_execution_bridge",
+      "name": "test_ru10_bridge_maps_blocked_to_unsupported_without_observations",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.runner.test_ru10_execution_bridge",
+      "name": "test_ru10_bridge_only_uses_explicit_observation_normalizer",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_ru02_source_identity",
+      "name": "test_d01_materializer_builds_full_manifest_from_exact_tree",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_ru02_source_identity",
+      "name": "test_d01_unmaterialized_lfs_pointer_blocks_complete_source",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_ru02_source_identity",
+      "name": "test_d20_annotated_tag_is_peeled_to_commit_and_tree",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_ru02_source_identity",
+      "name": "test_d20_arbitrary_40hex_is_not_accepted_without_commit_object",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_ru02_source_identity",
+      "name": "test_d26_credential_bearing_urls_are_rejected_without_echoing_secret",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_real_git",
+      "name": "test_real_git_archive_reconciles_paths_modes_symlink_and_exact_tree[sha1]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_real_git",
+      "name": "test_real_git_archive_reconciles_paths_modes_symlink_and_exact_tree[sha256]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_real_git",
+      "name": "test_real_unresolved_source_member_cannot_be_omitted_or_promoted[sha1-LFS]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_real_git",
+      "name": "test_real_unresolved_source_member_cannot_be_omitted_or_promoted[sha1-SUBMODULE]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_real_git",
+      "name": "test_real_unresolved_source_member_cannot_be_omitted_or_promoted[sha256-LFS]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_real_git",
+      "name": "test_real_unresolved_source_member_cannot_be_omitted_or_promoted[sha256-SUBMODULE]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_actual_member_budget_is_enforced",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_alias_and_unsafe_source_paths_rejected[../a]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_alias_and_unsafe_source_paths_rejected[/a]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_alias_and_unsafe_source_paths_rejected[a/./b]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_alias_and_unsafe_source_paths_rejected[a//b]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_alias_and_unsafe_source_paths_rejected[a\\\\b]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_corrupt_original_payload_rejected_without_extraction",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_declared_parent_metadata_is_not_source_member",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_exact_source_names_preserved[.gitignore]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_exact_source_names_preserved[\\u017c\\xf3\\u0142\\u0107.txt]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_exact_source_names_preserved[a/.hidden]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_exact_source_names_preserved[component:colon.txt]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_fail_closed_source_and_target_controls[bool_length]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_fail_closed_source_and_target_controls[bounded]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_fail_closed_source_and_target_controls[encoding]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_fail_closed_source_and_target_controls[lfs]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_fail_closed_source_and_target_controls[limit]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_fail_closed_source_and_target_controls[noncanonical_base64]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_fail_closed_source_and_target_controls[submodule]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_fail_closed_source_and_target_controls[target]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_member_reconciliation_rejects[rows0-SOURCE_ARCHIVE_MISSING_MEMBERS]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_member_reconciliation_rejects[rows1-SOURCE_ARCHIVE_UNDECLARED_MEMBER]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_member_reconciliation_rejects[rows2-SOURCE_ARCHIVE_MEMBER_CONFLICT]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_member_reconciliation_rejects[rows3-SOURCE_ARCHIVE_MODE_MISMATCH]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_member_reconciliation_rejects[rows4-SOURCE_ARCHIVE_UNDECLARED_DIRECTORY]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_member_reconciliation_rejects[rows5-SOURCE_ARCHIVE_UNDECLARED_DIRECTORY]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_member_reconciliation_rejects[rows6-SOURCE_ARCHIVE_DUPLICATE_OR_UNSUPPORTED_PATH]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_pointer_without_manifest_marker_still_rejects",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_supported_budget_caps_cannot_be_raised[central_bytes]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_supported_budget_caps_cannot_be_raised[expanded_bytes]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_supported_budget_caps_cannot_be_raised[input_bytes]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_supported_budget_caps_cannot_be_raised[member_bytes]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_supported_budget_caps_cannot_be_raised[members]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_supported_budget_caps_cannot_be_raised[ratio]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_archive_reconciliation",
+      "name": "test_symlink_target_bytes_read_without_following_and_generic_transport_unchanged",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_alias_conflict_in_bootstrap_closure_leaves_no_durable_history",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_complete_structured_schema_identity_ignores_mapping_insertion_order[history]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_complete_structured_schema_identity_ignores_mapping_insertion_order[projection]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_finalization_ref_sets_compare_complete_structured_schema_keys",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_generation_authority_branch_agrees_with_exact_identity[AUTHORIZED_GIT-repository_authority_ref-snapshot_authority_ref]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_generation_authority_branch_agrees_with_exact_identity[AUTHORIZED_SNAPSHOT-snapshot_authority_ref-repository_authority_ref]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_generation_cannot_contradict_its_exact_identity_context[authority_mode-False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_generation_cannot_contradict_its_exact_identity_context[authority_mode-True]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_generation_cannot_contradict_its_exact_identity_context[materialized_source_manifest_ref-False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_generation_cannot_contradict_its_exact_identity_context[materialized_source_manifest_ref-True]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_generation_cannot_contradict_its_exact_identity_context[snapshot_authority_ref-False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_generation_cannot_contradict_its_exact_identity_context[snapshot_authority_ref-True]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_generation_cannot_contradict_its_exact_identity_context[source_identity_profile_ref-False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_generation_cannot_contradict_its_exact_identity_context[source_identity_profile_ref-True]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_identity_or_alias_remapping_is_a_conflict[changed0]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_identity_or_alias_remapping_is_a_conflict[changed1]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_incomplete_binding_is_not_a_successful_alias_mapping[changed0]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_incomplete_binding_is_not_a_successful_alias_mapping[changed1]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_new_material_identity_can_have_its_own_new_generation_alias",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_same_identity_and_alias_can_retain_another_archive_representation",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_schema_substitution_is_not_the_same_authoritative_identity",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_typed_identity_is_hashable_and_compares_the_entire_schema_reference[legacy_schema]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_generation_alias_guard",
+      "name": "test_typed_identity_is_hashable_and_compares_the_entire_schema_reference[schema1]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_intermediate_object_lengths_are_not_supported[41]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_intermediate_object_lengths_are_not_supported[48]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_intermediate_object_lengths_are_not_supported[63]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_repository_algorithm_controls_exact_ids[sha1-40-40-None]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_repository_algorithm_controls_exact_ids[sha1-40-64-INVALID_GIT_TREE_OBJECT_ID]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_repository_algorithm_controls_exact_ids[sha1-41-40-INVALID_GIT_OBJECT_ID]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_repository_algorithm_controls_exact_ids[sha1-64-40-INVALID_GIT_OBJECT_ID]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_repository_algorithm_controls_exact_ids[sha256-40-64-INVALID_GIT_OBJECT_ID]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_repository_algorithm_controls_exact_ids[sha256-64-40-INVALID_GIT_TREE_OBJECT_ID]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_repository_algorithm_controls_exact_ids[sha256-64-64-None]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_repository_algorithm_controls_exact_ids[sha512-64-64-INVALID_GIT_OBJECT_ID]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha1-40-40-True]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha1-40-64-False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha1-41-40-False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha1-64-40-False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha256-40-64-False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha256-64-40-False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha256-64-64-True]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.stage2.test_source_object_format_regression",
+      "name": "test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha512-64-64-False]",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.workflow.test_platform",
+      "name": "test_generic_platform_adapter_fallbacks",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.workflow.test_platform",
+      "name": "test_mock_platform_adapter_queued_multi_select",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.workflow.test_platform",
+      "name": "test_mock_platform_adapter_records_clipboard_and_explorer",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.workflow.test_platform",
+      "name": "test_windows_platform_adapter_handles_missing_file_gracefully",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.workflow.test_settings",
+      "name": "test_atomic_save_leaves_no_temporary_garbage",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.workflow.test_settings",
+      "name": "test_campaign_locator_recording",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.workflow.test_settings",
+      "name": "test_github_repo_remembered_until_explicitly_changed",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.workflow.test_settings",
+      "name": "test_invalid_corrupted_config_fails_safe_to_defaults",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.workflow.test_settings",
+      "name": "test_no_credential_fields_in_persisted_settings",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.workflow.test_settings",
+      "name": "test_settings_default_values",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    },
+    {
+      "classname": "tests.workflow.test_settings",
+      "name": "test_settings_persistence_across_reloads",
+      "status": "PASS",
+      "evidence": "PRODUCT_TEST_RESULTS.xml"
+    }
+  ],
+  "binding_policy": "Latest case evidence replaces only the same previously failed case. Original failure logs retained. Generic foundation/read-model/build evidence reused where bound files and dependencies unchanged; final CLI/Product suite rerun after UTF-8 delta.",
+  "source_bindings": [
+    {
+      "path": ".gitattributes",
+      "bytes": 653,
+      "sha256": "d0f68b008f53f48aff7a4894ddf5ea48f139be5ab3bdfbe52ebe843e30aeb03d"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 185,
+      "sha256": "9ce3c4969bb25f9a00a6785c03cf922e78b18e817b86e4f00939d49adb96a621"
+    },
+    {
+      "path": "build/build_single_file.py",
+      "bytes": 22369,
+      "sha256": "9669cd90a6c7589958dce860a04874feb780d4db965d231f65bc203defc82827"
+    },
+    {
+      "path": "build/build_single_file_v2_0_2.py",
+      "bytes": 616,
+      "sha256": "763f301ed0d6fde20fcf43a81eebc5f32603dc5c33907b0faa78f7b1bfb1f199"
+    },
+    {
+      "path": "build/normalize_runtime_metadata.py",
+      "bytes": 5305,
+      "sha256": "1ce0d959b2f4d9736b45514ecb59c98ee2eaf00d0c60aed4b36d6fac0d67ee87"
+    },
+    {
+      "path": "pyproject.toml",
+      "bytes": 1692,
+      "sha256": "b3e0243059100c7940d8477af604350c3859f0765521e125ee42467881252bf7"
+    },
+    {
+      "path": "requirements-f2.lock",
+      "bytes": 189,
+      "sha256": "57ff29a80f28d2417b87b527a8b8f1b40fb378c56bfe537df8054fc2cc65feaf"
+    },
+    {
+      "path": "src/bdb_audit/__init__.py",
+      "bytes": 73,
+      "sha256": "a91245c311394aa4aa2af48233cb18101bc44e6ebe24ac834d76d87d0f47a843"
+    },
+    {
+      "path": "src/bdb_audit/__main__.py",
+      "bytes": 227,
+      "sha256": "04093690532c645c4764670a2048a4550515b98312ae6b2abcbe3382e4a0f86b"
+    },
+    {
+      "path": "src/bdb_audit/adjudication/__init__.py",
+      "bytes": 1674,
+      "sha256": "6269bcc2b87cc9b36b74bd37b24ac8075b66ca763b27c77414a9092551cce826"
+    },
+    {
+      "path": "src/bdb_audit/adjudication/contribution.py",
+      "bytes": 11951,
+      "sha256": "c426da067307dea2aadc98e1b185b4bef8031a7283d6d75714c15a20735cec57"
+    },
+    {
+      "path": "src/bdb_audit/adjudication/engine.py",
+      "bytes": 12706,
+      "sha256": "68e01e9fef03bde092004ac444afab1fc4b049e34ec7a824533a4b48e4c69291"
+    },
+    {
+      "path": "src/bdb_audit/adjudication/models.py",
+      "bytes": 22427,
+      "sha256": "ee7f265dd9fa14b2fd0cb8a68cbbf724680040b4f288f873f1b03465ba4bec33"
+    },
+    {
+      "path": "src/bdb_audit/assurance/__init__.py",
+      "bytes": 1483,
+      "sha256": "1a1c97667a814254557beffe66eedb36c70e21f24f97c52b8ee94babedba9a6a"
+    },
+    {
+      "path": "src/bdb_audit/assurance/artifact_hashes.py",
+      "bytes": 1545,
+      "sha256": "33b5700b91ef60c42b14eb97a41e3a66334517c926260af3c275d30a234e9f93"
+    },
+    {
+      "path": "src/bdb_audit/assurance/candidate_case.py",
+      "bytes": 8435,
+      "sha256": "5136c446d3c619165d8dd8884532b0f12e5be0fb9a58f835a1e7b06285337843"
+    },
+    {
+      "path": "src/bdb_audit/assurance/challenger.py",
+      "bytes": 13414,
+      "sha256": "21a2f2b4fdf0a8d0cfd65ea69fe65cc3e691456e5b5b23d027b3cbacfc162854"
+    },
+    {
+      "path": "src/bdb_audit/assurance/conclusion.py",
+      "bytes": 7630,
+      "sha256": "ac75b01d92177bfc1c90c9a9acaf6b5a5c5e76a4e4467976e9cc76375e89c4b0"
+    },
+    {
+      "path": "src/bdb_audit/assurance/finalization_identity.py",
+      "bytes": 2620,
+      "sha256": "573e4f7cf7e678869a8209949bcfff38e6c2e7f2f318199e6ae8ed01f0dcbb30"
+    },
+    {
+      "path": "src/bdb_audit/assurance/finalization_service.py",
+      "bytes": 25188,
+      "sha256": "3df2c4f896701b0156abce5879fc4456dde9d0d5d0a5d74297f6193c0ff67426"
+    },
+    {
+      "path": "src/bdb_audit/assurance/legacy.py",
+      "bytes": 54793,
+      "sha256": "558a3d7f52e756dd4028755da7afc8048e01bfe96c72051bd7eb86bd58725ef9"
+    },
+    {
+      "path": "src/bdb_audit/assurance/release.py",
+      "bytes": 16018,
+      "sha256": "8bc46b3f25b8c24f11dcff7de37fd4342180f3e1d67ad35458119cdc8e3f9586"
+    },
+    {
+      "path": "src/bdb_audit/assurance/residual_risk.py",
+      "bytes": 14359,
+      "sha256": "86edaf183eb0c3b7f70c783a4f5c84e70930ec3c2f4f8b12cb1924f8095fa572"
+    },
+    {
+      "path": "src/bdb_audit/assurance/residual_risk_finalization.py",
+      "bytes": 15288,
+      "sha256": "7df08abeed7b73c843230b83427c399deae0c5f7a5dba74a3af763dbdd405959"
+    },
+    {
+      "path": "src/bdb_audit/assurance/zip_safety.py",
+      "bytes": 10209,
+      "sha256": "315c686143f5300ec9259ef47e424e3294c7cbdabfdfd76233bb8a1ea93c7146"
+    },
+    {
+      "path": "src/bdb_audit/attack/__init__.py",
+      "bytes": 1000,
+      "sha256": "18033d796fa0f208c99fd38303b2be4a54d782ef5bcf5bc40190d502b3f4b6d0"
+    },
+    {
+      "path": "src/bdb_audit/attack/calibration.py",
+      "bytes": 7226,
+      "sha256": "da5c8117bd1e08c160c25c560493745f44e8398f9626b9cbef6b590bb43ca30e"
+    },
+    {
+      "path": "src/bdb_audit/attack/gate.py",
+      "bytes": 18072,
+      "sha256": "48887ead9ac7bb46711c1d86cc9647d294a2b478c344d34a9e35b7fcf0644f92"
+    },
+    {
+      "path": "src/bdb_audit/attack/hunter.py",
+      "bytes": 8010,
+      "sha256": "70257cfb959d270aa7b0265669537bb2793a2446cb52d0ec445e9f04eb8cd4bc"
+    },
+    {
+      "path": "src/bdb_audit/attack/interaction_graph.py",
+      "bytes": 16350,
+      "sha256": "b28308fcb9798ef44f9580945c17d97e146478e69969b3ed4d66adbb21b13015"
+    },
+    {
+      "path": "src/bdb_audit/attack/mutation.py",
+      "bytes": 16858,
+      "sha256": "a3b296f4acc41217edffdcc832e04602923f66254437be6914eafeb104abc41d"
+    },
+    {
+      "path": "src/bdb_audit/attack/scheduler.py",
+      "bytes": 9562,
+      "sha256": "7b0db0ffd627683de4e50c809999c3c270be4f4dc6954a1139205ad4421d19ed"
+    },
+    {
+      "path": "src/bdb_audit/attack/skeptic.py",
+      "bytes": 8705,
+      "sha256": "ac7705b7e4ad6e96716b36a70b42dbbdf1dfe1563112acbb352d101415face36"
+    },
+    {
+      "path": "src/bdb_audit/cli.py",
+      "bytes": 10356,
+      "sha256": "1042d4fecfa106bbf54eccda964cafb122a4e7c41df59ce18ab1c5155c2de77c"
+    },
+    {
+      "path": "src/bdb_audit/coordinator/__init__.py",
+      "bytes": 2165,
+      "sha256": "c27ab1f888472f2ea93c662a1b444beb2c11e2ea895b2b0f1a63e552eebd02f8"
+    },
+    {
+      "path": "src/bdb_audit/coordinator/e6_operation_hook.py",
+      "bytes": 6515,
+      "sha256": "69b6e714e5e8b67fc1ef533bfbcc919a71abf69deb53f925b92a1b115bb6373b"
+    },
+    {
+      "path": "src/bdb_audit/coordinator/operations.py",
+      "bytes": 31819,
+      "sha256": "2e5f57669bf143a7b5248ec81486fad73534485efece9c31aa544df4164c271b"
+    },
+    {
+      "path": "src/bdb_audit/coordinator/reference_slice.py",
+      "bytes": 34522,
+      "sha256": "c00bbd6cd34904c627f9b4f2b2481667737e7a238952f03039e014062eb63959"
+    },
+    {
+      "path": "src/bdb_audit/coordinator/reference_slice_residual_hook.py",
+      "bytes": 1748,
+      "sha256": "a47d441363b73adac22a917d3982388ad7b83c31eb967e24ed519c6bcb2e3865"
+    },
+    {
+      "path": "src/bdb_audit/core/__init__.py",
+      "bytes": 260,
+      "sha256": "86416fb58d40ed5fe43ebb2b7147944e0b7129df617f607eeb1172970d5f8821"
+    },
+    {
+      "path": "src/bdb_audit/core/artifact_contract_overlay_r5_3_3.json",
+      "bytes": 2043,
+      "sha256": "cdb3d3a934c4364e6c98a1a973d23e099921d184a3bdd9278def4fc418255de2"
+    },
+    {
+      "path": "src/bdb_audit/core/artifact_contract_registry_r5_3.json",
+      "bytes": 205238,
+      "sha256": "5a89cfe26d927c9bf2638ad1e656b4ed810544f8d35e3e0ddf1365cd54b7343c"
+    },
+    {
+      "path": "src/bdb_audit/core/artifact_contract_registry_r5_3_1.json",
+      "bytes": 208158,
+      "sha256": "3cd0945f2987499761281f51cadb48a5947ac8255e4af292f4837cbc843a2a8b"
+    },
+    {
+      "path": "src/bdb_audit/core/canonical_json.py",
+      "bytes": 4310,
+      "sha256": "62dfa640d32fdea9025ae167eb1c8a1c7a3bdde6d3b913677aad517ebdea37ac"
+    },
+    {
+      "path": "src/bdb_audit/core/errors.py",
+      "bytes": 282,
+      "sha256": "fd22fd0097c928833d63439c665e3dca4a9faa9fad7914ad3354c4715f8d4140"
+    },
+    {
+      "path": "src/bdb_audit/core/foundation_golden_vectors_r5_3_1.json",
+      "bytes": 71207,
+      "sha256": "1beeedd979c06816480cc5adc144fd3470a7379630e6ed8d4a4770c5448c48e7"
+    },
+    {
+      "path": "src/bdb_audit/core/hashing.py",
+      "bytes": 3514,
+      "sha256": "286dee6109409661624572e4c3e87935d33f22c9a0e3a7bfad8dabbf471248f1"
+    },
+    {
+      "path": "src/bdb_audit/core/ids.py",
+      "bytes": 3639,
+      "sha256": "ed86c60cff7fbde881733685cb83c3517f1fd5f798d12e8ba9055a52dd8aad44"
+    },
+    {
+      "path": "src/bdb_audit/core/registry.py",
+      "bytes": 15485,
+      "sha256": "1da10c55484fa8f7ce16885e62cd023d052bcb529ca76dbf85fdf9202e73ffd7"
+    },
+    {
+      "path": "src/bdb_audit/core/registry_overlay.py",
+      "bytes": 4545,
+      "sha256": "1a13df00d29a216f0c08f19ffb2355dd7ef77bafc7ce24756cdcbd57bbc91301"
+    },
+    {
+      "path": "src/bdb_audit/corpus/__init__.py",
+      "bytes": 430,
+      "sha256": "b4de42d09fedb7c9f5ee7316ef550595577abcc5325692aa451868bd411c7db3"
+    },
+    {
+      "path": "src/bdb_audit/corpus/engine.py",
+      "bytes": 7266,
+      "sha256": "a7bd45e4f6d3bf832624b3d4fb526c20eafc8e33c56bb7c9c80ff0181206715f"
+    },
+    {
+      "path": "src/bdb_audit/coverage/__init__.py",
+      "bytes": 1412,
+      "sha256": "4482ca06b282a07f12582ecd48092b98ac0a939a8c3edb8424af995dd18098ac"
+    },
+    {
+      "path": "src/bdb_audit/coverage/engine.py",
+      "bytes": 4196,
+      "sha256": "f7f4d29dac6fced7b196e4bb1d4e6179c78560ae0741e7e71487d30df8cbca47"
+    },
+    {
+      "path": "src/bdb_audit/coverage/gap_engine.py",
+      "bytes": 10123,
+      "sha256": "a014575c5aef9321f2fa8a4f2386769cc307afa97dac5c78529b50455285a7bb"
+    },
+    {
+      "path": "src/bdb_audit/coverage/invariants.py",
+      "bytes": 7471,
+      "sha256": "b371971f9f671c774be2c7cc40cef530477cb9d25938ef48175e1b8d057f0e97"
+    },
+    {
+      "path": "src/bdb_audit/coverage/models.py",
+      "bytes": 17314,
+      "sha256": "d708b82759ffb71df295c48248cb9935ccbaf61d82d4d73664b6fbc177d792f5"
+    },
+    {
+      "path": "src/bdb_audit/coverage/policies.py",
+      "bytes": 10574,
+      "sha256": "dd38fa51d030e2d0d6376d80f19421267483c3cd3eb894d1efaa8348ce4c74eb"
+    },
+    {
+      "path": "src/bdb_audit/deepen/__init__.py",
+      "bytes": 2299,
+      "sha256": "6bf61e36ca4ca3199e360a35ce7bd124d6f514981e78c472ab7e5447c1e6ea9d"
+    },
+    {
+      "path": "src/bdb_audit/deepen/adapters.py",
+      "bytes": 12884,
+      "sha256": "e6dbac7f739ac03d6a358eeeb54fb8ff2c0ea02a5597cbd4a07122d4d5ee159e"
+    },
+    {
+      "path": "src/bdb_audit/deepen/causal.py",
+      "bytes": 6593,
+      "sha256": "7e0267859cb9a031fc3fb3bd77cdb9495f56dfcda810874ed19ea77abdaac340"
+    },
+    {
+      "path": "src/bdb_audit/deepen/concurrency.py",
+      "bytes": 8497,
+      "sha256": "49fec12ac7db6aed4ed096b1b90b932dc55ec47c9a266f3de27235c1f7382d78"
+    },
+    {
+      "path": "src/bdb_audit/deepen/crash.py",
+      "bytes": 11315,
+      "sha256": "73a3abd173ea0325d7f8b43f152c0dde94d7c3987b6b7ba342f7c4440a188781"
+    },
+    {
+      "path": "src/bdb_audit/deepen/endurance.py",
+      "bytes": 7272,
+      "sha256": "1c77686225960e5aa57b13b03e090df7cf6dbc8b31d51095c08afabaae97a880"
+    },
+    {
+      "path": "src/bdb_audit/deepen/exploration.py",
+      "bytes": 9503,
+      "sha256": "1f7982d6ee7c6cd71d913c64944a3b4930f0924e0897dee411f4bba3a8ad7caf"
+    },
+    {
+      "path": "src/bdb_audit/deepen/gate.py",
+      "bytes": 14359,
+      "sha256": "2b0de47d79c54b7dd4c1d7bfaeba51d6447b575ea4055eeb1e907be42010b3ac"
+    },
+    {
+      "path": "src/bdb_audit/deepen/state_model.py",
+      "bytes": 15948,
+      "sha256": "917b4dbb43944be3c39f680703520b78963f8b32d058e7f204b9fb150afd4249"
+    },
+    {
+      "path": "src/bdb_audit/deepen/temporal.py",
+      "bytes": 11328,
+      "sha256": "6dfd3051327e55e985bbd584f8741e2f8df5393ed45036750dc0637a05975a8a"
+    },
+    {
+      "path": "src/bdb_audit/evidence/__init__.py",
+      "bytes": 1124,
+      "sha256": "77a4108762c0a208e8195535cc3ec2e64da0d15214fd9610f3cd0d0910b5c4d3"
+    },
+    {
+      "path": "src/bdb_audit/evidence/engine.py",
+      "bytes": 2564,
+      "sha256": "2c2f7174ac26387808b47ad8babfac42490cf9317d071d3164b26ae8a9095676"
+    },
+    {
+      "path": "src/bdb_audit/evidence/graph.py",
+      "bytes": 13316,
+      "sha256": "43cac4103adb3677556f89556b7765658349dfb333c274ebedada838d1b09aa0"
+    },
+    {
+      "path": "src/bdb_audit/evidence/models.py",
+      "bytes": 13186,
+      "sha256": "b4600b15fae3272d21179cde114aecc66c298c64385a9175d4618409db10371a"
+    },
+    {
+      "path": "src/bdb_audit/execution/__init__.py",
+      "bytes": 2243,
+      "sha256": "d5c372ce70f46636fff8112ab33c9446e69c4f7414a09232e5e763c073e69695"
+    },
+    {
+      "path": "src/bdb_audit/execution/adapters.py",
+      "bytes": 7789,
+      "sha256": "1c778a0e39dc0372801289464c734896c7dbb1b94a0c0c1c1acf3a4549ae2cb9"
+    },
+    {
+      "path": "src/bdb_audit/execution/dag.py",
+      "bytes": 2001,
+      "sha256": "aa4817b84484d982cef346bf586781353996c63deea18fa6a53314ef8e73e67f"
+    },
+    {
+      "path": "src/bdb_audit/execution/differential.py",
+      "bytes": 15120,
+      "sha256": "3d6b6c6198967a35f8c125242b31531bb5deb939c17bf988cdb6cda069daaca3"
+    },
+    {
+      "path": "src/bdb_audit/execution/fuzzing.py",
+      "bytes": 16099,
+      "sha256": "d10d2fa0bbc8006cf81217d038010454e7a55a245f2db482e715b616c5a55e19"
+    },
+    {
+      "path": "src/bdb_audit/execution/metamorphic.py",
+      "bytes": 17141,
+      "sha256": "7dd4c1c8a6f6503b5db018887c4b4856ea7e7ad02efac3a6e965b7e60ee7a173"
+    },
+    {
+      "path": "src/bdb_audit/execution/models.py",
+      "bytes": 9942,
+      "sha256": "229d46687ad2d0f981f829c99da9356cb37805679c3f41c7bdf776f0d5930bcd"
+    },
+    {
+      "path": "src/bdb_audit/features/__init__.py",
+      "bytes": 910,
+      "sha256": "0a65b6e9a600bf22155a75323959ef5652327643a44de83a0d7a1596d076c219"
+    },
+    {
+      "path": "src/bdb_audit/features/cli.py",
+      "bytes": 9560,
+      "sha256": "e37b33d4d392ad8c22100a40f86457bdf466c36847b1be3fee27f84b01acd154"
+    },
+    {
+      "path": "src/bdb_audit/features/discovery.py",
+      "bytes": 5752,
+      "sha256": "8f3aad2e12d1f2716b0cdcfc9245b4ca9dcdf1ed96af4d7adc9581908fc30d37"
+    },
+    {
+      "path": "src/bdb_audit/features/models.py",
+      "bytes": 10534,
+      "sha256": "f6ad1360c90f865e31998e8530f8c56b95fad6a1d745dd5c6a70a56f7f796d04"
+    },
+    {
+      "path": "src/bdb_audit/features/oracles.py",
+      "bytes": 1164,
+      "sha256": "1d4bbdb540ff1ccd13be16d37958d4b953c9deb9cb4b1d64c4aca72014b909d2"
+    },
+    {
+      "path": "src/bdb_audit/features/planner.py",
+      "bytes": 1103,
+      "sha256": "cc18abb2b34105d90b5e21eb740d345a80c379ca0464eb04ca9777c73e40fc3e"
+    },
+    {
+      "path": "src/bdb_audit/features/projection.py",
+      "bytes": 3643,
+      "sha256": "b520273f53d98c9ef9c8edb3ace4b718a6e7ccee45a4d854f122b9826aba207d"
+    },
+    {
+      "path": "src/bdb_audit/features/serialization.py",
+      "bytes": 4485,
+      "sha256": "c26397797a8c9432bafab446687206c9919afe9727fe890809f9bb3352c6ffd3"
+    },
+    {
+      "path": "src/bdb_audit/features/testability.py",
+      "bytes": 988,
+      "sha256": "63676f387e52c12f446ee3cd7191f4e38028483b924ddf69757340d60b2a6d97"
+    },
+    {
+      "path": "src/bdb_audit/features/verification.py",
+      "bytes": 6511,
+      "sha256": "6af79dea9e308925053277962527cfe2af3fcfe2c0e674fbe953f64cf56d0f10"
+    },
+    {
+      "path": "src/bdb_audit/history/__init__.py",
+      "bytes": 2164,
+      "sha256": "b0bd0f6c82e70d467d983117b692d090379496c1b6f714ac614276bf494af0de"
+    },
+    {
+      "path": "src/bdb_audit/history/authority_hooks.py",
+      "bytes": 109415,
+      "sha256": "6d95db4a30eeedd43c50cc6e5da15ee35adb206de9b1068b7349b5d2f66a9a98"
+    },
+    {
+      "path": "src/bdb_audit/history/closure.py",
+      "bytes": 7369,
+      "sha256": "4c6baa8461380e9d295a603266bfbda8cb3333545e0bd0e87011d34b8e4735ad"
+    },
+    {
+      "path": "src/bdb_audit/history/objects.py",
+      "bytes": 31381,
+      "sha256": "dbb3eb6e7e5b51ce9b37d03d4392cd119d5d2fa04581834722c65647ff88fe6b"
+    },
+    {
+      "path": "src/bdb_audit/history/raw_artifacts.py",
+      "bytes": 4486,
+      "sha256": "9751d00ba9b53a0802568a917e9cc7ea0fe0f9f89440fb70ab8b3d308ffebbe7"
+    },
+    {
+      "path": "src/bdb_audit/history/replay.py",
+      "bytes": 7589,
+      "sha256": "e43e685ca73ea78ba828173973272f91278d60298fb7c8ca6f332ae50324b00f"
+    },
+    {
+      "path": "src/bdb_audit/history/residual_risk_release_authority.py",
+      "bytes": 5379,
+      "sha256": "1c80064058f3e86ed76e40d117cfe5e63515d15b7428088239bf1389dfa7724e"
+    },
+    {
+      "path": "src/bdb_audit/history/store.py",
+      "bytes": 61452,
+      "sha256": "a9b72fcbcb1f0bb9800c4974a14267020b328c0e468b9d5a211043282b1c5f79"
+    },
+    {
+      "path": "src/bdb_audit/history/successor.py",
+      "bytes": 8138,
+      "sha256": "ec8e9b70c696cb3a5fc07c093496abdce73c54d2ed3725955fd5ee069a5a0c23"
+    },
+    {
+      "path": "src/bdb_audit/history_view/__init__.py",
+      "bytes": 342,
+      "sha256": "05f343ecfa02f6d0006ca3614e49f9116dce147cb904075d7f70e417b23cf0cd"
+    },
+    {
+      "path": "src/bdb_audit/history_view/cli.py",
+      "bytes": 5303,
+      "sha256": "1b4de146301424959fc82b619452c1bae8ce9cff0585076abdbb66b81c2376dd"
+    },
+    {
+      "path": "src/bdb_audit/history_view/models.py",
+      "bytes": 2416,
+      "sha256": "b917e3f706f14ad13376b2504f0179f4e8ff96856ec8717637e18e5d5c19c2fd"
+    },
+    {
+      "path": "src/bdb_audit/history_view/share.py",
+      "bytes": 7115,
+      "sha256": "0731ff8de535516f68b66e4a8e92e295f62cd4fa64455b44fc7f33cbe7f1419c"
+    },
+    {
+      "path": "src/bdb_audit/history_view/trends.py",
+      "bytes": 2934,
+      "sha256": "6c91fe939f003a3cd703ae18e39a284d725897e786a8dbcaf9b3b6f780c1112e"
+    },
+    {
+      "path": "src/bdb_audit/hypothesis/__init__.py",
+      "bytes": 527,
+      "sha256": "a59f5057cf575f01385e591f75fa206a75344ba7615fde1156707dc722e65c58"
+    },
+    {
+      "path": "src/bdb_audit/hypothesis/engine.py",
+      "bytes": 3565,
+      "sha256": "dd22fbce9df67b6aaeba473163362acecbc8d6ef4f66ab2348f4f6ea953143bf"
+    },
+    {
+      "path": "src/bdb_audit/hypothesis/models.py",
+      "bytes": 4363,
+      "sha256": "e60fd73ff71d944686a975cf24bbd87cb0c1104ecc33705c67b2d2dfa48a4c48"
+    },
+    {
+      "path": "src/bdb_audit/hypothesis/orchestrator.py",
+      "bytes": 6617,
+      "sha256": "e363e7d0008c19b6758815be8b58c32a4bb9075286e3a98ed2ee1f78c60f2290"
+    },
+    {
+      "path": "src/bdb_audit/incremental/__init__.py",
+      "bytes": 652,
+      "sha256": "6ac6a48c4f5f7668ea7176fba64e75108000d336f6c555a30849e6e9df1b0d81"
+    },
+    {
+      "path": "src/bdb_audit/incremental/cli.py",
+      "bytes": 9397,
+      "sha256": "b4bbed00a5cd0ea401a8175d68dfe6c36eb9e9a0027c852d4b099a17d6bf5201"
+    },
+    {
+      "path": "src/bdb_audit/incremental/models.py",
+      "bytes": 10529,
+      "sha256": "1c388475b1de594de1337d56eecac9421acbfa114adedd6d417c0b4337065d3f"
+    },
+    {
+      "path": "src/bdb_audit/incremental/planner.py",
+      "bytes": 7999,
+      "sha256": "4e4d95e3a6ce8707f53cfab402d054fcd403e205f5fae961a891f3de1701024a"
+    },
+    {
+      "path": "src/bdb_audit/inventory/__init__.py",
+      "bytes": 1035,
+      "sha256": "e069de838908d662b64b99ecc8f6309b978c07809b4cd550a4c10b58ba1afb08"
+    },
+    {
+      "path": "src/bdb_audit/inventory/accounting.py",
+      "bytes": 6862,
+      "sha256": "76ac9d088133d614bc374863119dec9520bc404f62f4b368464a11425f2e3560"
+    },
+    {
+      "path": "src/bdb_audit/inventory/engine.py",
+      "bytes": 10218,
+      "sha256": "4f041d2091b5561d875b78bc97bf90664ba68658aeac4a65a1f6d31eeb0f604b"
+    },
+    {
+      "path": "src/bdb_audit/inventory/models.py",
+      "bytes": 13136,
+      "sha256": "1076b073f018bef292aa1e2caf888318ca205ff07fda80f7ca42acd7bd223e87"
+    },
+    {
+      "path": "src/bdb_audit/knowledge/__init__.py",
+      "bytes": 693,
+      "sha256": "7cc86583283bf63f938548508df6ed188d9585fa67921719a43cd8f40c9d91b2"
+    },
+    {
+      "path": "src/bdb_audit/knowledge/exposure.py",
+      "bytes": 17882,
+      "sha256": "8972fb134d6d4415ed33760124fd5e8b6edc4c4d9de178202354f850bd01c5bf"
+    },
+    {
+      "path": "src/bdb_audit/knowledge/quarantine.py",
+      "bytes": 2083,
+      "sha256": "3d2c9bbb834a5928fb7f8a99cc7ffb981a2e1a999e126a8df2d26fa89d780f59"
+    },
+    {
+      "path": "src/bdb_audit/legacy_cli.py",
+      "bytes": 20894,
+      "sha256": "3e6b6fcae03e5d3b2e7918c97f8eaa180ecb60ca004b2c28cd1f36234a675dd8"
+    },
+    {
+      "path": "src/bdb_audit/opportunities/__init__.py",
+      "bytes": 522,
+      "sha256": "58aed29d6bf040c13c8d04f50133ad27691d91a551fa676baa34e39cd7f6dc9d"
+    },
+    {
+      "path": "src/bdb_audit/opportunities/analysis.py",
+      "bytes": 2142,
+      "sha256": "2e5ddd021b6594c07fc510167d6ebc62a7549618c9f39dfa1b844ddb03c721fb"
+    },
+    {
+      "path": "src/bdb_audit/opportunities/analysis_helpers.py",
+      "bytes": 1646,
+      "sha256": "e1a88201490265ffd7d1469fe7b9ed36834392cd86c564faa19821e0408ce978"
+    },
+    {
+      "path": "src/bdb_audit/opportunities/architecture/__init__.py",
+      "bytes": 131,
+      "sha256": "ebc0f54c3c103a815c0f2b0cf5839df9b37e0a984101b3154331d3590022cdf5"
+    },
+    {
+      "path": "src/bdb_audit/opportunities/architecture/improvements.py",
+      "bytes": 706,
+      "sha256": "507b3355b09ef2ad7c0502ed28bf2c3d3154453a2ec8fa489a49015c3f5504be"
+    },
+    {
+      "path": "src/bdb_audit/opportunities/cli.py",
+      "bytes": 6362,
+      "sha256": "ed1cd325d6ae9be72ad9b9e243dfa4b6ec85666cd7d1178681c47f5b10566ea6"
+    },
+    {
+      "path": "src/bdb_audit/opportunities/friction.py",
+      "bytes": 1442,
+      "sha256": "2777e86669dedb0b1d4718c5f4f98e35147bc77e85b7057600e5575b323dfba1"
+    },
+    {
+      "path": "src/bdb_audit/opportunities/models.py",
+      "bytes": 6646,
+      "sha256": "5f5008fe7746cef7301e4408cbcf98404a638ff748225399358f50c90b8cdb35"
+    },
+    {
+      "path": "src/bdb_audit/opportunities/platform_patterns.py",
+      "bytes": 942,
+      "sha256": "c0e9e02530230678e2748a1c2e4f087bf72962b0628d8e396101084634372d1c"
+    },
+    {
+      "path": "src/bdb_audit/opportunities/product_context.py",
+      "bytes": 498,
+      "sha256": "62deef8438fb60e9837428b1bb0eb542466c4f66254530ecb17fea02eb4db1b8"
+    },
+    {
+      "path": "src/bdb_audit/opportunities/ranking.py",
+      "bytes": 1566,
+      "sha256": "8ad310be47d2e033b73e5a4ce9971983944c0938143017f6886def5ac64dd3ed"
+    },
+    {
+      "path": "src/bdb_audit/opportunities/skeptic.py",
+      "bytes": 1371,
+      "sha256": "d79f8d0261ddd0961bae3c0212b3b3d1ae8cacd26d5ce2ef50611dc72130710e"
+    },
+    {
+      "path": "src/bdb_audit/opportunities/task_traces.py",
+      "bytes": 1325,
+      "sha256": "7fae8bee79e73701accbaf8bb06f24956fc2eb4837953738645850564d1284b0"
+    },
+    {
+      "path": "src/bdb_audit/orchestration/__init__.py",
+      "bytes": 2644,
+      "sha256": "93932c727153260c67cc95abe801cf4dd2d40521c3d54e9f8e5c0a2b3bf4ec31"
+    },
+    {
+      "path": "src/bdb_audit/orchestration/capability.py",
+      "bytes": 14146,
+      "sha256": "666f2065da53545ac69da978fbe4e203ad57e7626a5b4eb99a4044e89015b241"
+    },
+    {
+      "path": "src/bdb_audit/orchestration/compiler.py",
+      "bytes": 2289,
+      "sha256": "84d8f8d7a4a333dd4b7e5961ab4e1cc5e26e246396a9c733cb64e233038fbfeb"
+    },
+    {
+      "path": "src/bdb_audit/orchestration/compiler_v1.py",
+      "bytes": 117,
+      "sha256": "87f2294f6f3a465a3cc097e32c2a85f5832ac84091c27724cf4c4557dfe88c17"
+    },
+    {
+      "path": "src/bdb_audit/orchestration/e3.py",
+      "bytes": 29393,
+      "sha256": "b73c200834ff13811c0a1eedfa04ab0f858fbda8fb2ae3fca5f46e4cc0191a12"
+    },
+    {
+      "path": "src/bdb_audit/orchestration/e3_gate.py",
+      "bytes": 12563,
+      "sha256": "4b5d0630585817b912703ac5ba7cb878cbc73d1b8122f9e606be393439e42409"
+    },
+    {
+      "path": "src/bdb_audit/orchestration/e3_reveal.py",
+      "bytes": 27997,
+      "sha256": "9555a1970de365df90896e5fa59f5bfa25e18fa88a316f2f066a9bb2256aa0e7"
+    },
+    {
+      "path": "src/bdb_audit/orchestration/fsm.py",
+      "bytes": 8682,
+      "sha256": "1d6bb3f5589cdc8cc54a990d26e51ca108c3117ab3d6823cf792f3126a096558"
+    },
+    {
+      "path": "src/bdb_audit/orchestration/isolation.py",
+      "bytes": 197,
+      "sha256": "9f7e1d24cc7a7937507fb504da88db06b9e1678c7258406435512d2fc599fd51"
+    },
+    {
+      "path": "src/bdb_audit/orchestration/native_ensemble.py",
+      "bytes": 22235,
+      "sha256": "278bddc2efe7c2eb0181cbf9ac82c727728b3a14b2d26d748082b67041a7d377"
+    },
+    {
+      "path": "src/bdb_audit/orchestration/runs.py",
+      "bytes": 9600,
+      "sha256": "5b24a18cec8968cebd11d8be8d78c4a74b8cc8173c8e460a06fe61343a6f302a"
+    },
+    {
+      "path": "src/bdb_audit/orchestration/stages.py",
+      "bytes": 9989,
+      "sha256": "dd075f836de46d152a0b883957c89d103ab39b389b8ab4a9c26ed0c8dc77f4c3"
+    },
+    {
+      "path": "src/bdb_audit/orchestration/templates.py",
+      "bytes": 6800,
+      "sha256": "86ed53b6f6803765e8c99b17605452aaeaacff5aabc0c23ad958f07b1651ee68"
+    },
+    {
+      "path": "src/bdb_audit/product_cli.py",
+      "bytes": 7090,
+      "sha256": "447e8b906809355dbc66d37a76d322f7f80ece5bac125b25522d8902b06d80cc"
+    },
+    {
+      "path": "src/bdb_audit/product_safety.py",
+      "bytes": 730,
+      "sha256": "381c69c286f4c474ff2ac56878fd8610d0d6f7aa3e0547a35ddaa54e92fea46d"
+    },
+    {
+      "path": "src/bdb_audit/qualification/__init__.py",
+      "bytes": 455,
+      "sha256": "45c6c7584ac46ad4883c97d2091637c7dc5a13efc5fb03a81113047316a546b7"
+    },
+    {
+      "path": "src/bdb_audit/qualification/cli.py",
+      "bytes": 4281,
+      "sha256": "738a11373901d1867008c663f2a6c8cf884c38c65c65f0af02bbdae7b4aafc58"
+    },
+    {
+      "path": "src/bdb_audit/qualification/continuous.py",
+      "bytes": 9438,
+      "sha256": "b754f077a73b23a687d4c9af56e2aac6139d23d89e8d7cbaa7ddbe01f5a8da43"
+    },
+    {
+      "path": "src/bdb_audit/qualification/holdout_corpus.py",
+      "bytes": 1136,
+      "sha256": "deae7ed3273f6b63ac5a4500f801a35ef76db5240b0b6d6a3df996a215eefdea"
+    },
+    {
+      "path": "src/bdb_audit/qualification/holdout_truth.py",
+      "bytes": 1123,
+      "sha256": "9e0ea4693d567d7fb6fc330ad66c4bc673bba909320da2707d7c2f4a313bbd8b"
+    },
+    {
+      "path": "src/bdb_audit/qualification/methodology_metrics.py",
+      "bytes": 3957,
+      "sha256": "068387206f71c9fe48d655f12a84b1c6b43cd371158b326399a8d36d95dd7b66"
+    },
+    {
+      "path": "src/bdb_audit/qualification/real_target_harness.py",
+      "bytes": 13754,
+      "sha256": "1cd4202fb8f9fbbf16c65e99e38976d297d2a9d573f6b24d52fab8ddbf3532e0"
+    },
+    {
+      "path": "src/bdb_audit/qualification/receipts.py",
+      "bytes": 7923,
+      "sha256": "1fbfae244cb77da7d44c133e412160dae48be0a28afdcd83f343241398186776"
+    },
+    {
+      "path": "src/bdb_audit/qualification/reference_corpus.py",
+      "bytes": 2640,
+      "sha256": "5fd49768afbc2a293db7749b236d5eda38ee6781ff19b3774ee031c289304083"
+    },
+    {
+      "path": "src/bdb_audit/qualification/reference_truth.py",
+      "bytes": 1276,
+      "sha256": "1904f88e5e55f316dda3bab8e578528b3f389662b1a262a7361fc8bdf61bc0ef"
+    },
+    {
+      "path": "src/bdb_audit/qualification/runner.py",
+      "bytes": 7166,
+      "sha256": "0a4e5088d8569cce84e6360e8765a8cd387559b4c5c1ae2e3a152e3570ae8c2e"
+    },
+    {
+      "path": "src/bdb_audit/release_validator.py",
+      "bytes": 13862,
+      "sha256": "448869ee340c1ae0cf47df1b608c4c1c919e48b4cce4dd122f64bd6fd3274cb6"
+    },
+    {
+      "path": "src/bdb_audit/release_validator_cli.py",
+      "bytes": 3122,
+      "sha256": "ffb9ee9fb964c290c13e46796c464da15ac015274356d352ea89d0e100b459b3"
+    },
+    {
+      "path": "src/bdb_audit/remediation/__init__.py",
+      "bytes": 641,
+      "sha256": "bda8ea7c6940b898f78ae0bae7e1cf9fa71e71eb5c6cd2e8437f97f28d5d78d2"
+    },
+    {
+      "path": "src/bdb_audit/remediation/models.py",
+      "bytes": 5301,
+      "sha256": "415a80244d7248c4bbaa1fe0212071b93ae19c60c83a0a21c24df190aeaff665"
+    },
+    {
+      "path": "src/bdb_audit/remediation/planner.py",
+      "bytes": 9953,
+      "sha256": "af848171f7666306a80c3bd0d37e651dd283bbfbb370f012db1ac365207aab6a"
+    },
+    {
+      "path": "src/bdb_audit/remediation/validation.py",
+      "bytes": 2400,
+      "sha256": "fa55fb0cecf84fdfd496484e79e724fc90ce1175aedf1b854827c3b2b8ed7964"
+    },
+    {
+      "path": "src/bdb_audit/report/__init__.py",
+      "bytes": 1682,
+      "sha256": "613336b6c750682859db6b119b29a00ca7005390763264db1c22e4ab1c2aac65"
+    },
+    {
+      "path": "src/bdb_audit/report/builder.py",
+      "bytes": 4743,
+      "sha256": "8d7ead232eb7018fee2f74f576923cf0576c32a92177eb1dc7a8722e4192ffc8"
+    },
+    {
+      "path": "src/bdb_audit/report/bundle.py",
+      "bytes": 10493,
+      "sha256": "d0b1d8d29272946ca605aca9c1dc0d9d76408337c3be6cc8694a2e6a0e330008"
+    },
+    {
+      "path": "src/bdb_audit/report/models.py",
+      "bytes": 3113,
+      "sha256": "397a4c2659837f7169d92b365bbdc253c27d2c6a70168bd2a539316590b9ad15"
+    },
+    {
+      "path": "src/bdb_audit/report/render_html.py",
+      "bytes": 2035,
+      "sha256": "846e16f3e6040c3365a342f8a7fbdc93146b9f4e4b33da2ce17825bfe055934c"
+    },
+    {
+      "path": "src/bdb_audit/report/render_markdown.py",
+      "bytes": 2346,
+      "sha256": "1217140b1790803fc8fffcffa0d5866d2747b6b451f0a4b80244c09ca53eb83c"
+    },
+    {
+      "path": "src/bdb_audit/report/validation.py",
+      "bytes": 4111,
+      "sha256": "61f2b65b57b6155d752ecf39c404c70ae7f4744d482a43ba718716924ce57618"
+    },
+    {
+      "path": "src/bdb_audit/runner/__init__.py",
+      "bytes": 252,
+      "sha256": "c39ad8e333f1cfde086f6b94dbe5703b2501ae1f5320f6bdeead6a920854a494"
+    },
+    {
+      "path": "src/bdb_audit/runner/adapters.py",
+      "bytes": 1699,
+      "sha256": "e11899ff215f31bac59ad581b7c5cd8261c162bf3666fba764005bd5efa8eaef"
+    },
+    {
+      "path": "src/bdb_audit/runner/bridge.py",
+      "bytes": 2337,
+      "sha256": "9084974c452a5c6fa49d67ec4327fccb53aed3b1f321b7d9d65a6e40ed5db348"
+    },
+    {
+      "path": "src/bdb_audit/runner/environments.py",
+      "bytes": 2563,
+      "sha256": "f2d4e6f6b6d5905c7db43b977181803c05cb78101abe9eac303dfd33abb9cb8d"
+    },
+    {
+      "path": "src/bdb_audit/runner/permissions.py",
+      "bytes": 2263,
+      "sha256": "2006cee52fd07488112c80cb00cb2c636373f2ae0c3d5072b7f1532ff13a9cd4"
+    },
+    {
+      "path": "src/bdb_audit/runner/specs.py",
+      "bytes": 5855,
+      "sha256": "6dec959b083c9e5d22496ac6f251af743002b483494b26f47759217df1a9e272"
+    },
+    {
+      "path": "src/bdb_audit/runner/supervisor.py",
+      "bytes": 8792,
+      "sha256": "07de6124dea8dc83802b06cf540f1a3cb4b1d0e880ed41b1738aed92d113bbf0"
+    },
+    {
+      "path": "src/bdb_audit/runner/verification.py",
+      "bytes": 2512,
+      "sha256": "6cfb20b26f1ace7f0dff0fce1f91326a0de5fa5f58514c92bc4ecbd8ebae327f"
+    },
+    {
+      "path": "src/bdb_audit/schemas/__init__.py",
+      "bytes": 789,
+      "sha256": "c96c274b53eb442698f95169e9f5e9b874fe5365b6f05446f6ea492f662a3eac"
+    },
+    {
+      "path": "src/bdb_audit/schemas/adjudication.py",
+      "bytes": 4650,
+      "sha256": "12022bd4ab50adbe7c777cecef375511c5f2fc5b09484b09fff8ca6c44740dca"
+    },
+    {
+      "path": "src/bdb_audit/schemas/assurance.py",
+      "bytes": 6744,
+      "sha256": "4e32b2b6d3bfc690f911eeb5251e83f9aeea3e831479539ee2606724a6457ba8"
+    },
+    {
+      "path": "src/bdb_audit/schemas/binding.py",
+      "bytes": 6537,
+      "sha256": "7c607ba7b3d11964d08e35bfdf9b7b26d6f1169e236b3ac1f5f1cab466361f68"
+    },
+    {
+      "path": "src/bdb_audit/schemas/bootstrap.py",
+      "bytes": 6041,
+      "sha256": "85b61893f95c5f242a9c0a50455bd33e4b3afb75778fc7b36e876024f0a1148b"
+    },
+    {
+      "path": "src/bdb_audit/schemas/command.py",
+      "bytes": 2496,
+      "sha256": "349fee826e53f91adf5ec63bf91138b49a462258f09fae47686119ac9806f10d"
+    },
+    {
+      "path": "src/bdb_audit/schemas/coverage.py",
+      "bytes": 3855,
+      "sha256": "4e63f57d794126beda8afabe4367c28bfaeb3f55380d3d8ba8cf3326ef200ccf"
+    },
+    {
+      "path": "src/bdb_audit/schemas/deepen.py",
+      "bytes": 1816,
+      "sha256": "82e4ee7a338829b1d778353da515c3dbd0f30e9b8c67355188193b4e5a592aeb"
+    },
+    {
+      "path": "src/bdb_audit/schemas/evidence.py",
+      "bytes": 2817,
+      "sha256": "c35326728437a1cbf52477bec637830d0ba06dc23e354007ba8b2482e742c4a9"
+    },
+    {
+      "path": "src/bdb_audit/schemas/experiment.py",
+      "bytes": 2620,
+      "sha256": "58b55718f196e21537c4d517a9c2f4573bc89df49e5a6f3c9a29fd56ac542e41"
+    },
+    {
+      "path": "src/bdb_audit/schemas/foundation.py",
+      "bytes": 7065,
+      "sha256": "7da4c11cd57f6f26771ba342a7f9f5a5d28b68e3ee5e962d7731494e02424b13"
+    },
+    {
+      "path": "src/bdb_audit/schemas/hypothesis.py",
+      "bytes": 1483,
+      "sha256": "7bd77c13542c340f4de38739a3227596b3af01abd3df92c46cece0b50a681fc7"
+    },
+    {
+      "path": "src/bdb_audit/schemas/identity.py",
+      "bytes": 9159,
+      "sha256": "676d624ec2c9671d8b72ebc88b7d0086506fd407f814c5588594f172eb585a93"
+    },
+    {
+      "path": "src/bdb_audit/schemas/inventory.py",
+      "bytes": 3706,
+      "sha256": "e08202896427d554c155810a2da86e446365c5f5424565b96b9603fa24f4d968"
+    },
+    {
+      "path": "src/bdb_audit/schemas/orchestration.py",
+      "bytes": 6414,
+      "sha256": "7f2a0f17a80ea138ddce1d424b40ff54e9a19fed757ec76bcdda56495e12cec8"
+    },
+    {
+      "path": "src/bdb_audit/schemas/stop.py",
+      "bytes": 4984,
+      "sha256": "e14946401960fd9a0d6e077d11119561935bd2115d93703eb380ba4ca797e82e"
+    },
+    {
+      "path": "src/bdb_audit/self_audit.py",
+      "bytes": 26248,
+      "sha256": "7e51ecd4551d1f1d17d906722957304e7554ed9a14d4ee36a83427d00e5d4851"
+    },
+    {
+      "path": "src/bdb_audit/source/__init__.py",
+      "bytes": 607,
+      "sha256": "db106a5e7976a11c06f6f33096e44b916ba136940752562cf2092a9323776554"
+    },
+    {
+      "path": "src/bdb_audit/source/archive.py",
+      "bytes": 6453,
+      "sha256": "6765f95ed7a6627867857ac8c8b2b284feda59ea432222a1e825f2cceac16a5c"
+    },
+    {
+      "path": "src/bdb_audit/source/git_resolver.py",
+      "bytes": 6780,
+      "sha256": "5bca8d24778871d7999e0c0af62918b556422d3bcbe0c157d1a5c8eea2cafd59"
+    },
+    {
+      "path": "src/bdb_audit/source/materializer.py",
+      "bytes": 5614,
+      "sha256": "635904a91eaaf37456872c13b077d013d221881ec82a0fc0baa8f9a9cd1e29bf"
+    },
+    {
+      "path": "src/bdb_audit/stop/__init__.py",
+      "bytes": 1601,
+      "sha256": "6042e0f41922e753f4a48ece222a5675ab5ba9b991b2d3b215066ca932f26562"
+    },
+    {
+      "path": "src/bdb_audit/stop/authority.py",
+      "bytes": 24708,
+      "sha256": "92b35adb2d0f1b263acb60f7917f9432b5a9caae061bb3bcdfd4e6a3e04addaf"
+    },
+    {
+      "path": "src/bdb_audit/stop/e6.py",
+      "bytes": 34369,
+      "sha256": "60ffa14eb310cb75610df98c0ad4c5950a479ad30e6dce381aacf93abfb755f6"
+    },
+    {
+      "path": "src/bdb_audit/stop/evaluator.py",
+      "bytes": 16037,
+      "sha256": "cebe895ccabe7b0a819a31ce16665da5adfbc3a22ea533a539ba40591031dfe2"
+    },
+    {
+      "path": "src/bdb_audit/stop/input_builder.py",
+      "bytes": 23346,
+      "sha256": "2a2085413ae305927cdbc7883b612ac6553d63e9267cc2906485bb13e602ea07"
+    },
+    {
+      "path": "src/bdb_audit/stop/models.py",
+      "bytes": 21878,
+      "sha256": "ffb9b57fc1be3a4af41446860388b52607669e229e0db44ce321ab36bf9c54b5"
+    },
+    {
+      "path": "src/bdb_audit/stop/operation.py",
+      "bytes": 14829,
+      "sha256": "129351bf8b17980891a2b8f0293f9b2511ae616197f9d5e13442d2c20ec4464f"
+    },
+    {
+      "path": "src/bdb_audit/stop/planner_compat.py",
+      "bytes": 5583,
+      "sha256": "d2b14bb53c11f3d30fbf803690c51ff3d4c6df73d79c51dd0183a22985e11c5d"
+    },
+    {
+      "path": "src/bdb_audit/stop/predicates.py",
+      "bytes": 2702,
+      "sha256": "6abcfcc79a4ae201557d4cc9feaba84092b53f87121f15260ca2f7b38f35d1a5"
+    },
+    {
+      "path": "src/bdb_audit/stop/residual_risk_evaluator.py",
+      "bytes": 6737,
+      "sha256": "d8d3f74bbc252e0b65f7cc7add940ac6d5d9b38bb97ee10ee73c6489a6bba415"
+    },
+    {
+      "path": "src/bdb_audit/stop/residual_risk_projection.py",
+      "bytes": 4475,
+      "sha256": "3e1449500b35290f8e67ce6656b54f07a31d4b2220918fa8c27d48741a7046f1"
+    },
+    {
+      "path": "src/bdb_audit/strategy/__init__.py",
+      "bytes": 435,
+      "sha256": "343f095d8e2ba918a6006f10de8626081879d9f0f9bf28d52574484cdad632ef"
+    },
+    {
+      "path": "src/bdb_audit/strategy/cli.py",
+      "bytes": 7595,
+      "sha256": "8f2bb9ca4c0174496d830011965f26299a5c92fb9906de21e9afbd597ab9aca7"
+    },
+    {
+      "path": "src/bdb_audit/strategy/entrypoints.py",
+      "bytes": 2852,
+      "sha256": "d4053688370370352f6abfd88a240d70f0506d5405e4053928175da2c204356a"
+    },
+    {
+      "path": "src/bdb_audit/strategy/models.py",
+      "bytes": 6555,
+      "sha256": "0fb45ad7e49923de341e604ec34f411fcef740739be87d7d448be61b49b63c4d"
+    },
+    {
+      "path": "src/bdb_audit/strategy/planner.py",
+      "bytes": 6337,
+      "sha256": "742d4fae8bb8953bc558098176eb85de7ab0812b538ef9018158db31a22ef7ba"
+    },
+    {
+      "path": "src/bdb_audit/ui.py",
+      "bytes": 43188,
+      "sha256": "260f44e671da1bd48e9d90d998d36207d36978d2e272860d6a4535e63971843c"
+    },
+    {
+      "path": "src/bdb_audit/vault/__init__.py",
+      "bytes": 152,
+      "sha256": "9b696a08187b5b144c8ce39e653fae80c04c943400638777b47cfbaa635a20f0"
+    },
+    {
+      "path": "src/bdb_audit/vault/raw_store.py",
+      "bytes": 6295,
+      "sha256": "3db30453e16994624445262855bacf1f6e02cf813c9f865376d57e07e77bc23e"
+    },
+    {
+      "path": "src/bdb_audit/version.py",
+      "bytes": 254,
+      "sha256": "7c3c845ec10d45c755010919e332360755d2d1dd89a75ca3d75f899c15b46c2c"
+    },
+    {
+      "path": "src/bdb_audit/vnext_commands.py",
+      "bytes": 1339,
+      "sha256": "270ace4d963a0302bc8bbf983d21c11f5923e34ec870ed69461f9c8c9d9a4693"
+    },
+    {
+      "path": "src/bdb_audit/workbench/__init__.py",
+      "bytes": 220,
+      "sha256": "9182f4d80131407a3fe5f1ddb94815dd982126786ab01d32373ee70645758e21"
+    },
+    {
+      "path": "src/bdb_audit/workbench/cli.py",
+      "bytes": 5162,
+      "sha256": "b7b720699783e0c0a81e91ae6b792f2ac271b0ef9aa89ca0c6217cbfa3ac59a3"
+    },
+    {
+      "path": "src/bdb_audit/workbench/projection.py",
+      "bytes": 5412,
+      "sha256": "3ed17d46c604ac874b0959c5f1192b525d25f23d36a0775b5576a246af0277bc"
+    },
+    {
+      "path": "src/bdb_audit/workflow/__init__.py",
+      "bytes": 1744,
+      "sha256": "252d4df2d870d59635ab2bfd5c8933c4d696614e90d37e70dc1a5c490d497d9a"
+    },
+    {
+      "path": "src/bdb_audit/workflow/assignments.py",
+      "bytes": 16212,
+      "sha256": "948e3cabf3f9bbec481a24b791793f8ea970c7e2ceb3ac708df78686905b54a6"
+    },
+    {
+      "path": "src/bdb_audit/workflow/assurance_projection.py",
+      "bytes": 22366,
+      "sha256": "314d7efadf61cd05e4d15fae01aec5689da1bb72b2df3572d2324c1d4f0189bd"
+    },
+    {
+      "path": "src/bdb_audit/workflow/continuation_service.py",
+      "bytes": 5893,
+      "sha256": "8d6bbdb60474d198a40a6ff0ae343a0367557d6a3c2fa646a2297c15b37cfbd9"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e2_checkpoint.py",
+      "bytes": 13746,
+      "sha256": "d07de32839fd4f7e724ba6d8063826ac28a4a603cbb178b77577cb5c0912f486"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e2_contradiction.py",
+      "bytes": 24294,
+      "sha256": "136136bf4fc90b0b86dcf6b6f4b6afae367acd8992181d2971c026dcdd5b47c3"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e2_contradiction_resolution.py",
+      "bytes": 34689,
+      "sha256": "882d4e8161a7f8ab7c8d35ad88dc7a3078a754838b4c8ef1a528154dc84ae8bf"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e2_finalize.py",
+      "bytes": 31634,
+      "sha256": "b7ed8d75c622711e650bb4f7013731447a9850ce4c13a62f1eabdc07ce1fb6ad"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e2_reveal.py",
+      "bytes": 21370,
+      "sha256": "d9454f320e8b78b026d1741af4a66490d8bfded3cfafbce3ac7f89ed10218702"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e2_shadow.py",
+      "bytes": 21836,
+      "sha256": "0f01a2743ef4a46dead8fd1bec64b2994b39d7be3339cbdffeae4d30dfc81959"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e2_synthesis.py",
+      "bytes": 22751,
+      "sha256": "0ffc4e26b886b554e120dac25f380aaa8432faf114307cf2b9d32b261dff6611"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e3_checkpoint.py",
+      "bytes": 19139,
+      "sha256": "7d973ebc239349ae1f734ab3fdb85048e93360aeb0fb4d932c34faf7c1b0ff56"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e3_cumulative.py",
+      "bytes": 31619,
+      "sha256": "08f4d8e2654f0ea155ed46220f1de940a078e3f5f99fc78d3023c24fee3a6e52"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e3_cumulative_result.py",
+      "bytes": 25256,
+      "sha256": "4e0804a22dc716d4aa8693decf9345206e87a3f2619218a1c954c46fc7df98e5"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e3_gap.py",
+      "bytes": 29330,
+      "sha256": "01ec9e421a1580a9252e29e5876f1ab18e90d1aa760176545d06b43ef523a16a"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e3_gap_result.py",
+      "bytes": 23699,
+      "sha256": "d811d047c24f13851b08613a75a92f41156b7e3d2c5a7c274990bef644022328"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e3_holdout.py",
+      "bytes": 25701,
+      "sha256": "5a24563c4e3e1b7b0bf5e8aaae8199556e0164b7c4eb2aa0d99e45f191d43318"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e3_holdout_result.py",
+      "bytes": 21549,
+      "sha256": "3660601ed61c600af62a8c1b7b01f8b1fc1f58af43ba227148e812f475f8425e"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e5_runtime.py",
+      "bytes": 87743,
+      "sha256": "b3af35de65dc6cc008ba9c1936dfed870147a0181f569742af7520338e56b4c8"
+    },
+    {
+      "path": "src/bdb_audit/workflow/e6_runtime_hook.py",
+      "bytes": 10023,
+      "sha256": "514accb3df86fcbe5fcf3101d02db32edf0a5db44c6f977c975eef8cd7805f2a"
+    },
+    {
+      "path": "src/bdb_audit/workflow/executors.py",
+      "bytes": 2362,
+      "sha256": "d2be948d0a3b66d596f066067a9d9f861cda10d0310b780a23077e203fb61eaa"
+    },
+    {
+      "path": "src/bdb_audit/workflow/history_projection.py",
+      "bytes": 5857,
+      "sha256": "390a82da3b0842f281a130d2c1e1139850c83332d08fbfef7f42b71a10d59a35"
+    },
+    {
+      "path": "src/bdb_audit/workflow/import_report.py",
+      "bytes": 2099,
+      "sha256": "ad15f35da0247808cd67831e9f7658212cf11b41c8db8a50f336f89a8ba71b7c"
+    },
+    {
+      "path": "src/bdb_audit/workflow/inbox.py",
+      "bytes": 39865,
+      "sha256": "f1a80ae39100a15a9c4a6887c9324ccbbead8604de97c9914c47d6bfff67af01"
+    },
+    {
+      "path": "src/bdb_audit/workflow/manual_stage.py",
+      "bytes": 92322,
+      "sha256": "e3eed9ed71543003c15c50319184969a12de67f98458f3b9a280bd56df96abab"
+    },
+    {
+      "path": "src/bdb_audit/workflow/orchestrator.py",
+      "bytes": 92498,
+      "sha256": "c9a557051fae829baab193a4820ef918d540240978ae8618f2a9908fe4af6d46"
+    },
+    {
+      "path": "src/bdb_audit/workflow/package_resume.py",
+      "bytes": 11067,
+      "sha256": "18ce40b5e89a4f1cc5ed99f7875bbbb380ddb1fff2e6c377f71cd120cdef5e18"
+    },
+    {
+      "path": "src/bdb_audit/workflow/packaging.py",
+      "bytes": 16492,
+      "sha256": "4b7a0184bde561344c76ae01256952200effcc149fae7219c4d6e533c55fc0d2"
+    },
+    {
+      "path": "src/bdb_audit/workflow/platform.py",
+      "bytes": 5736,
+      "sha256": "b018183a37b28ce0c33c3a03e61ef20e102211087af655f28f50f116262e8988"
+    },
+    {
+      "path": "src/bdb_audit/workflow/read_models.py",
+      "bytes": 20408,
+      "sha256": "dc022aaf311c136ee82bc031390c92d1cca4f3691cfa03cc133e0e0dfd4ff672"
+    },
+    {
+      "path": "src/bdb_audit/workflow/result_proposal.py",
+      "bytes": 6916,
+      "sha256": "dfddb937a4fe5cab349355f1d49b066a856a03d6838fa38117ae4a78c590a26a"
+    },
+    {
+      "path": "src/bdb_audit/workflow/scope_baseline.py",
+      "bytes": 6766,
+      "sha256": "1dac81f5d8c7b4b365cf1bc5fc6a59f29827df2299428905cff778273d698382"
+    },
+    {
+      "path": "src/bdb_audit/workflow/settings.py",
+      "bytes": 5950,
+      "sha256": "34b2a5f521d84c93ea47dcc53ded385b80882f67041b06be428f72f422b8430f"
+    },
+    {
+      "path": "src/bdb_audit/workflow/source_target.py",
+      "bytes": 4901,
+      "sha256": "bee312be9074ac8bab1c26fbee5c03fa2ccf0d1f899b36d18785d77ffc412cff"
+    },
+    {
+      "path": "src/bdb_audit/workflow/stage_completion_evidence.py",
+      "bytes": 2235,
+      "sha256": "19036208eb98ae21ef724df95baca2b513e7b7bf94ad1b4a2d6386b7248a282b"
+    },
+    {
+      "path": "src/bdb_audit/workflow/stage_finalize.py",
+      "bytes": 27712,
+      "sha256": "ac5a549fee5633f3eed5aa1a4ac89538ce03e5e0ab28e876df84bc23923da18b"
+    },
+    {
+      "path": "src/bdb_audit/workflow/stage_resume.py",
+      "bytes": 15292,
+      "sha256": "2441362046cf63fa27ca1c9e1da4acbdcad85d067e0251e6180be7759a90064f"
+    },
+    {
+      "path": "src/bdb_audit/workflow/stage_service.py",
+      "bytes": 4011,
+      "sha256": "4bc9939ff7b23b98d95b7ec3e96903ac1b515c61ce106c72c3b40b41f1865ae2"
+    },
+    {
+      "path": "tests/anti_false_pass/test_d01_d27_anti_false_pass.py",
+      "bytes": 7281,
+      "sha256": "151d3d76a8b2ba8e7d8906884a34992024a25fd29cfae295279099d45c2841ed"
+    },
+    {
+      "path": "tests/anti_false_pass/test_disabled_checker_control.py",
+      "bytes": 4592,
+      "sha256": "6b99be628dcb16365807c07b711f8b15810547892d6023dab622ad252a7ce006"
+    },
+    {
+      "path": "tests/anti_false_pass/test_methodology_receipts.py",
+      "bytes": 4885,
+      "sha256": "71163e687bdf9faa85bf54428a45554b090ff011dac103ac954cd71b69356dc7"
+    },
+    {
+      "path": "tests/anti_false_pass/test_ru13b_real_target_corpus.py",
+      "bytes": 2737,
+      "sha256": "f947d7a94ee1bbd921ad6c633c439710fe8a1d3e8eac2ab0e329c858eaecf95a"
+    },
+    {
+      "path": "tests/anti_false_pass/test_tampered_and_drift_controls.py",
+      "bytes": 4208,
+      "sha256": "dab317406e584aa1c138a47467365971fc764337a36f101acbc66d0e78d2bc83"
+    },
+    {
+      "path": "tests/compatibility/build_corpus.py",
+      "bytes": 15755,
+      "sha256": "7ec7f0c3fb480bf6e3f6acad30a25e268eb23384afb86aec025b0b0440131415"
+    },
+    {
+      "path": "tests/compatibility/corpus_support.py",
+      "bytes": 3116,
+      "sha256": "902a03121f324c6b13c6aad8827f7c346e4bed7fbceb84e685746da7b94a0b73"
+    },
+    {
+      "path": "tests/compatibility/test_compatibility_corpus.py",
+      "bytes": 11197,
+      "sha256": "7501003337ad2bf6e1dd53d89d4ec30db4e8430c477e8daba9ceccec733a0a9f"
+    },
+    {
+      "path": "tests/compatibility/test_legacy_baseline.py",
+      "bytes": 1943,
+      "sha256": "b23d98dcceb9556af89d452081a9b7483d1ae9ea6ed619e8f4817f58c5f8a98d"
+    },
+    {
+      "path": "tests/compatibility/verify_f0.py",
+      "bytes": 8797,
+      "sha256": "537de16ff2a671ffad63fe15fd69eb41ab758ba7fa1ca13b1b0305302f18bc6f"
+    },
+    {
+      "path": "tests/compatibility/verify_m1.py",
+      "bytes": 3347,
+      "sha256": "dc901edeec8450a06fd20aacc5759c5415f330c1051b2ec5c91aad0e4f9593ae"
+    },
+    {
+      "path": "tests/f1/conftest.py",
+      "bytes": 106,
+      "sha256": "2ce16caf030b46b515691e22e22b98333a3b392c6d7cc2c1751b166275215c84"
+    },
+    {
+      "path": "tests/f1/dual_support.py",
+      "bytes": 5543,
+      "sha256": "f6541cf5ef00fb3c090df887931267e501aecc609496edec9e59b31ea54b4827"
+    },
+    {
+      "path": "tests/f1/test_core.py",
+      "bytes": 8119,
+      "sha256": "7ecd89a6aec568ce11354da4f4fdf3faef97d00907e8008471469a18542e270b"
+    },
+    {
+      "path": "tests/f1/test_legacy.py",
+      "bytes": 4374,
+      "sha256": "7ad2a5dda32cb6157f76cd847d4412e67b4e05e8212ed714b348988e5c3506bf"
+    },
+    {
+      "path": "tests/f1/test_zip.py",
+      "bytes": 5171,
+      "sha256": "fd98acb1980219ebbad8d4ab8f20d0e0d68c45f08e34147813eba32db5f27ea5"
+    },
+    {
+      "path": "tests/f1/verify_f1.py",
+      "bytes": 8161,
+      "sha256": "665e8a1811d33826f3c0f4926f2195888c87d1ede994f9a58c18a755722b1fcd"
+    },
+    {
+      "path": "tests/f2/__init__.py",
+      "bytes": 21,
+      "sha256": "2030ea75a36a3d4a1c7d5da7f8ec8c668184f8b2cd6c1754627fd98a6f7fb6df"
+    },
+    {
+      "path": "tests/f2/crash_worker.py",
+      "bytes": 659,
+      "sha256": "d762243b1a262ea4021e5e97edec1940f24db2eeecd9fd25ae033ec9d0cd1391"
+    },
+    {
+      "path": "tests/f2/diagnose_authority_boundary.py",
+      "bytes": 3145,
+      "sha256": "f7f2c2e2737c65faeaf6c1938cb7283988ba4346ae84bb87988b62d3d06eb0f4"
+    },
+    {
+      "path": "tests/f2/diagnose_bootstrap_order.py",
+      "bytes": 3629,
+      "sha256": "7c1dbfa11990201c58eafaab437499a4215c96bf2e12336730c3c4de974a6f87"
+    },
+    {
+      "path": "tests/f2/helpers.py",
+      "bytes": 7467,
+      "sha256": "6208d96d28d3e3f9250022ca30c15e7b7b77ac12ad018522790b0e0ed1ac6c6e"
+    },
+    {
+      "path": "tests/f2/test_authority_repairs.py",
+      "bytes": 13085,
+      "sha256": "5af1d56ead2fc23084d57665fcdf5d787f4948753aa93b45f857cf90cdaa14bf"
+    },
+    {
+      "path": "tests/f2/test_bootstrap_order_diagnostic.py",
+      "bytes": 1026,
+      "sha256": "b59c5334e1027401186a8703b3ff7eb64f7ae4eaf91cf29b6578016ff8ef3534"
+    },
+    {
+      "path": "tests/f2/test_cli.py",
+      "bytes": 524,
+      "sha256": "45f453eacebb8e1868745cd4dbb4cffe5e1794bb8adc84161125959a15713f4e"
+    },
+    {
+      "path": "tests/f2/test_closure_tiebreak_regression.py",
+      "bytes": 1030,
+      "sha256": "b2ba5d648af995538956e0c4d8d3faa3e1605b8b0186c8c13686ecd09d35a57c"
+    },
+    {
+      "path": "tests/f2/test_golden_vectors_complete.py",
+      "bytes": 7032,
+      "sha256": "48323083cd1772c519f31e6e75da7d58a2a99e226b5704ec38b3ffe9899f6cff"
+    },
+    {
+      "path": "tests/f2/test_history_process_faults.py",
+      "bytes": 2763,
+      "sha256": "1ea1fb8504a4fb8c0b8c4ea6c92fdccb661d146802f03af10e4dc0474a85b78e"
+    },
+    {
+      "path": "tests/f2/test_m10_schema_identity.py",
+      "bytes": 1362,
+      "sha256": "39ff9cefd76fd3489790dedc3f85b77484d008a6c884dec25ce0169ee5881e6a"
+    },
+    {
+      "path": "tests/f2/test_m11_corpus.py",
+      "bytes": 1805,
+      "sha256": "5edae54f4955057b6ddcaf9357503ed5f5832523e1b6775442e3e9aabff0e8c8"
+    },
+    {
+      "path": "tests/f2/test_m12_knowledge_discovery.py",
+      "bytes": 2459,
+      "sha256": "b2e7ad2fec2fc6c39640567041f730654b47c2a7ecc09a3879a8c5f09fa33355"
+    },
+    {
+      "path": "tests/f2/test_m13_quarantine.py",
+      "bytes": 4769,
+      "sha256": "ca3228a16b5ee3e9b1786d237c75bf8b9af00f610e95ea49ce933820806a90cc"
+    },
+    {
+      "path": "tests/f2/test_m5_fsm.py",
+      "bytes": 1501,
+      "sha256": "847035a09ae1a8dbd298ea82dd90a1adf518f6f0f5bae89aa0be8588e05a3f8a"
+    },
+    {
+      "path": "tests/f2/test_m5_objects.py",
+      "bytes": 4133,
+      "sha256": "d3e6228f5390efe7523a117d2490d21a18ed76138c8ff5a4880bcfc6df0d0be5"
+    },
+    {
+      "path": "tests/f2/test_m5_transaction.py",
+      "bytes": 3116,
+      "sha256": "95c00159083f78b51a2644272a9006aaba21ab509a767663486ea276d994d5ad"
+    },
+    {
+      "path": "tests/f2/test_m6_stages.py",
+      "bytes": 1423,
+      "sha256": "f7ccb43a89af671f1dd5ef6f21e92d2f632b055f1b93bb0c2694f9edd5a0ef21"
+    },
+    {
+      "path": "tests/f2/test_m7_isolation.py",
+      "bytes": 6389,
+      "sha256": "117f3d1eb09f35f36c1309580914a44b21ef1d1e159327b4eeab50f643aed6df"
+    },
+    {
+      "path": "tests/f2/test_m8_capability.py",
+      "bytes": 4275,
+      "sha256": "88da650fd47a1d1b85d88c40a8782213f7f48b5b74c4d7b42280b16c852e354c"
+    },
+    {
+      "path": "tests/f2/test_m9_compiler.py",
+      "bytes": 1212,
+      "sha256": "dafe007458444d69a9f20358f97e25ed623fc9a7be5d02018844729fbbcc38cb"
+    },
+    {
+      "path": "tests/f2/test_registry_schema.py",
+      "bytes": 10742,
+      "sha256": "545d38125a7f64d09cb6280e1a54e55e46ec43698eede8ddb5b766fd097ad7fc"
+    },
+    {
+      "path": "tests/f2/verify_f2.py",
+      "bytes": 10474,
+      "sha256": "790206ba4b010d3cb4e31e2842bf46f017bc27be5e4fc440c43586ba7e392eed"
+    },
+    {
+      "path": "tests/f3/test_m14_inventory.py",
+      "bytes": 13789,
+      "sha256": "d2cab0d031462acbcd8b96ff5a7c07ad69b27a9a7a16ef6c50e779326f67b4a3"
+    },
+    {
+      "path": "tests/f3/test_m15_m16_coverage.py",
+      "bytes": 15255,
+      "sha256": "145515b22ca1727707a8a199189305fe0458589178e38d37bd44d5bc395cd027"
+    },
+    {
+      "path": "tests/f3/test_m17_m18_hypothesis.py",
+      "bytes": 5431,
+      "sha256": "90ebbb689d4401d58e507c59fa21ca30fabdd2dec5edfb6cf1cf84639d5bd3e7"
+    },
+    {
+      "path": "tests/f3/test_m19_experiment_execution.py",
+      "bytes": 5357,
+      "sha256": "95fdc4833682a5e545eda9dbb44adcfda84c260487580ba0b5495e570520c59e"
+    },
+    {
+      "path": "tests/f3/test_m20_evidence_qualification.py",
+      "bytes": 7551,
+      "sha256": "f4fdc2a3f2bf2110313967343ac1021c9f31a0e93e8f52495fb1ecb032581c12"
+    },
+    {
+      "path": "tests/f3/test_m21_m22_adjudication.py",
+      "bytes": 8268,
+      "sha256": "b034edf1c86599835e85a9a979bdce354d5eb66cbf1b076ff5a26f4caaa4a018"
+    },
+    {
+      "path": "tests/f3/test_m23_projection.py",
+      "bytes": 4646,
+      "sha256": "2b358bfdd06326ced55e143013b19cf672e5659518c067f4a891d136a092e953"
+    },
+    {
+      "path": "tests/f3/test_m24_stage_completion_stop.py",
+      "bytes": 5949,
+      "sha256": "9330606e613988e51743a71695281a7cf7d73a192ee80f69b5750e24e3db74b0"
+    },
+    {
+      "path": "tests/f3/test_m25_reference_slice.py",
+      "bytes": 4749,
+      "sha256": "92b246c83e87f0011e2fee87e611fd2284d66d8c1b8936db5e6f5177c99534b1"
+    },
+    {
+      "path": "tests/f3/test_m26_adversarial_failures.py",
+      "bytes": 24403,
+      "sha256": "dbeeb4a516f409fa30e49f717656d25f892585ea306583277affb7e184c614a7"
+    },
+    {
+      "path": "tests/f3/test_pr028_regressions.py",
+      "bytes": 21192,
+      "sha256": "485bce135874b7322c98839734e05a0e2ee5b5ffc02b93b7043cfbb9f4ddc5f2"
+    },
+    {
+      "path": "tests/f3/test_r5n15_prior_accepted_boundary.py",
+      "bytes": 5597,
+      "sha256": "7374c18076c1f20b292659535aec9db94aa3793d08adc4604639b1e2c6eeb9ce"
+    },
+    {
+      "path": "tests/f4/test_domain_integration.py",
+      "bytes": 22995,
+      "sha256": "f1d4f4367fef767d67cf843c7a2491538e5749f0733318d32cc1d79df896402b"
+    },
+    {
+      "path": "tests/f4/test_wp01_collector_coverage.py",
+      "bytes": 12202,
+      "sha256": "c3713773338cb9ba81f1be1ee4a8ea08007bef337ce8470d00e38a232d86fbf6"
+    },
+    {
+      "path": "tests/f4/test_wp02_invariant_categories.py",
+      "bytes": 9447,
+      "sha256": "992f068170aa01c3667df53fd6cbadf868f47c54ba866764c9cb12d0dc9409e4"
+    },
+    {
+      "path": "tests/f4/test_wp03_obligation_policy.py",
+      "bytes": 14247,
+      "sha256": "e7afb9db8a298746ad1e337811aba8599a85f0177468914eab9681ab21db86a2"
+    },
+    {
+      "path": "tests/f4/test_wp04_gap_engine.py",
+      "bytes": 9824,
+      "sha256": "aa6ae95a9358ea4696273dde3080c86e3dc398620bb55ee18316c9596ec3b20b"
+    },
+    {
+      "path": "tests/f4/test_wp05_hypothesis_orchestration.py",
+      "bytes": 6752,
+      "sha256": "622ca92049577c04ad9d51442c58eff9ad7ff6613a3c2df2d21e10b4035989d5"
+    },
+    {
+      "path": "tests/f4/test_wp06_execution_adapters.py",
+      "bytes": 8814,
+      "sha256": "0ed874907377b2b8a1dec8109b87c051aed25ec2535e7831fe60d6f3db5d5363"
+    },
+    {
+      "path": "tests/f4/test_wp07_evidence_graph_invalidation.py",
+      "bytes": 7962,
+      "sha256": "d2dc6a8b5e113299f183bf886e32ac3b42028d9aac32255d2f887bcb2a2b4c4e"
+    },
+    {
+      "path": "tests/f4/test_wp08_finding_root_cause_contradiction.py",
+      "bytes": 11241,
+      "sha256": "df3134b69d33e8367be1e31d93db4b2f085226defaf05159b6a3ea40457cc1a0"
+    },
+    {
+      "path": "tests/f4/test_wp09_native_e1_e2.py",
+      "bytes": 9219,
+      "sha256": "31b9d0d7675a33d28ebb3136fe0cc79337fecbaea7c9bf8dd2cfc9fe9ba64aec"
+    },
+    {
+      "path": "tests/f4/test_wp10_replay_successor.py",
+      "bytes": 9717,
+      "sha256": "4d4b9359035fcb0327360ee97297c1e4b1bf9b6ace4ab46df51979ea6e3c4e27"
+    },
+    {
+      "path": "tests/f5/test_pr01_blind_novelty.py",
+      "bytes": 19121,
+      "sha256": "a93abc3603621169cddee83d73f7dfb677fd4b456723b4303b40e8be07c3d465"
+    },
+    {
+      "path": "tests/f5/test_pr02_checkpoint_reveal.py",
+      "bytes": 19063,
+      "sha256": "99cc750813aa2ab824a946d0ab64ac0d94c01b41911031463cb23edffeba45dc"
+    },
+    {
+      "path": "tests/f5/test_pr03_fuzzing_adapter.py",
+      "bytes": 8096,
+      "sha256": "d1e9115d4b145fe6383081548cc11685fe15b1f2817d8169b80b1aa703624dee"
+    },
+    {
+      "path": "tests/f5/test_pr04_differential_testing.py",
+      "bytes": 9110,
+      "sha256": "303c38d16f61b70c78b9eba4b7f365bdd028e066534d79b1b9b058779bebf99b"
+    },
+    {
+      "path": "tests/f5/test_pr05_metamorphic_testing.py",
+      "bytes": 9477,
+      "sha256": "04db9c06957a26a54464232d8eab1ba3f7187e6788ffcc43e4cbcc218590bf55"
+    },
+    {
+      "path": "tests/f5/test_pr06_e3_integration_gate.py",
+      "bytes": 18929,
+      "sha256": "a61c114b756534f84542daafe9c02c6f19f1e11412c0bc3be626bf0442404298"
+    },
+    {
+      "path": "tests/f6/test_pr01_state_model.py",
+      "bytes": 8067,
+      "sha256": "141bcaab08d6881ffa29c732d3966ed4006be4b4cc78ec0930574f9af9175675"
+    },
+    {
+      "path": "tests/f6/test_pr02_temporal_invariants.py",
+      "bytes": 7319,
+      "sha256": "9577e68f3c178f1032f1b06a4e3d166fe82af237baa295435c34553ef9ba6c36"
+    },
+    {
+      "path": "tests/f6/test_pr03_property_stateful.py",
+      "bytes": 7559,
+      "sha256": "1f2e9b616fe0eb40fcc0113f5fd6561505eaee164a10f0411387dedc0d7e6690"
+    },
+    {
+      "path": "tests/f6/test_pr04_bounded_exploration.py",
+      "bytes": 5501,
+      "sha256": "683f41ddc3e866147906ae27102751d866dd26a340889965007dea4eb0b7567b"
+    },
+    {
+      "path": "tests/f6/test_pr05_concurrency_schedule.py",
+      "bytes": 8594,
+      "sha256": "370244841733203a70690c78445e120566834e42ff808c4ac60177a8b6ee0efd"
+    },
+    {
+      "path": "tests/f6/test_pr06_crash_recovery.py",
+      "bytes": 4710,
+      "sha256": "8c0226f45be84466eb0311e3925e0f1cfe772b7ba7fbd18e2f1d58f92a9f65e1"
+    },
+    {
+      "path": "tests/f6/test_pr07_endurance.py",
+      "bytes": 5457,
+      "sha256": "62eccfee777b48d61778dc1bd92d760bb99b6a68a3671e4c6885ba01c8e2275d"
+    },
+    {
+      "path": "tests/f6/test_pr08_causal_chain.py",
+      "bytes": 5681,
+      "sha256": "7b8add4b2c11c567fb2257d3149d1569dd25e4b7444f133993ff5037227c3210"
+    },
+    {
+      "path": "tests/f6/test_pr09_e4_integration_gate.py",
+      "bytes": 8846,
+      "sha256": "bb0bafdf4f286605fc572467160381824b4bb18a68cfcdc027dfc59889f76719"
+    },
+    {
+      "path": "tests/f7/test_adaptive_e6_canonical_authority.py",
+      "bytes": 18146,
+      "sha256": "63872c8a4bf2f5d1f42c3b58e442de5d9003dd958a6c2188a507332fd23ab06f"
+    },
+    {
+      "path": "tests/f7/test_adaptive_e6_recursive_runtime.py",
+      "bytes": 3970,
+      "sha256": "9131a66f52afe30adb255f016be5bb1d5b6691f6ee9021d308f5604a462c5a58"
+    },
+    {
+      "path": "tests/f7/test_challenger_temporal_boundaries.py",
+      "bytes": 1980,
+      "sha256": "091aeec88ba0bcdeb99fba9572cc2ac2db86ba7e73289956482a29104ca7ed91"
+    },
+    {
+      "path": "tests/f7/test_f04_f05_direct_store_admission.py",
+      "bytes": 36616,
+      "sha256": "a4bedb44129870a969acb571de7da63fe6f68df9a6fddb8ceaba47731cef660f"
+    },
+    {
+      "path": "tests/f7/test_finalization_temporal_boundaries.py",
+      "bytes": 16019,
+      "sha256": "b4693b9c506b67534ba18fdb7646ebc0fe3a531fe21ee42c003d4bb84d7a634f"
+    },
+    {
+      "path": "tests/f7/test_post_e6_canonical_cut_contract.py",
+      "bytes": 1593,
+      "sha256": "b92bc079318be0e267948f9cf5d09f90e80d2c418378ce85d9093c4944400975"
+    },
+    {
+      "path": "tests/f7/test_pr01_interaction_graph.py",
+      "bytes": 9267,
+      "sha256": "088eb012583a629807f3e5750af644acee19889c615bcedeaeea4180f078a748"
+    },
+    {
+      "path": "tests/f7/test_pr02_interaction_scheduler.py",
+      "bytes": 5775,
+      "sha256": "4bdc49f5a6e40fd1e06e4ecfa6fd752645f46142f7cb3dd496ab12ad057d9175"
+    },
+    {
+      "path": "tests/f7/test_pr03_mutation_framework.py",
+      "bytes": 9841,
+      "sha256": "b3255e912f823173ef4a56dbc0d1baa3dffa4180f2ccbce9781cad2e3a5605e6"
+    },
+    {
+      "path": "tests/f7/test_pr04_auditor_calibration.py",
+      "bytes": 6260,
+      "sha256": "4325f48466f937a0512c67741f5166c298c652a9091e2b4dfd295ec0572243db"
+    },
+    {
+      "path": "tests/f7/test_pr05_final_skeptic.py",
+      "bytes": 4992,
+      "sha256": "8d204ffc8e0057b4379504cc377b047ac7831fb5bb8d6e68be7e0254927b1062"
+    },
+    {
+      "path": "tests/f7/test_pr06_false_negative_hunter.py",
+      "bytes": 3950,
+      "sha256": "0fde6d024741a03fe8bbb3aef50f039f4333f00d79956d467bb4ba861d2de157"
+    },
+    {
+      "path": "tests/f7/test_pr07_residual_risk.py",
+      "bytes": 6486,
+      "sha256": "b45a7872c81e202e69462a8b76d9c5e2e1c17fc62f68d3c5a23525f732dc1584"
+    },
+    {
+      "path": "tests/f7/test_pr08_candidate_assurance_case.py",
+      "bytes": 5665,
+      "sha256": "6639f03deef7fd1c51ebad6768a1ab1375a291148891b6a613de51e060f27950"
+    },
+    {
+      "path": "tests/f7/test_pr09_challenger_execution.py",
+      "bytes": 11048,
+      "sha256": "09c5e6a2a932b82829d718950f3087215c0c0d306f419c1fbbee6969467afe99"
+    },
+    {
+      "path": "tests/f7/test_pr10_stop_gate_engine.py",
+      "bytes": 7219,
+      "sha256": "7faefb7e4ea20458bfbc718e1b295af003bb4cdc3c0bb7d9c7d760661cffaea5"
+    },
+    {
+      "path": "tests/f7/test_pr11_adaptive_e6_generator.py",
+      "bytes": 8984,
+      "sha256": "0160f47ba6679f967fbad7400726dc82aa2155b24b9743b92c53c12ecd8b561d"
+    },
+    {
+      "path": "tests/f7/test_pr12_release_and_successor.py",
+      "bytes": 10350,
+      "sha256": "e8c5b41d4f67b598dc97a3d11afd529636f99c201a4c0e4a42f428b557e05e70"
+    },
+    {
+      "path": "tests/f7/test_pr13_e5_stop_integration_gate.py",
+      "bytes": 11903,
+      "sha256": "ca57a93017c2e05456953abb31d0a897f6f234eec90185577a986a9a9acaa8c6"
+    },
+    {
+      "path": "tests/f7/test_release_policy_authority.py",
+      "bytes": 4332,
+      "sha256": "775f0e9f0ab68434e1722a94e2ba2c412796ca199f6b4f621b4ec76668c34cba"
+    },
+    {
+      "path": "tests/f7/test_residual_risk_canonical_authority.py",
+      "bytes": 6462,
+      "sha256": "134f353d5fff6c5a6ffb15b610a2deb3f0d88b3a8de69cf67c3157f38be591d5"
+    },
+    {
+      "path": "tests/f7/test_residual_risk_finalization.py",
+      "bytes": 6488,
+      "sha256": "118edba2ac1b1c38f97bb47f31e98ba03a1fe86edd5253b01a608be6d2d34757"
+    },
+    {
+      "path": "tests/f7/test_residual_risk_stop_semantics.py",
+      "bytes": 2753,
+      "sha256": "4f8eb0f20c309f40f7c36f9c748ad9b877e7e7b51d07ca6cca0fc4875c32c22c"
+    },
+    {
+      "path": "tests/f7/test_ru06_residual_closure.py",
+      "bytes": 1890,
+      "sha256": "256aaf749005877ece0492554ff5dbfd8d1efc3cfbb06586756cc14c23991cca"
+    },
+    {
+      "path": "tests/f7/test_ru06_stop_challenge_finalization.py",
+      "bytes": 30349,
+      "sha256": "7e95c48687f6c7b12e26c966ec4439cd84675adda197094a24d605cc5f9e56b8"
+    },
+    {
+      "path": "tests/f7/test_stop_authority_false_pass.py",
+      "bytes": 6191,
+      "sha256": "cc2c49205028948413d2d3b96e2058c5986a2ebe1612b478457e25c674f214da"
+    },
+    {
+      "path": "tests/f7/test_stop_authority_store_gate.py",
+      "bytes": 4637,
+      "sha256": "b956e275bca05ca71ac051ff856d274d16675973f9fe3cdae96cba4b6188dd57"
+    },
+    {
+      "path": "tests/f8/test_distribution_provenance.py",
+      "bytes": 2728,
+      "sha256": "55973a8854c058e5ea2d19634af12297eb9944390b60c1d2b914d76d231745c4"
+    },
+    {
+      "path": "tests/f8/test_github_action_pins.py",
+      "bytes": 1489,
+      "sha256": "27e9ebfaedf8fe9eedbb8bb8ff62797c5618a1a4e6c9289b06ba711f0f603bdb"
+    },
+    {
+      "path": "tests/f8/test_m46_build.py",
+      "bytes": 3837,
+      "sha256": "42f0294a47d94d28dcbfccf2194d060dcbf14f80ed2247ccedf7e9ec789f194a"
+    },
+    {
+      "path": "tests/f8/test_m46_standalone_clean_env.py",
+      "bytes": 4231,
+      "sha256": "36b5410a2a29e2f253e77c38ee43a2d677e52565342c6a0507155293b386c827"
+    },
+    {
+      "path": "tests/f8/test_m47_cli.py",
+      "bytes": 9982,
+      "sha256": "7320c13e3cefeaabefe37a89896f0e5f612892a1bf519714f5055dcb1c7464f8"
+    },
+    {
+      "path": "tests/f8/test_m48_ui_parity.py",
+      "bytes": 5244,
+      "sha256": "3c9fb994bf82f581d93779e67ea66abf844c9e7e02fbe633be0dfa4a3e023be9"
+    },
+    {
+      "path": "tests/f8/test_m49_release_validator.py",
+      "bytes": 8433,
+      "sha256": "a96277946260a42933f582587c148c19bf5f8a3900d095a8796611d3b03cbbcf"
+    },
+    {
+      "path": "tests/f8/test_m50_self_audit.py",
+      "bytes": 3621,
+      "sha256": "05073cc77ba1fc9a350ddf7530ef2a16708d71fd4245e89e934178f962c62c9f"
+    },
+    {
+      "path": "tests/f8/test_python_dependency_hash_locks.py",
+      "bytes": 3778,
+      "sha256": "c640dc1a71b4b8d4c93692de5692a63d1c345467d6c31d2285f297085fee70e2"
+    },
+    {
+      "path": "tests/f8/test_ru07_release_truth.py",
+      "bytes": 7667,
+      "sha256": "fe8abef02977dd6a1137b9f3ceef778ba437f5bc423cd79913ebeb5e62b525cc"
+    },
+    {
+      "path": "tests/f8/test_ru07_runtime_record_normalization.py",
+      "bytes": 1282,
+      "sha256": "ca40d47c6130bfed4a00afd5cf23f716333b6cdad7501452b2c4895c7c3dea18"
+    },
+    {
+      "path": "tests/f8/test_ru08_complete_workflow.py",
+      "bytes": 15279,
+      "sha256": "3b58acd7e26e9c4673483ff3bae09ac0b9bd6726b0ad69a8c08afe3c62859cd5"
+    },
+    {
+      "path": "tests/f8/test_ru09_cli.py",
+      "bytes": 2204,
+      "sha256": "92a31200727ef4df75e5f88a0a8046a6bdb8fd22c86ac5c552491f607be1f68d"
+    },
+    {
+      "path": "tests/f8/test_ru09_remediation_bundle.py",
+      "bytes": 6947,
+      "sha256": "42c11a8d4a9063b9456c92cdc34004f3e456b21411482b7444da48d358f98095"
+    },
+    {
+      "path": "tests/f8/test_ru09_report_builder.py",
+      "bytes": 4847,
+      "sha256": "1fcdcf372d540e2f2960b4f6e523050307b93073bf697a067201a8754147a045"
+    },
+    {
+      "path": "tests/f8/test_runtime_build_input_closure.py",
+      "bytes": 1418,
+      "sha256": "6588184b7e697fd85e6a01b030542236d103e35e4c9b5eb8640d6ee8420260b3"
+    },
+    {
+      "path": "tests/f8/test_v2_0_2_stop_operation.py",
+      "bytes": 5272,
+      "sha256": "b360b308c264ce864d9a693e8400f72d36de1bb3945fcc67702226d4f79b3b4a"
+    },
+    {
+      "path": "tests/features/test_ru11_cli.py",
+      "bytes": 3055,
+      "sha256": "92d0efd4f45f6561583cb4e09d287302a80a962a4c943c6813303cee8b6e41d0"
+    },
+    {
+      "path": "tests/features/test_ru11_functional_verification.py",
+      "bytes": 6848,
+      "sha256": "b241767e56f6ede6f2113c40db38ccc6ab1eddcd7e04b5671153ab0473989dda"
+    },
+    {
+      "path": "tests/history_view/test_ru17_history_share.py",
+      "bytes": 4037,
+      "sha256": "3ad1ae025ffb2344fe0b0838c556e84ea4e7459e69620507c1fd5a2cf0df45d1"
+    },
+    {
+      "path": "tests/incremental/test_ru16_incremental.py",
+      "bytes": 3845,
+      "sha256": "439715d12e2c3fd6c1f501b6dd30b1fbaf808b7af8bf6be654e85bb1ac10e1f0"
+    },
+    {
+      "path": "tests/opportunities/test_ru15_opportunities.py",
+      "bytes": 3916,
+      "sha256": "cbba89470347ff9d481a4c1e48b8feff1754b95775026cfa27756ba8b9a3d2ea"
+    },
+    {
+      "path": "tests/product/test_product_v1.py",
+      "bytes": 7685,
+      "sha256": "9d4e3e8dfe030345ca59f2e8d5be32eb1ce91fe02b0d2769b43aa33b5b6a4d27"
+    },
+    {
+      "path": "tests/product/test_runner_real_git.py",
+      "bytes": 1090,
+      "sha256": "9d39ac8a35c8cd49a5ee090932edc8690526120bbdbc68fe7c6515c64a55caf9"
+    },
+    {
+      "path": "tests/qualification/test_ru13c_continuous.py",
+      "bytes": 2752,
+      "sha256": "bc8a3df206f5a49a4af7c04083e90ffc2fa981929cb18da0dbe5f58e9b579214"
+    },
+    {
+      "path": "tests/runner/test_ru10_cli_and_process_tree.py",
+      "bytes": 3791,
+      "sha256": "5394bf723472e08c45008a2d042e3cc13f19f010f466605a1fd10cde32cefb73"
+    },
+    {
+      "path": "tests/runner/test_ru10_controlled_runner.py",
+      "bytes": 4567,
+      "sha256": "202d7cc8376fd4d5e243c405ebbb32cb06fc557197848ec132f766750a461e5d"
+    },
+    {
+      "path": "tests/runner/test_ru10_environment_and_verification.py",
+      "bytes": 3037,
+      "sha256": "7cd884f2ab3e94865a062122e4a31929bc34c66ad9d722a1791761d2a8a6c7ce"
+    },
+    {
+      "path": "tests/runner/test_ru10_execution_bridge.py",
+      "bytes": 3186,
+      "sha256": "df2ee1fe34356cb08a1cdd1a8d383e5f078a7fe30f0551867d0419642a1e45fd"
+    },
+    {
+      "path": "tests/stage1/test_ru01_residuals.py",
+      "bytes": 4058,
+      "sha256": "b7284a4684583b8b72204c806336191121c4e8624ed66398c2461422867d0c3b"
+    },
+    {
+      "path": "tests/stage1/test_stage1_foundation.py",
+      "bytes": 40746,
+      "sha256": "33d00315585b0292aa368379e69f59166cd45afc39191eed182375c2b04248bd"
+    },
+    {
+      "path": "tests/stage2/test_ru02_source_identity.py",
+      "bytes": 4147,
+      "sha256": "040e6610587a9283c08157a62fddc2cdb0367f9fe20fdd1071509543f22e5dce"
+    },
+    {
+      "path": "tests/stage2/test_source_archive_real_git.py",
+      "bytes": 5089,
+      "sha256": "26bceaf9bd77caa57793c2636f56deff944b9425ffd03f4aaa7b8ca85a0ce31f"
+    },
+    {
+      "path": "tests/stage2/test_source_archive_reconciliation.py",
+      "bytes": 5712,
+      "sha256": "a622dc088588d0f53c7827390a90e7a451837934cae3c257104092b0bdbf6430"
+    },
+    {
+      "path": "tests/stage2/test_source_generation_alias_guard.py",
+      "bytes": 9628,
+      "sha256": "ededa03927d95ee2a3c9a8ccd86761ce0d5d20e0cc3cb2786c615b18d58b6fe2"
+    },
+    {
+      "path": "tests/stage2/test_source_object_format_regression.py",
+      "bytes": 2353,
+      "sha256": "ff78b7cf6564a399ac152ece5c6675663ddf2481867a98e19116d60ee635b7da"
+    },
+    {
+      "path": "tests/stage3/test_ru03_assignment_vault.py",
+      "bytes": 3724,
+      "sha256": "4f267bf0345a3783cafcda1430abcf31591f1920278579f4d1260118c62b71d6"
+    },
+    {
+      "path": "tests/stage3/test_ru03_authority_bindings.py",
+      "bytes": 7981,
+      "sha256": "18ef9c90354ec40bfc24d87ddd91ad2a47f51487b29d8f82b2445779bc7375c6"
+    },
+    {
+      "path": "tests/stage3/test_ru03_e3_completion_identity.py",
+      "bytes": 4423,
+      "sha256": "d603030961dc02a8f0ed229d1d0abc968a656cdfb59c5431b997202ac16fe79b"
+    },
+    {
+      "path": "tests/stage3/test_ru03_import_ui_diagnostics.py",
+      "bytes": 2076,
+      "sha256": "9c2ef226fd60b3887e4343373c0c304583e26d8b08152880d28bbc74a18076c1"
+    },
+    {
+      "path": "tests/stage3/test_ru03_package_identity.py",
+      "bytes": 2000,
+      "sha256": "dcf3313e6518e10fae19ffa8a621d4ac435ac2894b8c04a833f24510d38ba218"
+    },
+    {
+      "path": "tests/stage3/test_ru03_result_roundtrip.py",
+      "bytes": 6697,
+      "sha256": "821f960de84ea9f8a261c10912f9f7e889bf91a1e2d137c71b3ef3ef4916d630"
+    },
+    {
+      "path": "tests/stage4/test_ru04_verified_read_models.py",
+      "bytes": 16214,
+      "sha256": "e238ce89af62f69dfcbeec44809852268d8a4e366eb287a731c66cb1e77aceea"
+    },
+    {
+      "path": "tests/stage5/test_ru05_truthful_adjudication_d11.py",
+      "bytes": 11237,
+      "sha256": "653995c4dc1e3aab9c9879d2eafcbbdf6e7e97d863c07ea70694220437eda3ac"
+    },
+    {
+      "path": "tests/stage5/test_ru05_truthful_self_test.py",
+      "bytes": 1434,
+      "sha256": "be1ae12a84be2f2a7c72ff93669960ceda80ba38e1bdba2514d41c8a29964514"
+    },
+    {
+      "path": "tests/strategy/test_ru14_strategy.py",
+      "bytes": 2761,
+      "sha256": "4eeacfe8c28a7c073b65422f47fcadc323fd20cd15ffa1c543b2bab35aec4c41"
+    },
+    {
+      "path": "tests/workbench/test_ru12b_workbench.py",
+      "bytes": 3150,
+      "sha256": "27963e6714621a493f4bdb1cd136343a979e3c72b9398a9ce00bf4517ef9a40e"
+    },
+    {
+      "path": "tests/workflow/__init__.py",
+      "bytes": 81,
+      "sha256": "e138ebce9a83e677d758672875c27662d40e50e91f2a0e213048abe2859f7b80"
+    },
+    {
+      "path": "tests/workflow/nf02_raw_crash_worker.py",
+      "bytes": 815,
+      "sha256": "652578945c3f1d0f38063b553762dfc06043e9a35a93d92c3622726247c64cc3"
+    },
+    {
+      "path": "tests/workflow/test_e1_freeze_and_isolation.py",
+      "bytes": 4220,
+      "sha256": "39f0069d0575515a506531e88c7b3467b7c6de0ddf34ffce9ab2035e5cbbc306"
+    },
+    {
+      "path": "tests/workflow/test_e5_runtime.py",
+      "bytes": 26402,
+      "sha256": "694ec1fec8c4294e3657c0ea40bafef0707337c63c9fcfe3ff85887e35fe91b5"
+    },
+    {
+      "path": "tests/workflow/test_inbox.py",
+      "bytes": 15882,
+      "sha256": "d3bd2ed3b19a739defb5c29c919f5cc17dedb797f0ae7d962da282212ea0dac5"
+    },
+    {
+      "path": "tests/workflow/test_manual_stage.py",
+      "bytes": 107649,
+      "sha256": "53af500741399f1d15ed156a47f0f0ba63694cc899bd3ad3efb68ee7d95cc3fb"
+    },
+    {
+      "path": "tests/workflow/test_nf02_raw_derivation.py",
+      "bytes": 11840,
+      "sha256": "64fe0932a04b8d82d3ab6d5d657fd1f28d3e710810fe9d6b24a1965fefee594f"
+    },
+    {
+      "path": "tests/workflow/test_nf02_raw_durability.py",
+      "bytes": 13968,
+      "sha256": "7e7740544b779ed985afe94aec661552c025c97762a34e989175e8fc9f6777c0"
+    },
+    {
+      "path": "tests/workflow/test_nf02_synthetic_lane_result_authority.py",
+      "bytes": 64043,
+      "sha256": "67959f39a317e85d8f17783df878476c3538ceec80479d262902c2f3ef2c0dba"
+    },
+    {
+      "path": "tests/workflow/test_orchestrator.py",
+      "bytes": 33899,
+      "sha256": "390ffcf755f06209859eab9e725f2505b115d7026df8b75327976941e38caeaf"
+    },
+    {
+      "path": "tests/workflow/test_platform.py",
+      "bytes": 2109,
+      "sha256": "2510e4f25e1f7dfd5f82ae41d24e13a82e0bb33f4cada8a9242c58620f29b017"
+    },
+    {
+      "path": "tests/workflow/test_review_blockers.py",
+      "bytes": 15119,
+      "sha256": "53a4564f37c4e2752a2604b24f48c83397371f0f1007970c89aadd2b9c2c2629"
+    },
+    {
+      "path": "tests/workflow/test_ru12a_assurance_views.py",
+      "bytes": 5191,
+      "sha256": "2acafb0ddec9d2a019d2cd0e595d1f2f1b3eac0689fb6f4a693f3fa3293d20e6"
+    },
+    {
+      "path": "tests/workflow/test_scope_baseline.py",
+      "bytes": 7901,
+      "sha256": "f3dff4806ba60a77c9b5a5c3809255a472cff470589f60bbe58d6255bf0cd78a"
+    },
+    {
+      "path": "tests/workflow/test_settings.py",
+      "bytes": 4591,
+      "sha256": "fefb6f0b4a33c01462177b1dcd1a1514c0ea162a9e32c4bf6c2b62f01eb59771"
+    },
+    {
+      "path": "tests/workflow/test_stage_finalize.py",
+      "bytes": 18617,
+      "sha256": "d3cef566b0713c777b6993e414a62ef0fc4cbff4d5813cdcfc9d5b4eafd077b2"
+    },
+    {
+      "path": "tests/workflow/test_ui_v2_0_3.py",
+      "bytes": 4349,
+      "sha256": "9be7a392495177b670357cf0767f74859cec4807423bfcd3dd7d13949daa406e"
+    },
+    {
+      "path": "tools/cleanup_inventory.py",
+      "bytes": 3929,
+      "sha256": "3619f7c393a9607a7baaa9887ccc1aed8dc0710fa2120f0e3653d7299eb4a432"
+    },
+    {
+      "path": "tools/prepare_product_cleanup.py",
+      "bytes": 7868,
+      "sha256": "d9baa6edde5bc78382a0b2be6c94baaa2d603df1719e6f1c796b3bd99c12e87e"
+    },
+    {
+      "path": "tools/product_smoke.py",
+      "bytes": 5072,
+      "sha256": "896b9b4bf089f395f4f0658eb6b4caf32fa297fd732cf8a5b2af98e197843d52"
+    },
+    {
+      "path": "tools/product_test_tmp.py",
+      "bytes": 976,
+      "sha256": "54ff06b2e1c648c9672ad1eb2750751b0b844790600d8bf521ce784225f6b60d"
+    },
+    {
+      "path": "tools/verify_product_cleanup.py",
+      "bytes": 3382,
+      "sha256": "52bda9979c4e20d1060d6f5c36fe7e4380487c32043b97eceb2e334dfe1b6188"
+    }
+  ],
+  "artifact_sha256": "094065a8fc59efe7d1bba48343f842f480f8422fd21ee29c2117b15975a80ce5",
+  "artifact_bytes": 1503253,
+  "ruff": "PASS src build tests/product tools",
+  "mypy": "PASS 51 files",
+  "diff_check": "PASS code/config paths",
+  "tui_start_exit": "PASS",
+  "standalone_real_subprocess_smoke": "PASS",
+  "deep_self_test": "PASS",
+  "release_validator": "PASS LOCAL_ARTIFACT_VALIDATION; independent clean-room NOT_RUN",
+  "formal_R5_4_2_Q1_Q2": "NO_NEW_PASS_CLAIM; original status retained",
+  "nf02": "OPEN; intake disabled globally",
+  "full_E1_E6_external_audit": "BLOCKED_NOT_COMPLETED"
+}

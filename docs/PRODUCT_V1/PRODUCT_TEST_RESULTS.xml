@@ -1,0 +1,885 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="25" failures="6" skipped="0" tests="421" time="354.128" timestamp="2026-10-11T03:50:31.425360+02:00" hostname="DESKTOP-99K5D30"><testcase classname="tests.product.test_product_v1" name="test_start_resume_and_report_bind_real_commit" time="10.961" /><testcase classname="tests.product.test_product_v1" name="test_public_import_is_disabled_without_any_mutation[unauthorized]" time="3.790" /><testcase classname="tests.product.test_product_v1" name="test_public_import_is_disabled_without_any_mutation[wrong_raw]" time="3.650" /><testcase classname="tests.product.test_product_v1" name="test_public_import_is_disabled_without_any_mutation[second_slot]" time="3.994" /><testcase classname="tests.product.test_product_v1" name="test_public_import_is_disabled_without_any_mutation[missing_output]" time="3.679" /><testcase classname="tests.product.test_product_v1" name="test_public_import_is_disabled_without_any_mutation[terminal_attempt]" time="4.121" /><testcase classname="tests.product.test_product_v1" name="test_public_import_is_disabled_without_any_mutation[stale_cut]" time="3.665" /><testcase classname="tests.product.test_product_v1" name="test_public_import_is_disabled_without_any_mutation[declared_not_enforced]" time="3.896" /><testcase classname="tests.product.test_product_v1" name="test_public_import_is_disabled_without_any_mutation[self_grant]" time="3.779" /><testcase classname="tests.product.test_product_v1" name="test_resume_rejects_tampered_package" time="5.026"><failure message="AttributeError: 'NoneType' object has no attribute 'ingest_zip'">campaign = (WindowsPath('C:/Projekty/Audyty/BDB Audit/.product-test-tmp/da294f9d00a54911920566f9282fe423/test_resume_rejects_tamp...ial_governing_policy_ref', ...}, 'audit_completion': 'NOT_COMPLETED', 'campaign_id': 'campaign_300473efe55500ee', ...})
+capsys = &lt;_pytest.capture.CaptureFixture object at 0x000001D6E31B7E50&gt;
+
+    def test_resume_rejects_tampered_package(campaign, capsys):
+        store, _, data = campaign
+        package = Path(data["packages"][0]["package_zip_path"])
+        package.write_bytes(b"substituted raw ZIP")
+        before = _bytes(store.parent)
+        assert run_cli(["product", "resume", "--store", str(store), "--json"]) == 2
+        assert json.loads(capsys.readouterr().err)["status"] == "BLOCKED"
+        assert _bytes(store.parent) == before
+        # Exercise the actual E1 inbox, bypassing the product CLI.
+        workflow = FullAuditOrchestrator(settings_mgr=SettingsManager(store.parent / "product-settings.json"))
+        workflow.resume_campaign(store)
+        before = _bytes(store.parent)
+&gt;       imported = workflow.e1_inbox.ingest_zip(result)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'ingest_zip'
+
+tests\product\test_product_v1.py:107: AttributeError</failure></testcase><testcase classname="tests.product.test_product_v1" name="test_store_cannot_self_authorize_or_accept_external_result" time="3.865" /><testcase classname="tests.product.test_product_v1" name="test_manual_stage_import_blocked_without_mutation" time="3.496" /><testcase classname="tests.product.test_product_v1" name="test_disabled_import_does_not_create_missing_store" time="0.005" /><testcase classname="tests.product.test_product_v1" name="test_start_refuses_overwriting_campaign" time="4.208" /><testcase classname="tests.product.test_runner_real_git" name="test_real_git_metadata_not_copied_and_cleanup_succeeds" time="0.477" /><testcase classname="tests.runner.test_ru10_cli_and_process_tree" name="test_ru10_vnext_cli_preserves_legacy_command_surface" time="0.125" /><testcase classname="tests.runner.test_ru10_cli_and_process_tree" name="test_ru10_tools_plan_and_run_and_results_cli" time="0.092" /><testcase classname="tests.runner.test_ru10_cli_and_process_tree" name="test_ru10_environment_verify_exposes_real_limitations" time="0.144" /><testcase classname="tests.runner.test_ru10_cli_and_process_tree" name="test_ru10_required_host_filesystem_isolation_fails_closed" time="0.004" /><testcase classname="tests.runner.test_ru10_cli_and_process_tree" name="test_ru10_timeout_terminates_spawned_child_process_tree" time="10.202"><failure message="AssertionError: assert not True&#10; +  where True = exists()&#10; +    where exists = WindowsPath('C:/Projekty/Audyty/BDB Audit/.product-test-tmp/da294f9d00a54911920566f9282fe423/test_ru10_timeout_terminates_spawned_child_process_tree-005dc21ce5e04801834ad2fd3ea68b94/child-survived.txt').exists">tmp_path = WindowsPath('C:/Projekty/Audyty/BDB Audit/.product-test-tmp/da294f9d00a54911920566f9282fe423/test_ru10_timeout_terminates_spawned_child_process_tree-005dc21ce5e04801834ad2fd3ea68b94')
+
+    def test_ru10_timeout_terminates_spawned_child_process_tree(tmp_path: Path) -&gt; None:
+        source = _source(tmp_path)
+        marker = tmp_path / "child-survived.txt"
+        child = f"import time; from pathlib import Path; time.sleep(3); Path({str(marker)!r}).write_text('survived')"
+        parent = (
+            "import subprocess,sys,time; "
+            f"subprocess.Popen([sys.executable, '-c', {child!r}]); "
+            "time.sleep(30)"
+        )
+        result = ToolSupervisor().run(
+            ToolRunSpec(
+                run_id="child-tree-timeout",
+                source_root=str(source),
+                evidence_dir=str(tmp_path / "evidence"),
+                argv=(sys.executable, "-c", parent),
+                timeout_seconds=1,
+            )
+        )
+        assert result.supervisor_status == "TIMEOUT"
+        time.sleep(4)
+&gt;       assert not marker.exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Projekty/Audyty/BDB Audit/.product-test-tmp/da294f9d00a54911920566f9282fe423/test_ru10_timeout_terminates_spawned_child_process_tree-005dc21ce5e04801834ad2fd3ea68b94/child-survived.txt').exists
+
+tests\runner\test_ru10_cli_and_process_tree.py:101: AssertionError</failure></testcase><testcase classname="tests.runner.test_ru10_controlled_runner" name="test_ru10_executes_exact_argv_only_in_disposable_copy" time="0.168" /><testcase classname="tests.runner.test_ru10_controlled_runner" name="test_ru10_shell_tokens_are_plain_arguments_not_shell_programs" time="0.097" /><testcase classname="tests.runner.test_ru10_controlled_runner" name="test_ru10_timeout_is_not_success" time="6.203" /><testcase classname="tests.runner.test_ru10_controlled_runner" name="test_ru10_output_limit_is_not_success" time="2.097" /><testcase classname="tests.runner.test_ru10_controlled_runner" name="test_ru10_network_isolation_requirement_fails_closed_when_unavailable" time="0.005" /><testcase classname="tests.runner.test_ru10_controlled_runner" name="test_ru10_sensitive_environment_is_rejected" time="0.005" /><testcase classname="tests.runner.test_ru10_controlled_runner" name="test_ru10_evidence_cannot_be_written_inside_target" time="0.004" /><testcase classname="tests.runner.test_ru10_environment_and_verification" name="test_ru10_source_manifest_is_content_bound_and_ignores_vcs_metadata" time="0.021" /><testcase classname="tests.runner.test_ru10_environment_and_verification" name="test_ru10_environment_manifest_binds_source_and_capability" time="0.011" /><testcase classname="tests.runner.test_ru10_environment_and_verification" name="test_ru10_evidence_verifier_detects_raw_output_tamper" time="0.128" /><testcase classname="tests.runner.test_ru10_environment_and_verification" name="test_ru10_evidence_verifier_detects_receipt_tamper" time="0.112" /><testcase classname="tests.runner.test_ru10_execution_bridge" name="test_ru10_bridge_does_not_invent_observation_from_zero_exit" time="0.063" /><testcase classname="tests.runner.test_ru10_execution_bridge" name="test_ru10_bridge_only_uses_explicit_observation_normalizer" time="0.087" /><testcase classname="tests.runner.test_ru10_execution_bridge" name="test_ru10_bridge_maps_blocked_to_unsupported_without_observations" time="0.006" /><testcase classname="tests.stage2.test_ru02_source_identity" name="test_d20_arbitrary_40hex_is_not_accepted_without_commit_object" time="0.421" /><testcase classname="tests.stage2.test_ru02_source_identity" name="test_d20_annotated_tag_is_peeled_to_commit_and_tree" time="0.789" /><testcase classname="tests.stage2.test_ru02_source_identity" name="test_d01_materializer_builds_full_manifest_from_exact_tree" time="1.067" /><testcase classname="tests.stage2.test_ru02_source_identity" name="test_d01_unmaterialized_lfs_pointer_blocks_complete_source" time="0.911" /><testcase classname="tests.stage2.test_ru02_source_identity" name="test_d26_credential_bearing_urls_are_rejected_without_echoing_secret" time="0.001" /><testcase classname="tests.stage2.test_source_archive_real_git" name="test_real_git_archive_reconciles_paths_modes_symlink_and_exact_tree[sha1]" time="2.003" /><testcase classname="tests.stage2.test_source_archive_real_git" name="test_real_git_archive_reconciles_paths_modes_symlink_and_exact_tree[sha256]" time="1.541" /><testcase classname="tests.stage2.test_source_archive_real_git" name="test_real_unresolved_source_member_cannot_be_omitted_or_promoted[sha1-LFS]" time="1.430" /><testcase classname="tests.stage2.test_source_archive_real_git" name="test_real_unresolved_source_member_cannot_be_omitted_or_promoted[sha1-SUBMODULE]" time="1.288" /><testcase classname="tests.stage2.test_source_archive_real_git" name="test_real_unresolved_source_member_cannot_be_omitted_or_promoted[sha256-LFS]" time="1.360" /><testcase classname="tests.stage2.test_source_archive_real_git" name="test_real_unresolved_source_member_cannot_be_omitted_or_promoted[sha256-SUBMODULE]" time="1.067" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_exact_source_names_preserved[.gitignore]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_exact_source_names_preserved[a/.hidden]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_exact_source_names_preserved[\u017c\xf3\u0142\u0107.txt]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_exact_source_names_preserved[component:colon.txt]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_symlink_target_bytes_read_without_following_and_generic_transport_unchanged" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_alias_and_unsafe_source_paths_rejected[../a]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_alias_and_unsafe_source_paths_rejected[a/./b]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_alias_and_unsafe_source_paths_rejected[a//b]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_alias_and_unsafe_source_paths_rejected[/a]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_alias_and_unsafe_source_paths_rejected[a\\b]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_member_reconciliation_rejects[rows0-SOURCE_ARCHIVE_MISSING_MEMBERS]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_member_reconciliation_rejects[rows1-SOURCE_ARCHIVE_UNDECLARED_MEMBER]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_member_reconciliation_rejects[rows2-SOURCE_ARCHIVE_MEMBER_CONFLICT]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_member_reconciliation_rejects[rows3-SOURCE_ARCHIVE_MODE_MISMATCH]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_member_reconciliation_rejects[rows4-SOURCE_ARCHIVE_UNDECLARED_DIRECTORY]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_member_reconciliation_rejects[rows5-SOURCE_ARCHIVE_UNDECLARED_DIRECTORY]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_member_reconciliation_rejects[rows6-SOURCE_ARCHIVE_DUPLICATE_OR_UNSUPPORTED_PATH]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_declared_parent_metadata_is_not_source_member" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_fail_closed_source_and_target_controls[bounded]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_fail_closed_source_and_target_controls[limit]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_fail_closed_source_and_target_controls[bool_length]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_fail_closed_source_and_target_controls[lfs]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_fail_closed_source_and_target_controls[submodule]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_fail_closed_source_and_target_controls[target]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_fail_closed_source_and_target_controls[encoding]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_fail_closed_source_and_target_controls[noncanonical_base64]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_pointer_without_manifest_marker_still_rejects" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_corrupt_original_payload_rejected_without_extraction" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_supported_budget_caps_cannot_be_raised[input_bytes]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_supported_budget_caps_cannot_be_raised[expanded_bytes]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_supported_budget_caps_cannot_be_raised[central_bytes]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_supported_budget_caps_cannot_be_raised[member_bytes]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_supported_budget_caps_cannot_be_raised[members]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_supported_budget_caps_cannot_be_raised[ratio]" time="0.001" /><testcase classname="tests.stage2.test_source_archive_reconciliation" name="test_actual_member_budget_is_enforced" time="0.001" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_same_identity_and_alias_can_retain_another_archive_representation" time="0.001" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_identity_or_alias_remapping_is_a_conflict[changed0]" time="0.001" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_identity_or_alias_remapping_is_a_conflict[changed1]" time="0.001" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_schema_substitution_is_not_the_same_authoritative_identity" time="0.001" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_new_material_identity_can_have_its_own_new_generation_alias" time="0.001" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_generation_authority_branch_agrees_with_exact_identity[AUTHORIZED_GIT-repository_authority_ref-snapshot_authority_ref]" time="0.013" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_generation_authority_branch_agrees_with_exact_identity[AUTHORIZED_SNAPSHOT-snapshot_authority_ref-repository_authority_ref]" time="0.041" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_incomplete_binding_is_not_a_successful_alias_mapping[changed0]" time="0.001" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_incomplete_binding_is_not_a_successful_alias_mapping[changed1]" time="0.001" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_typed_identity_is_hashable_and_compares_the_entire_schema_reference[legacy_schema]" time="0.001" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_typed_identity_is_hashable_and_compares_the_entire_schema_reference[schema1]" time="0.001" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_alias_conflict_in_bootstrap_closure_leaves_no_durable_history" time="0.387" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_complete_structured_schema_identity_ignores_mapping_insertion_order[history]" time="0.002" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_complete_structured_schema_identity_ignores_mapping_insertion_order[projection]" time="0.002" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_finalization_ref_sets_compare_complete_structured_schema_keys" time="0.002" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_generation_cannot_contradict_its_exact_identity_context[materialized_source_manifest_ref-False]" time="0.417" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_generation_cannot_contradict_its_exact_identity_context[materialized_source_manifest_ref-True]" time="0.479" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_generation_cannot_contradict_its_exact_identity_context[source_identity_profile_ref-False]" time="0.382" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_generation_cannot_contradict_its_exact_identity_context[source_identity_profile_ref-True]" time="0.492" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_generation_cannot_contradict_its_exact_identity_context[snapshot_authority_ref-False]" time="0.345" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_generation_cannot_contradict_its_exact_identity_context[snapshot_authority_ref-True]" time="0.495" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_generation_cannot_contradict_its_exact_identity_context[authority_mode-False]" time="0.343" /><testcase classname="tests.stage2.test_source_generation_alias_guard" name="test_generation_cannot_contradict_its_exact_identity_context[authority_mode-True]" time="0.497" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_repository_algorithm_controls_exact_ids[sha1-40-40-None]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_repository_algorithm_controls_exact_ids[sha256-64-64-None]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_repository_algorithm_controls_exact_ids[sha1-64-40-INVALID_GIT_OBJECT_ID]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_repository_algorithm_controls_exact_ids[sha256-40-64-INVALID_GIT_OBJECT_ID]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_repository_algorithm_controls_exact_ids[sha1-40-64-INVALID_GIT_TREE_OBJECT_ID]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_repository_algorithm_controls_exact_ids[sha256-64-40-INVALID_GIT_TREE_OBJECT_ID]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_repository_algorithm_controls_exact_ids[sha512-64-64-INVALID_GIT_OBJECT_ID]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_repository_algorithm_controls_exact_ids[sha1-41-40-INVALID_GIT_OBJECT_ID]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_intermediate_object_lengths_are_not_supported[41]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_intermediate_object_lengths_are_not_supported[48]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_intermediate_object_lengths_are_not_supported[63]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha1-40-40-True]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha256-64-64-True]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha1-64-40-False]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha256-40-64-False]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha1-40-64-False]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha256-64-40-False]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha1-41-40-False]" time="0.001" /><testcase classname="tests.stage2.test_source_object_format_regression" name="test_workflow_descriptor_cannot_undo_verified_algorithm_shape[sha512-64-64-False]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_golden" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[{&quot;a&quot;:1,&quot;a&quot;:2}]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[{&quot;a&quot;:1,&quot;\u0061&quot;:2}]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[-0]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[1.0]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[1e0]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[NaN]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[Infinity]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[+1]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[9007199254740992]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[-9007199254740992]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[&quot;\ud800&quot;]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[&quot;\udfff&quot;]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[\xef\xbb\xbf{}]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[{&quot;\u00e9&quot;:1}]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_parse_rejections[\xff]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_roundtrip[True]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_roundtrip[False]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_roundtrip[None]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_roundtrip[0]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_roundtrip[9007199254740991]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_roundtrip[-9007199254740991]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_roundtrip[\xe9]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_roundtrip[e\u0301]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_roundtrip[\U0001f600]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_roundtrip[value9]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_unicode_and_order" time="0.001" /><testcase classname="tests.f1.test_core" name="test_decimal_rejections[-0]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_decimal_rejections[00]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_decimal_rejections[+1]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_decimal_rejections[1.0]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_decimal_rejections[1e2]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_decimal_rejections[.5]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_decimal_rejections[0.00]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_decimal_rejections[-01]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_decimal_rejections[1.]" time="0.001" /><testcase classname="tests.f1.test_core" name="test_decimal_rational" time="0.001" /><testcase classname="tests.f1.test_core" name="test_reference_properties" time="0.035" /><testcase classname="tests.f1.test_core" name="test_stream_ownership_and_bounds" time="0.005" /><testcase classname="tests.f1.test_core" name="test_domain_and_ids" time="0.004" /><testcase classname="tests.f1.test_core" name="test_cross_process" time="0.462" /><testcase classname="tests.f1.test_core" name="test_resource_bounds_and_alias_bypass" time="0.001" /><testcase classname="tests.f1.test_core" name="test_pinned_golden_identity_vectors" time="0.003" /><testcase classname="tests.f1.test_core" name="test_reference_boundaries" time="0.001" /><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[VALID_BASE_F1]" time="0.922"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[VALID_BASE_FINAL]" time="0.000"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[VALID_E2_F1]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[VALID_E2_F2]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[VALID_E2_FINAL]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[VALID_ATTESTATION]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[VALID_CONTINUATION_TICKET]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[VALID_PREVIOUS_PROMPT_BUNDLE]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[WRONG_VARIANT]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[WRONG_RUN_ID]" time="0.000"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[WRONG_AUDIT_ID]" time="0.000"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[WRONG_SOURCE_SHA]" time="0.000"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[WRONG_SOURCE_TREE]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[CONFLICTING_DUPLICATE]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[INVALID_HASH_MANIFEST]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[MISSING_SNAPSHOT]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[BROKEN_LEDGER_PREFIX]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[BAD_F1_CHECKPOINT]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[BAD_F2_CHECKPOINT]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[EARLY_REVEAL]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[SOURCE_GENERATION_MIX]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[SUBSTITUTE_F2]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[UNSAFE_ZIP_PATH]" time="0.001"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[DUPLICATE_MEMBER]" time="0.000"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_dual_corpus[WRONG_ARTIFACT_FAMILY]" time="0.000"><error message="failed on setup with &quot;AssertionError&quot;">@pytest.fixture(scope="module")
+    def dual():
+&gt;       return {r["fixture_id"]: r for r in run_dual()}
+                                            ^^^^^^^^^^
+
+tests\f1\test_legacy.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def run_dual():
+        manifest = json.loads((CORPUS / "manifest.json").read_bytes())
+        assert manifest["unresolved_expectation_conflicts"] == []
+        frozen = load_legacy()
+        rows = []
+        for row in manifest["fixtures"]:
+            old = observe(frozen, row, frozen)
+            new = observe(v2, row, frozen)
+&gt;           assert old["status"] == row["legacy_observed_result"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tests\f1\dual_support.py:94: AssertionError</error></testcase><testcase classname="tests.f1.test_legacy" name="test_two_oracles" time="0.001" /><testcase classname="tests.f1.test_legacy" name="test_prefix_sequence_boundaries" time="0.001" /><testcase classname="tests.f1.test_legacy" name="test_previous_prompt_failure_paths" time="0.258" /><testcase classname="tests.f1.test_legacy" name="test_exact_payload_metadata_and_duplicate_basename" time="0.337" /><testcase classname="tests.f1.test_legacy" name="test_snapshot_raw_binding" time="0.403" /><testcase classname="tests.f1.test_legacy" name="test_missing_and_malformed_archive" time="0.558" /><testcase classname="tests.f1.test_zip" name="test_paths[/a]" time="0.001" /><testcase classname="tests.f1.test_zip" name="test_paths[../a]" time="0.001" /><testcase classname="tests.f1.test_zip" name="test_paths[a/../../b]" time="0.001" /><testcase classname="tests.f1.test_zip" name="test_paths[a\\b]" time="0.001" /><testcase classname="tests.f1.test_zip" name="test_paths[C:/a]" time="0.001" /><testcase classname="tests.f1.test_zip" name="test_paths[//host/a]" time="0.001" /><testcase classname="tests.f1.test_zip" name="test_duplicates_and_special" time="0.003" /><testcase classname="tests.f1.test_zip" name="test_quotas" time="0.002" /><testcase classname="tests.f1.test_zip" name="test_crc_and_nested" time="0.002" /><testcase classname="tests.f1.test_zip" name="test_actual_decompression_not_header[0]" time="0.001" /><testcase classname="tests.f1.test_zip" name="test_actual_decompression_not_header[8]" time="0.002" /><testcase classname="tests.f1.test_zip" name="test_actual_decompression_not_header[12]" time="0.004" /><testcase classname="tests.f1.test_zip" name="test_actual_decompression_not_header[14]" time="0.009" /><testcase classname="tests.f1.test_zip" name="test_actual_decompression_not_header[93]" time="0.003" /><testcase classname="tests.f1.test_zip" name="test_empty_and_zip64_metadata" time="0.001" /><testcase classname="tests.f1.test_zip" name="test_manifest_cases" time="0.002" /><testcase classname="tests.f1.test_zip" name="test_representation_identity" time="0.002" /><testcase classname="tests.f1.test_zip" name="test_owned_handle_cleanup" time="0.049" /><testcase classname="tests.f2.test_authority_repairs" name="test_forged_local_grant_does_not_authorize_delivery" time="0.001" /><testcase classname="tests.f2.test_authority_repairs" name="test_delivery_uses_accepted_grant_and_rebuilds_without_grant_cache" time="0.755" /><testcase classname="tests.f2.test_authority_repairs" name="test_command_required_fields_and_initialization_shape" time="0.516" /><testcase classname="tests.f2.test_authority_repairs" name="test_accepted_resolver_requires_exact_cut_and_membership" time="0.464" /><testcase classname="tests.f2.test_authority_repairs" name="test_forged_blindness_annotations_cannot_supply_missing_fact[UNKNOWN-False]" time="0.471" /><testcase classname="tests.f2.test_authority_repairs" name="test_forged_blindness_annotations_cannot_supply_missing_fact[UNKNOWN-True]" time="0.527" /><testcase classname="tests.f2.test_authority_repairs" name="test_forged_blindness_annotations_cannot_supply_missing_fact[DECLARED-False]" time="0.580" /><testcase classname="tests.f2.test_authority_repairs" name="test_forged_blindness_annotations_cannot_supply_missing_fact[DECLARED-True]" time="0.609" /><testcase classname="tests.f2.test_authority_repairs" name="test_forged_blindness_annotations_cannot_supply_missing_fact[ENFORCED-False]" time="0.600" /><testcase classname="tests.f2.test_authority_repairs" name="test_forged_blindness_annotations_cannot_supply_missing_fact[ENFORCED-True]" time="0.525" /><testcase classname="tests.f2.test_authority_repairs" name="test_runtime_acceptance_enforces_fsm_before_persistence" time="0.506" /><testcase classname="tests.f2.test_authority_repairs" name="test_finding_claim_successor_identity_and_revision_are_store_enforced" time="0.633" /><testcase classname="tests.f2.test_bootstrap_order_diagnostic" name="test_order_conflict_reproduces_from_exact_sources" time="0.011" /><testcase classname="tests.f2.test_bootstrap_order_diagnostic" name="test_diagnostic_command_is_not_reported_as_gate_pass" time="0.156" /><testcase classname="tests.f2.test_cli" name="test_help_has_no_domain_side_effect" time="0.810" /><testcase classname="tests.f2.test_closure_tiebreak_regression" name="test_independent_command_uses_normative_kind_order[False]" time="0.213" /><testcase classname="tests.f2.test_closure_tiebreak_regression" name="test_independent_command_uses_normative_kind_order[True]" time="0.181" /><testcase classname="tests.f2.test_closure_tiebreak_regression" name="test_typed_dependency_still_precedes_kind_order" time="0.099" /><testcase classname="tests.f2.test_golden_vectors_complete" name="test_golden_set_identity_and_completeness" time="0.091" /><testcase classname="tests.f2.test_golden_vectors_complete" name="test_canonical_identity_vectors" time="0.157" /><testcase classname="tests.f2.test_golden_vectors_complete" name="test_commit_closure_and_dag_vectors" time="0.300" /><testcase classname="tests.f2.test_golden_vectors_complete" name="test_bootstrap_precedence_r5n80_and_fr03_vectors" time="0.305" /><testcase classname="tests.f2.test_golden_vectors_complete" name="test_fsm_vectors" time="0.003" /><testcase classname="tests.f2.test_golden_vectors_complete" name="test_governance_and_schema_boundary_vectors" time="0.222" /><testcase classname="tests.f2.test_history_process_faults" name="test_process_death_is_old_or_new_complete[before_object_durability]" time="2.382" /><testcase classname="tests.f2.test_history_process_faults" name="test_process_death_is_old_or_new_complete[after_object_durability]" time="2.153" /><testcase classname="tests.f2.test_history_process_faults" name="test_process_death_is_old_or_new_complete[before_commit_durability]" time="1.827" /><testcase classname="tests.f2.test_history_process_faults" name="test_process_death_is_old_or_new_complete[after_commit_before_receipt]" time="1.926" /><testcase classname="tests.f2.test_history_process_faults" name="test_process_death_is_old_or_new_complete[after_receipt_before_head]" time="2.411" /><testcase classname="tests.f2.test_history_process_faults" name="test_process_death_is_old_or_new_complete[after_head_durability]" time="2.424" /><testcase classname="tests.f2.test_history_process_faults" name="test_process_death_is_old_or_new_complete[after_commit_durability_before_ack]" time="1.964" /><testcase classname="tests.f2.test_history_process_faults" name="test_real_concurrent_expected_head_conflict" time="0.576" /><testcase classname="tests.f2.test_m10_schema_identity" name="test_all_f2_schema_keys_are_bound_with_backend_identity" time="0.500" /><testcase classname="tests.f2.test_m10_schema_identity" name="test_layered_validator_fail_closed_before_unbound_runtime_acceptance" time="0.244" /><testcase classname="tests.f2.test_m11_corpus" name="test_direct_predecessor_single_auxiliary_multi_and_legacy_raw_preserved" time="0.001" /><testcase classname="tests.f2.test_m11_corpus" name="test_corpus_rejects_multiple_direct_and_cross_source_members" time="0.001" /><testcase classname="tests.f2.test_m12_knowledge_discovery" name="test_knowledge_state_is_attempt_bound_and_blind_origin_needs_earlier_cut" time="0.002" /><testcase classname="tests.f2.test_m12_knowledge_discovery" name="test_provenance_classes_and_no_false_blind_claim" time="0.001" /><testcase classname="tests.f2.test_m13_quarantine" name="test_quarantine_positive_bytes_and_opaque_namespace" time="0.001" /><testcase classname="tests.f2.test_m13_quarantine" name="test_transitive_forbidden_ref_fails_closed" time="0.001" /><testcase classname="tests.f2.test_m13_quarantine" name="test_nested_forbidden_refs_are_checked_recursively[dict-in-dict]" time="0.001" /><testcase classname="tests.f2.test_m13_quarantine" name="test_nested_forbidden_refs_are_checked_recursively[list-in-dict]" time="0.001" /><testcase classname="tests.f2.test_m13_quarantine" name="test_nested_forbidden_refs_are_checked_recursively[dict-in-list]" time="0.001" /><testcase classname="tests.f2.test_m13_quarantine" name="test_nested_forbidden_refs_are_checked_recursively[list-in-list]" time="0.001" /><testcase classname="tests.f2.test_m13_quarantine" name="test_nested_allowed_refs_are_projected_to_safe_bytes_deterministically" time="0.001" /><testcase classname="tests.f2.test_m5_fsm" name="test_e0_and_lane_completion_gates" time="0.001" /><testcase classname="tests.f2.test_m5_fsm" name="test_terminal_state_and_retry_are_immutable" time="0.001" /><testcase classname="tests.f2.test_m5_objects" name="test_r5n80_union_precedence_vectors" time="0.375" /><testcase classname="tests.f2.test_m5_objects" name="test_bootstrap_accepts_one_head_and_retry" time="0.374" /><testcase classname="tests.f2.test_m5_objects" name="test_empty_history_after_seq1_and_blocked_admission_rejected" time="0.503" /><testcase classname="tests.f2.test_m5_transaction" name="test_each_persistence_boundary_recovers_old_or_new[before_object_durability]" time="0.723" /><testcase classname="tests.f2.test_m5_transaction" name="test_each_persistence_boundary_recovers_old_or_new[after_object_durability]" time="0.815" /><testcase classname="tests.f2.test_m5_transaction" name="test_each_persistence_boundary_recovers_old_or_new[before_commit_durability]" time="0.552" /><testcase classname="tests.f2.test_m5_transaction" name="test_each_persistence_boundary_recovers_old_or_new[after_commit_before_receipt]" time="0.541" /><testcase classname="tests.f2.test_m5_transaction" name="test_each_persistence_boundary_recovers_old_or_new[after_receipt_before_head]" time="0.599" /><testcase classname="tests.f2.test_m5_transaction" name="test_each_persistence_boundary_recovers_old_or_new[after_head_durability]" time="0.684" /><testcase classname="tests.f2.test_m5_transaction" name="test_each_persistence_boundary_recovers_old_or_new[after_commit_durability_before_ack]" time="0.535" /><testcase classname="tests.f2.test_m5_transaction" name="test_expected_head_compare_and_id_reuse_conflict" time="0.435" /><testcase classname="tests.f2.test_m6_stages" name="test_initial_stage_registry_recognizes_e1_to_e5_and_exact_ref" time="0.007" /><testcase classname="tests.f2.test_m6_stages" name="test_stage_plan_rejects_duplicate_ordinal_cycle_missing_predecessor_and_reveal" time="0.002" /><testcase classname="tests.f2.test_m7_isolation" name="test_isolation_classes_do_not_fallback_to_enforced" time="0.002" /><testcase classname="tests.f2.test_m7_isolation" name="test_isolation_requires_material_channel_basis_before_enforced" time="0.001" /><testcase classname="tests.f2.test_m7_isolation" name="test_store_does_not_accept_unresolved_enforced_isolation[False-ISOLATION_REQUIRED_ASSURANCE_MISMATCH]" time="7.975" /><testcase classname="tests.f2.test_m7_isolation" name="test_store_does_not_accept_unresolved_enforced_isolation[True-ISOLATION_REQUIRED_ASSURANCE_MISMATCH]" time="9.654" /><testcase classname="tests.f2.test_m7_isolation" name="test_grant_exposure_is_monotonic_and_discovery_provenance" time="0.002" /><testcase classname="tests.f2.test_m7_isolation" name="test_lane_spec_keeps_isolation_and_knowledge_requirements_explicit" time="0.001" /><testcase classname="tests.f2.test_m8_capability" name="test_positive_view_excludes_hidden_and_transitive_forbidden_bytes" time="0.001" /><testcase classname="tests.f2.test_m8_capability" name="test_grant_is_accepted_before_delivery" time="0.001" /><testcase classname="tests.f2.test_m8_capability" name="test_recursive_positive_view_rejects_nested_cycles_and_unknown_refs[cycle-VIEW_REFERENCE_CYCLE]" time="0.002" /><testcase classname="tests.f2.test_m8_capability" name="test_recursive_positive_view_rejects_nested_cycles_and_unknown_refs[unknown-VIEW_TRANSITIVE_LEAK]" time="0.001" /><testcase classname="tests.f2.test_m9_compiler" name="test_compiler_is_byte_deterministic_and_has_no_authority_writer" time="0.003" /><testcase classname="tests.f2.test_registry_schema" name="test_exact_loader_and_unknown_kind_version" time="0.119" /><testcase classname="tests.f2.test_registry_schema" name="test_contract_mutations[ordering_rules-value0-ORDERING_RULE_DEFECT]" time="0.101" /><testcase classname="tests.f2.test_registry_schema" name="test_contract_mutations[reference_contract_mode-SCHEMA_BOUND_BEFORE_FIRST_ACCEPTANCE-EXPLICIT_COMPLETE]" time="0.108" /><testcase classname="tests.f2.test_registry_schema" name="test_contract_mutations[material_refs-value2-EXPLICIT_COMPLETE]" time="0.081" /><testcase classname="tests.f2.test_registry_schema" name="test_contract_mutations[canonical_role-OTHER-UNKNOWN_CANONICAL_ROLE]" time="0.108" /><testcase classname="tests.f2.test_registry_schema" name="test_ref_classes_and_top_level_semantics_cannot_be_overridden" time="0.217" /><testcase classname="tests.f2.test_registry_schema" name="test_registry_concrete_golden[R5N01_CRITICAL_REGISTRY_REF_COMPLETENESS]" time="0.095" /><testcase classname="tests.f2.test_registry_schema" name="test_registry_concrete_golden[R5N02_CANONICAL_ROLE_DOMAIN_REJECT]" time="0.107" /><testcase classname="tests.f2.test_registry_schema" name="test_registry_concrete_golden[R5N04_DANGLING_REF_TARGET_REJECT]" time="0.112" /><testcase classname="tests.f2.test_registry_schema" name="test_registry_concrete_golden[R5N25_EXPLICIT_COMPLETE_BODY_REGISTRY_PARITY]" time="0.126" /><testcase classname="tests.f2.test_registry_schema" name="test_registry_concrete_golden[R5N42_REFERENCE_ARRAY_DEFAULT_ORDERING]" time="0.130" /><testcase classname="tests.f2.test_registry_schema" name="test_registry_concrete_golden[R5N70_INVENTORY_INVARIANT_MATERIALITY_EXPLICIT]" time="0.155" /><testcase classname="tests.f2.test_registry_schema" name="test_r5n06_exact_missing_binding" time="0.158" /><testcase classname="tests.f2.test_registry_schema" name="test_r5n77_implementation_exists_without_acceptance" time="0.142" /><testcase classname="tests.f2.test_registry_schema" name="test_bound_exact_bytes_no_rebinding_and_reference_parity" time="0.766" /><testcase classname="tests.f2.test_registry_schema" name="test_structural_failures_match_reference[body0]" time="0.268" /><testcase classname="tests.f2.test_registry_schema" name="test_structural_failures_match_reference[body1]" time="0.263" /><testcase classname="tests.f2.test_registry_schema" name="test_structural_failures_match_reference[body2]" time="0.201" /><testcase classname="tests.f2.test_registry_schema" name="test_structural_failures_match_reference[body3]" time="0.208" /><testcase classname="tests.f2.test_registry_schema" name="test_duplicates_rejected_before_unbound_schema" time="0.149" /><testcase classname="tests.f2.test_registry_schema" name="test_offline_pinned_behavior[patch0-DIALECT]" time="0.283" /><testcase classname="tests.f2.test_registry_schema" name="test_offline_pinned_behavior[patch1-EXTERNAL_RESOLUTION]" time="0.241" /><testcase classname="tests.f2.test_registry_schema" name="test_offline_pinned_behavior[patch2-EXTERNAL_RESOLUTION]" time="0.201" /><testcase classname="tests.f2.test_registry_schema" name="test_offline_pinned_behavior[patch3-FORMAT_NOT_PINNED]" time="0.303" /><testcase classname="tests.f2.test_registry_schema" name="test_offline_pinned_behavior[patch4-DYNAMIC_RESOLUTION]" time="0.269" /><testcase classname="tests.f2.test_registry_schema" name="test_local_resolution_and_missing_target_fail_closed" time="0.349" /><testcase classname="tests.f2.test_registry_schema" name="test_backend_identity_and_format_behavior" time="0.689" /><testcase classname="tests.f2.test_registry_schema" name="test_typed_reference_set_identity_includes_schema" time="0.001" /><testcase classname="tests.f3.test_m14_inventory" name="test_surface_key_and_record" time="0.004" /><testcase classname="tests.f3.test_m14_inventory" name="test_input_disposition_record_and_enum_separation" time="0.003" /><testcase classname="tests.f3.test_m14_inventory" name="test_scope_state_record_and_enum_separation" time="0.002" /><testcase classname="tests.f3.test_m14_inventory" name="test_inventory_revision_and_domain_separation" time="0.002" /><testcase classname="tests.f3.test_m14_inventory" name="test_terminal_accounting_validation" time="0.001" /><testcase classname="tests.f3.test_m14_inventory" name="test_m14_golden_vectors" time="0.169" /><testcase classname="tests.f3.test_m14_inventory" name="test_m14_gate_full_evaluation" time="0.035" /><testcase classname="tests.f3.test_m14_inventory" name="test_m14_schemas_with_layered_validator" time="0.891" /><testcase classname="tests.f3.test_m15_m16_coverage" name="test_invariant_and_no_backlink_cycle" time="0.001" /><testcase classname="tests.f3.test_m15_m16_coverage" name="test_materiality_assessment" time="0.001" /><testcase classname="tests.f3.test_m15_m16_coverage" name="test_coverage_obligation_and_input_history_requirement" time="0.002" /><testcase classname="tests.f3.test_m15_m16_coverage" name="test_coverage_obligation_qualification_and_single_waiver_authority" time="0.001" /><testcase classname="tests.f3.test_m15_m16_coverage" name="test_coverage_golden_vectors" time="0.098" /><testcase classname="tests.f3.test_m15_m16_coverage" name="test_adversarial_coverage_engine" time="0.006" /><testcase classname="tests.f3.test_m15_m16_coverage" name="test_coverage_schemas_with_layered_validator" time="0.107" /><testcase classname="tests.f3.test_m17_m18_hypothesis" name="test_discovery_opportunity_map" time="0.001" /><testcase classname="tests.f3.test_m17_m18_hypothesis" name="test_hypothesis_lifecycle_and_rejection_retention" time="0.008" /><testcase classname="tests.f3.test_m17_m18_hypothesis" name="test_hypothesis_confirmation_flow" time="0.001" /><testcase classname="tests.f3.test_m17_m18_hypothesis" name="test_adversarial_hypothesis_rules" time="0.001" /><testcase classname="tests.f3.test_m17_m18_hypothesis" name="test_hypothesis_schema_with_layered_validator" time="0.078" /><testcase classname="tests.f3.test_m19_experiment_execution" name="test_fr04_golden_vectors" time="0.013" /><testcase classname="tests.f3.test_m19_experiment_execution" name="test_experiment_spec_and_execution_binding" time="0.009" /><testcase classname="tests.f3.test_m19_experiment_execution" name="test_m19_schemas_with_layered_validator" time="0.136" /><testcase classname="tests.f3.test_m20_evidence_qualification" name="test_observation_creation" time="0.002" /><testcase classname="tests.f3.test_m20_evidence_qualification" name="test_shared_oracle_independence_rejection" time="0.002" /><testcase classname="tests.f3.test_m20_evidence_qualification" name="test_evidence_qualification_and_applicability" time="0.006" /><testcase classname="tests.f3.test_m20_evidence_qualification" name="test_invalidation_propagation" time="0.002" /><testcase classname="tests.f3.test_m20_evidence_qualification" name="test_m20_schemas_with_layered_validator" time="0.117" /><testcase classname="tests.f3.test_m21_m22_adjudication" name="test_m21_golden_vectors" time="0.014" /><testcase classname="tests.f3.test_m21_m22_adjudication" name="test_finding_adjudication_flow" time="0.010" /><testcase classname="tests.f3.test_m21_m22_adjudication" name="test_finding_claim_successor_keeps_logical_identity_and_changes_revision_digest" time="0.002" /><testcase classname="tests.f3.test_m21_m22_adjudication" name="test_contradiction_and_majority_vote_forbidden" time="0.004" /><testcase classname="tests.f3.test_m21_m22_adjudication" name="test_m21_schemas_with_layered_validator" time="0.102" /><testcase classname="tests.f3.test_m23_projection" name="test_m23_derived_contribution_unique_support_leave_one_out" time="0.002" /><testcase classname="tests.f3.test_m23_projection" name="test_m23_projection_rebuild_determinism_and_no_canonical_mutation" time="0.001" /><testcase classname="tests.f3.test_m23_projection" name="test_m23_reject_contribution_as_canonical_authority" time="0.001" /><testcase classname="tests.f3.test_m24_stage_completion_stop" name="test_m24_schemas_validity" time="0.383" /><testcase classname="tests.f3.test_m24_stage_completion_stop" name="test_m24_stage_completion_happy_and_blocked" time="0.001" /><testcase classname="tests.f3.test_m24_stage_completion_stop" name="test_m24_intermediate_stop_happy_path_ends_continue_required" time="0.002" /><testcase classname="tests.f3.test_m24_stage_completion_stop" name="test_m24_intermediate_stop_forbids_pass_and_release_readiness" time="0.001" /><testcase classname="tests.f3.test_m25_reference_slice" name="test_foundation_reference_slice_end_to_end" time="9.444" /><testcase classname="tests.f3.test_m25_reference_slice" name="test_foundation_reference_slice_determinism" time="19.206" /><testcase classname="tests.f3.test_m25_reference_slice" name="test_store_rejects_completed_stage_without_required_results[lane_refs0-None-REFERENCE_CARDINALITY_MISMATCH]" time="9.270" /><testcase classname="tests.f3.test_m25_reference_slice" name="test_store_rejects_completed_stage_without_required_results[None-output_refs1-STAGE_COMPLETION_EXECUTION_EVIDENCE_REQUIRED]" time="8.399" /><testcase classname="tests.f3.test_m26_adversarial_failures" name="test_f1_contaminated_lane_rejects_blind_slot" time="0.001" /><testcase classname="tests.f3.test_m26_adversarial_failures" name="test_f2_missing_unknown_material_surface_blocks_stage_completion" time="0.001" /><testcase classname="tests.f3.test_m26_adversarial_failures" name="test_f3_shared_broken_oracle_rejects_independence" time="0.001" /><testcase classname="tests.f3.test_m26_adversarial_failures" name="test_f4_crash_and_idempotent_retry_exactly_one_accepted_effect" time="0.429" /><testcase classname="tests.f3.test_m26_adversarial_failures" name="test_f5_stale_predecessor_blocked_canonical_admission" time="0.199" /><testcase classname="tests.f3.test_m26_adversarial_failures" name="test_steady_state_stale_parent_head_fails_closed" time="0.579" /><testcase classname="tests.f3.test_m26_adversarial_failures" name="test_f6_invalidated_evidence_blocks_completion_until_replacement" time="8.631" /><testcase classname="tests.f3.test_m26_adversarial_failures" name="test_f7_insufficient_data_intermediate_stop_both_reasons" time="8.771" /><testcase classname="tests.f3.test_pr028_regressions" name="test_continuation_budget_authorization_none_legal_and_omitted" time="9.137" /><testcase classname="tests.f3.test_pr028_regressions" name="test_continuation_budget_authorization_real_accepted_legal" time="9.216" /><testcase classname="tests.f3.test_pr028_regressions" name="test_continuation_budget_authorization_dangling_rejected" time="8.852" /><testcase classname="tests.f3.test_pr028_regressions" name="test_continuation_budget_authorization_wrong_kind_rejected" time="8.726" /><testcase classname="tests.f3.test_pr028_regressions" name="test_stop_input_snapshot_valid_same_commit_pass" time="8.509" /><testcase classname="tests.f3.test_pr028_regressions" name="test_stop_input_snapshot_dangling_rejected" time="8.300" /><testcase classname="tests.f3.test_pr028_regressions" name="test_stop_input_snapshot_wrong_kind_rejected" time="8.701" /><testcase classname="tests.f3.test_pr028_regressions" name="test_stop_input_snapshot_stale_head_conflict" time="8.572" /><testcase classname="tests.f3.test_pr028_regressions" name="test_stop_input_snapshot_missing_projection_input_conflict" time="8.812" /><testcase classname="tests.f3.test_pr028_regressions" name="test_stop_input_snapshot_extra_projection_input_conflict" time="8.157" /><testcase classname="tests.f3.test_pr028_regressions" name="test_schema_binding_snapshot_and_budget_optionality" time="0.177" /><testcase classname="tests.f3.test_r5n15_prior_accepted_boundary" name="test_generic_prior_accepted_same_commit_uses_r5n15_error" time="0.090" /><testcase classname="tests.f3.test_r5n15_prior_accepted_boundary" name="test_content_or_prior_same_commit_remains_content_dag_legal" time="0.090" /><testcase classname="tests.f3.test_r5n15_prior_accepted_boundary" name="test_reference_slice_accepts_knowledge_before_discovery" time="10.415" /><testcase classname="tests.f3.test_r5n15_prior_accepted_boundary" name="test_fabricated_canonical_prior_ref_is_rejected" time="10.053" /><testcase classname="tests.f3.test_r5n15_prior_accepted_boundary" name="test_orphan_object_row_is_not_prior_acceptance_evidence" time="8.320" /><testcase classname="tests.workflow.test_settings" name="test_settings_default_values" time="0.001" /><testcase classname="tests.workflow.test_settings" name="test_settings_persistence_across_reloads" time="0.004" /><testcase classname="tests.workflow.test_settings" name="test_github_repo_remembered_until_explicitly_changed" time="0.015" /><testcase classname="tests.workflow.test_settings" name="test_invalid_corrupted_config_fails_safe_to_defaults" time="0.010" /><testcase classname="tests.workflow.test_settings" name="test_atomic_save_leaves_no_temporary_garbage" time="0.003" /><testcase classname="tests.workflow.test_settings" name="test_no_credential_fields_in_persisted_settings" time="0.002" /><testcase classname="tests.workflow.test_settings" name="test_campaign_locator_recording" time="0.006" /><testcase classname="tests.workflow.test_platform" name="test_mock_platform_adapter_records_clipboard_and_explorer" time="0.002" /><testcase classname="tests.workflow.test_platform" name="test_mock_platform_adapter_queued_multi_select" time="0.001" /><testcase classname="tests.workflow.test_platform" name="test_generic_platform_adapter_fallbacks" time="0.002" /><testcase classname="tests.workflow.test_platform" name="test_windows_platform_adapter_handles_missing_file_gracefully" time="0.011" /><testcase classname="tests.f8.test_m46_build" name="test_m46_build_reproducibility" time="0.594"><failure message="PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmprfizxo_u'">def test_m46_build_reproducibility():
+        """Hard requirement: same input -&gt; exact same bytes and SHA256."""
+        with tempfile.TemporaryDirectory() as td:
+            p1 = Path(td) / "build1.py"
+            p2 = Path(td) / "build2.py"
+&gt;           _, sha1, sz1 = build_standalone(p1)
+                           ^^^^^^^^^^^^^^^^^^^^
+
+tests\f8\test_m46_build.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+build\build_single_file.py:552: in build_standalone
+    output_path.write_bytes(script_bytes)
+C:\Python314\Lib\pathlib\__init__.py:796: in write_bytes
+    with self.open(mode='wb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/Skarabeusz/AppData/Local/Temp/tmprfizxo_u/build1.py')
+mode = 'wb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       PermissionError: [Errno 13] Permission denied: 'C:\\Users\\Skarabeusz\\AppData\\Local\\Temp\\tmprfizxo_u\\build1.py'
+
+C:\Python314\Lib\pathlib\__init__.py:771: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+top = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmprfizxo_u', topdown = False
+onerror = &lt;function _rmtree_unsafe.&lt;locals&gt;.onerror at 0x000001D6E5909380&gt;
+followlinks = &lt;object object at 0x000001D6DF7D0210&gt;
+
+&gt;   ???
+E   PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmprfizxo_u'
+
+&lt;frozen os&gt;:377: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+    def test_m46_build_reproducibility():
+        """Hard requirement: same input -&gt; exact same bytes and SHA256."""
+&gt;       with tempfile.TemporaryDirectory() as td:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\f8\test_m46_build.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\tempfile.py:971: in __exit__
+    self.cleanup()
+C:\Python314\Lib\tempfile.py:975: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+C:\Python314\Lib\tempfile.py:955: in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+C:\Python314\Lib\shutil.py:852: in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+C:\Python314\Lib\shutil.py:689: in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+&lt;frozen os&gt;:413: in walk
+    ???
+C:\Python314\Lib\shutil.py:687: in onerror
+    onexc(os.scandir, err.filename, err)
+C:\Python314\Lib\tempfile.py:927: in onexc
+    _resetperms(path)
+C:\Python314\Lib\tempfile.py:283: in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+func = &lt;built-in function chmod&gt;
+path = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmprfizxo_u', args = (448,)
+
+    def _dont_follow_symlinks(func, path, *args):
+        # Pass follow_symlinks=False, unless not supported on this platform.
+        if func in _os.supports_follow_symlinks:
+&gt;           func(path, *args, follow_symlinks=False)
+E           PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmprfizxo_u'
+
+C:\Python314\Lib\tempfile.py:272: PermissionError</failure></testcase><testcase classname="tests.f8.test_m46_build" name="test_m46_manifest_and_payload_contents" time="0.088" /><testcase classname="tests.f8.test_m46_build" name="test_m46_no_absolute_machine_paths" time="0.618"><failure message="PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpf_wcpmk5'">def test_m46_no_absolute_machine_paths():
+        """Standalone script must contain no machine-specific absolute paths."""
+        with tempfile.TemporaryDirectory() as td:
+            out_file = Path(td) / "test_standalone.py"
+&gt;           build_standalone(out_file)
+
+tests\f8\test_m46_build.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+build\build_single_file.py:552: in build_standalone
+    output_path.write_bytes(script_bytes)
+C:\Python314\Lib\pathlib\__init__.py:796: in write_bytes
+    with self.open(mode='wb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/Skarabeusz/AppData/Local/Temp/tmpf_wcpmk5/test_standalone.py')
+mode = 'wb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       PermissionError: [Errno 13] Permission denied: 'C:\\Users\\Skarabeusz\\AppData\\Local\\Temp\\tmpf_wcpmk5\\test_standalone.py'
+
+C:\Python314\Lib\pathlib\__init__.py:771: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+top = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpf_wcpmk5', topdown = False
+onerror = &lt;function _rmtree_unsafe.&lt;locals&gt;.onerror at 0x000001D6E5909590&gt;
+followlinks = &lt;object object at 0x000001D6DF7D0210&gt;
+
+&gt;   ???
+E   PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpf_wcpmk5'
+
+&lt;frozen os&gt;:377: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+    def test_m46_no_absolute_machine_paths():
+        """Standalone script must contain no machine-specific absolute paths."""
+&gt;       with tempfile.TemporaryDirectory() as td:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\f8\test_m46_build.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\tempfile.py:971: in __exit__
+    self.cleanup()
+C:\Python314\Lib\tempfile.py:975: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+C:\Python314\Lib\tempfile.py:955: in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+C:\Python314\Lib\shutil.py:852: in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+C:\Python314\Lib\shutil.py:689: in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+&lt;frozen os&gt;:413: in walk
+    ???
+C:\Python314\Lib\shutil.py:687: in onerror
+    onexc(os.scandir, err.filename, err)
+C:\Python314\Lib\tempfile.py:927: in onexc
+    _resetperms(path)
+C:\Python314\Lib\tempfile.py:283: in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+func = &lt;built-in function chmod&gt;
+path = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpf_wcpmk5', args = (448,)
+
+    def _dont_follow_symlinks(func, path, *args):
+        # Pass follow_symlinks=False, unless not supported on this platform.
+        if func in _os.supports_follow_symlinks:
+&gt;           func(path, *args, follow_symlinks=False)
+E           PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpf_wcpmk5'
+
+C:\Python314\Lib\tempfile.py:272: PermissionError</failure></testcase><testcase classname="tests.f8.test_m46_build" name="test_m46_standalone_verification_and_tamper_detection" time="0.631"><failure message="PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmp7y9ndk9p'">def test_m46_standalone_verification_and_tamper_detection():
+        """Standalone script verifies payload and fails closed on tampering."""
+        import subprocess
+        import sys
+    
+        with tempfile.TemporaryDirectory() as td:
+            out_file = Path(td) / "test_standalone.py"
+&gt;           build_standalone(out_file)
+
+tests\f8\test_m46_build.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+build\build_single_file.py:552: in build_standalone
+    output_path.write_bytes(script_bytes)
+C:\Python314\Lib\pathlib\__init__.py:796: in write_bytes
+    with self.open(mode='wb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/Skarabeusz/AppData/Local/Temp/tmp7y9ndk9p/test_standalone.py')
+mode = 'wb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       PermissionError: [Errno 13] Permission denied: 'C:\\Users\\Skarabeusz\\AppData\\Local\\Temp\\tmp7y9ndk9p\\test_standalone.py'
+
+C:\Python314\Lib\pathlib\__init__.py:771: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+top = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmp7y9ndk9p', topdown = False
+onerror = &lt;function _rmtree_unsafe.&lt;locals&gt;.onerror at 0x000001D6E5909F30&gt;
+followlinks = &lt;object object at 0x000001D6DF7D0210&gt;
+
+&gt;   ???
+E   PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmp7y9ndk9p'
+
+&lt;frozen os&gt;:377: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+    def test_m46_standalone_verification_and_tamper_detection():
+        """Standalone script verifies payload and fails closed on tampering."""
+        import subprocess
+        import sys
+    
+&gt;       with tempfile.TemporaryDirectory() as td:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\f8\test_m46_build.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\tempfile.py:971: in __exit__
+    self.cleanup()
+C:\Python314\Lib\tempfile.py:975: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+C:\Python314\Lib\tempfile.py:955: in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+C:\Python314\Lib\shutil.py:852: in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+C:\Python314\Lib\shutil.py:689: in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+&lt;frozen os&gt;:413: in walk
+    ???
+C:\Python314\Lib\shutil.py:687: in onerror
+    onexc(os.scandir, err.filename, err)
+C:\Python314\Lib\tempfile.py:927: in onexc
+    _resetperms(path)
+C:\Python314\Lib\tempfile.py:283: in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+func = &lt;built-in function chmod&gt;
+path = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmp7y9ndk9p', args = (448,)
+
+    def _dont_follow_symlinks(func, path, *args):
+        # Pass follow_symlinks=False, unless not supported on this platform.
+        if func in _os.supports_follow_symlinks:
+&gt;           func(path, *args, follow_symlinks=False)
+E           PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmp7y9ndk9p'
+
+C:\Python314\Lib\tempfile.py:272: PermissionError</failure></testcase><testcase classname="tests.f8.test_m46_standalone_clean_env" name="test_standalone_payload_contains_pinned_runtime_closure" time="0.153" /><testcase classname="tests.f8.test_m46_standalone_clean_env" name="test_standalone_runs_in_clean_isolated_python_without_jsonschema_installed" time="0.513"><failure message="PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpz3ldxj2c'">def test_standalone_runs_in_clean_isolated_python_without_jsonschema_installed():
+        """The exact release defect: clean host import fails, embedded runtime succeeds."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            artifact = root / "BDB_AUDIT_ASSISTANT_v2.0.3.py"
+            venv_dir = root / "clean_venv"
+&gt;           build_standalone(artifact)
+
+tests\f8\test_m46_standalone_clean_env.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+build\build_single_file.py:552: in build_standalone
+    output_path.write_bytes(script_bytes)
+C:\Python314\Lib\pathlib\__init__.py:796: in write_bytes
+    with self.open(mode='wb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/Skarabeusz/AppData/Local/Temp/tmpz3ldxj2c/BDB_AUDIT_ASSISTANT_v2.0.3.py')
+mode = 'wb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       PermissionError: [Errno 13] Permission denied: 'C:\\Users\\Skarabeusz\\AppData\\Local\\Temp\\tmpz3ldxj2c\\BDB_AUDIT_ASSISTANT_v2.0.3.py'
+
+C:\Python314\Lib\pathlib\__init__.py:771: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+top = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpz3ldxj2c', topdown = False
+onerror = &lt;function _rmtree_unsafe.&lt;locals&gt;.onerror at 0x000001D6E586FCC0&gt;
+followlinks = &lt;object object at 0x000001D6DF7D0210&gt;
+
+&gt;   ???
+E   PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpz3ldxj2c'
+
+&lt;frozen os&gt;:377: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+    def test_standalone_runs_in_clean_isolated_python_without_jsonschema_installed():
+        """The exact release defect: clean host import fails, embedded runtime succeeds."""
+&gt;       with tempfile.TemporaryDirectory() as td:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\f8\test_m46_standalone_clean_env.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\tempfile.py:971: in __exit__
+    self.cleanup()
+C:\Python314\Lib\tempfile.py:975: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+C:\Python314\Lib\tempfile.py:955: in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+C:\Python314\Lib\shutil.py:852: in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+C:\Python314\Lib\shutil.py:689: in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+&lt;frozen os&gt;:413: in walk
+    ???
+C:\Python314\Lib\shutil.py:687: in onerror
+    onexc(os.scandir, err.filename, err)
+C:\Python314\Lib\tempfile.py:927: in onexc
+    _resetperms(path)
+C:\Python314\Lib\tempfile.py:283: in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+func = &lt;built-in function chmod&gt;
+path = 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpz3ldxj2c', args = (448,)
+
+    def _dont_follow_symlinks(func, path, *args):
+        # Pass follow_symlinks=False, unless not supported on this platform.
+        if func in _os.supports_follow_symlinks:
+&gt;           func(path, *args, follow_symlinks=False)
+E           PermissionError: [WinError 5] Odmowa dostępu: 'C:\\Users\\SKARAB~1\\AppData\\Local\\Temp\\tmpz3ldxj2c'
+
+C:\Python314\Lib\tempfile.py:272: PermissionError</failure></testcase><testcase classname="tests.f8.test_runtime_build_input_closure" name="test_declared_runtime_input_cannot_disappear[absent]" time="0.004" /><testcase classname="tests.f8.test_runtime_build_input_closure" name="test_declared_runtime_input_cannot_disappear[directory]" time="0.003" /><testcase classname="tests.f8.test_runtime_build_input_closure" name="test_declared_runtime_files_retained_and_transport_exclusions_preserved" time="0.006" /><testcase classname="tests.f8.test_distribution_provenance" name="test_generated_versioned_standalones_are_not_tracked" time="0.057" /><testcase classname="tests.f8.test_distribution_provenance" name="test_generated_versioned_standalones_are_ignored" time="0.001" /><testcase classname="tests.f8.test_distribution_provenance" name="test_dist_readme_declares_release_authority_boundary" time="0.001" /><testcase classname="tests.f8.test_ru09_report_builder" name="test_report_is_deterministic_and_bound_to_exact_current_cut" time="0.896" /><testcase classname="tests.f8.test_ru09_report_builder" name="test_report_tracks_new_accepted_history_without_rewriting_prior_projection" time="1.301" /><testcase classname="tests.f8.test_ru09_report_builder" name="test_unknown_extraction_is_explicit_and_deterministic" time="0.001" /><testcase classname="tests.f8.test_ru09_report_builder" name="test_report_validation_rejects_duplicate_accepted_fact" time="0.742" /><testcase classname="tests.f8.test_ru09_report_builder" name="test_report_reference_validation_fails_closed_on_dangling_ref" time="0.634" /><testcase classname="tests.f8.test_ru09_report_builder" name="test_report_cannot_claim_full_assurance_by_default" time="0.969" /><testcase classname="tests.f8.test_ru09_remediation_bundle" name="test_root_cause_planner_keeps_all_symptoms_and_stays_proposed" time="0.001" /><testcase classname="tests.f8.test_ru09_remediation_bundle" name="test_remediation_cycle_is_rejected" time="0.001" /><testcase classname="tests.f8.test_ru09_remediation_bundle" name="test_q09_requires_repair_unit_for_explicit_p0_p1" time="0.545" /><testcase classname="tests.f8.test_ru09_remediation_bundle" name="test_markdown_and_html_escape_untrusted_payload" time="0.002" /><testcase classname="tests.f8.test_ru09_remediation_bundle" name="test_bundle_is_deterministic_and_detects_tamper" time="1.256" /><testcase classname="tests.f8.test_ru09_remediation_bundle" name="test_full_assurance_export_is_blocked_on_incomplete_campaign" time="0.691" /><testcase classname="tests.f8.test_ru09_cli" name="test_report_bundle_cli_export_and_verify" time="1.209" /><testcase classname="tests.f8.test_ru09_cli" name="test_single_report_formats_are_available" time="2.252" /><testcase classname="tests.f8.test_ru09_cli" name="test_remediation_cli_exports_only_proposed_plan_and_validates_it" time="1.250" /><testcase classname="tests.f8.test_ru09_cli" name="test_full_assurance_cli_refuses_incomplete_campaign" time="0.901" /></testsuite></testsuites>

@@ -1,0 +1,71 @@
+{
+  "git_directory_file_bytes": 255338359,
+  "files_removed": 2752,
+  "logical_bytes_removed": 262233104,
+  "worktree_file_bytes_removed": 262233104,
+  "before_tree_logical_bytes": 7083918754,
+  "tree_logical_bytes_after_deletions_before_product_additions": 6821685650,
+  "archival_identity_verified_all_blobs": true,
+  "git_restore_samples_verified": [
+    {
+      "path": "docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/3ae872fbca66d04a4b21fe878c4c1f3c4c5b7c5e1fc5279e241ecb187ebae9e4/payload_schemas/BUILD_PROVENANCE_RECEIPT_V2.schema.json",
+      "git_blob_sha": "33dae24246fb33258e17c744cb5e8d9ab23009c2",
+      "bytes": 99939,
+      "worktree_bytes": 99939,
+      "sha256": "7b3d1de72ed6d3267a39712ceb49298f05f54ca29fdd994dede6bde80714b625",
+      "archive_commit": "f23dbedccb6dca9d23f41830e282e814e550bca1",
+      "classification": "SAFE_TO_REMOVE",
+      "archived_in_commit": "f23dbedccb6dca9d23f41830e282e814e550bca1",
+      "reason": "Obsolete generated build copy; no active runtime/test/build or current readback dependency. Original snapshot manifest remains bound to pinned archive commit.",
+      "restore_command": "git -c core.longpaths=true restore --source=f23dbedccb6dca9d23f41830e282e814e550bca1 --worktree -- 'docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/3ae872fbca66d04a4b21fe878c4c1f3c4c5b7c5e1fc5279e241ecb187ebae9e4/payload_schemas/BUILD_PROVENANCE_RECEIPT_V2.schema.json'"
+    },
+    {
+      "path": "docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/a0be05d997537b8b0830a01fa7a967b2e8ed769ebf57d690d8b31716c8bae419/schemas/view_manifest__2.schema.json",
+      "git_blob_sha": "7223065c505f1d09b5fb6ada497b32846bf00fb4",
+      "bytes": 99925,
+      "worktree_bytes": 99925,
+      "sha256": "be2f0969d87b8fd507c4cd29e39ef3b3aa60ea917b64641b68dc64f9c83d526f",
+      "archive_commit": "f23dbedccb6dca9d23f41830e282e814e550bca1",
+      "classification": "SAFE_TO_REMOVE",
+      "archived_in_commit": "f23dbedccb6dca9d23f41830e282e814e550bca1",
+      "reason": "Obsolete generated build copy; no active runtime/test/build or current readback dependency. Original snapshot manifest remains bound to pinned archive commit.",
+      "restore_command": "git -c core.longpaths=true restore --source=f23dbedccb6dca9d23f41830e282e814e550bca1 --worktree -- 'docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/a0be05d997537b8b0830a01fa7a967b2e8ed769ebf57d690d8b31716c8bae419/schemas/view_manifest__2.schema.json'"
+    },
+    {
+      "path": "docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/ffe285b90a95b315d30dd765143d6582b05f64b5acee32803c9c5a24444a8d3a/schemas/view_manifest__2.schema.json",
+      "git_blob_sha": "7223065c505f1d09b5fb6ada497b32846bf00fb4",
+      "bytes": 99925,
+      "worktree_bytes": 99925,
+      "sha256": "be2f0969d87b8fd507c4cd29e39ef3b3aa60ea917b64641b68dc64f9c83d526f",
+      "archive_commit": "f23dbedccb6dca9d23f41830e282e814e550bca1",
+      "classification": "SAFE_TO_REMOVE",
+      "archived_in_commit": "f23dbedccb6dca9d23f41830e282e814e550bca1",
+      "reason": "Obsolete generated build copy; no active runtime/test/build or current readback dependency. Original snapshot manifest remains bound to pinned archive commit.",
+      "restore_command": "git -c core.longpaths=true restore --source=f23dbedccb6dca9d23f41830e282e814e550bca1 --worktree -- 'docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/ffe285b90a95b315d30dd765143d6582b05f64b5acee32803c9c5a24444a8d3a/schemas/view_manifest__2.schema.json'"
+    }
+  ],
+  "git_restore_command": [
+    "git",
+    "-c",
+    "core.longpaths=true",
+    "--git-dir=C:\\Projekty\\Audyty\\BDB Audit\\.git",
+    "--work-tree=C:\\Projekty\\Audyty\\BDB Audit\\.product-smoke\\r-81a80c16",
+    "restore",
+    "--source=f23dbedccb6dca9d23f41830e282e814e550bca1",
+    "--worktree",
+    "--",
+    "docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/3ae872fbca66d04a4b21fe878c4c1f3c4c5b7c5e1fc5279e241ecb187ebae9e4/payload_schemas/BUILD_PROVENANCE_RECEIPT_V2.schema.json",
+    "docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/a0be05d997537b8b0830a01fa7a967b2e8ed769ebf57d690d8b31716c8bae419/schemas/view_manifest__2.schema.json",
+    "docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/ffe285b90a95b315d30dd765143d6582b05f64b5acee32803c9c5a24444a8d3a/schemas/view_manifest__2.schema.json"
+  ],
+  "restore_environment": {
+    "GIT_INDEX_FILE": "separate scratch index"
+  },
+  "original_untracked_sha256_verified": 8,
+  "original_untracked_directories_unchanged_mtime": true,
+  "review_and_main_unchanged": true,
+  "git_count_objects_after": "count: 0\nsize: 0\nin-pack: 8756\npacks: 4\nsize-pack: 247579\nprune-packable: 0\ngarbage: 8\nsize-garbage: 277\n",
+  "git_object_store_reduction": "NONE; history retained; object-store size-pack reported in KiB",
+  "complete_git_directory_size": "sum of current .git file lengths; not filesystem allocation",
+  "full_clone_reduction": "not promised"
+}

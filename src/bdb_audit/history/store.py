@@ -16,6 +16,7 @@ from ..core.canonical_json import canonical_bytes, parse
 from ..core.errors import ValidationError
 from ..core.hashing import object_digest
 from ..core.registry import ContractRegistry, canonical_reference_set
+from ..product_safety import EXTERNAL_RESULT_KINDS, require_external_ingestion_authority
 from ..schemas.foundation import ALL_EXECUTABLE_KINDS, F2_KINDS, F3_KINDS, M5_KINDS, foundation_schema_bindings
 from .closure import canonical_order, ClosureNode
 from .objects import (
@@ -154,6 +155,7 @@ class TransactionalHistoryStore:
             con.close()
 
     def issue_ingestion_capability(self, body: dict[str, Any], *, batch_ticket: str | None = None) -> str:
+        require_external_ingestion_authority()
         if not batch_ticket or not isinstance(batch_ticket, str):
             raise ValidationError("UNAUTHORIZED_PRODUCER_AUTHORITY", "Valid batch ticket required to issue ingestion capability")
 
@@ -921,6 +923,10 @@ class TransactionalHistoryStore:
         objects = list(immutable_objects)
         if any(not isinstance(o, CanonicalObject) for o in objects):
             raise ValidationError("OBJECT_REQUIRED")
+        if command.command_kind == "INGEST_EXTERNAL_LANE_RESULT" or any(
+            obj.kind in EXTERNAL_RESULT_KINDS for obj in objects
+        ):
+            require_external_ingestion_authority()
         command_obj = command.as_object()
         if not any(isinstance(o, CanonicalObject) and o.digest == command_obj.digest for o in objects):
             objects.insert(0, command_obj)

@@ -1,0 +1,30 @@
+# CLEANUP PLAN — PRODUCT-V1
+
+Archive: `f23dbedccb6dca9d23f41830e282e814e550bca1`; remote review ref verified with git ls-remote. Main/review are immutable. SAFE_TO_REMOVE: 2752 exact files, 262233104 bytes, 10 obsolete generated build directories. Full path list, Git IDs, SHA256, restoration commands and verification: CLEANUP_REMOVAL_MANIFEST.json.
+
+Only old build copies referenced solely by the immutable original REVIEW_SNAPSHOT_MANIFEST are archived. That manifest continues to describe `f23dbedccb6dca9d23f41830e282e814e550bca1`, not the product tree; its references are explicitly `archived_in_commit` in the product removal manifest. All files were recovered via git cat-file, Git blob ID and SHA256 verified, and compared with every worktree file. No original evidence is destroyed. No active runtime/src/tests/build/.github/pyproject reference was found by rg. Dynamic build_time_candidates tool uses current BUILD_TIME_CANDIDATE_READBACK and generates its destination by current input digest; all its active readback sets and dependencies remain present. Historical formal reports are evaluated from the archive commit.
+
+SAFE_TO_REMOVE directories:
+- `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/3ae872fbca66d04a4b21fe878c4c1f3c4c5b7c5e1fc5279e241ecb187ebae9e4/` (277 files, 26327477 bytes).
+- `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/6149465ae7e62b583d30952e2ff34eead1f6c1342c76515321b018c7df628729/` (275 files, 26308792 bytes).
+- `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/75aced7227c08da5a8907609b40921b60c5d456b14d01e14d03a7d5bcb2ac6bc/` (275 files, 25811428 bytes).
+- `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/9d79b934735cba132d1c3f3964263111416d60e5a2d4513471dce5b66589793e/` (275 files, 26308226 bytes).
+- `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/a0be05d997537b8b0830a01fa7a967b2e8ed769ebf57d690d8b31716c8bae419/` (275 files, 26216105 bytes).
+- `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/b0e0970f98f3601a0f5ee50e5187927ebe9fceca38efd8657e58907d03cfefb7/` (275 files, 26215569 bytes).
+- `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/bdc75e33a27e9f117a83d872a1d86cb5aaf901d4bf299ecb5e3c638eef914b8f/` (275 files, 26216105 bytes).
+- `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/d48910ba617e5e44620a760f72f829e38d628b8552d76d19c0177e45db834715/` (275 files, 26304691 bytes).
+- `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/e30489d2429c0fe0904a759f7a78d75172a74f7b2cd2b93a4430b6a9cd4c86f6/` (275 files, 26216105 bytes).
+- `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/ffe285b90a95b315d30dd765143d6582b05f64b5acee32803c9c5a24444a8d3a/` (275 files, 26308606 bytes).
+
+- KEEP `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/2f251b82a63e026a8c49a1caacde36aa9bbfcc00fb4341469f1e0d57032e1e72/`: 277 files, 26327477 bytes; active references: docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json, docs/R5_4_2/autonomous_2026_10_07/NF02_Q1_IMPACT_MATRIX.json, docs/R5_4_2/autonomous_2026_10_07/OPT4_CURRENT_WITNESS_BINDINGS.json.
+- KEEP `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/333b137bd402941e9c6b05dfd105a74e129fff8db7ec7ce4e1d9a3122078490a/`: 277 files, 26428340 bytes; active references: docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json, docs/R5_4_2/autonomous_2026_10_07/ACTIVE_EXECUTION_STATE.md, docs/R5_4_2/autonomous_2026_10_07/BUILD_SCHEMA_FIXTURE_READBACK.json, docs/R5_4_2/autonomous_2026_10_07/BUILD_TIME_CANDIDATE_READBACK.json, docs/R5_4_2/autonomous_2026_10_07/DRAFT_VERIFICATION.json, docs/R5_4_2/autonomous_2026_10_07/INITIAL_PROTOCOL_BUILD_READBACK.json, docs/R5_4_2/autonomous_2026_10_07/NF02_Q1_IMPACT_MATRIX.json, docs/R5_4_2/autonomous_2026_10_07/SCHEMA_REGISTRY_BUILD_READBACK.json, docs/R5_4_2/autonomous_2026_10_07/SOURCE_PROFILE_BUILD_READBACK.json.
+- KEEP `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/7a8aaee05b40160ba0fa906783596098558d53e01813daa0d791d845d09053c1/`: 275 files, 26243806 bytes; active references: docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json, docs/R5_4_2/autonomous_2026_10_07/OD037_AFFECTED_BUILD_VERIFICATION.json.
+- KEEP `docs/R5_4_2/autonomous_2026_10_07/build_time_candidate/dab5361967c377022ec2d5e3518c7a883901a298d65ed9d8a3e04319fe7e0a69/`: 277 files, 26421133 bytes; active references: docs/R5_4_2/REVIEW_SNAPSHOT_MANIFEST.json, docs/R5_4_2/autonomous_2026_10_07/ACTIVE_EXECUTION_STATE.md, docs/R5_4_2/autonomous_2026_10_07/NF02_Q1_IMPACT_MATRIX.json, docs/R5_4_2/autonomous_2026_10_07/PRE_FREEZE_CANDIDATE_PREFLIGHT.md.
+
+KEEP: src, tests, active build, .github, pyproject, legacy, F1-F8 qualifications, frozen normative sources, user untracked changes and raw/accepted evidence. KEEP checkpoint_history, normative_build_candidate, golden_build_candidate, build_schema_fixtures: identity-bearing formal inputs/references need more review; no blanket deletion. NEEDS_REVIEW: other duplicate groups and all unknown files. No deletion authorization inferred from their size.
+
+Rollback on a product working branch: `git -c core.longpaths=true restore --source=f23dbedccb6dca9d23f41830e282e814e550bca1 --worktree -- <exact path from manifest>`. To restore all removed files, pass the manifest paths via a NUL pathspec file and --pathspec-from-file/--pathspec-file-nul. Formal R5.4.2 workflow: create a separate checkout/worktree at the pinned archive; historical scripts and inputs there are complete. Gzip historical payloads: docs/R5_4_2/restore_review_evidence.py.
+
+After removal: product tests + all affected safe surfaces, Ruff, mypy, standalone build/release-validator/smoke; protected Git identity and untracked preservation checks. Reduction concerns file bytes in active worktree only. Git history retains blobs; .git and a full clone do not automatically shrink. Exact .git measurements and before/after tree sizes are recorded in CLEANUP_RESULT.json after execution.
+
+Test wykonanej komendy odtworzenia (oddzielny indeks, Windows longpaths, porównanie SHA256): `tools/verify_product_cleanup.py`; wynik `CLEANUP_RESULT.json`.

@@ -1,0 +1,42 @@
+{
+  "app_version": "2.0.3",
+  "artifact_path": "C:\\Projekty\\Audyty\\BDB Audit\\dist\\BDB_AUDIT_ASSISTANT_v2.0.3_PRODUCT_V1.py",
+  "build_id": "BDB-V2-STANDALONE-2.0.3",
+  "checks": {
+    "0_version_identity": "PASS",
+    "10_same_environment_rebuild_identity": "PASS",
+    "10b_clean_room_rebuild_identity": "NOT_RUN",
+    "1_startup_integrity": "PASS",
+    "2_embedded_registry_pin": "PASS",
+    "3_embedded_stagespec_definition_presence": "PASS",
+    "4_embedded_lanespec_definition_presence": "PASS",
+    "5_embedded_template_definition_presence": "PASS",
+    "6_payload_manifest": "PASS",
+    "7_exact_digests": "PASS",
+    "7b_embedded_runtime_closure": "PASS",
+    "8_self_test_isolated_embedded_runtime": "PASS",
+    "9_foundation_golden_vectors_pin": "PASS",
+    "9b_compatibility_corpus": "NOT_RUN"
+  },
+  "manifest_files_count": 397,
+  "qualification_scope": "LOCAL_ARTIFACT_VALIDATION",
+  "runtime_lock": {
+    "attrs": "26.1.0",
+    "jsonschema": "4.25.1",
+    "jsonschema-specifications": "2025.9.1",
+    "referencing": "0.37.0",
+    "rpds-py": "2026.6.3"
+  },
+  "runtime_platform": {
+    "implementation": "cpython",
+    "machine": "x86_64",
+    "python_major": 3,
+    "python_minor": 14,
+    "soabi": "cp314-win_amd64",
+    "system": "windows"
+  },
+  "sha256": "094065a8fc59efe7d1bba48343f842f480f8422fd21ee29c2117b15975a80ce5",
+  "size": 1503253,
+  "status": "PASS",
+  "validator_cli": "bdb_audit.release_validator_cli"
+}
